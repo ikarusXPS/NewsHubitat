@@ -1,0 +1,217 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  // Development: SQLite (default)
+  // Production: Set DATABASE_URL to PostgreSQL connection string
+  // Note: URL is defined in prisma.config.ts (Prisma 7+)
+  provider = "sqlite"
+}
+
+model NewsArticle {
+  id                String   @id
+  title             String
+  titleTranslated   String?  // JSON string: { de?: string, en?: string }
+  content           String
+  contentTranslated String?  // JSON string: { de?: string, en?: string }
+  summary           String?
+  originalLanguage  String
+  publishedAt       DateTime
+  url               String   @unique
+  imageUrl          String?
+  sentiment         String
+  sentimentScore    Float
+  perspective       String
+  topics            String   // JSON string: string[]
+  entities          String   // JSON string: string[]
+  translationQuality Float?
+  cached            Boolean  @default(false)
+  confidence        Int?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  source            NewsSource @relation(fields: [sourceId], references: [id])
+  sourceId          String
+
+  @@index([publishedAt])
+  @@index([perspective])
+  @@index([sentiment])
+  @@index([sourceId])
+}
+
+model NewsSource {
+  id           String   @id
+  name         String
+  country      String
+  region       String
+  language     String
+  politicalBias Float
+  reliability  Int
+  ownership    String
+  apiEndpoint  String?
+  rateLimit    Int
+  lastFetched  DateTime?
+  articles     NewsArticle[]
+
+  @@index([region])
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  createdAt    DateTime @default(now())
+  bookmarks    Bookmark[]
+  preferences  String?  // JSON string
+
+  // New relations for features
+  emailSubscription EmailSubscription?
+  userPersonas      UserPersona[]
+}
+
+model Bookmark {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  articleId String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, articleId])
+  @@index([userId])
+}
+
+model StoryCluster {
+  id              String   @id @default(cuid())
+  canonicalTitle  String
+  articles        String   // JSON string array of IDs
+  perspectives    String   // Comma separated or JSON
+  biasDistribution String  // JSON string
+  framingDifferences String // JSON string
+  significance    Float?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([createdAt])
+}
+
+// ============================================================================
+// EMAIL DIGEST FEATURE
+// ============================================================================
+
+model EmailSubscription {
+  id            String   @id @default(cuid())
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        String
+  email         String
+  frequency     String   // daily, weekly, realtime
+  regions       String   // JSON array of regions to include
+  topics        String   // JSON array of topics to include
+  minSeverity   String   @default("medium") // critical, high, medium, low
+  isActive      Boolean  @default(true)
+  lastSentAt    DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([userId])
+  @@index([frequency])
+  @@index([isActive])
+}
+
+model EmailDigest {
+  id            String   @id @default(cuid())
+  userId        String
+  articleIds    String   // JSON array of article IDs included
+  subject       String
+  htmlContent   String
+  sentAt        DateTime?
+  status        String   @default("pending") // pending, sent, failed
+  errorMessage  String?
+  createdAt     DateTime @default(now())
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// ============================================================================
+// AI PERSONAS FEATURE
+// ============================================================================
+
+model AIPersona {
+  id            String   @id @default(cuid())
+  name          String
+  description   String
+  systemPrompt  String   // The AI's personality/perspective prompt
+  icon          String?  // Emoji or icon identifier
+  color         String?  // Hex color for UI
+  isDefault     Boolean  @default(false)
+  isPublic      Boolean  @default(true) // Available to all users
+  createdBy     String?  // User ID if custom persona
+  usageCount    Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  userPersonas  UserPersona[]
+
+  @@index([isPublic])
+  @@index([isDefault])
+}
+
+model UserPersona {
+  id          String    @id @default(cuid())
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  persona     AIPersona @relation(fields: [personaId], references: [id], onDelete: Cascade)
+  personaId   String
+  isActive    Boolean   @default(false) // Currently selected persona
+  lastUsedAt  DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@unique([userId, personaId])
+  @@index([userId])
+}
+
+// ============================================================================
+// SOCIAL SHARING FEATURE
+// ============================================================================
+
+model SharedContent {
+  id            String   @id @default(cuid())
+  shareCode     String   @unique // Short unique code for URL
+  contentType   String   // article, cluster, comparison, digest
+  contentId     String   // ID of the shared content
+  title         String
+  description   String?
+  imageUrl      String?
+  createdBy     String?  // User ID if logged in
+  viewCount     Int      @default(0)
+  expiresAt     DateTime?
+  createdAt     DateTime @default(now())
+
+  clicks        ShareClick[]
+
+  @@index([shareCode])
+  @@index([contentType])
+  @@index([createdAt])
+}
+
+model ShareClick {
+  id            String   @id @default(cuid())
+  sharedContent SharedContent @relation(fields: [sharedContentId], references: [id], onDelete: Cascade)
+  sharedContentId String
+  platform      String   // twitter, facebook, linkedin, whatsapp, telegram, copy, email
+  referrer      String?
+  userAgent     String?
+  ipHash        String?  // Hashed IP for analytics (privacy-friendly)
+  createdAt     DateTime @default(now())
+
+  @@index([sharedContentId])
+  @@index([platform])
+  @@index([createdAt])
+}
