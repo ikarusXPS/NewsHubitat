@@ -52,6 +52,11 @@ const EventMap = lazy(() => import('./pages/EventMap').then(m => ({ default: m.E
 const Community = lazy(() => import('./pages/Community').then(m => ({ default: m.Community })));
 const Profile = lazy(() => import('./pages/Profile').then(m => ({ default: m.Profile })));
 
+// Auth pages (public - no auth required)
+const VerifyEmail = lazy(() => import('./pages/VerifyEmail'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
+
 // Loading fallback component - Cyber style
 function PageLoader() {
   return (
@@ -109,6 +114,10 @@ function AppRoutes() {
             <Route path="/community" element={<Community />} />
             <Route path="/bookmarks" element={<Bookmarks />} />
             <Route path="/profile" element={<Profile />} />
+            {/* Auth pages (public - no auth required) */}
+            <Route path="/verify-email" element={<VerifyEmail />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             {/* Settings as full page when accessed directly */}
             <Route path="/settings" element={<Settings />} />
           </Routes>
