@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Command, Trash2, Save, Download, Upload, Plus, X, User, LogOut, ChevronRight, Mail, Shield } from 'lucide-react';
+import { Command, Trash2, Save, Download, Upload, Plus, X, User, LogOut, ChevronRight, Mail, Shield, Loader2, Edit } from 'lucide-react';
 import { useAppStore } from '../store';
 import { useAuth } from '../contexts/AuthContext';
 import { cn, getRegionLabel } from '../lib/utils';
@@ -9,6 +9,7 @@ import { FOCUS_PRESETS } from '../config/focusPresets';
 import { PresetCard } from '../components/PresetCard';
 import { Toast } from '../components/Toast';
 import { ConfirmDialog } from '../components/ConfirmDialog';
+import { AvatarPicker } from '../components/profile/AvatarPicker';
 
 const ALL_REGIONS: PerspectiveRegion[] = [
   'afrika', 'alternative', 'asien', 'china', 'deutschland',
@@ -54,6 +55,13 @@ export function Settings() {
     const stored = localStorage.getItem('newshub-filter-presets');
     return stored ? JSON.parse(stored) : {};
   });
+
+  // Profile editing state per D-27
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [namePassword, setNamePassword] = useState('');
+  const [isUpdatingName, setIsUpdatingName] = useState(false);
+  const [showAvatarPicker, setShowAvatarPicker] = useState(false);
 
   // Toast state
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info'; isOpen: boolean }>({
@@ -267,6 +275,115 @@ export function Settings() {
           </div>
         )}
       </div>
+
+      {/* Profile Editing per D-27 */}
+      {isAuthenticated && user && (
+        <div className="rounded-lg border border-gray-700 bg-gray-800 p-4">
+          <h2 className="text-lg font-medium text-white mb-4 font-mono flex items-center gap-2">
+            <Edit className="h-5 w-5 text-[#00f0ff]" />
+            {language === 'de' ? 'Profil bearbeiten' : 'Edit Profile'}
+          </h2>
+
+          {/* Current Profile Display */}
+          <div className="flex items-center gap-4 mb-6">
+            <div className="h-16 w-16 rounded-xl bg-gradient-to-br from-[#00f0ff] to-[#bf00ff] flex items-center justify-center text-white text-2xl font-bold">
+              {user?.name?.charAt(0).toUpperCase() || 'U'}
+            </div>
+            <div>
+              <p className="text-white font-medium">{user?.name}</p>
+              <p className="text-gray-500 text-sm">{user?.email}</p>
+            </div>
+          </div>
+
+          {/* Change Avatar Button */}
+          <button
+            onClick={() => setShowAvatarPicker(true)}
+            className="w-full mb-4 py-2 rounded-lg border border-gray-700 text-gray-300 hover:text-white hover:border-gray-600 transition-colors"
+          >
+            {language === 'de' ? 'Avatar andern' : 'Change Avatar'}
+          </button>
+
+          {/* Name Change with Password per D-28 */}
+          {!isEditingProfile ? (
+            <button
+              onClick={() => {
+                setIsEditingProfile(true);
+                setNewName(user?.name || '');
+              }}
+              className="btn-cyber px-4 py-2 rounded-lg text-sm"
+            >
+              {language === 'de' ? 'Namen andern' : 'Change Name'}
+            </button>
+          ) : (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">
+                  {language === 'de' ? 'Neuer Name' : 'New Name'}
+                </label>
+                <input
+                  type="text"
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  className="w-full rounded-lg bg-gray-700 px-4 py-2 text-white outline-none ring-1 ring-gray-600 focus:ring-[#00f0ff]"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">
+                  {language === 'de' ? 'Passwort bestatigen' : 'Confirm Password'}
+                </label>
+                <input
+                  type="password"
+                  value={namePassword}
+                  onChange={(e) => setNamePassword(e.target.value)}
+                  className="w-full rounded-lg bg-gray-700 px-4 py-2 text-white outline-none ring-1 ring-gray-600 focus:ring-[#00f0ff]"
+                />
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={async () => {
+                    setIsUpdatingName(true);
+                    try {
+                      const response = await fetch('/api/profile/name', {
+                        method: 'PUT',
+                        headers: {
+                          'Content-Type': 'application/json',
+                          Authorization: `Bearer ${localStorage.getItem('newshub-auth-token')}`,
+                        },
+                        body: JSON.stringify({ name: newName, currentPassword: namePassword }),
+                      });
+                      if (!response.ok) throw new Error('Failed to update');
+                      showToast(language === 'de' ? 'Name aktualisiert' : 'Name updated', 'success');
+                      setIsEditingProfile(false);
+                      setNamePassword('');
+                    } catch {
+                      showToast(language === 'de' ? 'Fehler beim Aktualisieren' : 'Failed to update', 'error');
+                    } finally {
+                      setIsUpdatingName(false);
+                    }
+                  }}
+                  disabled={isUpdatingName || !newName || !namePassword}
+                  className={cn(
+                    'btn-cyber btn-cyber-primary px-4 py-2 rounded-lg text-sm flex items-center gap-2',
+                    (isUpdatingName || !newName || !namePassword) && 'opacity-50 cursor-not-allowed'
+                  )}
+                >
+                  {isUpdatingName && <Loader2 className="h-4 w-4 animate-spin" />}
+                  {language === 'de' ? 'Speichern' : 'Save'}
+                </button>
+                <button
+                  onClick={() => {
+                    setIsEditingProfile(false);
+                    setNamePassword('');
+                  }}
+                  className="btn-cyber px-4 py-2 rounded-lg text-sm"
+                >
+                  {language === 'de' ? 'Abbrechen' : 'Cancel'}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Reading & Personalization Section per D-14, D-65 */}
       <div className="rounded-lg border border-gray-700 bg-gray-800 p-4">
@@ -741,6 +858,39 @@ export function Settings() {
         onConfirm={confirmDialog.onConfirm}
         onCancel={() => setConfirmDialog({ ...confirmDialog, isOpen: false })}
         variant="warning"
+      />
+
+      {/* Avatar Picker Modal */}
+      <AvatarPicker
+        isOpen={showAvatarPicker}
+        onClose={() => setShowAvatarPicker(false)}
+        onSave={async (presetId, file) => {
+          const token = localStorage.getItem('newshub-auth-token');
+          if (file) {
+            const formData = new FormData();
+            formData.append('avatar', file);
+            const response = await fetch('/api/profile/avatar/upload', {
+              method: 'POST',
+              headers: { Authorization: `Bearer ${token}` },
+              body: formData,
+            });
+            if (!response.ok) throw new Error('Upload failed');
+          } else if (presetId) {
+            const response = await fetch('/api/profile/avatar/preset', {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({ presetId }),
+            });
+            if (!response.ok) throw new Error('Update failed');
+          }
+          showToast(language === 'de' ? 'Avatar aktualisiert' : 'Avatar updated', 'success');
+        }}
+        currentPresetId={null}
+        articles={new Map()}
+        isVerified={user?.emailVerified === true}
       />
     </div>
   );
