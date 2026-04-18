@@ -43,7 +43,7 @@ async function callAIWithFallback(
       const response = await result.response;
       const text = response.text();
       if (text) return text;
-    } catch (err) {
+    } catch {
       logger.debug('Gemini failed, trying next provider');
     }
   }
@@ -66,7 +66,7 @@ async function callAIWithFallback(
       });
       const text = response.choices[0]?.message?.content;
       if (text) return text;
-    } catch (err) {
+    } catch {
       logger.debug('OpenRouter failed, trying next provider');
     }
   }
@@ -76,7 +76,8 @@ async function callAIWithFallback(
     try {
       const messages: Anthropic.MessageParam[] = [];
       if (conversationHistory && conversationHistory.length > 0) {
-        const recentHistory = conversationHistory.slice(-6);
+        // Limit to last 4 messages for token efficiency (already optimized by frontend)
+        const recentHistory = conversationHistory.slice(-4);
         messages.push(...recentHistory);
       }
       messages.push({ role: 'user', content: userPrompt });
@@ -104,8 +105,30 @@ interface ArticleContext {
   summary: string;
   source: string;
   perspective: string;
-  sentiment: string;
+  sentiment?: string; // Optional - frontend may omit for token savings
   url: string;
+}
+
+// Coverage gap detection (per D-04, D-05, D-06)
+// Exported for unit testing
+export function detectCoverageGap(context: ArticleContext[]): {
+  hasGap: boolean;
+  regionCount: number;
+  regions: string[];
+} {
+  const perspectives = context
+    .map(a => a.perspective)
+    .filter(p => typeof p === 'string' && p.length > 0);
+  const uniqueRegions = [...new Set(perspectives)];
+  const regionCount = uniqueRegions.length;
+  // Gap exists if we have sources but fewer than 3 regions (per D-05)
+  const hasGap = regionCount > 0 && regionCount < 3;
+  return { hasGap, regionCount, regions: uniqueRegions };
+}
+
+export function buildGapInstruction(hasGap: boolean, regionCount: number, regions: string[]): string {
+  if (!hasGap) return '';
+  return `\nHINWEIS: Die Quellen stammen nur aus ${regionCount} Region(en) (${regions.join(', ')}). Erwaehne am Ende deiner Antwort kurz, dass weitere Perspektiven hilfreich sein koennten.`;
 }
 
 interface ConversationMessage {
@@ -126,45 +149,32 @@ router.post('/ask', async (req, res) => {
       return res.status(400).json({ error: 'Question is required' });
     }
 
-    // Build context from articles
+    // Build compact context from articles (optimized for token efficiency)
     const articleContext = context
       .map(
         (a, i) =>
-          `[${i + 1}] "${a.title}" (${a.source}, ${a.perspective}, ${a.sentiment})\n${a.summary}`
+          `[${i + 1}] ${a.title} | ${a.source} (${a.perspective})\n${a.summary?.slice(0, 150) || ''}`
       )
       .join('\n\n');
 
-    const systemPrompt = `Du bist ein KI-Assistent für Nachrichtenanalyse zum Nahost-Konflikt.
-Du hast Zugang zu ${context.length} aktuellen Artikeln aus verschiedenen Perspektiven.
+    // Detect coverage gap (per D-04, D-05)
+    const { hasGap, regionCount, regions } = detectCoverageGap(context);
+    const gapInstruction = buildGapInstruction(hasGap, regionCount, regions);
 
-KRITISCH WICHTIG - ZITIER-REGELN:
-- Du MUSST für JEDE Behauptung eine Quelle angeben
-- Format: [1], [2], [3] etc. entsprechend der Artikel-Nummern
-- Mehrere Quellen für gleiche Info: [1][2][3]
-- NIEMALS Informationen ohne Zitat nennen
+    const systemPrompt = `Nachrichtenanalyse-Assistent. ${context.length} Artikel verfügbar.
 
-Beispiel guter Antwort:
-"Laut westlichen Quellen wurden Verhandlungen aufgenommen [1][3], während nahöstliche Medien von anhaltenden Spannungen berichten [2][5]. Die türkische Berichterstattung fokussiert auf diplomatische Bemühungen [4]."
+ZITIER-PFLICHT: Jede Aussage mit [1], [2] etc. belegen. Mehrere Quellen: [1][2][3].${gapInstruction}
 
-Deine Aufgaben:
-- Beantworte Fragen NUR basierend auf den bereitgestellten Artikeln
-- Vergleiche verschiedene Perspektiven objektiv
-- Weise auf Unterschiede in der Berichterstattung hin
-- Bleibe neutral und faktenbasiert
-- Bei widersprüchlichen Informationen: zeige beide Seiten mit jeweiligen Quellen
+Aufgaben: Fragen anhand der Artikel beantworten, Perspektiven vergleichen, Unterschiede aufzeigen, neutral bleiben.
 
-Antworte auf Deutsch, prägnant und hilfreich.`;
+Antworte auf Deutsch, prägnant.`;
 
-    const userPrompt = `ARTIKEL-KONTEXT:
+    const userPrompt = `ARTIKEL:
 ${articleContext}
 
 FRAGE: ${question}
 
-ANWEISUNG:
-Beantworte die Frage basierend AUSSCHLIESSLICH auf den obigen Artikeln.
-Du MUSST nach JEDER Aussage die Quellennummer(n) in eckigen Klammern angeben: [1], [2], etc.
-Wenn mehrere Artikel dieselbe Information liefern, gib alle an: [1][2][3]
-Vergleiche unterschiedliche Perspektiven und zeige deren Quellen.`;
+Antworte basierend auf den Artikeln. Zitiere mit [1], [2] etc.`;
 
     // Check if any AI provider is available
     if (!geminiClient && !openrouterClient && !anthropicClient) {
@@ -279,7 +289,7 @@ Analysiere diesen Artikel auf Propaganda-Indikatoren.`;
       } else {
         throw new Error('No JSON found in response');
       }
-    } catch (parseError) {
+    } catch {
       // Fallback response if parsing fails
       res.json({
         score: 50,
