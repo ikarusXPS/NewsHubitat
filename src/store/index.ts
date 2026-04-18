@@ -45,6 +45,10 @@ interface AppState {
   pauseHistory: () => void;
   resumeHistory: () => void;
 
+  // Personalization per D-14
+  isPersonalizationEnabled: boolean;
+  togglePersonalization: () => void;
+
   // Focus System & Onboarding
   hasCompletedOnboarding: boolean;
   activeFocusPreset: FocusPreset | null;
@@ -210,6 +214,11 @@ export const useAppStore = create<AppState>()(
       pauseHistory: () => set({ isHistoryPaused: true }),
       resumeHistory: () => set({ isHistoryPaused: false }),
 
+      // Personalization per D-14
+      isPersonalizationEnabled: true,
+      togglePersonalization: () =>
+        set((state) => ({ isPersonalizationEnabled: !state.isPersonalizationEnabled })),
+
       // Focus System & Onboarding
       hasCompletedOnboarding: false,
       activeFocusPreset: null,
@@ -369,6 +378,7 @@ export const useAppStore = create<AppState>()(
         bookmarkedArticles: state.bookmarkedArticles,
         readingHistory: state.readingHistory,
         isHistoryPaused: state.isHistoryPaused,
+        isPersonalizationEnabled: state.isPersonalizationEnabled,
         hasCompletedOnboarding: state.hasCompletedOnboarding,
         activeFocusPreset: state.activeFocusPreset,
         customPresets: state.customPresets,

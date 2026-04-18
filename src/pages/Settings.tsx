@@ -42,6 +42,11 @@ export function Settings() {
     deleteCustomPreset,
     readingHistory,
     clearReadingHistory,
+    isPersonalizationEnabled,
+    togglePersonalization,
+    isHistoryPaused,
+    pauseHistory,
+    resumeHistory,
   } = useAppStore();
 
   const [presetName, setPresetName] = useState('');
@@ -91,6 +96,7 @@ export function Settings() {
   };
 
   const deletePreset = (name: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { [name]: _, ...rest } = savedPresets;
     setSavedPresets(rest);
     localStorage.setItem('newshub-filter-presets', JSON.stringify(rest));
@@ -121,7 +127,7 @@ export function Settings() {
     reader.onload = (event) => {
       try {
         const settings = JSON.parse(event.target?.result as string);
-        if (settings.theme) theme !== settings.theme && toggleTheme();
+        if (settings.theme && theme !== settings.theme) toggleTheme();
         if (settings.language) setLanguage(settings.language);
         if (settings.commandPaletteEnabled !== undefined) setCommandPaletteEnabled(settings.commandPaletteEnabled);
         if (settings.presets) {
@@ -129,7 +135,7 @@ export function Settings() {
           localStorage.setItem('newshub-filter-presets', JSON.stringify(settings.presets));
         }
         showToast('Einstellungen erfolgreich importiert', 'success');
-      } catch (err) {
+      } catch {
         showToast('Fehler beim Importieren der Einstellungen', 'error');
       }
     };
@@ -260,6 +266,71 @@ export function Settings() {
             </button>
           </div>
         )}
+      </div>
+
+      {/* Reading & Personalization Section per D-14, D-65 */}
+      <div className="rounded-lg border border-gray-700 bg-gray-800 p-4">
+        <h2 className="text-lg font-medium text-white mb-4">
+          {language === 'de' ? 'Lesen & Personalisierung' : 'Reading & Personalization'}
+        </h2>
+
+        <div className="space-y-4">
+          {/* Personalization toggle per D-14 */}
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-white text-sm">
+                {language === 'de' ? 'Personalisierte Empfehlungen' : 'Personalized Recommendations'}
+              </p>
+              <p className="text-gray-500 text-xs">
+                {language === 'de'
+                  ? '"Für Dich"-Vorschläge basierend auf Leseverlauf'
+                  : '"For You" suggestions based on reading history'}
+              </p>
+            </div>
+            <button
+              onClick={togglePersonalization}
+              className={cn(
+                'relative w-12 h-6 rounded-full transition-colors',
+                isPersonalizationEnabled ? 'bg-[#00f0ff]' : 'bg-gray-700'
+              )}
+            >
+              <span
+                className={cn(
+                  'absolute top-1 w-4 h-4 rounded-full bg-white transition-transform',
+                  isPersonalizationEnabled ? 'left-7' : 'left-1'
+                )}
+              />
+            </button>
+          </div>
+
+          {/* History pause toggle per D-65 */}
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-white text-sm">
+                {language === 'de' ? 'Verlaufsverfolgung pausieren' : 'Pause History Tracking'}
+              </p>
+              <p className="text-gray-500 text-xs">
+                {language === 'de'
+                  ? 'Leseaktivität wird nicht aufgezeichnet'
+                  : 'Reading activity will not be recorded'}
+              </p>
+            </div>
+            <button
+              onClick={() => isHistoryPaused ? resumeHistory() : pauseHistory()}
+              className={cn(
+                'relative w-12 h-6 rounded-full transition-colors',
+                isHistoryPaused ? 'bg-[#ff6600]' : 'bg-gray-700'
+              )}
+            >
+              <span
+                className={cn(
+                  'absolute top-1 w-4 h-4 rounded-full bg-white transition-transform',
+                  isHistoryPaused ? 'left-7' : 'left-1'
+                )}
+              />
+            </button>
+          </div>
+        </div>
       </div>
 
       <div className="rounded-lg border border-gray-700 bg-gray-800 p-4 space-y-4">

@@ -10,6 +10,7 @@ import { TopKeywords } from './TopKeywords';
 import { MediaBiasBar } from './MediaBiasBar';
 import { SourceFilterBanner } from './SourceFilterBanner';
 import { BulkReadActions } from './BulkReadActions';
+import { ForYouCarousel } from './ForYouCarousel';
 import { useAppStore } from '../store';
 import { useCachedQuery } from '../hooks/useCachedQuery';
 import { cn } from '../lib/utils';
@@ -73,7 +74,7 @@ async function fetchNews(
 type TrendFilter = 'all' | 'escalation' | 'de-escalation';
 
 export function NewsFeed() {
-  const { filters, feedState, readState, markAsRead, markAsUnread, isArticleRead } = useAppStore();
+  const { filters, feedState, readState, markAsRead, markAsUnread, isArticleRead, isPersonalizationEnabled } = useAppStore();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [trendFilter, setTrendFilter] = useState<TrendFilter>('all');
   const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
@@ -126,7 +127,7 @@ export function NewsFeed() {
   }, [isArticleRead, markAsRead, markAsUnread]);
 
   // Memoize article processing to avoid recalculating on every render
-  const articles = data?.data || [];
+  const articles = useMemo(() => data?.data || [], [data?.data]);
 
   const { filteredArticles, escalationCount, deEscalationCount, criticalEvents, allArticleIds } = useMemo(() => {
     // Step 1: Filter by enabled sources
@@ -210,6 +211,9 @@ export function NewsFeed() {
     <div className="space-y-3">
       {/* Hero Section */}
       <HeroSection stats={heroStats} />
+
+      {/* For You Carousel per D-17 - after HeroSection */}
+      <ForYouCarousel enabled={isPersonalizationEnabled} />
 
       {/* Source Filter Banner */}
       <SourceFilterBanner sources={sources} />
