@@ -48,6 +48,7 @@ const MapView = lazy(() => import('./pages/MapView').then(m => ({ default: m.Map
 const Globe = lazy(() => import('./pages/Globe').then(m => ({ default: m.Globe })));
 const Monitor = lazy(() => import('./pages/Monitor').then(m => ({ default: m.Monitor })));
 const Bookmarks = lazy(() => import('./pages/Bookmarks').then(m => ({ default: m.Bookmarks })));
+const ReadingHistory = lazy(() => import('./pages/ReadingHistory').then(m => ({ default: m.ReadingHistory })));
 const Settings = lazy(() => import('./pages/Settings').then(m => ({ default: m.Settings })));
 const EventMap = lazy(() => import('./pages/EventMap').then(m => ({ default: m.EventMap })));
 const Community = lazy(() => import('./pages/Community').then(m => ({ default: m.Community })));
@@ -114,6 +115,7 @@ function AppRoutes() {
             <Route path="/events" element={<EventMap />} />
             <Route path="/community" element={<Community />} />
             <Route path="/bookmarks" element={<Bookmarks />} />
+            <Route path="/history" element={<ReadingHistory />} />
             <Route path="/profile" element={<Profile />} />
             {/* Auth pages (public - no auth required) */}
             <Route path="/verify-email" element={<VerifyEmail />} />

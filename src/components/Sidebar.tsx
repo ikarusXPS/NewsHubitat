@@ -8,6 +8,7 @@ import {
   Clock,
   Cpu,
   Globe2,
+  History,
   MapPin,
   Radio,
   Settings,
@@ -66,6 +67,7 @@ const navItems = [
   { to: '/community', icon: Users, label: 'Community', badge: 'new' },
   { to: '/analysis', icon: BarChart3, label: 'Analytics' },
   { to: '/timeline', icon: Clock, label: 'Timeline' },
+  { to: '/history', icon: History, label: 'History' },
   { to: '/bookmarks', icon: Bookmark, label: 'Saved' },
 ];
 
