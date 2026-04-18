@@ -16,7 +16,7 @@ export function MarketSparkline({
   height = 20,
   showArea = true,
 }: MarketSparklineProps) {
-  const { path, areaPath, isPositive } = useMemo(() => {
+  const { path, areaPath } = useMemo(() => {
     if (data.length < 2) {
       return { path: '', areaPath: '', isPositive: true };
     }

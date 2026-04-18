@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion';
-import { cn } from '../../lib/utils';
 
 interface TensionGaugeProps {
   value: number; // 0-100
@@ -13,14 +12,6 @@ const LEVEL_COLORS = {
   high: '#ff6600',
   critical: '#ff0044',
 };
-
-// Get color based on value position on the gauge
-function getValueColor(value: number): string {
-  if (value >= 75) return LEVEL_COLORS.critical;
-  if (value >= 50) return LEVEL_COLORS.high;
-  if (value >= 25) return LEVEL_COLORS.medium;
-  return LEVEL_COLORS.low;
-}
 
 export function TensionGauge({ value, level, size = 'md' }: TensionGaugeProps) {
   const color = LEVEL_COLORS[level];

@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { TrendingUp, TrendingDown, DollarSign, Droplet, Coins, BarChart3 } from 'lucide-react';

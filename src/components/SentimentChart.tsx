@@ -9,7 +9,6 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-  Cell,
 } from 'recharts';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, TrendingUp, Clock, X, ExternalLink } from 'lucide-react';
@@ -86,11 +85,12 @@ export function SentimentChart() {
     );
   }
 
-  const handleBarClick = (data: Record<string, unknown>, sentimentType: 'Positiv' | 'Negativ' | 'Neutral') => {
+  const handleBarClick = (data: unknown, sentimentType: 'Positiv' | 'Negativ' | 'Neutral') => {
+    const record = data as Record<string, unknown>;
     setClickedBar({
-      region: data.region as string,
+      region: record.region as string,
       sentiment: sentimentType,
-      count: data[sentimentType] as number,
+      count: record[sentimentType] as number,
     });
   };
 

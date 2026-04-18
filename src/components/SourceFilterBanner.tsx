@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Target, Radio } from 'lucide-react';
+import { X, Target } from 'lucide-react';
 import { useAppStore } from '../store';
 import type { NewsSource } from '../types';
 

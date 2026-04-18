@@ -51,6 +51,8 @@ export default defineConfig({
         ],
       },
       workbox: {
+        // Increase max size to include globe-vendor chunk (~2.5MB)
+        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024, // 3MB
         // Cache strategies for different resource types
         runtimeCaching: [
           {
@@ -111,23 +113,33 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          // React core
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          // Query and state management
-          'state-vendor': ['@tanstack/react-query', 'zustand'],
-          // UI libraries
-          'ui-vendor': ['lucide-react'],
-          // Animation
-          'animation-vendor': ['framer-motion'],
-          // Map (heavy, lazy-loaded)
-          'map-vendor': ['leaflet', 'react-leaflet'],
-          // 3D Globe (heavy, lazy-loaded)
-          'globe-vendor': ['globe.gl', 'three'],
-          // Charts
-          'chart-vendor': ['recharts'],
-          // Command palette
-          'cmdk-vendor': ['cmdk', '@radix-ui/react-dialog'],
+        manualChunks(id: string) {
+          if (id.includes('node_modules')) {
+            if (id.includes('react-dom') || id.includes('react-router-dom') || id.includes('/react/')) {
+              return 'react-vendor';
+            }
+            if (id.includes('@tanstack/react-query') || id.includes('zustand')) {
+              return 'state-vendor';
+            }
+            if (id.includes('lucide-react')) {
+              return 'ui-vendor';
+            }
+            if (id.includes('framer-motion')) {
+              return 'animation-vendor';
+            }
+            if (id.includes('leaflet') || id.includes('react-leaflet')) {
+              return 'map-vendor';
+            }
+            if (id.includes('globe.gl') || id.includes('three')) {
+              return 'globe-vendor';
+            }
+            if (id.includes('recharts')) {
+              return 'chart-vendor';
+            }
+            if (id.includes('cmdk') || id.includes('@radix-ui/react-dialog')) {
+              return 'cmdk-vendor';
+            }
+          }
         },
       },
     },

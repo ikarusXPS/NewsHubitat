@@ -229,7 +229,7 @@ export const useAppStore = create<AppState>()(
             },
           };
         }),
-      toggleAllSourcesInRegion: (region, enabled) =>
+      toggleAllSourcesInRegion: (_region, _enabled) =>
         set((state) => {
           // This requires access to sources - handled at component level
           // Store just tracks the enabledSources state

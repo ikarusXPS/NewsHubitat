@@ -8,7 +8,7 @@ interface ReadToggleProps {
 }
 
 export function ReadToggle({ articleId, className }: ReadToggleProps) {
-  const { readState, markAsRead, markAsUnread, isArticleRead } = useAppStore();
+  const { markAsRead, markAsUnread, isArticleRead } = useAppStore();
   const isRead = isArticleRead(articleId);
 
   const handleToggle = (e: React.MouseEvent) => {

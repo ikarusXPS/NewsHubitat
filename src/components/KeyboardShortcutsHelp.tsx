@@ -59,8 +59,8 @@ export function KeyboardShortcutsHelp({ isOpen, onClose }: KeyboardShortcutsHelp
                     Navigation
                   </h3>
                   <div className="grid grid-cols-2 gap-2">
-                    {groups.navigation.map((shortcut) => (
-                      <ShortcutRow key={shortcut.key} {...shortcut} />
+                    {groups.navigation.map((shortcut, index) => (
+                      <ShortcutRow key={`nav-${index}`} shortcutKey={shortcut.key} description={shortcut.description} />
                     ))}
                   </div>
                 </div>
@@ -71,8 +71,8 @@ export function KeyboardShortcutsHelp({ isOpen, onClose }: KeyboardShortcutsHelp
                     Actions
                   </h3>
                   <div className="grid grid-cols-2 gap-2">
-                    {groups.actions.map((shortcut) => (
-                      <ShortcutRow key={shortcut.key} {...shortcut} />
+                    {groups.actions.map((shortcut, index) => (
+                      <ShortcutRow key={`action-${index}`} shortcutKey={shortcut.key} description={shortcut.description} />
                     ))}
                   </div>
                 </div>
@@ -83,8 +83,8 @@ export function KeyboardShortcutsHelp({ isOpen, onClose }: KeyboardShortcutsHelp
                     Feed Navigation
                   </h3>
                   <div className="grid grid-cols-2 gap-2">
-                    {groups.feed.map((shortcut) => (
-                      <ShortcutRow key={shortcut.key} {...shortcut} />
+                    {groups.feed.map((shortcut, index) => (
+                      <ShortcutRow key={`feed-${index}`} shortcutKey={shortcut.key} description={shortcut.description} />
                     ))}
                   </div>
                 </div>
@@ -104,12 +104,12 @@ export function KeyboardShortcutsHelp({ isOpen, onClose }: KeyboardShortcutsHelp
   );
 }
 
-function ShortcutRow({ key: keyName, description }: { key: string; description: string }) {
+function ShortcutRow({ shortcutKey, description }: { shortcutKey: string; description: string }) {
   return (
     <div className="flex items-center justify-between p-2 rounded-lg bg-gray-900/50 border border-gray-800">
       <span className="text-sm text-gray-300">{description}</span>
       <kbd className="px-2 py-1 rounded bg-gray-800 text-[#00f0ff] text-xs font-mono border border-gray-700 min-w-[2rem] text-center">
-        {keyName}
+        {shortcutKey}
       </kbd>
     </div>
   );

@@ -20,7 +20,7 @@ function getCountryFlag(countryCode: string): string {
   return String.fromCodePoint(...codePoints);
 }
 
-export function SourceRow({ source, isEnabled, onToggle, color }: SourceRowProps) {
+export function SourceRow({ source, isEnabled, onToggle, color: _color }: SourceRowProps) {
   const { setActiveSourceFilter } = useAppStore();
 
   const handleFilterBySource = (e: React.MouseEvent) => {
