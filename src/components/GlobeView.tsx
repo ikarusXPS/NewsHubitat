@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { Loader2, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
 import { cn } from '../lib/utils';
@@ -7,11 +8,12 @@ import { useMapCenter } from '../hooks/useMapCenter';
 import type { GeoEvent } from '../types';
 
 interface GlobeViewProps {
-  points?: GeoEvent[];
+  points?: GeoEvent[];                    // Optional: external data (keeps backward compat)
   onPointClick?: (point: GeoEvent) => void;
   className?: string;
-  isLoading?: boolean;
-  focusEventId?: string | null; // External control to zoom to specific event
+  isLoading?: boolean;                    // Optional: external loading state
+  focusEventId?: string | null;           // External control to zoom to specific event
+  useInternalQuery?: boolean;             // NEW: when true, fetch data internally
 }
 
 // Cyber-styled colors matching the UI theme - Based on EventCategory
@@ -25,9 +27,35 @@ const CATEGORY_COLORS: Record<string, string> = {
   protest: '#00ff88',      // Success green
 };
 
-export function GlobeView({ points = [], onPointClick, className, isLoading: externalLoading = false, focusEventId }: GlobeViewProps) {
+export function GlobeView({
+  points: externalPoints,
+  onPointClick,
+  className,
+  isLoading: externalLoading = false,
+  focusEventId,
+  useInternalQuery = false,
+}: GlobeViewProps) {
   const mapCenter = useMapCenter();
+
+  // Internal query for independent data fetching
+  const { data: internalData, isLoading: internalLoading } = useQuery({
+    queryKey: ['geo-events'],
+    queryFn: async () => {
+      const res = await fetch('/api/events/geo');
+      if (!res.ok) throw new Error('Failed to fetch geo events');
+      const json = await res.json();
+      return json.data as GeoEvent[];
+    },
+    enabled: useInternalQuery,
+    staleTime: 60_000,
+    refetchInterval: 2 * 60_000,
+  });
+
+  // Use internal data if useInternalQuery, otherwise use external props
+  const points = useInternalQuery ? (internalData ?? []) : (externalPoints ?? []);
+  const isLoading = useInternalQuery ? internalLoading : externalLoading;
   const containerRef = useRef<HTMLDivElement>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- globe.gl returns complex untyped object
   const globeRef = useRef<any>(null);
   const [isInitializing, setIsInitializing] = useState(true);
   const [selectedPoint, setSelectedPoint] = useState<GeoEvent | null>(null);
@@ -76,6 +104,10 @@ export function GlobeView({ points = [], onPointClick, className, isLoading: ext
   useEffect(() => {
     if (!containerRef.current) return;
 
+    // Capture ref value for cleanup
+    const container = containerRef.current;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- globe.gl returns complex untyped object
     let globe: any = null;
     let animationFrameId: number;
     let clickHandler: ((event: MouseEvent) => void) | null = null;
@@ -84,6 +116,7 @@ export function GlobeView({ points = [], onPointClick, className, isLoading: ext
     const initGlobe = async () => {
       try {
         // Expose THREE to window for globe.gl compatibility
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (window as any).THREE = THREE;
 
         const GlobeGL = (await import('globe.gl')).default;
@@ -205,11 +238,14 @@ export function GlobeView({ points = [], onPointClick, className, isLoading: ext
             }
 
             // Store the event data directly on the group for raycasting
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Custom property on THREE.Group
             (group as any).__eventData = point;
             return group;
           })
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- globe.gl callback signature
           .customThreeObjectUpdate((obj: any, d: object) => {
             // Update stored event data
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (obj as any).__eventData = d;
             if (obj.__globeObjData) {
               Object.assign(obj.__globeObjData, d);
@@ -260,11 +296,13 @@ export function GlobeView({ points = [], onPointClick, className, isLoading: ext
           .hexBinPointWeight((d: object) => getIntensity((d as GeoEvent).severity))
           .hexAltitude(0.001)
           .hexBinResolution(4)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- globe.gl hex callback
           .hexTopColor((d: any) => {
             const avgCategory = d.points[0].category;
             const color = CATEGORY_COLORS[avgCategory] || CATEGORY_COLORS.political;
             return `${color}40`; // Transparent hex
           })
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- globe.gl hex callback
           .hexSideColor((d: any) => {
             const avgCategory = d.points[0].category;
             const color = CATEGORY_COLORS[avgCategory] || CATEGORY_COLORS.political;
@@ -288,6 +326,7 @@ export function GlobeView({ points = [], onPointClick, className, isLoading: ext
           raycaster.setFromCamera(mouse, globe.camera());
 
           // Find custom objects with event data
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- THREE.Object3D with custom props
           const customObjects = globe.scene().children.filter((obj: any) => {
             const data = obj.__globeObjData || obj.__eventData;
             return data && points.some(p => p.id === data.id);
@@ -297,6 +336,7 @@ export function GlobeView({ points = [], onPointClick, className, isLoading: ext
 
           if (intersects.length > 0) {
             const clickedObj = intersects[0].object;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any -- THREE.Object3D with custom props
             let parent: any = clickedObj;
             // Traverse up to find parent with event data
             while (parent && !parent.__globeObjData && !parent.__eventData) {
@@ -327,6 +367,7 @@ export function GlobeView({ points = [], onPointClick, className, isLoading: ext
           raycaster.setFromCamera(mouse, globe.camera());
 
           // Find custom objects with event data
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- THREE.Object3D with custom props
           const customObjects = globe.scene().children.filter((obj: any) => {
             const data = obj.__globeObjData || obj.__eventData;
             return data && points.some(p => p.id === data.id);
@@ -336,6 +377,7 @@ export function GlobeView({ points = [], onPointClick, className, isLoading: ext
 
           if (intersects.length > 0) {
             const hoveredObj = intersects[0].object;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any -- THREE.Object3D with custom props
             let parent: any = hoveredObj;
             // Traverse up to find parent with event data
             while (parent && !parent.__globeObjData && !parent.__eventData) {
@@ -424,10 +466,10 @@ export function GlobeView({ points = [], onPointClick, className, isLoading: ext
     return () => {
       window.removeEventListener('resize', handleResize);
       if (clickHandler) {
-        containerRef.current?.removeEventListener('click', clickHandler);
+        container?.removeEventListener('click', clickHandler);
       }
       if (mouseMoveHandler) {
-        containerRef.current?.removeEventListener('mousemove', mouseMoveHandler);
+        container?.removeEventListener('mousemove', mouseMoveHandler);
       }
       if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
@@ -443,6 +485,7 @@ export function GlobeView({ points = [], onPointClick, className, isLoading: ext
     if (focusEventId && globeRef.current && points.length > 0) {
       const event = points.find(p => p.id === focusEventId);
       if (event) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- External event trigger requires state update
         setSelectedPoint(event);
         globeRef.current.pointOfView(
           { lat: event.location.lat, lng: event.location.lng, altitude: 1.5 },
@@ -489,12 +532,12 @@ export function GlobeView({ points = [], onPointClick, className, isLoading: ext
       <div ref={containerRef} className="h-full w-full" />
 
       {/* Loading overlay - Cyber styled */}
-      {(isInitializing || externalLoading) && (
+      {(isInitializing || isLoading) && (
         <div className="absolute inset-0 flex items-center justify-center bg-[#0a0e1a]/90 backdrop-blur-sm">
           <div className="flex flex-col items-center gap-3">
             <Loader2 className="h-8 w-8 animate-spin text-[#00f0ff]" />
             <span className="text-sm font-mono text-[#00f0ff]/70 uppercase tracking-wider">
-              {externalLoading ? 'Loading Events...' : 'Loading Globe...'}
+              {isLoading ? 'Loading Events...' : 'Loading Globe...'}
             </span>
           </div>
         </div>
