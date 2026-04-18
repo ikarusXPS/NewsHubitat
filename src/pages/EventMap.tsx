@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEventSocket } from '../hooks/useEventSocket';
+import { LiveBadge } from '../components/LiveBadge';
 import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from 'react-leaflet';
@@ -636,20 +637,9 @@ export function EventMap() {
         </div>
       </div>
 
-      {/* WebSocket Connection Status (per D-12, D-14) */}
+      {/* WebSocket Connection Status */}
       <div className="absolute bottom-4 left-4 z-10">
-        <div className={cn(
-          'flex items-center gap-2 px-3 py-1.5 rounded-full font-mono text-[10px] uppercase tracking-wider backdrop-blur-sm border',
-          isConnected
-            ? 'bg-[#00ff88]/10 border-[#00ff88]/30 text-[#00ff88]'
-            : 'bg-gray-800/80 border-gray-700 text-gray-500'
-        )}>
-          <div className={cn(
-            'w-1.5 h-1.5 rounded-full',
-            isConnected ? 'bg-[#00ff88] animate-pulse' : 'bg-gray-500'
-          )} />
-          <span>{isConnected ? 'LIVE' : 'OFFLINE'}</span>
-        </div>
+        <LiveBadge isConnected={isConnected} />
       </div>
 
       {/* Map */}
