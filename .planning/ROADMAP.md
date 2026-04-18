@@ -54,7 +54,7 @@ Plans:
 - [x] 02-01-PLAN.md — Historical events i18n database (111 global events, DE/EN)
 - [x] 02-02-PLAN.md — Location extraction expansion (184 global cities for B6)
 - [ ] 02-03-PLAN.md — Article preview in EventDetailPanel with i18n
-- [ ] 02-04-PLAN.md — GlobeView independent query + useEventSocket hook
+- [x] 02-04-PLAN.md — GlobeView independent query + useEventSocket hook
 - [ ] 02-05-PLAN.md — LiveBadge component and Timeline WebSocket integration
 
 **Success Criteria:**
@@ -176,4 +176,4 @@ High-priority bugs to address during phases:
 ---
 
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-18 after 02-01 execution complete*
+*Last updated: 2026-04-18 after 02-04 execution complete*
