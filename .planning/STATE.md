@@ -5,7 +5,7 @@
 See: .planning/PROJECT.md (updated 2026-04-18)
 
 **Core value:** Users can see how the same story is covered by different regional perspectives
-**Current focus:** Phase 2 - Event System
+**Current focus:** Phase 3 - Auth Completion
 
 ## Milestone Progress
 
@@ -31,10 +31,10 @@ See: .planning/PROJECT.md (updated 2026-04-18)
 **Goal:** Link timeline events to articles and add historical database
 
 ### Requirements
-- [ ] EVT-01: User can view timeline events linked to related NewsArticles
-- [ ] EVT-02: User can browse historical events database (100+ key events)
-- [ ] EVT-03: User sees clustered event markers in dense map regions
-- [ ] EVT-04: User sees real-time event markers update on globe/map
+- [x] EVT-01: User can view timeline events linked to related NewsArticles
+- [x] EVT-02: User can browse historical events database (100+ key events)
+- [x] EVT-03: User sees clustered event markers in dense map regions
+- [x] EVT-04: User sees real-time event markers update on globe/map
 
 ### Plans
 | Plan | Objective | Tasks | Wave | Status |
