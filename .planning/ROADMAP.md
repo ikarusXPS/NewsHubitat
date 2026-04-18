@@ -8,12 +8,12 @@
 
 | # | Phase | Goal | Requirements | Status |
 |---|-------|------|--------------|--------|
-| 1 | AI Analysis | Complete AI Q&A with citations and context | AI-01, AI-02, AI-03, AI-04 | ✓ Complete |
-| 2 | Event System | Link timeline to articles, add historical DB | EVT-01, EVT-02, EVT-03, EVT-04 | ✓ Complete |
-| 3 | Auth Completion | Add email verification and password reset | AUTH-01, AUTH-02 | ✓ Complete |
-| 4 | User Preferences | Implement settings page with all preferences | PREF-01, PREF-02, PREF-03, PREF-04, UI-02 | ✓ Complete |
-| 5 | Bookmarks | Enable article saving and bookmark management | BOOK-01, BOOK-02, BOOK-03 | ✓ Complete |
-| 6 | Reading History | Track history and personalize feed | HIST-01, HIST-02, HIST-03, UI-01 | ○ Pending |
+| 1 | AI Analysis | Complete AI Q&A with citations and context | AI-01, AI-02, AI-03, AI-04 | Complete |
+| 2 | Event System | Link timeline to articles, add historical DB | EVT-01, EVT-02, EVT-03, EVT-04 | Complete |
+| 3 | Auth Completion | Add email verification and password reset | AUTH-01, AUTH-02 | Complete |
+| 4 | User Preferences | Implement settings page with all preferences | PREF-01, PREF-02, PREF-03, PREF-04, UI-02 | Complete |
+| 5 | Bookmarks | Enable article saving and bookmark management | BOOK-01, BOOK-02, BOOK-03 | Complete |
+| 6 | Reading History | Track history and personalize feed | HIST-01, HIST-02, HIST-03, UI-01 | In Progress |
 
 ---
 
@@ -153,15 +153,32 @@ Plans:
 
 ## Phase 6: Reading History
 
-**Goal:** Track reading history and personalize news feed
+**Goal:** Track reading history, personalize news feed, add gamification and profile enhancements
 
 **Requirements:** HIST-01, HIST-02, HIST-03, UI-01
 
+**Plans:** 6 plans
+
+Plans:
+- [ ] 06-01-PLAN.md — Database schema + store extensions (HIST-01)
+- [ ] 06-02-PLAN.md — History page with timeline grouping (HIST-02)
+- [ ] 06-03-PLAN.md — Personalization engine + For You carousel (HIST-03)
+- [ ] 06-04-PLAN.md — Profile enhancements + avatar system (UI-01)
+- [ ] 06-05-PLAN.md — Gamification: badges, achievements, unlocks (HIST-01)
+- [ ] 06-06-PLAN.md — Leaderboard + account management (HIST-01, UI-01)
+
+**Wave Structure:**
+- Wave 1: Plans 01, 02 (foundational, parallel)
+- Wave 2: Plans 03, 04 (depends on Wave 1, parallel)
+- Wave 3: Plans 05, 06 (depends on Wave 2, parallel)
+
 **Success Criteria:**
-1. User reads article and it appears in reading history
-2. User views reading history page with all read articles
-3. User sees personalized feed recommendations based on reading patterns
-4. User views and edits profile on UserProfile page
+1. User reads article and it appears in reading history with readCount tracking
+2. User views reading history page with date-grouped articles and filtering
+3. User sees personalized "For You" carousel based on reading patterns
+4. User views enhanced profile with reading insights and avatar selection
+5. User earns badges for reading achievements (volume, diversity, behavior)
+6. User appears on leaderboard and can manage account data
 
 **Depends on:** Phase 5 (builds on user data patterns)
 
@@ -203,4 +220,4 @@ High-priority bugs to address during phases:
 ---
 
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-18 after 03-05 execution (Phase 3 complete - 5/5 plans)*
+*Last updated: 2026-04-18 after Phase 6 planning (6 plans created in 3 waves)*
