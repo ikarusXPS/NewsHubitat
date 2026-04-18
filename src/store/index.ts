@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { FilterState, PerspectiveRegion, Sentiment } from '../types';
 import type { FocusPreset } from '../types/focus';
-import type { FeedState, ReadState, CustomFeed } from '../types/feeds';
+import type { FeedState, ReadState, CustomFeed, ReadingHistoryEntry } from '../types/feeds';
 import { detectDefaultRegions } from '../utils/regionDetection';
 import { defaultFeedState, defaultReadState } from '../types/feeds';
 
@@ -37,10 +37,13 @@ interface AppState {
   toggleBookmark: (articleId: string) => void;
   isBookmarked: (articleId: string) => boolean;
 
-  // Reading History
-  readingHistory: { articleId: string; timestamp: number }[];
+  // Reading History (enhanced for Phase 6)
+  readingHistory: ReadingHistoryEntry[];
   addToReadingHistory: (articleId: string) => void;
   clearReadingHistory: () => void;
+  isHistoryPaused: boolean;
+  pauseHistory: () => void;
+  resumeHistory: () => void;
 
   // Focus System & Onboarding
   hasCompletedOnboarding: boolean;
@@ -161,26 +164,51 @@ export const useAppStore = create<AppState>()(
         }),
       isBookmarked: (articleId) => get().bookmarkedArticles.includes(articleId),
 
-      // Reading History
+      // Reading History (enhanced for Phase 6)
       readingHistory: [],
       addToReadingHistory: (articleId) =>
         set((state) => {
-          // Don't add duplicates within 5 minutes
-          const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
-          const recentEntry = state.readingHistory.find(
-            (entry) => entry.articleId === articleId && entry.timestamp > fiveMinutesAgo
-          );
-          if (recentEntry) return state;
+          // Respect pause state per D-65, D-66
+          if (state.isHistoryPaused) return state;
 
-          // Keep only last 100 entries
+          // Check existing entry
+          const existingIndex = state.readingHistory.findIndex(
+            (entry) => entry.articleId === articleId
+          );
+
+          // Don't increment within 5 minutes (dedup window)
+          const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
+          if (existingIndex !== -1) {
+            const existing = state.readingHistory[existingIndex];
+            if (existing.timestamp > fiveMinutesAgo) {
+              return state;
+            }
+            // Update existing entry with incremented readCount
+            const newHistory = [...state.readingHistory];
+            newHistory[existingIndex] = {
+              ...existing,
+              timestamp: Date.now(),
+              readCount: existing.readCount + 1,
+            };
+            // Move to front
+            newHistory.unshift(newHistory.splice(existingIndex, 1)[0]);
+            return { readingHistory: newHistory.slice(0, 100) };
+          }
+
+          // New entry
           const newHistory = [
-            { articleId, timestamp: Date.now() },
-            ...state.readingHistory.filter((e) => e.articleId !== articleId),
-          ].slice(0, 100);
+            { articleId, timestamp: Date.now(), readCount: 1 },
+            ...state.readingHistory,
+          ].slice(0, 100);  // Keep 100 limit per D-03
 
           return { readingHistory: newHistory };
         }),
       clearReadingHistory: () => set({ readingHistory: [] }),
+
+      // History pause per D-65, D-66
+      isHistoryPaused: false,
+      pauseHistory: () => set({ isHistoryPaused: true }),
+      resumeHistory: () => set({ isHistoryPaused: false }),
 
       // Focus System & Onboarding
       hasCompletedOnboarding: false,
@@ -229,6 +257,7 @@ export const useAppStore = create<AppState>()(
             },
           };
         }),
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       toggleAllSourcesInRegion: (_region, _enabled) =>
         set((state) => {
           // This requires access to sources - handled at component level
@@ -339,6 +368,7 @@ export const useAppStore = create<AppState>()(
         commandPaletteEnabled: state.commandPaletteEnabled,
         bookmarkedArticles: state.bookmarkedArticles,
         readingHistory: state.readingHistory,
+        isHistoryPaused: state.isHistoryPaused,
         hasCompletedOnboarding: state.hasCompletedOnboarding,
         activeFocusPreset: state.activeFocusPreset,
         customPresets: state.customPresets,
