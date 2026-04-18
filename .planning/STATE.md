@@ -20,14 +20,14 @@ See: .planning/PROJECT.md (updated 2026-04-18)
 | 3 | Auth Completion | ✓ Complete | 5/5 |
 | 4 | User Preferences | ✓ Complete | 0/0 (pre-existing) |
 | 5 | Bookmarks | ✓ Complete | 0/0 (pre-existing) |
-| 6 | Reading History | ○ Pending | 0/0 |
+| 6 | Reading History | ◆ Ready to execute | 6/6 |
 
 **Progress:** ████████░░ 83%
 
 ## Current Phase
 
 **Phase:** 6 - Reading History
-**Status:** Pending
+**Status:** Ready to execute
 **Goal:** Track reading history and personalize news feed
 
 ### Requirements
@@ -39,12 +39,17 @@ See: .planning/PROJECT.md (updated 2026-04-18)
 ### Plans
 | Plan | Objective | Tasks | Wave | Status |
 |------|-----------|-------|------|--------|
-| — | Not yet planned | — | — | — |
+| 06-01 | Database schema + store extensions | 3 | 1 | ○ Pending |
+| 06-02 | History page with timeline grouping | 3 | 1 | ○ Pending |
+| 06-03 | Personalization engine + For You carousel | 3 | 2 | ○ Pending |
+| 06-04 | Profile enhancements + avatar system | 3 | 2 | ○ Pending |
+| 06-05 | Gamification: badges, achievements | 3 | 3 | ○ Pending |
+| 06-06 | Leaderboard + account management | 3 | 3 | ○ Pending |
 
 ## Session Context
 
-**Last action:** Verified and marked Phase 5 complete (pre-existing bookmark implementation)
-**Next step:** Discuss Phase 6 (Reading History) requirements
+**Last action:** Completed planning for Phase 6 - 6 plans in 3 waves
+**Next step:** Execute Phase 6 with /gsd-execute-phase 6
 **Resume file:** —
 
 ### Phase 5 Notes
