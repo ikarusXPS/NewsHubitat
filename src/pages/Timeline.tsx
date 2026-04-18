@@ -214,6 +214,63 @@ function EventCard({ event, onSelect }: EventCardProps) {
   );
 }
 
+// Article Preview Component (EVT-01, D-01, D-02, D-03)
+interface ArticlePreviewProps {
+  article: {
+    id: string;
+    title: string;
+    source: { name: string };
+    publishedAt: string;
+    perspective: string;
+    url: string;
+  };
+}
+
+function ArticlePreview({ article }: ArticlePreviewProps) {
+  // Format time ago for article timestamp
+  const formatTimeAgo = (dateStr: string): string => {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffMins < 1) return 'Gerade';
+    if (diffMins < 60) return `${diffMins}m`;
+    if (diffHours < 24) return `${diffHours}h`;
+    if (diffDays < 7) return `${diffDays}d`;
+    return date.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
+  };
+
+  return (
+    <div className="flex items-center justify-between p-3 rounded-lg bg-gray-800/50 hover:bg-gray-800 transition-colors group">
+      <div className="flex-1 min-w-0">
+        <h4 className="text-sm font-mono text-gray-300 group-hover:text-[#00f0ff] truncate transition-colors">
+          {article.title}
+        </h4>
+        <div className="flex items-center gap-2 mt-1 text-[10px] font-mono text-gray-500">
+          <span>{article.source.name}</span>
+          <span>|</span>
+          <span>{formatTimeAgo(article.publishedAt)}</span>
+          <span>|</span>
+          <span className="uppercase">{article.perspective}</span>
+        </div>
+      </div>
+      <a
+        href={article.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="p-2 text-gray-500 hover:text-[#00f0ff] transition-colors flex-shrink-0"
+        onClick={(e) => e.stopPropagation()}
+        aria-label="Open article in new tab"
+      >
+        <ExternalLink className="h-4 w-4" />
+      </a>
+    </div>
+  );
+}
+
 // Event Detail Panel Component
 function EventDetailPanel({
   event,
