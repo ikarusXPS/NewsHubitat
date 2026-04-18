@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -18,7 +18,8 @@ import {
   Info,
 } from 'lucide-react';
 import { cn } from '../lib/utils';
-import type { TimelineEvent } from '../types';
+import { useAppStore } from '../store';
+import type { TimelineEvent, NewsArticle } from '../types';
 
 type SeverityLevel = 'critical' | 'high' | 'medium' | 'low';
 
@@ -280,6 +281,46 @@ function EventDetailPanel({
   onClose: () => void;
 }) {
   const config = CATEGORY_CONFIG[event.category] || CATEGORY_CONFIG.other;
+  const language = useAppStore(state => state.language); // 'de' | 'en'
+
+  // State for fetched article details
+  const [articles, setArticles] = useState<ArticlePreviewProps['article'][]>([]);
+  const [isLoadingArticles, setIsLoadingArticles] = useState(false);
+
+  // Fetch full article data when event is selected
+  useEffect(() => {
+    if (event.relatedArticles.length === 0) return;
+
+    setIsLoadingArticles(true);
+    fetch(`/api/events/${event.id}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.data.articles) {
+          setArticles(data.data.articles.map((a: NewsArticle) => ({
+            id: a.id,
+            title: a.title,
+            source: { name: a.source.name },
+            publishedAt: typeof a.publishedAt === 'string' ? a.publishedAt : new Date(a.publishedAt).toISOString(),
+            perspective: a.perspective,
+            url: a.url,
+          })));
+        }
+      })
+      .catch(err => {
+        console.error('Failed to fetch articles:', err);
+      })
+      .finally(() => {
+        setIsLoadingArticles(false);
+      });
+  }, [event.id, event.relatedArticles.length]);
+
+  // Helper for i18n text (historical events have { de, en }, current events have string)
+  const getLocalizedText = (text: string | { de: string; en: string }): string => {
+    if (typeof text === 'object' && text !== null) {
+      return text[language] || text.de; // Fallback to German
+    }
+    return text;
+  };
 
   return (
     <motion.div
@@ -318,7 +359,7 @@ function EventDetailPanel({
       <div className="p-4 space-y-6">
         {/* Title & Severity */}
         <div>
-          <h2 className="text-xl font-mono font-bold text-white mb-3">{event.title}</h2>
+          <h2 className="text-xl font-mono font-bold text-white mb-3">{getLocalizedText(event.title)}</h2>
           <div className="flex items-center gap-4">
             <SeverityIndicator severity={event.severity} />
             <span className="text-sm font-mono text-gray-400">
@@ -341,7 +382,7 @@ function EventDetailPanel({
             Beschreibung
           </h3>
           <p className="text-sm font-mono text-gray-300 leading-relaxed">
-            {event.description}
+            {getLocalizedText(event.description)}
           </p>
         </div>
 
@@ -371,18 +412,36 @@ function EventDetailPanel({
               Verwandte Artikel ({event.relatedArticles.length})
             </h3>
             <div className="space-y-2">
-              {event.relatedArticles.map((articleId, i) => (
-                <a
-                  key={articleId}
-                  href={`/article/${articleId}`}
-                  className="flex items-center justify-between p-3 rounded-lg bg-gray-800/50 hover:bg-gray-800 transition-colors group"
-                >
-                  <span className="text-sm font-mono text-gray-300 group-hover:text-[#00f0ff] transition-colors">
-                    Artikel #{i + 1}
-                  </span>
-                  <ExternalLink className="h-4 w-4 text-gray-500 group-hover:text-[#00f0ff] transition-colors" />
-                </a>
-              ))}
+              {isLoadingArticles ? (
+                // Loading skeleton
+                <>
+                  {[...Array(Math.min(3, event.relatedArticles.length))].map((_, i) => (
+                    <div key={i} className="p-3 rounded-lg bg-gray-800/50 animate-pulse">
+                      <div className="h-4 w-3/4 bg-gray-700 rounded mb-2" />
+                      <div className="h-3 w-1/2 bg-gray-700 rounded" />
+                    </div>
+                  ))}
+                </>
+              ) : articles.length > 0 ? (
+                // Real article previews
+                articles.map((article) => (
+                  <ArticlePreview key={article.id} article={article} />
+                ))
+              ) : (
+                // Fallback to IDs if fetch failed
+                event.relatedArticles.map((articleId, i) => (
+                  <a
+                    key={articleId}
+                    href={`/article/${articleId}`}
+                    className="flex items-center justify-between p-3 rounded-lg bg-gray-800/50 hover:bg-gray-800 transition-colors group"
+                  >
+                    <span className="text-sm font-mono text-gray-300 group-hover:text-[#00f0ff] transition-colors">
+                      Artikel #{i + 1}
+                    </span>
+                    <ExternalLink className="h-4 w-4 text-gray-500 group-hover:text-[#00f0ff] transition-colors" />
+                  </a>
+                ))
+              )}
             </div>
           </div>
         )}
