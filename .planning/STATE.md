@@ -16,7 +16,7 @@ See: .planning/PROJECT.md (updated 2026-04-18)
 | Phase | Name | Status | Plans |
 |-------|------|--------|-------|
 | 1 | AI Analysis | ✓ Complete | 1/1 |
-| 2 | Event System | ○ Pending | 0/0 |
+| 2 | Event System | ◐ Ready to execute | 5/5 |
 | 3 | Auth Completion | ○ Pending | 0/0 |
 | 4 | User Preferences | ○ Pending | 0/0 |
 | 5 | Bookmarks | ○ Pending | 0/0 |
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-04-18)
 ## Current Phase
 
 **Phase:** 2 - Event System
-**Status:** Context Gathered
+**Status:** Ready to execute
 **Goal:** Link timeline events to articles and add historical database
 
 ### Requirements
@@ -37,15 +37,19 @@ See: .planning/PROJECT.md (updated 2026-04-18)
 - [ ] EVT-04: User sees real-time event markers update on globe/map
 
 ### Plans
-| Plan | Objective | Tasks | Status |
-|------|-----------|-------|--------|
-| — | — | — | Awaiting planning |
+| Plan | Objective | Tasks | Wave | Status |
+|------|-----------|-------|------|--------|
+| 02-01 | Historical events i18n database (100+ events) | 2 | 1 | Pending |
+| 02-02 | Location extraction expansion (100+ patterns) | 1 | 1 | Pending |
+| 02-03 | Article preview in EventDetailPanel + i18n | 2 | 2 | Pending |
+| 02-04 | useEventSocket hook + GlobeView query | 3 | 2 | Pending |
+| 02-05 | LiveBadge component + Timeline integration | 3 | 3 | Pending |
 
 ## Session Context
 
-**Last action:** Phase 2 context gathered
-**Next step:** `/gsd-plan-phase 2` — plan Event System phase
-**Resume file:** `.planning/phases/02-event-system/02-CONTEXT.md`
+**Last action:** Phase 2 planning complete (5 plans in 3 waves)
+**Next step:** `/gsd-execute-phase 2` — execute Event System phase
+**Resume file:** `.planning/phases/02-event-system/02-01-PLAN.md`
 
 ### Key Decisions (Phase 2)
 - Inline article preview in event panel (D-01)

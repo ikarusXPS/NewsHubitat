@@ -463,17 +463,17 @@ export function useEventSocket(
 | A2 | 100+ historical events can be manually curated efficiently | Code Examples | May need automated data import if scope expands |
 | A3 | Socket.IO client connection sharing via module singleton works | Code Examples | May need context provider if multiple components conflict |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Historical Events Data Source**
    - What we know: Need 100+ global events from 1900+
    - What's unclear: Manual curation vs. automated import
-   - Recommendation: Manual curation for quality control; events are static and finite
+   - **RESOLUTION:** Manual curation (per CONTEXT.md D-08). Events are finite historical milestones requiring quality control and bilingual accuracy. Automated import adds complexity without clear benefit.
 
 2. **Socket.IO Connection in GlobeView**
    - What we know: GlobeView is lazy-loaded, may mount/unmount
    - What's unclear: Whether shared socket singleton handles this gracefully
-   - Recommendation: Test with lazy loading; add connection state logging
+   - **RESOLUTION:** Singleton with ref-counting. The useEventSocket hook maintains a module-level socket instance that persists across component mount/unmount cycles. Cleanup only disconnects when no components are subscribed. This matches the useBackendStatus.ts pattern already in codebase.
 
 ## Sources
 
