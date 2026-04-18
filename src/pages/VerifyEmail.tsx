@@ -56,6 +56,7 @@ export function VerifyEmail() {
       // Note: This would need the user to be logged in
       // For now, redirect to login with a message
       window.location.href = '/login?message=Please login to resend verification email';
+      setResendSuccess(true);
     } finally {
       setIsResending(false);
     }
