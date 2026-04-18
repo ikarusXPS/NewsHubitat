@@ -38,16 +38,16 @@ See: .planning/PROJECT.md (updated 2026-04-18)
 | Plan | Objective | Tasks | Wave | Status |
 |------|-----------|-------|------|--------|
 | 03-01 | Schema + token utilities | 4 | 1 | ✓ Complete |
-| 03-02 | Backend API + bilingual emails | 3 | 2 | ○ Pending |
+| 03-02 | Backend API + bilingual emails | 3 | 2 | ✓ Complete |
 | 03-03 | Cleanup service | 2 | 2 | ○ Pending |
 | 03-04 | Frontend verification/reset pages | 4 | 3 | ○ Pending |
 | 03-05 | Verification UI components | 5 | 3 | ○ Pending |
 
 ## Session Context
 
-**Last action:** Completed 03-01 (Schema + token utilities) - 4 tasks
-**Next step:** Execute 03-02 (Backend API + bilingual emails)
-**Resume file:** .planning/phases/03-auth-completion/03-01-SUMMARY.md
+**Last action:** Completed 03-02 (Backend API + bilingual emails) - 3 tasks
+**Next step:** Execute 03-03 (Cleanup service) - Wave 2 parallel
+**Resume file:** .planning/phases/03-auth-completion/03-02-SUMMARY.md
 
 ### Key Decisions (Phase 2)
 - Inline article preview in event panel (D-01)
@@ -88,6 +88,13 @@ High-priority bugs to integrate:
 - timingSafeEqual for constant-time token comparison
 - Set-based disposable domain lookup for O(1) performance
 
+### Key Decisions (03-02)
+- Exponential backoff for email retries: 1s, 2s, 4s (D-47)
+- Generic "If account exists" response prevents email enumeration (D-34)
+- tokenVersion in JWT payload for session invalidation (D-28)
+- Password reset also marks email as verified (D-31)
+- "Wasn't you?" recovery link in password change confirmation (D-33)
+
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-18 after 03-01 execution complete*
+*Last updated: 2026-04-18 after 03-02 execution complete*
