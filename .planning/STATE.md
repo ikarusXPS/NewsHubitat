@@ -5,7 +5,7 @@
 See: .planning/PROJECT.md (updated 2026-04-18)
 
 **Core value:** Users can see how the same story is covered by different regional perspectives
-**Current focus:** Phase 3 - Auth Completion
+**Current focus:** Phase 5 - Bookmarks
 
 ## Milestone Progress
 
@@ -18,36 +18,33 @@ See: .planning/PROJECT.md (updated 2026-04-18)
 | 1 | AI Analysis | ✓ Complete | 1/1 |
 | 2 | Event System | ✓ Complete | 5/5 |
 | 3 | Auth Completion | ✓ Complete | 5/5 |
-| 4 | User Preferences | ○ Pending | 0/0 |
+| 4 | User Preferences | ✓ Complete | 0/0 (pre-existing) |
 | 5 | Bookmarks | ○ Pending | 0/0 |
 | 6 | Reading History | ○ Pending | 0/0 |
 
-**Progress:** █████░░░░░ 50%
+**Progress:** ██████░░░░ 67%
 
 ## Current Phase
 
-**Phase:** 3 - Auth Completion
-**Status:** Complete
-**Goal:** Add email verification and password reset flows
+**Phase:** 5 - Bookmarks
+**Status:** Pending
+**Goal:** Enable article saving and bookmark management
 
 ### Requirements
-- [x] AUTH-01: User receives email verification after registration
-- [x] AUTH-02: User can reset password via email link
+- [ ] BOOK-01: User can save articles to bookmarks
+- [ ] BOOK-02: User can unsave articles from bookmarks
+- [ ] BOOK-03: User can view all bookmarked articles on BookmarksPage
 
 ### Plans
 | Plan | Objective | Tasks | Wave | Status |
 |------|-----------|-------|------|--------|
-| 03-01 | Schema + token utilities | 4 | 1 | ✓ Complete |
-| 03-02 | Backend API + bilingual emails | 3 | 2 | ✓ Complete |
-| 03-03 | Cleanup service | 2 | 2 | ✓ Complete |
-| 03-04 | Frontend verification/reset pages | 4 | 3 | ✓ Complete |
-| 03-05 | Verification UI components | 5 | 3 | ✓ Complete |
+| — | Not yet planned | — | — | — |
 
 ## Session Context
 
-**Last action:** Completed 03-05 (Verification UI components) - 5 tasks
-**Next step:** Phase 3 complete. Ready for Phase 4 (User Preferences).
-**Resume file:** .planning/phases/03-auth-completion/03-05-SUMMARY.md
+**Last action:** Marked Phase 4 complete (pre-existing implementation in Settings.tsx)
+**Next step:** Discuss Phase 5 (Bookmarks) requirements
+**Resume file:** —
 
 ### Key Decisions (Phase 2)
 - Inline article preview in event panel (D-01)
@@ -59,9 +56,17 @@ See: .planning/PROJECT.md (updated 2026-04-18)
 ## Open Issues
 
 High-priority bugs to integrate:
-- B5: Settings page needs more options (Phase 4)
+- B5: Settings page needs more options - RESOLVED (Settings.tsx already has theme, language, regions, presets, export/import)
 - B6: Map point density too low - FIXED in 02-02 (184 location patterns)
 - B7: Article thumbnail fallback (Phase 1 or 2)
+
+### Phase 4 Notes
+Phase 4 (User Preferences) was marked complete without new plans because all requirements were already implemented:
+- PREF-01: Language toggle exists in Settings.tsx (lines 297-321)
+- PREF-02: Theme toggle exists in Settings.tsx (lines 267-295)
+- PREF-03: Region filters exist in Settings.tsx (lines 386-406)
+- PREF-04: Zustand persist middleware handles cross-session persistence
+- UI-02: SettingsPage accessible via navigation
 
 ### Key Decisions (02-01)
 - Added 'economic' category to TimelineEventI18n for global events

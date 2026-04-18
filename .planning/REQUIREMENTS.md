@@ -28,10 +28,10 @@ Requirements for milestone 1.0 (Phases 5-6). Each maps to roadmap phases.
 
 ### User Preferences
 
-- [ ] **PREF-01**: User can configure language preference (de/en)
-- [ ] **PREF-02**: User can toggle theme (dark/light)
-- [ ] **PREF-03**: User can set default region filters
-- [ ] **PREF-04**: User preferences persist across sessions
+- [x] **PREF-01**: User can configure language preference (de/en)
+- [x] **PREF-02**: User can toggle theme (dark/light)
+- [x] **PREF-03**: User can set default region filters
+- [x] **PREF-04**: User preferences persist across sessions
 
 ### Bookmarks
 
@@ -48,7 +48,7 @@ Requirements for milestone 1.0 (Phases 5-6). Each maps to roadmap phases.
 ### User Interface
 
 - [ ] **UI-01**: User can view and edit profile on UserProfile page
-- [ ] **UI-02**: User can manage all preferences on SettingsPage
+- [x] **UI-02**: User can manage all preferences on SettingsPage
 
 ## v2 Requirements
 
@@ -106,10 +106,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | EVT-04 | Phase 2 | Complete |
 | AUTH-01 | Phase 3 | Pending |
 | AUTH-02 | Phase 3 | Pending |
-| PREF-01 | Phase 4 | Pending |
-| PREF-02 | Phase 4 | Pending |
-| PREF-03 | Phase 4 | Pending |
-| PREF-04 | Phase 4 | Pending |
+| PREF-01 | Phase 4 | Complete |
+| PREF-02 | Phase 4 | Complete |
+| PREF-03 | Phase 4 | Complete |
+| PREF-04 | Phase 4 | Complete |
 | BOOK-01 | Phase 5 | Pending |
 | BOOK-02 | Phase 5 | Pending |
 | BOOK-03 | Phase 5 | Pending |
@@ -117,7 +117,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | HIST-02 | Phase 6 | Pending |
 | HIST-03 | Phase 6 | Pending |
 | UI-01 | Phase 6 | Pending |
-| UI-02 | Phase 4 | Pending |
+| UI-02 | Phase 4 | Complete |
 
 **Coverage:**
 - v1 requirements: 22 total
