@@ -160,9 +160,9 @@ Plans:
 **Plans:** 6 plans
 
 Plans:
-- [ ] 06-01-PLAN.md — Database schema + store extensions (HIST-01)
-- [ ] 06-02-PLAN.md — History page with timeline grouping (HIST-02)
-- [ ] 06-03-PLAN.md — Personalization engine + For You carousel (HIST-03)
+- [x] 06-01-PLAN.md — Database schema + store extensions (HIST-01)
+- [x] 06-02-PLAN.md — History page with timeline grouping (HIST-02)
+- [x] 06-03-PLAN.md — Personalization engine + For You carousel (HIST-03)
 - [ ] 06-04-PLAN.md — Profile enhancements + avatar system (UI-01)
 - [ ] 06-05-PLAN.md — Gamification: badges, achievements, unlocks (HIST-01)
 - [ ] 06-06-PLAN.md — Leaderboard + account management (HIST-01, UI-01)

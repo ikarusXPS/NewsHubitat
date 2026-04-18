@@ -39,18 +39,25 @@ See: .planning/PROJECT.md (updated 2026-04-18)
 ### Plans
 | Plan | Objective | Tasks | Wave | Status |
 |------|-----------|-------|------|--------|
-| 06-01 | Database schema + store extensions | 3 | 1 | ○ Pending |
-| 06-02 | History page with timeline grouping | 3 | 1 | ○ Pending |
-| 06-03 | Personalization engine + For You carousel | 3 | 2 | ○ Pending |
+| 06-01 | Database schema + store extensions | 3 | 1 | ✓ Complete |
+| 06-02 | History page with timeline grouping | 3 | 1 | ✓ Complete |
+| 06-03 | Personalization engine + For You carousel | 3 | 2 | ✓ Complete |
 | 06-04 | Profile enhancements + avatar system | 3 | 2 | ○ Pending |
 | 06-05 | Gamification: badges, achievements | 3 | 3 | ○ Pending |
 | 06-06 | Leaderboard + account management | 3 | 3 | ○ Pending |
 
 ## Session Context
 
-**Last action:** Completed planning for Phase 6 - 6 plans in 3 waves
-**Next step:** Execute Phase 6 with /gsd-execute-phase 6
+**Last action:** Completed 06-03 (Personalization engine + For You carousel)
+**Next step:** Execute 06-04 (Profile enhancements + avatar system)
 **Resume file:** —
+
+### Key Decisions (06-03)
+- Topic weighting from title keywords with DE/EN stop words (D-09)
+- 7-day recency window weights recent reads 2x higher (D-15)
+- ForYouCarousel rendered after HeroSection in NewsFeed (D-17)
+- Settings toggles for personalization (D-14) and history pause (D-65)
+- Already-read articles excluded from recommendations (D-21)
 
 ### Phase 5 Notes
 Phase 5 (Bookmarks) was marked complete without new plans — all requirements pre-existing:
