@@ -17,7 +17,7 @@ See: .planning/PROJECT.md (updated 2026-04-18)
 |-------|------|--------|-------|
 | 1 | AI Analysis | ✓ Complete | 1/1 |
 | 2 | Event System | ✓ Complete | 5/5 |
-| 3 | Auth Completion | ○ Pending | 0/0 |
+| 3 | Auth Completion | ◐ Ready | 5/5 |
 | 4 | User Preferences | ○ Pending | 0/0 |
 | 5 | Bookmarks | ○ Pending | 0/0 |
 | 6 | Reading History | ○ Pending | 0/0 |
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-04-18)
 ## Current Phase
 
 **Phase:** 3 - Auth Completion
-**Status:** Context Gathered
+**Status:** Ready to execute
 **Goal:** Add email verification and password reset flows
 
 ### Requirements
@@ -37,12 +37,16 @@ See: .planning/PROJECT.md (updated 2026-04-18)
 ### Plans
 | Plan | Objective | Tasks | Wave | Status |
 |------|-----------|-------|------|--------|
-| (none yet) | — | — | — | — |
+| 03-01 | Schema + token utilities | 4 | 1 | ○ Pending |
+| 03-02 | Backend API + bilingual emails | 3 | 2 | ○ Pending |
+| 03-03 | Cleanup service | 2 | 2 | ○ Pending |
+| 03-04 | Frontend verification/reset pages | 4 | 3 | ○ Pending |
+| 03-05 | Verification UI components | 5 | 3 | ○ Pending |
 
 ## Session Context
 
-**Last action:** Gathered Phase 3 context (54 decisions captured)
-**Next step:** Run /gsd-plan-phase 3 to create implementation plans
+**Last action:** Planning complete - 5 plans in 3 waves (verified)
+**Next step:** Run /gsd-execute-phase 3 to implement
 **Resume file:** .planning/phases/03-auth-completion/03-CONTEXT.md
 
 ### Key Decisions (Phase 2)
