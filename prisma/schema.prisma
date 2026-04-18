@@ -91,10 +91,22 @@ model User {
   // Required for cleanup job (D-17)
   updatedAt              DateTime  @updatedAt
 
+  // Phase 6: Profile & Gamification
+  avatarUrl            String?
+  selectedPresetAvatar String?
+  featuredBadgeId      String?
+  showOnLeaderboard    Boolean   @default(true)
+  isHistoryPaused      Boolean   @default(false)
+
+  // Phase 6: Account deletion (D-69, D-70)
+  deletionRequestedAt  DateTime?
+  deletionConfirmToken String?
+
   // Relations for features
   emailSubscription EmailSubscription?
   emailDigests      EmailDigest[]
   userPersonas      UserPersona[]
+  badges            UserBadge[]
 
   // Indexes for token lookups (D-53)
   @@index([verificationTokenHash])
@@ -243,4 +255,49 @@ model ShareClick {
   @@index([sharedContentId])
   @@index([platform])
   @@index([createdAt])
+}
+
+// ============================================================================
+// PHASE 6: GAMIFICATION & READING HISTORY
+// ============================================================================
+
+model Badge {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String
+  tier        String   // bronze, silver, gold, platinum (D-41)
+  category    String   // volume, diversity, behavior (D-42)
+  iconType    String   // emoji identifier for icon
+  threshold   Int      // Required value to earn this tier
+  createdAt   DateTime @default(now())
+
+  userBadges  UserBadge[]
+
+  @@index([category])
+  @@index([tier])
+}
+
+model UserBadge {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  badge     Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+  badgeId   String
+  earnedAt  DateTime @default(now())
+  progress  Int      @default(0)  // Current progress toward next tier
+
+  @@unique([userId, badgeId])
+  @@index([userId])
+  @@index([badgeId])
+}
+
+model LeaderboardSnapshot {
+  id        String   @id @default(cuid())
+  date      DateTime
+  timeframe String   // all-time, monthly, weekly (D-57)
+  rankings  String   // JSON string of top 100 users (D-51)
+  createdAt DateTime @default(now())
+
+  @@index([date, timeframe])
+  @@index([timeframe])
 }
