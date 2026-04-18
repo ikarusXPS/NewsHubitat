@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- Context exports both provider and hook */
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import type { ReactNode } from 'react';
 
@@ -12,6 +13,7 @@ interface User {
     theme: 'dark' | 'light';
     regions: string[];
   };
+  emailVerified: boolean;
 }
 
 interface AuthContextType {
@@ -19,12 +21,14 @@ interface AuthContextType {
   token: string | null;
   isLoading: boolean;
   isAuthenticated: boolean;
+  isVerified: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, name: string) => Promise<void>;
   logout: () => void;
   updatePreferences: (preferences: Partial<User['preferences']>) => Promise<void>;
   addBookmark: (articleId: string) => Promise<void>;
   removeBookmark: (articleId: string) => Promise<void>;
+  resendVerification: () => Promise<{ success: boolean; rateLimited?: boolean; minutesRemaining?: number }>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -185,6 +189,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
   }, [token]);
 
+  const resendVerification = useCallback(async () => {
+    if (!token) throw new Error('Not authenticated');
+
+    const response = await fetch('/api/auth/resend-verification', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await response.json();
+
+    if (response.status === 429) {
+      return {
+        success: false,
+        rateLimited: true,
+        minutesRemaining: data.minutesRemaining,
+      };
+    }
+
+    return { success: data.success };
+  }, [token]);
+
   return (
     <AuthContext.Provider
       value={{
@@ -192,12 +219,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         token,
         isLoading,
         isAuthenticated: !!user,
+        isVerified: user?.emailVerified ?? false,
         login,
         register,
         logout,
         updatePreferences,
         addBookmark,
         removeBookmark,
+        resendVerification,
       }}
     >
       {children}
