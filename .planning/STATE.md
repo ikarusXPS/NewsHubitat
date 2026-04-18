@@ -37,7 +37,7 @@ See: .planning/PROJECT.md (updated 2026-04-18)
 ### Plans
 | Plan | Objective | Tasks | Wave | Status |
 |------|-----------|-------|------|--------|
-| 03-01 | Schema + token utilities | 4 | 1 | ○ Pending |
+| 03-01 | Schema + token utilities | 4 | 1 | ✓ Complete |
 | 03-02 | Backend API + bilingual emails | 3 | 2 | ○ Pending |
 | 03-03 | Cleanup service | 2 | 2 | ○ Pending |
 | 03-04 | Frontend verification/reset pages | 4 | 3 | ○ Pending |
@@ -45,9 +45,9 @@ See: .planning/PROJECT.md (updated 2026-04-18)
 
 ## Session Context
 
-**Last action:** Planning complete - 5 plans in 3 waves (verified)
-**Next step:** Run /gsd-execute-phase 3 to implement
-**Resume file:** .planning/phases/03-auth-completion/03-CONTEXT.md
+**Last action:** Completed 03-01 (Schema + token utilities) - 4 tasks
+**Next step:** Execute 03-02 (Backend API + bilingual emails)
+**Resume file:** .planning/phases/03-auth-completion/03-01-SUMMARY.md
 
 ### Key Decisions (Phase 2)
 - Inline article preview in event panel (D-01)
@@ -82,6 +82,12 @@ High-priority bugs to integrate:
 - Timeline uses same WebSocket pattern as EventMap for consistency
 - Last update timestamp shown in Timeline header for user awareness
 
+### Key Decisions (03-01)
+- 32-byte crypto random tokens (64 hex chars) per D-13
+- SHA-256 hash storage for tokens per D-14
+- timingSafeEqual for constant-time token comparison
+- Set-based disposable domain lookup for O(1) performance
+
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-18 after 02-05 execution complete (Phase 2 complete)*
+*Last updated: 2026-04-18 after 03-01 execution complete*
