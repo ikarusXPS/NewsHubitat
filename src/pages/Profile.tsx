@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import {
   User,
   Mail,
@@ -20,12 +21,43 @@ import { useAuth } from '../contexts/AuthContext';
 import { useAppStore } from '../store';
 import { cn } from '../lib/utils';
 import { Toast } from '../components/Toast';
+import { ReadingInsights } from '../components/profile/ReadingInsights';
+import type { NewsArticle } from '../types';
 
 export function Profile() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, isAuthenticated, logout, isLoading } = useAuth();
-  const { bookmarkedArticles, readingHistory } = useAppStore();
+  const { bookmarkedArticles, readingHistory, language } = useAppStore();
+
+  // Fetch history articles for ReadingInsights
+  const historyIds = readingHistory.map((e) => e.articleId);
+  const { data: historyArticles } = useQuery({
+    queryKey: ['profile-history-articles', historyIds.slice(0, 50)],
+    queryFn: async () => {
+      const map = new Map<string, NewsArticle>();
+      const results = await Promise.all(
+        historyIds.slice(0, 50).map(async (id) => {
+          try {
+            const response = await fetch(`/api/news/${id}`);
+            if (response.ok) {
+              const data = await response.json();
+              return { id, article: data.data as NewsArticle };
+            }
+          } catch {
+            // Ignore fetch errors
+          }
+          return null;
+        })
+      );
+      results.forEach((r) => {
+        if (r) map.set(r.id, r.article);
+      });
+      return map;
+    },
+    enabled: historyIds.length > 0 && isAuthenticated,
+    staleTime: 5 * 60 * 1000,
+  });
 
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
@@ -230,12 +262,35 @@ export function Profile() {
         </div>
       </div>
 
+      {/* Reading Insights per D-31 */}
+      {historyArticles && historyArticles.size > 0 && (
+        <div className="glass-panel rounded-xl p-6">
+          <h3 className="text-sm font-mono text-gray-500 uppercase tracking-wider mb-4">
+            {language === 'de' ? 'Leseeinblicke' : 'Reading Insights'}
+          </h3>
+          <ReadingInsights articles={historyArticles} />
+        </div>
+      )}
+
       {/* Quick Actions */}
       <div className="glass-panel rounded-xl overflow-hidden">
         <h3 className="text-sm font-mono text-gray-500 uppercase tracking-wider px-4 pt-4 pb-2">
           Quick Actions
         </h3>
         <div className="divide-y divide-gray-800">
+          <button
+            onClick={() => navigate('/history')}
+            className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-800/50 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <Clock className="h-5 w-5 text-[#00ff88]" />
+              <span className="text-white">
+                {language === 'de' ? 'Verlauf anzeigen' : 'View Reading History'}
+              </span>
+            </div>
+            <ChevronRight className="h-5 w-5 text-gray-500" />
+          </button>
+
           <button
             onClick={() => navigate('/bookmarks')}
             className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-800/50 transition-colors"
