@@ -81,7 +81,7 @@ Plans:
 - [x] 03-01-PLAN.md — Database schema + token utilities (AUTH-01, AUTH-02)
 - [x] 03-02-PLAN.md — Backend API endpoints + bilingual emails (AUTH-01, AUTH-02)
 - [x] 03-03-PLAN.md — Cleanup service for unverified accounts (AUTH-01)
-- [ ] 03-04-PLAN.md — Frontend verification/reset pages (AUTH-01, AUTH-02)
+- [x] 03-04-PLAN.md — Frontend verification/reset pages (AUTH-01, AUTH-02)
 - [ ] 03-05-PLAN.md — Verification UI components (AUTH-01)
 
 **Success Criteria:**
@@ -185,4 +185,4 @@ High-priority bugs to address during phases:
 ---
 
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-18 after 03-03 execution (3/5 plans complete)*
+*Last updated: 2026-04-18 after 03-04 execution (4/5 plans complete)*

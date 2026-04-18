@@ -40,14 +40,14 @@ See: .planning/PROJECT.md (updated 2026-04-18)
 | 03-01 | Schema + token utilities | 4 | 1 | ✓ Complete |
 | 03-02 | Backend API + bilingual emails | 3 | 2 | ✓ Complete |
 | 03-03 | Cleanup service | 2 | 2 | ✓ Complete |
-| 03-04 | Frontend verification/reset pages | 4 | 3 | ○ Pending |
+| 03-04 | Frontend verification/reset pages | 4 | 3 | ✓ Complete |
 | 03-05 | Verification UI components | 5 | 3 | ○ Pending |
 
 ## Session Context
 
-**Last action:** Completed 03-03 (Cleanup service) - 2 tasks
-**Next step:** Execute 03-04 (Frontend verification/reset pages) - Wave 3
-**Resume file:** .planning/phases/03-auth-completion/03-03-SUMMARY.md
+**Last action:** Completed 03-04 (Frontend verification/reset pages) - 4 tasks
+**Next step:** Execute 03-05 (Verification UI components) - Wave 3
+**Resume file:** .planning/phases/03-auth-completion/03-04-SUMMARY.md
 
 ### Key Decisions (Phase 2)
 - Inline article preview in event panel (D-01)
@@ -100,6 +100,12 @@ High-priority bugs to integrate:
 - Generate fresh verification token for each reminder email
 - Cleanup runs immediately on startup then daily interval (D-18)
 
+### Key Decisions (03-04)
+- Use /profile instead of /login as return link (no dedicated login page exists)
+- Password strength meter shows bilingual labels (EN/DE) simultaneously
+- All auth pages use full-screen dark cyber theme (bg-[#0a0a0f], bg-[#111118])
+- zxcvbn-ts initialization at module level for performance
+
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-18 after 03-03 execution complete*
+*Last updated: 2026-04-18 after 03-04 execution complete*
