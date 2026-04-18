@@ -42,15 +42,23 @@ See: .planning/PROJECT.md (updated 2026-04-18)
 | 06-01 | Database schema + store extensions | 3 | 1 | ✓ Complete |
 | 06-02 | History page with timeline grouping | 3 | 1 | ✓ Complete |
 | 06-03 | Personalization engine + For You carousel | 3 | 2 | ✓ Complete |
-| 06-04 | Profile enhancements + avatar system | 3 | 2 | ○ Pending |
+| 06-04 | Profile enhancements + avatar system | 3 | 2 | ✓ Complete |
 | 06-05 | Gamification: badges, achievements | 3 | 3 | ○ Pending |
 | 06-06 | Leaderboard + account management | 3 | 3 | ○ Pending |
 
 ## Session Context
 
-**Last action:** Completed 06-03 (Personalization engine + For You carousel)
-**Next step:** Execute 06-04 (Profile enhancements + avatar system)
+**Last action:** Completed 06-04 (Profile enhancements + avatar system)
+**Next step:** Execute 06-05 (Gamification: badges, achievements)
 **Resume file:** —
+
+### Key Decisions (06-04)
+- Name change requires password confirmation (D-28)
+- Avatar upload validates 2MB and JPEG/PNG (D-29)
+- Profile shows reading insights with streak, activity, regions, topics (D-31, D-33)
+- Only unlocked regions shown in avatar picker (D-35)
+- 5 articles from a region unlocks its avatars (D-37)
+- Custom avatar upload requires email verification (D-49)
 
 ### Key Decisions (06-03)
 - Topic weighting from title keywords with DE/EN stop words (D-09)
