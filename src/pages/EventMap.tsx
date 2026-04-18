@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEventSocket } from '../hooks/useEventSocket';
 import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from 'react-leaflet';
@@ -163,6 +164,8 @@ export function EventMap() {
   const [timeFilter, setTimeFilter] = useState<TimeFilter>('7d');
   const [showEventDetails, setShowEventDetails] = useState(false);
 
+  const queryClient = useQueryClient();
+
   // Fetch real events from API
   const { data: events, isLoading, error, refetch } = useQuery({
     queryKey: ['geo-events'], // Synchronized with Monitor
@@ -178,12 +181,23 @@ export function EventMap() {
     refetchInterval: 2 * 60_000, // Auto-refetch every 2 minutes (same as Monitor)
   });
 
+  // WebSocket for real-time updates (per D-12, D-13, D-14)
+  const { isConnected, newEvents, clearNewEvents, lastEventTime } = useEventSocket({
+    enabled: true,
+    onNewEvent: () => {
+      // Invalidate query to refetch data when new event arrives
+      queryClient.invalidateQueries({ queryKey: ['geo-events'] });
+    },
+  });
+
   // Handle URL params for deep linking (e.g., /event-map?event=abc123)
+  // Deep linking pattern - setting state based on URL params is valid
   useEffect(() => {
     const eventId = searchParams.get('event');
     if (eventId && events) {
       const event = events.find((e) => e.id === eventId);
       if (event) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setSelectedEvent(event);
         setShowEventDetails(true);
         // Clear the param after handling
@@ -211,6 +225,7 @@ export function EventMap() {
       return [];
     }
 
+    // eslint-disable-next-line react-hooks/purity -- Date.now() is intentionally used for time filtering within useMemo
     const now = Date.now();
     const timeFilterConfig = TIME_FILTER_OPTIONS.find((t) => t.value === timeFilter);
     const timeThreshold = timeFilterConfig?.ms ? now - timeFilterConfig.ms : null;
@@ -621,6 +636,22 @@ export function EventMap() {
         </div>
       </div>
 
+      {/* WebSocket Connection Status (per D-12, D-14) */}
+      <div className="absolute bottom-4 left-4 z-10">
+        <div className={cn(
+          'flex items-center gap-2 px-3 py-1.5 rounded-full font-mono text-[10px] uppercase tracking-wider backdrop-blur-sm border',
+          isConnected
+            ? 'bg-[#00ff88]/10 border-[#00ff88]/30 text-[#00ff88]'
+            : 'bg-gray-800/80 border-gray-700 text-gray-500'
+        )}>
+          <div className={cn(
+            'w-1.5 h-1.5 rounded-full',
+            isConnected ? 'bg-[#00ff88] animate-pulse' : 'bg-gray-500'
+          )} />
+          <span>{isConnected ? 'LIVE' : 'OFFLINE'}</span>
+        </div>
+      </div>
+
       {/* Map */}
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-4 min-h-0">
         {/* Event List */}
@@ -728,8 +759,8 @@ export function EventMap() {
 
                   // Check if event is recent (< 30 minutes)
                   const eventTime = new Date(event.timestamp).getTime();
-                  const now = Date.now();
-                  const isRecent = now - eventTime < 30 * 60 * 1000;
+                  // eslint-disable-next-line react-hooks/purity -- Date.now() for time-based styling
+                  const isRecent = Date.now() - eventTime < 30 * 60 * 1000;
 
                   return (
                     <CircleMarker
