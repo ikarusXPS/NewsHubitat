@@ -17,22 +17,22 @@ See: .planning/PROJECT.md (updated 2026-04-18)
 |-------|------|--------|-------|
 | 1 | AI Analysis | ✓ Complete | 1/1 |
 | 2 | Event System | ✓ Complete | 5/5 |
-| 3 | Auth Completion | ◐ Ready | 5/5 |
+| 3 | Auth Completion | ✓ Complete | 5/5 |
 | 4 | User Preferences | ○ Pending | 0/0 |
 | 5 | Bookmarks | ○ Pending | 0/0 |
 | 6 | Reading History | ○ Pending | 0/0 |
 
-**Progress:** ██░░░░░░░░ 33%
+**Progress:** █████░░░░░ 50%
 
 ## Current Phase
 
 **Phase:** 3 - Auth Completion
-**Status:** Ready to execute
+**Status:** Complete
 **Goal:** Add email verification and password reset flows
 
 ### Requirements
-- [ ] AUTH-01: User receives email verification after registration
-- [ ] AUTH-02: User can reset password via email link
+- [x] AUTH-01: User receives email verification after registration
+- [x] AUTH-02: User can reset password via email link
 
 ### Plans
 | Plan | Objective | Tasks | Wave | Status |
@@ -41,13 +41,13 @@ See: .planning/PROJECT.md (updated 2026-04-18)
 | 03-02 | Backend API + bilingual emails | 3 | 2 | ✓ Complete |
 | 03-03 | Cleanup service | 2 | 2 | ✓ Complete |
 | 03-04 | Frontend verification/reset pages | 4 | 3 | ✓ Complete |
-| 03-05 | Verification UI components | 5 | 3 | ○ Pending |
+| 03-05 | Verification UI components | 5 | 3 | ✓ Complete |
 
 ## Session Context
 
-**Last action:** Completed 03-04 (Frontend verification/reset pages) - 4 tasks
-**Next step:** Execute 03-05 (Verification UI components) - Wave 3
-**Resume file:** .planning/phases/03-auth-completion/03-04-SUMMARY.md
+**Last action:** Completed 03-05 (Verification UI components) - 5 tasks
+**Next step:** Phase 3 complete. Ready for Phase 4 (User Preferences).
+**Resume file:** .planning/phases/03-auth-completion/03-05-SUMMARY.md
 
 ### Key Decisions (Phase 2)
 - Inline article preview in event panel (D-01)
@@ -106,6 +106,11 @@ High-priority bugs to integrate:
 - All auth pages use full-screen dark cyber theme (bg-[#0a0a0f], bg-[#111118])
 - zxcvbn-ts initialization at module level for performance
 
+### Key Decisions (03-05)
+- Urgency colors: cyan (default) -> yellow (7 days) -> orange (3 days) -> red (1 day)
+- VerificationBanner placed before Layout in App.tsx for top positioning
+- LockedFeature renders children normally if not authenticated or already verified
+
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-18 after 03-04 execution complete*
+*Last updated: 2026-04-18 after 03-05 execution complete (Phase 3 complete)*
