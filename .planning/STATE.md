@@ -26,30 +26,24 @@ See: .planning/PROJECT.md (updated 2026-04-18)
 
 ## Current Phase
 
-**Phase:** 2 - Event System
-**Status:** Complete
-**Goal:** Link timeline events to articles and add historical database
+**Phase:** 3 - Auth Completion
+**Status:** Context Gathered
+**Goal:** Add email verification and password reset flows
 
 ### Requirements
-- [x] EVT-01: User can view timeline events linked to related NewsArticles
-- [x] EVT-02: User can browse historical events database (100+ key events)
-- [x] EVT-03: User sees clustered event markers in dense map regions
-- [x] EVT-04: User sees real-time event markers update on globe/map
+- [ ] AUTH-01: User receives email verification after registration
+- [ ] AUTH-02: User can reset password via email link
 
 ### Plans
 | Plan | Objective | Tasks | Wave | Status |
 |------|-----------|-------|------|--------|
-| 02-01 | Historical events i18n database (100+ events) | 2 | 1 | Complete |
-| 02-02 | Location extraction expansion (100+ patterns) | 1 | 1 | Complete |
-| 02-03 | Article preview in EventDetailPanel + i18n | 2 | 2 | Complete |
-| 02-04 | useEventSocket hook + GlobeView query | 3 | 2 | Complete |
-| 02-05 | LiveBadge component + Timeline integration | 3 | 3 | Complete |
+| (none yet) | — | — | — | — |
 
 ## Session Context
 
-**Last action:** Completed 02-05 (LiveBadge component + Timeline WebSocket integration)
-**Next step:** Phase transition - Event System complete, proceed to Phase 3
-**Resume file:** None (phase complete)
+**Last action:** Gathered Phase 3 context (54 decisions captured)
+**Next step:** Run /gsd-plan-phase 3 to create implementation plans
+**Resume file:** .planning/phases/03-auth-completion/03-CONTEXT.md
 
 ### Key Decisions (Phase 2)
 - Inline article preview in event panel (D-01)
