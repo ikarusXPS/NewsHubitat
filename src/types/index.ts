@@ -77,6 +77,27 @@ export interface TimelineEvent {
   relatedArticles: string[];
 }
 
+export interface I18nText {
+  de: string;
+  en: string;
+}
+
+export interface TimelineEventI18n {
+  id: string;
+  date: Date;
+  title: I18nText;
+  description: I18nText;
+  category: 'military' | 'diplomacy' | 'humanitarian' | 'protest' | 'other' | 'economic';
+  severity: number; // 1-10
+  sources: string[];
+  location?: {
+    lat: number;
+    lng: number;
+    name: string;
+  };
+  relatedArticles: string[];
+}
+
 export type EventSeverity = 'critical' | 'high' | 'medium' | 'low';
 export type EventCategory = 'conflict' | 'humanitarian' | 'political' | 'economic' | 'military' | 'protest' | 'diplomacy' | 'other';
 
