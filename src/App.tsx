@@ -6,6 +6,7 @@ import { onCLS, onINP, onLCP, onFCP, onTTFB } from 'web-vitals';
 import { Layout } from './components/Layout';
 import { Dashboard } from './pages/Dashboard';
 import { AuthProvider } from './contexts/AuthContext';
+import { VerificationBanner } from './components/VerificationBanner';
 import { cacheService } from './services/cacheService';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { FocusSuggestions } from './components/FocusSuggestions';
@@ -151,6 +152,9 @@ export default function App() {
         <BrowserRouter>
           {/* Show onboarding for first-time users */}
           {!hasCompletedOnboarding && <FocusOnboarding />}
+
+          {/* Verification banner for unverified users */}
+          <VerificationBanner />
 
           <Layout>
             <AppRoutes />
