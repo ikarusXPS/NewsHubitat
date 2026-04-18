@@ -1,10 +1,11 @@
 ---
 phase: 6
 slug: reading-history
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-04-18
+reviewed_at: 2026-04-18
 ---
 
 # Phase 6 - UI Design Contract
@@ -41,7 +42,7 @@ Declared values (must be multiples of 4):
 
 Exceptions:
 - Touch targets for avatar picker: 44px minimum (accessibility)
-- Podium heights: 70px, 100px, 140px (rank 3, 2, 1 respectively)
+- Podium heights: 72px, 100px, 140px (rank 3, 2, 1 respectively — all multiples of 4)
 
 ---
 
@@ -50,7 +51,7 @@ Exceptions:
 | Role | Size | Weight | Line Height | Font |
 |------|------|--------|-------------|------|
 | Body | 14px | 400 | 1.5 | Inter |
-| Label | 10px | 500 | 1.2 | JetBrains Mono (uppercase, letter-spacing: 0.1em) |
+| Label | 10px | 400 | 1.2 | JetBrains Mono (uppercase, letter-spacing: 0.1em) |
 | Heading | 20px | 700 | 1.2 | JetBrains Mono |
 | Display | 28px | 700 | 1.1 | JetBrains Mono |
 
@@ -354,7 +355,7 @@ Position: New tab in Community.tsx alongside Contribute/Badges
 ```
 
 **Time filters:** All-time (default), This Month, This Week
-**Podium heights:** 140px (#1), 100px (#2), 70px (#3)
+**Podium heights:** 140px (#1), 100px (#2), 72px (#3)
 **User's row:** Pinned at bottom with cyan highlight
 **Privacy opt-out:** User not shown on leaderboard if opted out in Settings
 
@@ -520,11 +521,11 @@ Pattern: Use existing `.skeleton` class with shimmer animation.
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
+- [x] Dimension 1 Copywriting: PASS
+- [x] Dimension 2 Visuals: PASS
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: PASS
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS
 
-**Approval:** pending
+**Approval:** approved 2026-04-18
