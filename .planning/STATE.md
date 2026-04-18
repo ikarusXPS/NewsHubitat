@@ -40,15 +40,15 @@ See: .planning/PROJECT.md (updated 2026-04-18)
 | Plan | Objective | Tasks | Wave | Status |
 |------|-----------|-------|------|--------|
 | 02-01 | Historical events i18n database (100+ events) | 2 | 1 | Pending |
-| 02-02 | Location extraction expansion (100+ patterns) | 1 | 1 | Pending |
+| 02-02 | Location extraction expansion (100+ patterns) | 1 | 1 | Complete |
 | 02-03 | Article preview in EventDetailPanel + i18n | 2 | 2 | Pending |
 | 02-04 | useEventSocket hook + GlobeView query | 3 | 2 | Pending |
 | 02-05 | LiveBadge component + Timeline integration | 3 | 3 | Pending |
 
 ## Session Context
 
-**Last action:** Phase 2 planning complete (5 plans in 3 waves)
-**Next step:** `/gsd-execute-phase 2` — execute Event System phase
+**Last action:** Completed 02-02 (location extraction expansion - 184 global patterns)
+**Next step:** Continue with remaining Phase 2 plans (02-01, 02-03, 02-04, 02-05)
 **Resume file:** `.planning/phases/02-event-system/02-01-PLAN.md`
 
 ### Key Decisions (Phase 2)
@@ -62,9 +62,9 @@ See: .planning/PROJECT.md (updated 2026-04-18)
 
 High-priority bugs to integrate:
 - B5: Settings page needs more options (Phase 4)
-- B6: Map point density too low (Phase 2)
+- B6: Map point density too low - FIXED in 02-02 (184 location patterns)
 - B7: Article thumbnail fallback (Phase 1 or 2)
 
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-18 after Phase 1 execution complete*
+*Last updated: 2026-04-18 after 02-02 execution complete*

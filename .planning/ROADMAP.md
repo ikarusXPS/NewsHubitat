@@ -52,7 +52,7 @@ Plans:
 
 Plans:
 - [ ] 02-01-PLAN.md — Historical events i18n database (100+ global events, DE/EN)
-- [ ] 02-02-PLAN.md — Location extraction expansion (50+ global cities for B6)
+- [x] 02-02-PLAN.md — Location extraction expansion (184 global cities for B6)
 - [ ] 02-03-PLAN.md — Article preview in EventDetailPanel with i18n
 - [ ] 02-04-PLAN.md — GlobeView independent query + useEventSocket hook
 - [ ] 02-05-PLAN.md — LiveBadge component and Timeline WebSocket integration
@@ -170,10 +170,10 @@ High-priority bugs to address during phases:
 | Bug | Description | Integrate With |
 |-----|-------------|----------------|
 | B5 | Settings page needs more options | Phase 4 |
-| B6 | Map point density too low | Phase 2 (Plan 02) |
+| B6 | Map point density too low | Phase 2 (Plan 02) - FIXED |
 | B7 | Article thumbnail fallback | Phase 1 or 2 |
 
 ---
 
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-18 after Phase 2 planning complete*
+*Last updated: 2026-04-18 after 02-02 execution complete*

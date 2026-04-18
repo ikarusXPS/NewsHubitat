@@ -126,4 +126,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-04-18*
-*Last updated: 2026-04-18 after Phase 1 execution complete*
+*Last updated: 2026-04-18 after 02-02 execution (EVT-03 partial: location patterns expanded)*
