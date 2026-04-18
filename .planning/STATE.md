@@ -5,7 +5,7 @@
 See: .planning/PROJECT.md (updated 2026-04-18)
 
 **Core value:** Users can see how the same story is covered by different regional perspectives
-**Current focus:** Phase 5 - Bookmarks
+**Current focus:** Phase 6 - Reading History
 
 ## Milestone Progress
 
@@ -19,21 +19,22 @@ See: .planning/PROJECT.md (updated 2026-04-18)
 | 2 | Event System | ✓ Complete | 5/5 |
 | 3 | Auth Completion | ✓ Complete | 5/5 |
 | 4 | User Preferences | ✓ Complete | 0/0 (pre-existing) |
-| 5 | Bookmarks | ○ Pending | 0/0 |
+| 5 | Bookmarks | ✓ Complete | 0/0 (pre-existing) |
 | 6 | Reading History | ○ Pending | 0/0 |
 
-**Progress:** ██████░░░░ 67%
+**Progress:** ████████░░ 83%
 
 ## Current Phase
 
-**Phase:** 5 - Bookmarks
+**Phase:** 6 - Reading History
 **Status:** Pending
-**Goal:** Enable article saving and bookmark management
+**Goal:** Track reading history and personalize news feed
 
 ### Requirements
-- [ ] BOOK-01: User can save articles to bookmarks
-- [ ] BOOK-02: User can unsave articles from bookmarks
-- [ ] BOOK-03: User can view all bookmarked articles on BookmarksPage
+- [ ] HIST-01: User's read articles are tracked automatically
+- [ ] HIST-02: User can view reading history
+- [ ] HIST-03: User sees personalized feed based on reading patterns
+- [ ] UI-01: User can view and edit profile on UserProfile page
 
 ### Plans
 | Plan | Objective | Tasks | Wave | Status |
@@ -42,9 +43,15 @@ See: .planning/PROJECT.md (updated 2026-04-18)
 
 ## Session Context
 
-**Last action:** Marked Phase 4 complete (pre-existing implementation in Settings.tsx)
-**Next step:** Discuss Phase 5 (Bookmarks) requirements
+**Last action:** Verified and marked Phase 5 complete (pre-existing bookmark implementation)
+**Next step:** Discuss Phase 6 (Reading History) requirements
 **Resume file:** —
+
+### Phase 5 Notes
+Phase 5 (Bookmarks) was marked complete without new plans — all requirements pre-existing:
+- BOOK-01: `toggleBookmark()` in Zustand store + bookmark button in NewsCard
+- BOOK-02: Same toggle removes bookmarks
+- BOOK-03: `src/pages/Bookmarks.tsx` with grid view, clear all, empty state
 
 ### Key Decisions (Phase 2)
 - Inline article preview in event panel (D-01)

@@ -12,7 +12,7 @@
 | 2 | Event System | Link timeline to articles, add historical DB | EVT-01, EVT-02, EVT-03, EVT-04 | ✓ Complete |
 | 3 | Auth Completion | Add email verification and password reset | AUTH-01, AUTH-02 | ✓ Complete |
 | 4 | User Preferences | Implement settings page with all preferences | PREF-01, PREF-02, PREF-03, PREF-04, UI-02 | ✓ Complete |
-| 5 | Bookmarks | Enable article saving and bookmark management | BOOK-01, BOOK-02, BOOK-03 | ○ Pending |
+| 5 | Bookmarks | Enable article saving and bookmark management | BOOK-01, BOOK-02, BOOK-03 | ✓ Complete |
 | 6 | Reading History | Track history and personalize feed | HIST-01, HIST-02, HIST-03, UI-01 | ○ Pending |
 
 ---
@@ -129,6 +129,15 @@ Plans:
 **Goal:** Enable article saving and bookmark management
 
 **Requirements:** BOOK-01, BOOK-02, BOOK-03
+
+**Plans:** 0 plans (pre-existing implementation)
+
+**Note:** All requirements were already implemented before this milestone began:
+- `toggleBookmark()` and `isBookmarked()` in Zustand store
+- Bookmark button in NewsCard.tsx with toggle and visual feedback
+- `src/pages/Bookmarks.tsx` with grid view, clear all, empty state
+- Route `/bookmarks` and Sidebar "Saved" navigation link
+- Zustand persist middleware for cross-session persistence
 
 **Success Criteria:**
 1. User clicks save on article and it appears in bookmarks

@@ -35,9 +35,9 @@ Requirements for milestone 1.0 (Phases 5-6). Each maps to roadmap phases.
 
 ### Bookmarks
 
-- [ ] **BOOK-01**: User can save articles to bookmarks
-- [ ] **BOOK-02**: User can unsave articles from bookmarks
-- [ ] **BOOK-03**: User can view all bookmarked articles on BookmarksPage
+- [x] **BOOK-01**: User can save articles to bookmarks
+- [x] **BOOK-02**: User can unsave articles from bookmarks
+- [x] **BOOK-03**: User can view all bookmarked articles on BookmarksPage
 
 ### Reading History
 
@@ -110,9 +110,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PREF-02 | Phase 4 | Complete |
 | PREF-03 | Phase 4 | Complete |
 | PREF-04 | Phase 4 | Complete |
-| BOOK-01 | Phase 5 | Pending |
-| BOOK-02 | Phase 5 | Pending |
-| BOOK-03 | Phase 5 | Pending |
+| BOOK-01 | Phase 5 | Complete |
+| BOOK-02 | Phase 5 | Complete |
+| BOOK-03 | Phase 5 | Complete |
 | HIST-01 | Phase 6 | Pending |
 | HIST-02 | Phase 6 | Pending |
 | HIST-03 | Phase 6 | Pending |
