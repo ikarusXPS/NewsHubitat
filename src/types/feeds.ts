@@ -36,3 +36,10 @@ export const defaultReadState: ReadState = {
   readArticles: [],
   hideReadArticles: false,
 };
+
+// Reading history entry with readCount per D-02
+export interface ReadingHistoryEntry {
+  articleId: string;
+  timestamp: number;
+  readCount: number;  // Track re-reads per D-02
+}
