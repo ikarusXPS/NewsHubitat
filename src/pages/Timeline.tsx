@@ -1,5 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEventSocket } from '../hooks/useEventSocket';
+import { LiveBadge } from '../components/LiveBadge';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Clock,
@@ -462,6 +464,17 @@ export function Timeline() {
     staleTime: 2 * 60 * 1000,
   });
 
+  const queryClient = useQueryClient();
+
+  // WebSocket for real-time updates (EVT-04, D-14)
+  const { isConnected, lastEventTime } = useEventSocket({
+    enabled: true,
+    onNewEvent: () => {
+      // Invalidate timeline query to show new events
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+    },
+  });
+
   // Toggle category selection (multi-select)
   const toggleCategory = (category: string) => {
     setSelectedCategories((prev) => {
@@ -557,6 +570,7 @@ export function Timeline() {
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold font-mono gradient-text-cyber">Ereignis-Timeline</h1>
@@ -564,14 +578,29 @@ export function Timeline() {
             Chronologische Dokumentation aller relevanten Ereignisse
           </p>
         </div>
-        <button
-          onClick={() => refetch()}
-          disabled={isFetching}
-          className="btn-cyber flex items-center gap-2 px-3 py-2 text-sm disabled:opacity-50"
-        >
-          <RefreshCw className={cn('h-4 w-4', isFetching && 'animate-spin')} />
-          Aktualisieren
-        </button>
+        <div className="flex items-center gap-4">
+          {/* Event count */}
+          <div className="text-sm font-mono text-gray-400">
+            {data?.meta.total || 0} Ereignisse
+          </div>
+          {/* Last update indicator */}
+          {lastEventTime && (
+            <div className="text-[10px] font-mono text-gray-600">
+              Letztes Update: {lastEventTime.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}
+            </div>
+          )}
+          {/* Live indicator */}
+          <LiveBadge isConnected={isConnected} />
+          {/* Refresh button */}
+          <button
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="btn-cyber flex items-center gap-2 px-3 py-2 text-sm disabled:opacity-50"
+          >
+            <RefreshCw className={cn('h-4 w-4', isFetching && 'animate-spin')} />
+            Aktualisieren
+          </button>
+        </div>
       </div>
 
       {/* Filters Section */}
