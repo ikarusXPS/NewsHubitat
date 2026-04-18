@@ -20,6 +20,7 @@ import { NewsAggregator } from './services/newsAggregator';
 import { WebSocketService } from './services/websocketService';
 import { CacheService } from './services/cacheService';
 import { AIService } from './services/aiService';
+import { CleanupService } from './services/cleanupService';
 
 const app = express();
 const httpServer = createServer(app);
@@ -140,6 +141,10 @@ httpServer.listen(PORT, () => {
   newsAggregator.startAggregation().catch((err) => {
     console.error('Aggregation error:', err);
   });
+
+  // Start cleanup service for unverified account management (D-18)
+  const cleanupService = CleanupService.getInstance();
+  cleanupService.start();
 });
 
 httpServer.on('error', (error: NodeJS.ErrnoException) => {
@@ -159,6 +164,7 @@ const shutdown = async () => {
   await wsService.shutdown();
   await cacheService.shutdown();
   aiService.shutdown();
+  CleanupService.getInstance().stop();
 
   httpServer.close(() => {
     console.log('Server closed');
