@@ -9,10 +9,10 @@ Requirements for milestone 1.0 (Phases 5-6). Each maps to roadmap phases.
 
 ### AI Analysis
 
-- [ ] **AI-01**: User receives citations with article IDs when AI answers questions
-- [ ] **AI-02**: User can ask follow-up questions with preserved context
-- [ ] **AI-03**: User sees coverage gap alerts when topics lack regional diversity
-- [ ] **AI-04**: User sees propaganda pattern indicators on articles
+- [x] **AI-01**: User receives citations with article IDs when AI answers questions
+- [x] **AI-02**: User can ask follow-up questions with preserved context
+- [x] **AI-03**: User sees coverage gap alerts when topics lack regional diversity
+- [x] **AI-04**: User sees propaganda pattern indicators on articles
 
 ### Event Timeline
 
@@ -96,10 +96,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AI-01 | Phase 1 | Pending |
-| AI-02 | Phase 1 | Pending |
-| AI-03 | Phase 1 | Pending |
-| AI-04 | Phase 1 | Pending |
+| AI-01 | Phase 1 | Complete |
+| AI-02 | Phase 1 | Complete |
+| AI-03 | Phase 1 | Complete |
+| AI-04 | Phase 1 | Complete |
 | EVT-01 | Phase 2 | Pending |
 | EVT-02 | Phase 2 | Pending |
 | EVT-03 | Phase 2 | Pending |
@@ -126,4 +126,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-04-18*
-*Last updated: 2026-04-18 after initialization*
+*Last updated: 2026-04-18 after Phase 1 execution complete*
