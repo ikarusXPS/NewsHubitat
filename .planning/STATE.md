@@ -39,7 +39,7 @@ See: .planning/PROJECT.md (updated 2026-04-18)
 ### Plans
 | Plan | Objective | Tasks | Wave | Status |
 |------|-----------|-------|------|--------|
-| 02-01 | Historical events i18n database (100+ events) | 2 | 1 | Pending |
+| 02-01 | Historical events i18n database (100+ events) | 2 | 1 | Complete |
 | 02-02 | Location extraction expansion (100+ patterns) | 1 | 1 | Complete |
 | 02-03 | Article preview in EventDetailPanel + i18n | 2 | 2 | Pending |
 | 02-04 | useEventSocket hook + GlobeView query | 3 | 2 | Pending |
@@ -47,9 +47,9 @@ See: .planning/PROJECT.md (updated 2026-04-18)
 
 ## Session Context
 
-**Last action:** Completed 02-02 (location extraction expansion - 184 global patterns)
-**Next step:** Continue with remaining Phase 2 plans (02-01, 02-03, 02-04, 02-05)
-**Resume file:** `.planning/phases/02-event-system/02-01-PLAN.md`
+**Last action:** Completed 02-01 (historical events i18n database - 111 events)
+**Next step:** Continue with remaining Phase 2 plans (02-03, 02-04, 02-05)
+**Resume file:** `.planning/phases/02-event-system/02-03-PLAN.md`
 
 ### Key Decisions (Phase 2)
 - Inline article preview in event panel (D-01)
@@ -65,6 +65,10 @@ High-priority bugs to integrate:
 - B6: Map point density too low - FIXED in 02-02 (184 location patterns)
 - B7: Article thumbnail fallback (Phase 1 or 2)
 
+### Key Decisions (02-01)
+- Added 'economic' category to TimelineEventI18n for global events
+- Preserved legacy getHistoricalEvents() with German default for backward compatibility
+
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-18 after 02-02 execution complete*
+*Last updated: 2026-04-18 after 02-01 execution complete*

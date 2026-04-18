@@ -17,7 +17,7 @@ Requirements for milestone 1.0 (Phases 5-6). Each maps to roadmap phases.
 ### Event Timeline
 
 - [ ] **EVT-01**: User can view timeline events linked to related NewsArticles
-- [ ] **EVT-02**: User can browse historical events database (100+ key events)
+- [x] **EVT-02**: User can browse historical events database (100+ key events)
 - [ ] **EVT-03**: User sees clustered event markers in dense map regions
 - [ ] **EVT-04**: User sees real-time event markers update on globe/map
 
@@ -101,7 +101,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AI-03 | Phase 1 | Complete |
 | AI-04 | Phase 1 | Complete |
 | EVT-01 | Phase 2 | Pending |
-| EVT-02 | Phase 2 | Pending |
+| EVT-02 | Phase 2 | Complete |
 | EVT-03 | Phase 2 | Pending |
 | EVT-04 | Phase 2 | Pending |
 | AUTH-01 | Phase 3 | Pending |
@@ -126,4 +126,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-04-18*
-*Last updated: 2026-04-18 after 02-02 execution (EVT-03 partial: location patterns expanded)*
+*Last updated: 2026-04-18 after 02-01 execution (EVT-02 complete: 111 historical events with i18n)*
