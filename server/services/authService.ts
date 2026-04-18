@@ -528,6 +528,13 @@ export class AuthService {
     return emailRegex.test(email);
   }
 
+  /**
+   * Verify a password against a hash (for profile editing D-28)
+   */
+  async verifyPassword(password: string, hash: string): Promise<boolean> {
+    return bcrypt.compare(password, hash);
+  }
+
   // Stats
   async getUserCount(): Promise<number> {
     return prisma.user.count();
