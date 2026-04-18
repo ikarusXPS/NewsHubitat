@@ -75,6 +75,15 @@ Plans:
 
 **Requirements:** AUTH-01, AUTH-02
 
+**Plans:** 5 plans
+
+Plans:
+- [ ] 03-01-PLAN.md — Database schema + token utilities (AUTH-01, AUTH-02)
+- [ ] 03-02-PLAN.md — Backend API endpoints + bilingual emails (AUTH-01, AUTH-02)
+- [ ] 03-03-PLAN.md — Cleanup service for unverified accounts (AUTH-01)
+- [ ] 03-04-PLAN.md — Frontend verification/reset pages (AUTH-01, AUTH-02)
+- [ ] 03-05-PLAN.md — Verification UI components (AUTH-01)
+
 **Success Criteria:**
 1. User registers and receives verification email
 2. User clicks verification link and account is activated
@@ -176,4 +185,4 @@ High-priority bugs to address during phases:
 ---
 
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-18 after Phase 2 complete (5/5 plans)*
+*Last updated: 2026-04-18 after Phase 3 planning (5 plans)*
