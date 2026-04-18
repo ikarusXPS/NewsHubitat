@@ -16,18 +16,18 @@ See: .planning/PROJECT.md (updated 2026-04-18)
 | Phase | Name | Status | Plans |
 |-------|------|--------|-------|
 | 1 | AI Analysis | ✓ Complete | 1/1 |
-| 2 | Event System | ◐ Ready to execute | 5/5 |
+| 2 | Event System | ✓ Complete | 5/5 |
 | 3 | Auth Completion | ○ Pending | 0/0 |
 | 4 | User Preferences | ○ Pending | 0/0 |
 | 5 | Bookmarks | ○ Pending | 0/0 |
 | 6 | Reading History | ○ Pending | 0/0 |
 
-**Progress:** █░░░░░░░░░ 17%
+**Progress:** ██░░░░░░░░ 33%
 
 ## Current Phase
 
 **Phase:** 2 - Event System
-**Status:** Ready to execute
+**Status:** Complete
 **Goal:** Link timeline events to articles and add historical database
 
 ### Requirements
@@ -43,13 +43,13 @@ See: .planning/PROJECT.md (updated 2026-04-18)
 | 02-02 | Location extraction expansion (100+ patterns) | 1 | 1 | Complete |
 | 02-03 | Article preview in EventDetailPanel + i18n | 2 | 2 | Complete |
 | 02-04 | useEventSocket hook + GlobeView query | 3 | 2 | Complete |
-| 02-05 | LiveBadge component + Timeline integration | 3 | 3 | Pending |
+| 02-05 | LiveBadge component + Timeline integration | 3 | 3 | Complete |
 
 ## Session Context
 
-**Last action:** Completed 02-03 (article preview + i18n in EventDetailPanel)
-**Next step:** Execute 02-05 (LiveBadge + Timeline WebSocket)
-**Resume file:** `.planning/phases/02-event-system/02-05-PLAN.md`
+**Last action:** Completed 02-05 (LiveBadge component + Timeline WebSocket integration)
+**Next step:** Phase transition - Event System complete, proceed to Phase 3
+**Resume file:** None (phase complete)
 
 ### Key Decisions (Phase 2)
 - Inline article preview in event panel (D-01)
@@ -79,6 +79,11 @@ High-priority bugs to integrate:
 - Limit socket reconnection to 5 attempts with 1s delay (T-02-06 mitigation)
 - Keep newEvents buffer at 10 items max
 
+### Key Decisions (02-05)
+- Consolidated LIVE badge styling into reusable LiveBadge component
+- Timeline uses same WebSocket pattern as EventMap for consistency
+- Last update timestamp shown in Timeline header for user awareness
+
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-18 after 02-03 execution complete*
+*Last updated: 2026-04-18 after 02-05 execution complete (Phase 2 complete)*

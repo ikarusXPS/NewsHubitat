@@ -9,7 +9,7 @@
 | # | Phase | Goal | Requirements | Status |
 |---|-------|------|--------------|--------|
 | 1 | AI Analysis | Complete AI Q&A with citations and context | AI-01, AI-02, AI-03, AI-04 | ✓ Complete |
-| 2 | Event System | Link timeline to articles, add historical DB | EVT-01, EVT-02, EVT-03, EVT-04 | ◐ Planning |
+| 2 | Event System | Link timeline to articles, add historical DB | EVT-01, EVT-02, EVT-03, EVT-04 | ✓ Complete |
 | 3 | Auth Completion | Add email verification and password reset | AUTH-01, AUTH-02 | ○ Pending |
 | 4 | User Preferences | Implement settings page with all preferences | PREF-01, PREF-02, PREF-03, PREF-04, UI-02 | ○ Pending |
 | 5 | Bookmarks | Enable article saving and bookmark management | BOOK-01, BOOK-02, BOOK-03 | ○ Pending |
@@ -55,7 +55,7 @@ Plans:
 - [x] 02-02-PLAN.md — Location extraction expansion (184 global cities for B6)
 - [x] 02-03-PLAN.md — Article preview in EventDetailPanel with i18n
 - [x] 02-04-PLAN.md — GlobeView independent query + useEventSocket hook
-- [ ] 02-05-PLAN.md — LiveBadge component and Timeline WebSocket integration
+- [x] 02-05-PLAN.md — LiveBadge component and Timeline WebSocket integration
 
 **Success Criteria:**
 1. User clicks timeline event and sees linked NewsArticles
@@ -176,4 +176,4 @@ High-priority bugs to address during phases:
 ---
 
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-18 after 02-03 execution complete*
+*Last updated: 2026-04-18 after Phase 2 complete (5/5 plans)*
