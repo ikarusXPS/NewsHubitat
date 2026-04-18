@@ -39,15 +39,15 @@ See: .planning/PROJECT.md (updated 2026-04-18)
 |------|-----------|-------|------|--------|
 | 03-01 | Schema + token utilities | 4 | 1 | ✓ Complete |
 | 03-02 | Backend API + bilingual emails | 3 | 2 | ✓ Complete |
-| 03-03 | Cleanup service | 2 | 2 | ○ Pending |
+| 03-03 | Cleanup service | 2 | 2 | ✓ Complete |
 | 03-04 | Frontend verification/reset pages | 4 | 3 | ○ Pending |
 | 03-05 | Verification UI components | 5 | 3 | ○ Pending |
 
 ## Session Context
 
-**Last action:** Completed 03-02 (Backend API + bilingual emails) - 3 tasks
-**Next step:** Execute 03-03 (Cleanup service) - Wave 2 parallel
-**Resume file:** .planning/phases/03-auth-completion/03-02-SUMMARY.md
+**Last action:** Completed 03-03 (Cleanup service) - 2 tasks
+**Next step:** Execute 03-04 (Frontend verification/reset pages) - Wave 3
+**Resume file:** .planning/phases/03-auth-completion/03-03-SUMMARY.md
 
 ### Key Decisions (Phase 2)
 - Inline article preview in event panel (D-01)
@@ -95,6 +95,11 @@ High-priority bugs to integrate:
 - Password reset also marks email as verified (D-31)
 - "Wasn't you?" recovery link in password change confirmation (D-33)
 
+### Key Decisions (03-03)
+- setInterval-based daily scheduler (simpler than node-cron for single job)
+- Generate fresh verification token for each reminder email
+- Cleanup runs immediately on startup then daily interval (D-18)
+
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-18 after 03-02 execution complete*
+*Last updated: 2026-04-18 after 03-03 execution complete*
