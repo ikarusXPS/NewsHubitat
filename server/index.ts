@@ -16,6 +16,7 @@ import { focusRoutes } from './routes/focus';
 import personasRoutes from './routes/personas';
 import sharingRoutes from './routes/sharing';
 import emailRoutes from './routes/email';
+import { profileRoutes } from './routes/profile';
 import { NewsAggregator } from './services/newsAggregator';
 import { WebSocketService } from './services/websocketService';
 import { CacheService } from './services/cacheService';
@@ -84,6 +85,7 @@ app.use('/api/focus', focusRoutes);
 app.use('/api/personas', personasRoutes);
 app.use('/api/share', sharingRoutes);
 app.use('/api/email', emailRoutes);
+app.use('/api/profile', profileRoutes);
 
 // Make services available to routes
 app.locals.wsService = wsService;
