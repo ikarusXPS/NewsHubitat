@@ -9,7 +9,7 @@
 | # | Phase | Goal | Requirements | Status |
 |---|-------|------|--------------|--------|
 | 1 | AI Analysis | Complete AI Q&A with citations and context | AI-01, AI-02, AI-03, AI-04 | ✓ Complete |
-| 2 | Event System | Link timeline to articles, add historical DB | EVT-01, EVT-02, EVT-03, EVT-04 | ○ Pending |
+| 2 | Event System | Link timeline to articles, add historical DB | EVT-01, EVT-02, EVT-03, EVT-04 | ◐ Planning |
 | 3 | Auth Completion | Add email verification and password reset | AUTH-01, AUTH-02 | ○ Pending |
 | 4 | User Preferences | Implement settings page with all preferences | PREF-01, PREF-02, PREF-03, PREF-04, UI-02 | ○ Pending |
 | 5 | Bookmarks | Enable article saving and bookmark management | BOOK-01, BOOK-02, BOOK-03 | ○ Pending |
@@ -44,9 +44,18 @@ Plans:
 
 ## Phase 2: Event System
 
-**Goal:** Link timeline events to articles and add historical database
+**Goal:** Link timeline events to articles and add historical database with bilingual support
 
 **Requirements:** EVT-01, EVT-02, EVT-03, EVT-04
+
+**Plans:** 5 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — Historical events i18n database (100+ global events, DE/EN)
+- [ ] 02-02-PLAN.md — Location extraction expansion (50+ global cities for B6)
+- [ ] 02-03-PLAN.md — Article preview in EventDetailPanel with i18n
+- [ ] 02-04-PLAN.md — GlobeView independent query + useEventSocket hook
+- [ ] 02-05-PLAN.md — LiveBadge component and Timeline WebSocket integration
 
 **Success Criteria:**
 1. User clicks timeline event and sees linked NewsArticles
@@ -161,10 +170,10 @@ High-priority bugs to address during phases:
 | Bug | Description | Integrate With |
 |-----|-------------|----------------|
 | B5 | Settings page needs more options | Phase 4 |
-| B6 | Map point density too low | Phase 2 |
+| B6 | Map point density too low | Phase 2 (Plan 02) |
 | B7 | Article thumbnail fallback | Phase 1 or 2 |
 
 ---
 
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-18 after Phase 1 execution complete*
+*Last updated: 2026-04-18 after Phase 2 planning complete*
