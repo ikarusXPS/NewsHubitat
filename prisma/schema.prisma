@@ -42,6 +42,8 @@ model NewsArticle {
   @@index([perspective])
   @@index([sentiment])
   @@index([sourceId])
+  @@index([publishedAt, perspective])  // Dashboard: filtered timeline
+  @@index([sentiment, publishedAt])    // Sentiment charts
 }
 
 model NewsSource {
@@ -70,9 +72,34 @@ model User {
   bookmarks    Bookmark[]
   preferences  String?  // JSON string
 
-  // New relations for features
+  // Email verification (AUTH-01 per D-51)
+  emailVerified          Boolean   @default(false)
+  verificationTokenHash  String?
+  verificationTokenExpiry DateTime?
+  verificationSendCount  Int       @default(0)
+  lastVerificationSentAt DateTime?
+
+  // Password reset (AUTH-02 per D-51)
+  resetTokenHash         String?
+  resetTokenExpiry       DateTime?
+  resetSendCount         Int       @default(0)
+  lastResetSentAt        DateTime?
+
+  // Session invalidation (D-27, D-28)
+  tokenVersion           Int       @default(0)
+
+  // Required for cleanup job (D-17)
+  updatedAt              DateTime  @updatedAt
+
+  // Relations for features
   emailSubscription EmailSubscription?
+  emailDigests      EmailDigest[]
   userPersonas      UserPersona[]
+
+  // Indexes for token lookups (D-53)
+  @@index([verificationTokenHash])
+  @@index([resetTokenHash])
+  @@index([emailVerified, createdAt])  // For cleanup job queries
 }
 
 model Bookmark {
@@ -125,6 +152,7 @@ model EmailSubscription {
 
 model EmailDigest {
   id            String   @id @default(cuid())
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId        String
   articleIds    String   // JSON array of article IDs included
   subject       String
@@ -198,6 +226,7 @@ model SharedContent {
 
   @@index([shareCode])
   @@index([contentType])
+  @@index([contentId])  // Lookup by content
   @@index([createdAt])
 }
 
