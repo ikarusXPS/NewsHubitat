@@ -183,7 +183,7 @@ export function EventMap() {
   });
 
   // WebSocket for real-time updates (per D-12, D-13, D-14)
-  const { isConnected, newEvents, clearNewEvents, lastEventTime } = useEventSocket({
+  const { isConnected } = useEventSocket({
     enabled: true,
     onNewEvent: () => {
       // Invalidate query to refetch data when new event arrives
