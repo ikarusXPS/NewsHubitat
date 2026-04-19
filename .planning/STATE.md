@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-04-18T21:52:30Z"
+last_updated: "2026-04-19T10:30:00Z"
 progress:
   total_phases: 6
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 17
-  completed_plans: 16
-  percent: 94
+  completed_plans: 17
+  percent: 100
 ---
 
 # State: NewsHub
@@ -34,22 +34,22 @@ See: .planning/PROJECT.md (updated 2026-04-18)
 | 3 | Auth Completion | ✓ Complete | 5/5 |
 | 4 | User Preferences | ✓ Complete | 0/0 (pre-existing) |
 | 5 | Bookmarks | ✓ Complete | 0/0 (pre-existing) |
-| 6 | Reading History | ◆ Ready to execute | 6/6 |
+| 6 | Reading History | ✓ Complete | 6/6 |
 
-**Progress:** █████████░ 94%
+**Progress:** ██████████ 100%
 
 ## Current Phase
 
 **Phase:** 6 - Reading History
-**Status:** Ready to execute
+**Status:** Complete
 **Goal:** Track reading history and personalize news feed
 
 ### Requirements
 
-- [ ] HIST-01: User's read articles are tracked automatically
-- [ ] HIST-02: User can view reading history
-- [ ] HIST-03: User sees personalized feed based on reading patterns
-- [ ] UI-01: User can view and edit profile on UserProfile page
+- [x] HIST-01: User's read articles are tracked automatically
+- [x] HIST-02: User can view reading history
+- [x] HIST-03: User sees personalized feed based on reading patterns
+- [x] UI-01: User can view and edit profile on UserProfile page
 
 ### Plans
 
@@ -60,13 +60,24 @@ See: .planning/PROJECT.md (updated 2026-04-18)
 | 06-03 | Personalization engine + For You carousel | 3 | 2 | ✓ Complete |
 | 06-04 | Profile enhancements + avatar system | 3 | 2 | ✓ Complete |
 | 06-05 | Gamification: badges, achievements | 3 | 3 | ✓ Complete |
-| 06-06 | Leaderboard + account management | 3 | 3 | ○ Pending |
+| 06-06 | Leaderboard + account management | 3 | 3 | ✓ Complete |
 
 ## Session Context
 
-**Last action:** Completed 06-05 (Gamification: badges, achievements)
-**Next step:** Execute 06-06 (Leaderboard + account management)
+**Last action:** Completed Phase 6 - Reading History (all 6 plans)
+**Next step:** Milestone v1.0 complete - verify and archive
 **Resume file:** None
+
+### Key Decisions (06-06)
+
+- Leaderboard shows top 100 users with time filters (D-51, D-57)
+- Podium heights 140px, 100px, 72px for visual hierarchy (D-52)
+- User's own position pinned at bottom if not in top 100 (D-54)
+- Weekly winner banner shows on Mondays (D-58, D-59)
+- Clear history preserves badges/achievements (D-62)
+- Account deletion requires password + email confirmation (D-67, D-68)
+- 7-day grace period for account deletion (D-70)
+- Data export supports JSON and CSV formats (D-71, D-72)
 
 ### Key Decisions (06-05)
 

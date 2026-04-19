@@ -13,7 +13,7 @@
 | 3 | Auth Completion | Add email verification and password reset | AUTH-01, AUTH-02 | Complete |
 | 4 | User Preferences | Implement settings page with all preferences | PREF-01, PREF-02, PREF-03, PREF-04, UI-02 | Complete |
 | 5 | Bookmarks | Enable article saving and bookmark management | BOOK-01, BOOK-02, BOOK-03 | Complete |
-| 6 | Reading History | Track history and personalize feed | HIST-01, HIST-02, HIST-03, UI-01 | In Progress |
+| 6 | Reading History | Track history and personalize feed | HIST-01, HIST-02, HIST-03, UI-01 | Complete |
 
 ---
 
@@ -165,7 +165,7 @@ Plans:
 - [x] 06-03-PLAN.md — Personalization engine + For You carousel (HIST-03)
 - [x] 06-04-PLAN.md — Profile enhancements + avatar system (UI-01)
 - [x] 06-05-PLAN.md — Gamification: badges, achievements, unlocks (HIST-01)
-- [ ] 06-06-PLAN.md — Leaderboard + account management (HIST-01, UI-01)
+- [x] 06-06-PLAN.md — Leaderboard + account management (HIST-01, UI-01)
 
 **Wave Structure:**
 - Wave 1: Plans 01, 02 (foundational, parallel)
