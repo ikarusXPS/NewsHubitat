@@ -10,6 +10,8 @@ import { PresetCard } from '../components/PresetCard';
 import { Toast } from '../components/Toast';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { AvatarPicker } from '../components/profile/AvatarPicker';
+import { DataExportModal } from '../components/modals/DataExportModal';
+import { DeleteAccountModal } from '../components/modals/DeleteAccountModal';
 
 const ALL_REGIONS: PerspectiveRegion[] = [
   'afrika', 'alternative', 'asien', 'china', 'deutschland',
@@ -62,6 +64,8 @@ export function Settings() {
   const [namePassword, setNamePassword] = useState('');
   const [isUpdatingName, setIsUpdatingName] = useState(false);
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   // Toast state
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info'; isOpen: boolean }>({
@@ -254,6 +258,24 @@ export function Settings() {
                   </button>
                 )}
               </div>
+            </div>
+
+            {/* Data Management */}
+            <div className="pt-4 border-t border-gray-700 space-y-3">
+              <button
+                onClick={() => setShowExportModal(true)}
+                className="w-full flex items-center gap-3 p-3 rounded-lg bg-gray-700/50 hover:bg-gray-700 transition-colors"
+              >
+                <Download className="h-4 w-4 text-[#00f0ff]" />
+                <span className="text-sm text-white">Daten exportieren</span>
+              </button>
+              <button
+                onClick={() => setShowDeleteModal(true)}
+                className="w-full flex items-center gap-3 p-3 rounded-lg bg-[#ff0044]/10 hover:bg-[#ff0044]/20 transition-colors border border-[#ff0044]/30"
+              >
+                <Trash2 className="h-4 w-4 text-[#ff0044]" />
+                <span className="text-sm text-[#ff0044]">Konto löschen</span>
+              </button>
             </div>
           </div>
         ) : (
@@ -891,6 +913,19 @@ export function Settings() {
         currentPresetId={null}
         articles={new Map()}
         isVerified={user?.emailVerified === true}
+      />
+
+      {/* Data Export Modal */}
+      <DataExportModal
+        isOpen={showExportModal}
+        onClose={() => setShowExportModal(false)}
+      />
+
+      {/* Delete Account Modal */}
+      <DeleteAccountModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        userEmail={user?.email || ''}
       />
     </div>
   );
