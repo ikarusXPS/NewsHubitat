@@ -1,8 +1,6 @@
 import { Router, Request, Response } from 'express';
-import { PrismaClient } from '../generated/prisma';
+import { prisma } from '../db/prisma';
 import { authMiddleware } from '../services/authService';
-
-const prisma = new PrismaClient();
 export const leaderboardRoutes = Router();
 
 interface AuthRequest extends Request {
