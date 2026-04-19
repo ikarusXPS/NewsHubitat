@@ -1,9 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { z } from 'zod';
-import { PrismaClient } from '../generated/prisma';
+import { prisma } from '../db/prisma';
 import { authMiddleware, AuthService } from '../services/authService';
-
-const prisma = new PrismaClient();
 export const accountRoutes = Router();
 
 interface AuthRequest extends Request {
