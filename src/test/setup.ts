@@ -1,3 +1,6 @@
+// Set environment variables before any test module loads
+process.env.JWT_SECRET = 'test-secret-key-for-testing-purposes-only';
+
 import '@testing-library/jest-dom';
 import { afterEach } from 'vitest';
 import { cleanup } from '@testing-library/react';
