@@ -44,9 +44,9 @@
   5. emailService tests pass with 80%+ coverage including template rendering
 **Plans:** 4 plans
 Plans:
-- [ ] 07-01-PLAN.md — aiService unit tests with provider fallback chain
-- [ ] 07-02-PLAN.md — authService unit tests with JWT edge cases
-- [ ] 07-03-PLAN.md — cacheService + emailService unit tests
+- [x] 07-01-PLAN.md — aiService unit tests with provider fallback chain
+- [x] 07-02-PLAN.md — authService unit tests with JWT edge cases
+- [x] 07-03-PLAN.md — cacheService + emailService unit tests
 - [x] 07-04-PLAN.md — cleanupService unit tests with grace period (96% coverage, 18 tests)
 
 ### Phase 8: Data Pipeline Service Tests
