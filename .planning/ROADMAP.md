@@ -42,7 +42,12 @@
   3. cacheService tests pass with 80%+ coverage including TTL expiration
   4. cleanupService tests pass with 80%+ coverage including deletion grace period
   5. emailService tests pass with 80%+ coverage including template rendering
-**Plans**: TBD
+**Plans:** 4 plans
+Plans:
+- [ ] 07-01-PLAN.md — aiService unit tests with provider fallback chain
+- [ ] 07-02-PLAN.md — authService unit tests with JWT edge cases
+- [ ] 07-03-PLAN.md — cacheService + emailService unit tests
+- [ ] 07-04-PLAN.md — cleanupService unit tests with grace period
 
 ### Phase 8: Data Pipeline Service Tests
 **Goal**: News data pipeline services have reliable test coverage
@@ -116,7 +121,7 @@
 | 4. User Preferences | v1.0 | 0/0 | Complete | 2026-04-18 |
 | 5. Bookmarks | v1.0 | 0/0 | Complete | 2026-04-18 |
 | 6. Reading History | v1.0 | 6/6 | Complete | 2026-04-19 |
-| 7. Core Backend Service Tests | v1.1 | 0/? | Not started | - |
+| 7. Core Backend Service Tests | v1.1 | 0/4 | Planned | - |
 | 8. Data Pipeline Service Tests | v1.1 | 0/? | Not started | - |
 | 9. Extension Service Tests | v1.1 | 0/? | Not started | - |
 | 10. Frontend Hook & Library Tests | v1.1 | 0/? | Not started | - |
@@ -125,4 +130,4 @@
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-20 after v1.1 roadmap created*
+*Last updated: 2026-04-20 after Phase 7 planning complete*
