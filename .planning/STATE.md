@@ -24,8 +24,8 @@ See: .planning/PROJECT.md (updated 2026-04-20)
 ## Current Position
 
 Phase: 7 of 12 (Core Backend Service Tests)
-Plan: Ready to plan
-Status: Ready to plan Phase 7
+Plan: 4 plans ready
+Status: Ready to execute Phase 7
 Last activity: 2026-04-20 — Roadmap created for v1.1
 
 Progress: [░░░░░░░░░░] 0%
@@ -63,7 +63,7 @@ Items acknowledged and carried forward from previous milestone close:
 ## Session Context
 
 **Last action:** Phase 7 context gathered
-**Next step:** Run /gsd-plan-phase 7 to plan phase
+**Next step:** Run /gsd-execute-phase 7 to execute plans
 **Resume file:** .planning/phases/07-core-backend-service-tests/07-CONTEXT.md
 
 ## Open Issues
