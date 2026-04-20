@@ -12,7 +12,7 @@ Requirements for Quality & Testing milestone. Each maps to roadmap phases.
 - [ ] **UNIT-01**: aiService has unit tests with 80%+ coverage
 - [ ] **UNIT-02**: authService has unit tests with 80%+ coverage
 - [ ] **UNIT-03**: cacheService has unit tests with 80%+ coverage
-- [ ] **UNIT-04**: cleanupService has unit tests with 80%+ coverage
+- [x] **UNIT-04**: cleanupService has unit tests with 80%+ coverage
 - [ ] **UNIT-05**: emailService has unit tests with 80%+ coverage
 - [ ] **UNIT-06**: eventsService has unit tests with 80%+ coverage
 - [ ] **UNIT-07**: focusSuggestionEngine has unit tests with 80%+ coverage
@@ -102,7 +102,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UNIT-01 | Phase 7 | Pending |
 | UNIT-02 | Phase 7 | Pending |
 | UNIT-03 | Phase 7 | Pending |
-| UNIT-04 | Phase 7 | Pending |
+| UNIT-04 | Phase 7 | Complete |
 | UNIT-05 | Phase 7 | Pending |
 | UNIT-06 | Phase 8 | Pending |
 | UNIT-07 | Phase 8 | Pending |
