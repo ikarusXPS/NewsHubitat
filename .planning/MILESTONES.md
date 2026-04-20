@@ -25,9 +25,38 @@ Multi-perspective news platform with AI coverage gap detection, bilingual histor
 
 ---
 
+## Active Milestones
+
+### v1.1 — Quality & Testing
+
+**Started:** 2026-04-20
+**Phases:** 6 (Phases 7-12)
+**Requirements:** 41
+
+**Goal:** Establish comprehensive test coverage (80%+) and code quality baseline
+
+**Phases:**
+| Phase | Name | Requirements | Status |
+|-------|------|--------------|--------|
+| 7 | Core Backend Service Tests | 5 | Not started |
+| 8 | Data Pipeline Service Tests | 6 | Not started |
+| 9 | Extension Service Tests | 5 | Not started |
+| 10 | Frontend Hook & Library Tests | 10 | Not started |
+| 11 | E2E Tests | 10 | Not started |
+| 12 | Bug Fixes & Code Quality | 5 | Not started |
+
+**Target deliverables:**
+- Unit test coverage 52% to 80%+
+- E2E tests for all 10 major pages
+- B7 bug fix (article thumbnail fallback)
+- ESLint zero errors, TypeScript strict mode
+- Dead code cleanup
+
+---
+
 ## Upcoming Milestones
 
-_(No upcoming milestones defined yet. Run `/gsd-new-milestone` to start the next milestone.)_
+_(No upcoming milestones defined yet. Run `/gsd-new-milestone` after v1.1 ships.)_
 
 ---
 

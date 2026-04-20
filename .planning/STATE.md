@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Quality & Testing
-status: planning
-last_updated: "2026-04-20T16:40:00Z"
+status: ready_to_plan
+last_updated: "2026-04-20T17:00:00Z"
 progress:
-  total_phases: 0
+  total_phases: 6
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -23,27 +23,33 @@ See: .planning/PROJECT.md (updated 2026-04-20)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-04-20 — Milestone v1.1 started
+Phase: 7 of 12 (Core Backend Service Tests)
+Plan: Ready to plan
+Status: Ready to plan Phase 7
+Last activity: 2026-04-20 — Roadmap created for v1.1
+
+Progress: [░░░░░░░░░░] 0%
 
 ## Milestone Progress
 
 **Milestone:** v1.1 - Quality & Testing
 **Goal:** Establish comprehensive test coverage and code quality baseline
-**Status:** Defining requirements
+**Status:** Ready to plan
 **Previous:** v1.0 shipped 2026-04-20
 
-**Target features:**
-- Unit test coverage 52% → 80%+
-- E2E tests for critical user flows
-- Fix B7: Article thumbnail fallback
-- Code quality improvements
+**Phases:**
+- Phase 7: Core Backend Service Tests (5 requirements)
+- Phase 8: Data Pipeline Service Tests (6 requirements)
+- Phase 9: Extension Service Tests (5 requirements)
+- Phase 10: Frontend Hook & Library Tests (10 requirements)
+- Phase 11: E2E Tests (10 requirements)
+- Phase 12: Bug Fixes & Code Quality (5 requirements)
+
+**Total requirements:** 41
 
 ## Deferred Items
 
-Items acknowledged and deferred at milestone v1.0 close on 2026-04-20:
+Items acknowledged and carried forward from previous milestone close:
 
 | Category | Item | Status |
 |----------|------|--------|
@@ -56,14 +62,14 @@ Items acknowledged and deferred at milestone v1.0 close on 2026-04-20:
 
 ## Session Context
 
-**Last action:** Started milestone v1.1 Quality & Testing
-**Next step:** Define requirements with REQ-IDs
+**Last action:** Created v1.1 roadmap with 6 phases (7-12)
+**Next step:** Run /gsd-plan-phase 7 to plan first phase
 **Resume file:** None
 
 ## Open Issues
 
-- B7: Article thumbnail fallback (scheduled for v1.1)
+- B7: Article thumbnail fallback (scheduled for Phase 12)
 
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-20 after v1.1 milestone started*
+*Last updated: 2026-04-20 after v1.1 roadmap created*

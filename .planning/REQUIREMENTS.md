@@ -99,13 +99,53 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (To be filled by roadmapper) | | |
+| UNIT-01 | Phase 7 | Pending |
+| UNIT-02 | Phase 7 | Pending |
+| UNIT-03 | Phase 7 | Pending |
+| UNIT-04 | Phase 7 | Pending |
+| UNIT-05 | Phase 7 | Pending |
+| UNIT-06 | Phase 8 | Pending |
+| UNIT-07 | Phase 8 | Pending |
+| UNIT-08 | Phase 8 | Pending |
+| UNIT-09 | Phase 8 | Pending |
+| UNIT-10 | Phase 8 | Pending |
+| UNIT-11 | Phase 8 | Pending |
+| UNIT-12 | Phase 9 | Pending |
+| UNIT-13 | Phase 9 | Pending |
+| UNIT-14 | Phase 9 | Pending |
+| UNIT-15 | Phase 9 | Pending |
+| UNIT-16 | Phase 9 | Pending |
+| HOOK-01 | Phase 10 | Pending |
+| HOOK-02 | Phase 10 | Pending |
+| HOOK-03 | Phase 10 | Pending |
+| HOOK-04 | Phase 10 | Pending |
+| HOOK-05 | Phase 10 | Pending |
+| HOOK-06 | Phase 10 | Pending |
+| HOOK-07 | Phase 10 | Pending |
+| LIB-01 | Phase 10 | Pending |
+| LIB-02 | Phase 10 | Pending |
+| LIB-03 | Phase 10 | Pending |
+| E2E-01 | Phase 11 | Pending |
+| E2E-02 | Phase 11 | Pending |
+| E2E-03 | Phase 11 | Pending |
+| E2E-04 | Phase 11 | Pending |
+| E2E-05 | Phase 11 | Pending |
+| E2E-06 | Phase 11 | Pending |
+| E2E-07 | Phase 11 | Pending |
+| E2E-08 | Phase 11 | Pending |
+| E2E-09 | Phase 11 | Pending |
+| E2E-10 | Phase 11 | Pending |
+| BUG-01 | Phase 12 | Pending |
+| QUAL-01 | Phase 12 | Pending |
+| QUAL-02 | Phase 12 | Pending |
+| QUAL-03 | Phase 12 | Pending |
+| QUAL-04 | Phase 12 | Pending |
 
 **Coverage:**
 - v1.1 requirements: 41 total
-- Mapped to phases: 0
-- Unmapped: 41 ⚠️
+- Mapped to phases: 41
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-20*
-*Last updated: 2026-04-20 after initial definition*
+*Last updated: 2026-04-20 after roadmap traceability added*

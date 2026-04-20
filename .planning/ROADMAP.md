@@ -2,21 +2,109 @@
 
 ## Milestones
 
-- **v1.0 AI Analysis & User Features** — Phases 1-6 (shipped 2026-04-20) [archived](milestones/v1.0-ROADMAP.md)
+- [x] **v1.0 AI Analysis & User Features** - Phases 1-6 (shipped 2026-04-20)
+- [ ] **v1.1 Quality & Testing** - Phases 7-12 (in progress)
 
 ## Phases
 
 <details>
-<summary>v1.0 AI Analysis & User Features (Phases 1-6) — SHIPPED 2026-04-20</summary>
+<summary>v1.0 AI Analysis & User Features (Phases 1-6) - SHIPPED 2026-04-20</summary>
 
-- [x] Phase 1: AI Analysis (1/1 plans) — completed 2026-04-18
-- [x] Phase 2: Event System (5/5 plans) — completed 2026-04-18
-- [x] Phase 3: Auth Completion (5/5 plans) — completed 2026-04-18
-- [x] Phase 4: User Preferences (0/0 plans, pre-existing) — completed 2026-04-18
-- [x] Phase 5: Bookmarks (0/0 plans, pre-existing) — completed 2026-04-18
-- [x] Phase 6: Reading History (6/6 plans) — completed 2026-04-19
+- [x] Phase 1: AI Analysis (1/1 plans) - completed 2026-04-18
+- [x] Phase 2: Event System (5/5 plans) - completed 2026-04-18
+- [x] Phase 3: Auth Completion (5/5 plans) - completed 2026-04-18
+- [x] Phase 4: User Preferences (0/0 plans, pre-existing) - completed 2026-04-18
+- [x] Phase 5: Bookmarks (0/0 plans, pre-existing) - completed 2026-04-18
+- [x] Phase 6: Reading History (6/6 plans) - completed 2026-04-19
 
 </details>
+
+### v1.1 Quality & Testing (In Progress)
+
+**Milestone Goal:** Establish comprehensive test coverage (80%+) and code quality baseline
+
+- [ ] **Phase 7: Core Backend Service Tests** - aiService, authService, cacheService, cleanupService, emailService
+- [ ] **Phase 8: Data Pipeline Service Tests** - eventsService, focusSuggestionEngine, marketDataService, newsAggregator, newsCrawler, newsApiService
+- [ ] **Phase 9: Extension Service Tests** - personaService, sharingService, stealthScraper, translationService, websocketService
+- [ ] **Phase 10: Frontend Hook & Library Tests** - All hooks and utility libraries
+- [ ] **Phase 11: E2E Tests** - Critical user flow verification
+- [ ] **Phase 12: Bug Fixes & Code Quality** - B7 fix, linting, type coverage, dead code
+
+## Phase Details
+
+### Phase 7: Core Backend Service Tests
+**Goal**: Core infrastructure services have reliable test coverage
+**Depends on**: v1.0 milestone complete
+**Requirements**: UNIT-01, UNIT-02, UNIT-03, UNIT-04, UNIT-05
+**Success Criteria** (what must be TRUE):
+  1. aiService tests pass with 80%+ coverage including fallback chain scenarios
+  2. authService tests pass with 80%+ coverage including token validation edge cases
+  3. cacheService tests pass with 80%+ coverage including TTL expiration
+  4. cleanupService tests pass with 80%+ coverage including deletion grace period
+  5. emailService tests pass with 80%+ coverage including template rendering
+**Plans**: TBD
+
+### Phase 8: Data Pipeline Service Tests
+**Goal**: News data pipeline services have reliable test coverage
+**Depends on**: Phase 7
+**Requirements**: UNIT-06, UNIT-07, UNIT-08, UNIT-09, UNIT-10, UNIT-11
+**Success Criteria** (what must be TRUE):
+  1. eventsService tests pass with 80%+ coverage including timeline queries
+  2. focusSuggestionEngine tests pass with 80%+ coverage including recency weighting
+  3. marketDataService tests pass with 80%+ coverage including fallback data
+  4. newsAggregator tests pass with 80%+ coverage including deduplication
+  5. newsCrawler tests pass with 80%+ coverage including RSS parsing errors
+**Plans**: TBD
+
+### Phase 9: Extension Service Tests
+**Goal**: Feature extension services have reliable test coverage
+**Depends on**: Phase 8
+**Requirements**: UNIT-12, UNIT-13, UNIT-14, UNIT-15, UNIT-16
+**Success Criteria** (what must be TRUE):
+  1. personaService tests pass with 80%+ coverage including persona matching
+  2. sharingService tests pass with 80%+ coverage including click tracking
+  3. stealthScraper tests pass with 80%+ coverage including rate limiting
+  4. translationService tests pass with 80%+ coverage including provider fallback chain
+  5. websocketService tests pass with 80%+ coverage including connection lifecycle
+**Plans**: TBD
+
+### Phase 10: Frontend Hook & Library Tests
+**Goal**: Frontend utilities and hooks have reliable test coverage
+**Depends on**: Phase 9
+**Requirements**: HOOK-01, HOOK-02, HOOK-03, HOOK-04, HOOK-05, HOOK-06, HOOK-07, LIB-01, LIB-02, LIB-03
+**Success Criteria** (what must be TRUE):
+  1. All 7 hook test suites pass with 80%+ coverage
+  2. articleRelevance.ts tests pass with 80%+ coverage including scoring edge cases
+  3. historySummarizer.ts tests pass with 80%+ coverage including empty history
+  4. personalization.ts tests pass with 80%+ coverage including cold start scenarios
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 11: E2E Tests
+**Goal**: Critical user flows verified end-to-end
+**Depends on**: Phase 10
+**Requirements**: E2E-01, E2E-02, E2E-03, E2E-04, E2E-05, E2E-06, E2E-07, E2E-08, E2E-09, E2E-10
+**Success Criteria** (what must be TRUE):
+  1. Dashboard page E2E tests verify news feed loading and filtering
+  2. Analysis page E2E tests verify AI Q&A and cluster interactions
+  3. Monitor and Timeline pages E2E tests verify real-time data display
+  4. EventMap and Community pages E2E tests verify map interactions and social features
+  5. User account pages E2E tests verify bookmarks, settings, history flows
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 12: Bug Fixes & Code Quality
+**Goal**: Codebase meets quality standards and known bugs resolved
+**Depends on**: Phase 11
+**Requirements**: BUG-01, QUAL-01, QUAL-02, QUAL-03, QUAL-04
+**Success Criteria** (what must be TRUE):
+  1. B7 Article thumbnail fallback system shows placeholder when image fails
+  2. ESLint passes with zero errors across entire codebase
+  3. TypeScript strict mode enabled and compiles with zero errors
+  4. Dead code identified by static analysis and removed
+  5. Overall unit test coverage reaches 80%+ threshold
+**Plans**: TBD
+**UI hint**: yes
 
 ## Progress
 
@@ -28,8 +116,13 @@
 | 4. User Preferences | v1.0 | 0/0 | Complete | 2026-04-18 |
 | 5. Bookmarks | v1.0 | 0/0 | Complete | 2026-04-18 |
 | 6. Reading History | v1.0 | 6/6 | Complete | 2026-04-19 |
+| 7. Core Backend Service Tests | v1.1 | 0/? | Not started | - |
+| 8. Data Pipeline Service Tests | v1.1 | 0/? | Not started | - |
+| 9. Extension Service Tests | v1.1 | 0/? | Not started | - |
+| 10. Frontend Hook & Library Tests | v1.1 | 0/? | Not started | - |
+| 11. E2E Tests | v1.1 | 0/? | Not started | - |
+| 12. Bug Fixes & Code Quality | v1.1 | 0/? | Not started | - |
 
 ---
-
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-20 after v1.0 milestone shipped*
+*Last updated: 2026-04-20 after v1.1 roadmap created*
