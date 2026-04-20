@@ -61,9 +61,12 @@ Users can see how the same story is covered by different regional perspectives �
 
 ### Active
 
-<!-- Next milestone scope (v1.1+) - to be defined -->
+<!-- v1.1: Quality & Testing -->
 
-_(No active requirements yet. Run `/gsd-new-milestone` to define v1.1 scope.)_
+- [ ] Unit test coverage 80%+ across backend services, frontend hooks, utilities
+- [ ] E2E tests for critical user flows (auth, bookmarks, reading history, personalization)
+- [ ] Fix B7: Article thumbnail fallback system
+- [ ] Code quality improvements (linting, type coverage, dead code cleanup)
 
 ### Out of Scope
 
@@ -73,8 +76,6 @@ _(No active requirements yet. Run `/gsd-new-milestone` to define v1.1 scope.)_
 - Redis caching — Future (performance optimization)
 - Service Worker offline — Future (performance optimization)
 - OAuth integration (Google, GitHub) — Future (advanced features)
-- Unit test coverage 80%+ — Future (QA milestone)
-- E2E auth flow tests — Future (QA milestone)
 - Load testing (10k concurrent users) — Future (QA milestone)
 - CI/CD pipeline — Future (deployment milestone)
 - Docker containerization — Future (deployment milestone)
@@ -133,9 +134,21 @@ This document evolves at phase transitions and milestone boundaries.
 - Core Value confirmed: multi-perspective comparison is the differentiator
 - Gamification and personalization added as key engagement features
 
-**Next milestone goals:**
-- Define v1.1 scope via `/gsd-new-milestone`
-- Consider: performance optimization, testing coverage, or deployment pipeline
+## Current Milestone: v1.1 Quality & Testing
+
+**Goal:** Establish comprehensive test coverage and code quality baseline
+
+**Target features:**
+- Unit test coverage from 52% → 80%+ (balanced across backend services, frontend hooks, utilities)
+- E2E tests for critical user flows (auth, bookmarks, reading history, personalization)
+- Fix deferred bug B7 (article thumbnail fallback)
+- Code quality improvements (linting, type coverage, dead code cleanup)
+
+**Baseline (2026-04-20):**
+- Unit coverage: 52% statements, 47% branches, 71% functions
+- E2E tests: 55 tests across 6 spec files
+- Unit test files: 5 (utils, config, ai route, mapCentering, factories)
+- TypeScript: Clean (no errors)
 
 ---
-*Last updated: 2026-04-20 after v1.0 milestone shipped*
+*Last updated: 2026-04-20 after v1.1 milestone started*
