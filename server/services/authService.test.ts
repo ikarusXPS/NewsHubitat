@@ -3,7 +3,19 @@
  * Tests JWT validation, auth flows, email verification, password reset, and rate limiting
  */
 
-import { describe, it, expect, afterEach, vi, beforeAll } from 'vitest';
+// Set JWT_SECRET BEFORE any imports that load authService
+process.env.JWT_SECRET = 'test-secret-key-for-testing-purposes-only';
+
+import { describe, it, expect, afterEach, afterAll, vi, beforeAll } from 'vitest';
+
+// Prevent process.exit from killing the test runner (authService calls this if JWT_SECRET missing)
+const originalExit = process.exit;
+beforeAll(() => {
+  process.exit = vi.fn() as never;
+});
+afterAll(() => {
+  process.exit = originalExit;
+});
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
@@ -50,12 +62,6 @@ vi.mock('../utils/disposableEmail', () => ({
 
 import { prisma } from '../db/prisma';
 import { EmailService } from './emailService';
-
-// Set JWT_SECRET before importing authService
-beforeAll(() => {
-  process.env.JWT_SECRET = 'test-secret-key-for-testing-purposes-only';
-});
-
 import { AuthService, authMiddleware } from './authService';
 
 // Singleton reset pattern (D-09, D-10)
