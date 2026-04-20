@@ -59,7 +59,15 @@ Plans:
   3. marketDataService tests pass with 80%+ coverage including fallback data
   4. newsAggregator tests pass with 80%+ coverage including deduplication
   5. newsCrawler tests pass with 80%+ coverage including RSS parsing errors
-**Plans**: TBD
+  6. newsApiService tests pass with 80%+ coverage including 3 API providers (GNews, NewsAPI, MediaStack)
+**Plans:** 6 plans
+Plans:
+- [ ] 08-01-PLAN.md — eventsService unit tests with location patterns and cache TTL
+- [ ] 08-02-PLAN.md — marketDataService unit tests with Yahoo Finance mock and fallback paths
+- [ ] 08-03-PLAN.md — newsApiService unit tests with 3 API providers and utility methods
+- [ ] 08-04-PLAN.md — newsCrawler unit tests with real cheerio and rate limiting
+- [ ] 08-05-PLAN.md — focusSuggestionEngine unit tests with tension/breaking/gap detection
+- [ ] 08-06-PLAN.md — newsAggregator unit tests with deduplication and confidence scoring
 
 ### Phase 9: Extension Service Tests
 **Goal**: Feature extension services have reliable test coverage
@@ -122,7 +130,7 @@ Plans:
 | 5. Bookmarks | v1.0 | 0/0 | Complete | 2026-04-18 |
 | 6. Reading History | v1.0 | 6/6 | Complete | 2026-04-19 |
 | 7. Core Backend Service Tests | v1.1 | 1/4 | In progress | - |
-| 8. Data Pipeline Service Tests | v1.1 | 0/? | Not started | - |
+| 8. Data Pipeline Service Tests | v1.1 | 0/6 | Planned | - |
 | 9. Extension Service Tests | v1.1 | 0/? | Not started | - |
 | 10. Frontend Hook & Library Tests | v1.1 | 0/? | Not started | - |
 | 11. E2E Tests | v1.1 | 0/? | Not started | - |
@@ -130,4 +138,4 @@ Plans:
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-20 after Phase 7 planning complete*
+*Last updated: 2026-04-20 after Phase 8 planning complete*
