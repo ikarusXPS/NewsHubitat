@@ -96,7 +96,18 @@ Plans:
   2. articleRelevance.ts tests pass with 80%+ coverage including scoring edge cases
   3. historySummarizer.ts tests pass with 80%+ coverage including empty history
   4. personalization.ts tests pass with 80%+ coverage including cold start scenarios
-**Plans**: TBD
+**Plans:** 10 plans
+Plans:
+- [ ] 10-01-PLAN.md — articleRelevance unit tests with keyword extraction and scoring (LIB-01)
+- [ ] 10-02-PLAN.md — historySummarizer unit tests with topic extraction and compression (LIB-02)
+- [ ] 10-03-PLAN.md — personalization unit tests with interest extraction and recommendations (LIB-03)
+- [ ] 10-04-PLAN.md — useMapCenter unit tests with preset priority and region calculation (HOOK-06)
+- [ ] 10-05-PLAN.md — useBackendStatus unit tests with health check and polling (HOOK-02)
+- [ ] 10-06-PLAN.md — useKeyboardShortcuts unit tests with navigation and input bypass (HOOK-05)
+- [ ] 10-07-PLAN.md — useEventSocket unit tests with connection lifecycle and events (HOOK-04)
+- [ ] 10-08-PLAN.md — useCachedQuery unit tests with network/cache fallback (HOOK-03)
+- [ ] 10-09-PLAN.md — useAchievements unit tests with milestone detection and persistence (HOOK-01)
+- [ ] 10-10-PLAN.md — usePersonalization unit tests with eligibility and cold start (HOOK-07)
 **UI hint**: yes
 
 ### Phase 11: E2E Tests
@@ -138,10 +149,10 @@ Plans:
 | 7. Core Backend Service Tests | v1.1 | 4/4 | Complete | 2026-04-20 |
 | 8. Data Pipeline Service Tests | v1.1 | 6/6 | Complete | 2026-04-21 |
 | 9. Extension Service Tests | v1.1 | 5/5 | Complete | 2026-04-21 |
-| 10. Frontend Hook & Library Tests | v1.1 | 0/? | Not started | - |
+| 10. Frontend Hook & Library Tests | v1.1 | 0/10 | Planned | - |
 | 11. E2E Tests | v1.1 | 0/? | Not started | - |
 | 12. Bug Fixes & Code Quality | v1.1 | 0/? | Not started | - |
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-21 after Phase 9 complete (5/5 plans)*
+*Last updated: 2026-04-21 after Phase 10 planning complete (10 plans)*
