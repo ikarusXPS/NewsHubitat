@@ -26,7 +26,7 @@
 - [x] **Phase 7: Core Backend Service Tests** - aiService, authService, cacheService, cleanupService, emailService (4/4 complete)
 - [x] **Phase 8: Data Pipeline Service Tests** - eventsService, focusSuggestionEngine, marketDataService, newsAggregator, newsCrawler, newsApiService (6/6 complete)
 - [x] **Phase 9: Extension Service Tests** - personaService, sharingService, stealthScraper, translationService, websocketService (5/5 complete)
-- [ ] **Phase 10: Frontend Hook & Library Tests** - All hooks and utility libraries
+- [x] **Phase 10: Frontend Hook & Library Tests** - All hooks and utility libraries (10/10 complete)
 - [ ] **Phase 11: E2E Tests** - Critical user flow verification
 - [ ] **Phase 12: Bug Fixes & Code Quality** - B7 fix, linting, type coverage, dead code
 
@@ -98,16 +98,16 @@ Plans:
   4. personalization.ts tests pass with 80%+ coverage including cold start scenarios
 **Plans:** 10 plans
 Plans:
-- [ ] 10-01-PLAN.md — articleRelevance unit tests with keyword extraction and scoring (LIB-01)
-- [ ] 10-02-PLAN.md — historySummarizer unit tests with topic extraction and compression (LIB-02)
-- [ ] 10-03-PLAN.md — personalization unit tests with interest extraction and recommendations (LIB-03)
-- [ ] 10-04-PLAN.md — useMapCenter unit tests with preset priority and region calculation (HOOK-06)
-- [ ] 10-05-PLAN.md — useBackendStatus unit tests with health check and polling (HOOK-02)
-- [ ] 10-06-PLAN.md — useKeyboardShortcuts unit tests with navigation and input bypass (HOOK-05)
-- [ ] 10-07-PLAN.md — useEventSocket unit tests with connection lifecycle and events (HOOK-04)
-- [ ] 10-08-PLAN.md — useCachedQuery unit tests with network/cache fallback (HOOK-03)
-- [ ] 10-09-PLAN.md — useAchievements unit tests with milestone detection and persistence (HOOK-01)
-- [ ] 10-10-PLAN.md — usePersonalization unit tests with eligibility and cold start (HOOK-07)
+- [x] 10-01-PLAN.md — articleRelevance unit tests with keyword extraction and scoring (LIB-01) - 88% coverage, 24 tests
+- [x] 10-02-PLAN.md — historySummarizer unit tests with topic extraction and compression (LIB-02) - 100% coverage, 27 tests
+- [x] 10-03-PLAN.md — personalization unit tests with interest extraction and recommendations (LIB-03) - 100% coverage, 38 tests
+- [x] 10-04-PLAN.md — useMapCenter unit tests with preset priority and region calculation (HOOK-06) - 100% coverage, 10 tests
+- [x] 10-05-PLAN.md — useBackendStatus unit tests with health check and polling (HOOK-02) - 100% coverage, 18 tests
+- [x] 10-06-PLAN.md — useKeyboardShortcuts unit tests with navigation and input bypass (HOOK-05) - 97% coverage, 43 tests
+- [x] 10-07-PLAN.md — useEventSocket unit tests with connection lifecycle and events (HOOK-04) - 96% coverage, 27 tests
+- [x] 10-08-PLAN.md — useCachedQuery unit tests with network/cache fallback (HOOK-03) - 100% coverage, 18 tests
+- [x] 10-09-PLAN.md — useAchievements unit tests with milestone detection and persistence (HOOK-01) - 100% coverage, 24 tests
+- [x] 10-10-PLAN.md — usePersonalization unit tests with eligibility and cold start (HOOK-07) - 100% coverage, 15 tests
 **UI hint**: yes
 
 ### Phase 11: E2E Tests
@@ -149,10 +149,10 @@ Plans:
 | 7. Core Backend Service Tests | v1.1 | 4/4 | Complete | 2026-04-20 |
 | 8. Data Pipeline Service Tests | v1.1 | 6/6 | Complete | 2026-04-21 |
 | 9. Extension Service Tests | v1.1 | 5/5 | Complete | 2026-04-21 |
-| 10. Frontend Hook & Library Tests | v1.1 | 0/10 | Planned | - |
+| 10. Frontend Hook & Library Tests | v1.1 | 10/10 | Complete | 2026-04-21 |
 | 11. E2E Tests | v1.1 | 0/? | Not started | - |
 | 12. Bug Fixes & Code Quality | v1.1 | 0/? | Not started | - |
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-21 after Phase 10 planning complete (10 plans)*
+*Last updated: 2026-04-21 after Phase 10 execution complete (244 tests, 80%+ coverage)*
