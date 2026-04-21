@@ -23,9 +23,9 @@
 
 **Milestone Goal:** Establish comprehensive test coverage (80%+) and code quality baseline
 
-- [ ] **Phase 7: Core Backend Service Tests** - aiService, authService, cacheService, cleanupService, emailService
-- [ ] **Phase 8: Data Pipeline Service Tests** - eventsService, focusSuggestionEngine, marketDataService, newsAggregator, newsCrawler, newsApiService
-- [ ] **Phase 9: Extension Service Tests** - personaService, sharingService, stealthScraper, translationService, websocketService
+- [x] **Phase 7: Core Backend Service Tests** - aiService, authService, cacheService, cleanupService, emailService (4/4 complete)
+- [x] **Phase 8: Data Pipeline Service Tests** - eventsService, focusSuggestionEngine, marketDataService, newsAggregator, newsCrawler, newsApiService (6/6 complete)
+- [x] **Phase 9: Extension Service Tests** - personaService, sharingService, stealthScraper, translationService, websocketService (5/5 complete)
 - [ ] **Phase 10: Frontend Hook & Library Tests** - All hooks and utility libraries
 - [ ] **Phase 11: E2E Tests** - Critical user flow verification
 - [ ] **Phase 12: Bug Fixes & Code Quality** - B7 fix, linting, type coverage, dead code
@@ -135,8 +135,8 @@ Plans:
 | 4. User Preferences | v1.0 | 0/0 | Complete | 2026-04-18 |
 | 5. Bookmarks | v1.0 | 0/0 | Complete | 2026-04-18 |
 | 6. Reading History | v1.0 | 6/6 | Complete | 2026-04-19 |
-| 7. Core Backend Service Tests | v1.1 | 1/4 | In progress | - |
-| 8. Data Pipeline Service Tests | v1.1 | 0/6 | Planned | - |
+| 7. Core Backend Service Tests | v1.1 | 4/4 | Complete | 2026-04-20 |
+| 8. Data Pipeline Service Tests | v1.1 | 6/6 | Complete | 2026-04-21 |
 | 9. Extension Service Tests | v1.1 | 5/5 | Complete | 2026-04-21 |
 | 10. Frontend Hook & Library Tests | v1.1 | 0/? | Not started | - |
 | 11. E2E Tests | v1.1 | 0/? | Not started | - |
