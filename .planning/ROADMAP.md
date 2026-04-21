@@ -85,7 +85,7 @@ Plans:
 - [x] 09-02-PLAN.md — sharingService unit tests with click tracking and analytics (100% coverage, 37 tests)
 - [ ] 09-03-PLAN.md — stealthScraper unit tests with Puppeteer mocking and cheerio parsing
 - [x] 09-04-PLAN.md — translationService unit tests with provider fallback chain (94% coverage, 45 tests)
-- [ ] 09-05-PLAN.md — websocketService unit tests with connection lifecycle and broadcasts
+- [x] 09-05-PLAN.md — websocketService unit tests with connection lifecycle and broadcasts (97% coverage, 52 tests)
 
 ### Phase 10: Frontend Hook & Library Tests
 **Goal**: Frontend utilities and hooks have reliable test coverage
@@ -137,7 +137,7 @@ Plans:
 | 6. Reading History | v1.0 | 6/6 | Complete | 2026-04-19 |
 | 7. Core Backend Service Tests | v1.1 | 1/4 | In progress | - |
 | 8. Data Pipeline Service Tests | v1.1 | 0/6 | Planned | - |
-| 9. Extension Service Tests | v1.1 | 3/5 | In progress | - |
+| 9. Extension Service Tests | v1.1 | 4/5 | In progress | - |
 | 10. Frontend Hook & Library Tests | v1.1 | 0/? | Not started | - |
 | 11. E2E Tests | v1.1 | 0/? | Not started | - |
 | 12. Bug Fixes & Code Quality | v1.1 | 0/? | Not started | - |

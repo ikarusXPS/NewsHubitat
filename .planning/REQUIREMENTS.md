@@ -24,7 +24,7 @@ Requirements for Quality & Testing milestone. Each maps to roadmap phases.
 - [x] **UNIT-13**: sharingService has unit tests with 80%+ coverage
 - [ ] **UNIT-14**: stealthScraper has unit tests with 80%+ coverage
 - [ ] **UNIT-15**: translationService has unit tests with 80%+ coverage
-- [ ] **UNIT-16**: websocketService has unit tests with 80%+ coverage
+- [x] **UNIT-16**: websocketService has unit tests with 80%+ coverage
 
 ### Unit Testing — Frontend Hooks
 
@@ -114,7 +114,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UNIT-13 | Phase 9 | Complete |
 | UNIT-14 | Phase 9 | Pending |
 | UNIT-15 | Phase 9 | Pending |
-| UNIT-16 | Phase 9 | Pending |
+| UNIT-16 | Phase 9 | Complete |
 | HOOK-01 | Phase 10 | Pending |
 | HOOK-02 | Phase 10 | Pending |
 | HOOK-03 | Phase 10 | Pending |
