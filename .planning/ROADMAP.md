@@ -79,7 +79,13 @@ Plans:
   3. stealthScraper tests pass with 80%+ coverage including rate limiting
   4. translationService tests pass with 80%+ coverage including provider fallback chain
   5. websocketService tests pass with 80%+ coverage including connection lifecycle
-**Plans**: TBD
+**Plans:** 5 plans
+Plans:
+- [ ] 09-01-PLAN.md — personaService unit tests with keyword matching and AI integration
+- [ ] 09-02-PLAN.md — sharingService unit tests with click tracking and analytics
+- [ ] 09-03-PLAN.md — stealthScraper unit tests with Puppeteer mocking and cheerio parsing
+- [ ] 09-04-PLAN.md — translationService unit tests with provider fallback chain
+- [ ] 09-05-PLAN.md — websocketService unit tests with connection lifecycle and broadcasts
 
 ### Phase 10: Frontend Hook & Library Tests
 **Goal**: Frontend utilities and hooks have reliable test coverage
@@ -131,11 +137,11 @@ Plans:
 | 6. Reading History | v1.0 | 6/6 | Complete | 2026-04-19 |
 | 7. Core Backend Service Tests | v1.1 | 1/4 | In progress | - |
 | 8. Data Pipeline Service Tests | v1.1 | 0/6 | Planned | - |
-| 9. Extension Service Tests | v1.1 | 0/? | Not started | - |
+| 9. Extension Service Tests | v1.1 | 0/5 | Planned | - |
 | 10. Frontend Hook & Library Tests | v1.1 | 0/? | Not started | - |
 | 11. E2E Tests | v1.1 | 0/? | Not started | - |
 | 12. Bug Fixes & Code Quality | v1.1 | 0/? | Not started | - |
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-20 after Phase 8 planning complete*
+*Last updated: 2026-04-21 after Phase 9 planning complete*
