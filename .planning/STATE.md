@@ -75,6 +75,7 @@ Items acknowledged and carried forward from previous milestone close:
 - **2026-04-20:** Shared EmailService mock instance via closure for cross-test assertion access
 - **2026-04-21:** Use undefined (not null) for optional sourceLang parameter in DeepL mock assertions
 - **2026-04-21:** personaService tests use globalThis to pass mock function into vi.mock factory for hoisting compatibility
+- **2026-04-21:** vi.resetModules() with dynamic import for fresh module-level Map state in sharingService tests
 
 ## Performance Metrics
 
@@ -82,6 +83,7 @@ Items acknowledged and carried forward from previous milestone close:
 |------|-------|------|----------------|-------|-------|
 | 2026-04-20 | 07 | 04 | 4 | 1 | 1 |
 | 2026-04-21 | 09 | 01 | 5 | 1 | 1 |
+| 2026-04-21 | 09 | 02 | 5 | 1 | 1 |
 | 2026-04-21 | 09 | 04 | 4 | 1 | 1 |
 
 ## Open Issues

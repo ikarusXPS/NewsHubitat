@@ -21,7 +21,7 @@ Requirements for Quality & Testing milestone. Each maps to roadmap phases.
 - [ ] **UNIT-10**: newsCrawler has unit tests with 80%+ coverage
 - [ ] **UNIT-11**: newsApiService has unit tests with 80%+ coverage
 - [ ] **UNIT-12**: personaService has unit tests with 80%+ coverage
-- [ ] **UNIT-13**: sharingService has unit tests with 80%+ coverage
+- [x] **UNIT-13**: sharingService has unit tests with 80%+ coverage
 - [ ] **UNIT-14**: stealthScraper has unit tests with 80%+ coverage
 - [ ] **UNIT-15**: translationService has unit tests with 80%+ coverage
 - [ ] **UNIT-16**: websocketService has unit tests with 80%+ coverage
@@ -111,7 +111,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UNIT-10 | Phase 8 | Pending |
 | UNIT-11 | Phase 8 | Pending |
 | UNIT-12 | Phase 9 | Pending |
-| UNIT-13 | Phase 9 | Pending |
+| UNIT-13 | Phase 9 | Complete |
 | UNIT-14 | Phase 9 | Pending |
 | UNIT-15 | Phase 9 | Pending |
 | UNIT-16 | Phase 9 | Pending |
