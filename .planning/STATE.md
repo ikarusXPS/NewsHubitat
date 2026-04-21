@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Quality & Testing
-status: planning
-last_updated: "2026-04-20T17:50:25.532Z"
-last_activity: 2026-04-20
+status: executing
+last_updated: "2026-04-21T12:26:15Z"
+last_activity: 2026-04-21
 progress:
   total_phases: 6
-  completed_phases: 1
-  total_plans: 4
-  completed_plans: 4
-  percent: 100
+  completed_phases: 2
+  total_plans: 21
+  completed_plans: 11
+  percent: 52
 ---
 
 # State: NewsHub
@@ -24,12 +24,12 @@ See: .planning/PROJECT.md (updated 2026-04-20)
 
 ## Current Position
 
-Phase: 8 of 12 (data pipeline service tests)
-Plan: Not started
+Phase: 9 of 12 (extension service tests)
+Plan: 04 of 05 (translationService tests)
 Status: In progress
-Last activity: 2026-04-20
+Last activity: 2026-04-21
 
-Progress: [██░░░░░░░░] 25%
+Progress: [█████░░░░░] 52%
 
 ## Milestone Progress
 
@@ -65,20 +65,23 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Completed 07-04-PLAN.md execution
-**Next step:** Continue with remaining Phase 7 plans (07-01, 07-02, 07-03)
-**Resume file:** .planning/phases/07-core-backend-service-tests/07-04-SUMMARY.md
+**Last action:** Completed 09-04-PLAN.md execution (translationService tests)
+**Next step:** Continue with 09-05-PLAN.md (websocketService tests)
+**Resume file:** None
 
 ## Decisions
 
 - **2026-04-20:** cleanupService tests use vi.useFakeTimers() with vi.setSystemTime() for deterministic date-based testing
 - **2026-04-20:** Shared EmailService mock instance via closure for cross-test assertion access
+- **2026-04-21:** Use undefined (not null) for optional sourceLang parameter in DeepL mock assertions
 
 ## Performance Metrics
 
 | Date | Phase | Plan | Duration (min) | Tasks | Files |
 |------|-------|------|----------------|-------|-------|
 | 2026-04-20 | 07 | 04 | 4 | 1 | 1 |
+| 2026-04-21 | 09 | 01 | 5 | 1 | 1 |
+| 2026-04-21 | 09 | 04 | 4 | 1 | 1 |
 
 ## Open Issues
 
