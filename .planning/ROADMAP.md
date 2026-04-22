@@ -5,6 +5,7 @@
 - [x] **v1.0 AI Analysis & User Features** - Phases 1-6 (shipped 2026-04-20)
 - [x] **v1.1 Quality & Testing** - Phases 7-12 (completed 2026-04-22)
 - [x] **v1.2 Performance & Scale** - Phases 13-17 (completed 2026-04-23)
+- [ ] **v1.3 Production Ready** - Phases 18-22 (in progress)
 
 ## Phases
 
@@ -20,9 +21,8 @@
 
 </details>
 
-### v1.1 Quality & Testing (In Progress)
-
-**Milestone Goal:** Establish comprehensive test coverage (80%+) and code quality baseline
+<details>
+<summary>v1.1 Quality & Testing (Phases 7-12) - COMPLETED 2026-04-22</summary>
 
 - [x] **Phase 7: Core Backend Service Tests** - aiService, authService, cacheService, cleanupService, emailService (4/4 complete)
 - [x] **Phase 8: Data Pipeline Service Tests** - eventsService, focusSuggestionEngine, marketDataService, newsAggregator, newsCrawler, newsApiService (6/6 complete)
@@ -31,224 +31,89 @@
 - [x] **Phase 11: E2E Tests** - Critical user flow verification (8/8 complete, 62 tests)
 - [x] **Phase 12: Bug Fixes & Code Quality** - B7 fix, linting, type coverage, dead code (4/4 complete)
 
+</details>
+
+<details>
+<summary>v1.2 Performance & Scale (Phases 13-17) - COMPLETED 2026-04-23</summary>
+
+- [x] **Phase 13: PostgreSQL Migration** - Docker Compose, Prisma adapter, JSONB, health endpoints (5/5 complete)
+- [x] **Phase 14: Redis Caching** - JWT blacklist, rate limiting, AI cache (5/5 complete)
+- [x] **Phase 15: Query Optimization** - Server-Timing, N+1 elimination, chunked saves (4/4 complete)
+- [x] **Phase 16: PWA / Service Worker** - Offline fallback, background sync, install prompt (6/6 complete)
+- [x] **Phase 17: Docker Deployment** - Multi-stage build, health checks, production serving (3/3 complete)
+
+</details>
+
+### v1.3 Production Ready (In Progress)
+
+**Milestone Goal:** Production-grade deployment infrastructure with CI/CD, error tracking, monitoring, and performance validation
+
+- [ ] **Phase 18: CI/CD Pipeline** - GitHub Actions for build, test, deploy with staging and production environments
+- [ ] **Phase 19: Sentry Error Tracking** - Frontend and backend error capture with source maps and performance monitoring
+- [ ] **Phase 20: Monitoring & Alerting** - Health endpoints, Prometheus metrics, uptime checks, Grafana dashboards
+- [ ] **Phase 21: Load Testing** - k6 scripts, 10k user validation, CI integration, performance baselines
+- [ ] **Phase 22: SMTP Production** - Production email provider, delivery verification, bounce handling
+
 ## Phase Details
 
-### Phase 7: Core Backend Service Tests
-**Goal**: Core infrastructure services have reliable test coverage
-**Depends on**: v1.0 milestone complete
-**Requirements**: UNIT-01, UNIT-02, UNIT-03, UNIT-04, UNIT-05
+### Phase 18: CI/CD Pipeline
+**Goal**: Automated build, test, and deployment pipeline with staging and production environments
+**Depends on**: Phase 17 (Docker Deployment)
+**Requirements**: CICD-01, CICD-02, CICD-03, CICD-04
 **Success Criteria** (what must be TRUE):
-  1. aiService tests pass with 80%+ coverage including fallback chain scenarios
-  2. authService tests pass with 80%+ coverage including token validation edge cases
-  3. cacheService tests pass with 80%+ coverage including TTL expiration
-  4. cleanupService tests pass with 80%+ coverage including deletion grace period
-  5. emailService tests pass with 80%+ coverage including template rendering
-**Plans:** 4 plans
-Plans:
-- [x] 07-01-PLAN.md — aiService unit tests with provider fallback chain
-- [x] 07-02-PLAN.md — authService unit tests with JWT edge cases
-- [x] 07-03-PLAN.md — cacheService + emailService unit tests
-- [x] 07-04-PLAN.md — cleanupService unit tests with grace period (96% coverage, 18 tests)
+  1. Pull requests trigger automated build and test runs with pass/fail status checks
+  2. Successful builds push Docker images to container registry with semantic version tags
+  3. Merges to main branch automatically deploy to staging environment
+  4. Production deployments require manual approval before execution
+  5. Deployment status visible in GitHub PR/commit interface
+**Plans**: TBD
 
-### Phase 8: Data Pipeline Service Tests
-**Goal**: News data pipeline services have reliable test coverage
-**Depends on**: Phase 7
-**Requirements**: UNIT-06, UNIT-07, UNIT-08, UNIT-09, UNIT-10, UNIT-11
+### Phase 19: Sentry Error Tracking
+**Goal**: Comprehensive error capture and performance monitoring across frontend and backend
+**Depends on**: Phase 18 (CI/CD Pipeline)
+**Requirements**: SNTR-01, SNTR-02, SNTR-03, SNTR-04
 **Success Criteria** (what must be TRUE):
-  1. eventsService tests pass with 80%+ coverage including timeline queries
-  2. focusSuggestionEngine tests pass with 80%+ coverage including recency weighting
-  3. marketDataService tests pass with 80%+ coverage including fallback data
-  4. newsAggregator tests pass with 80%+ coverage including deduplication
-  5. newsCrawler tests pass with 80%+ coverage including RSS parsing errors
-  6. newsApiService tests pass with 80%+ coverage including 3 API providers (GNews, NewsAPI, MediaStack)
-**Plans:** 6 plans
-Plans:
-- [ ] 08-01-PLAN.md — eventsService unit tests with location patterns and cache TTL
-- [ ] 08-02-PLAN.md — marketDataService unit tests with Yahoo Finance mock and fallback paths
-- [ ] 08-03-PLAN.md — newsApiService unit tests with 3 API providers and utility methods
-- [ ] 08-04-PLAN.md — newsCrawler unit tests with real cheerio and rate limiting
-- [ ] 08-05-PLAN.md — focusSuggestionEngine unit tests with tension/breaking/gap detection
-- [ ] 08-06-PLAN.md — newsAggregator unit tests with deduplication and confidence scoring
+  1. Frontend runtime errors are captured via React Error Boundary with Sentry SDK integration
+  2. Backend Express errors are captured via error handler middleware with Sentry SDK
+  3. Source maps are uploaded to Sentry enabling readable stack traces in production
+  4. Transaction traces show API latency and frontend performance metrics
+  5. Error alerts notify team when new issues occur
+**Plans**: TBD
 
-### Phase 9: Extension Service Tests
-**Goal**: Feature extension services have reliable test coverage
-**Depends on**: Phase 8
-**Requirements**: UNIT-12, UNIT-13, UNIT-14, UNIT-15, UNIT-16
+### Phase 20: Monitoring & Alerting
+**Goal**: Production observability with health checks, metrics, and alerting
+**Depends on**: Phase 19 (Sentry Error Tracking)
+**Requirements**: MNTR-01, MNTR-02, MNTR-03, MNTR-04
 **Success Criteria** (what must be TRUE):
-  1. personaService tests pass with 80%+ coverage including persona matching
-  2. sharingService tests pass with 80%+ coverage including click tracking
-  3. stealthScraper tests pass with 80%+ coverage including rate limiting
-  4. translationService tests pass with 80%+ coverage including provider fallback chain
-  5. websocketService tests pass with 80%+ coverage including connection lifecycle
-**Plans:** 5 plans
-Plans:
-- [x] 09-01-PLAN.md — personaService unit tests with keyword matching and AI integration (100% coverage, 38 tests)
-- [x] 09-02-PLAN.md — sharingService unit tests with click tracking and analytics (100% coverage, 37 tests)
-- [x] 09-03-PLAN.md — stealthScraper unit tests with Puppeteer mocking and cheerio parsing (93% coverage, 44 tests)
-- [x] 09-04-PLAN.md — translationService unit tests with provider fallback chain (94% coverage, 45 tests)
-- [x] 09-05-PLAN.md — websocketService unit tests with connection lifecycle and broadcasts (97% coverage, 52 tests)
+  1. Health endpoints respond with service status (/health, /health/db, /health/redis, /readiness)
+  2. Prometheus-format metrics endpoint exposes request counts, latencies, and system stats
+  3. External uptime monitoring alerts team when services are down or degraded
+  4. Grafana dashboard visualizes all key metrics with historical trends
+  5. Alert rules trigger notifications for error spikes and latency anomalies
+**Plans**: TBD
 
-### Phase 10: Frontend Hook & Library Tests
-**Goal**: Frontend utilities and hooks have reliable test coverage
-**Depends on**: Phase 9
-**Requirements**: HOOK-01, HOOK-02, HOOK-03, HOOK-04, HOOK-05, HOOK-06, HOOK-07, LIB-01, LIB-02, LIB-03
+### Phase 21: Load Testing
+**Goal**: Validate system handles 10,000 concurrent users with documented performance baselines
+**Depends on**: Phase 20 (Monitoring & Alerting)
+**Requirements**: LOAD-01, LOAD-02, LOAD-03, LOAD-04
 **Success Criteria** (what must be TRUE):
-  1. All 7 hook test suites pass with 80%+ coverage
-  2. articleRelevance.ts tests pass with 80%+ coverage including scoring edge cases
-  3. historySummarizer.ts tests pass with 80%+ coverage including empty history
-  4. personalization.ts tests pass with 80%+ coverage including cold start scenarios
-**Plans:** 10 plans
-Plans:
-- [x] 10-01-PLAN.md — articleRelevance unit tests with keyword extraction and scoring (LIB-01) - 88% coverage, 24 tests
-- [x] 10-02-PLAN.md — historySummarizer unit tests with topic extraction and compression (LIB-02) - 100% coverage, 27 tests
-- [x] 10-03-PLAN.md — personalization unit tests with interest extraction and recommendations (LIB-03) - 100% coverage, 38 tests
-- [x] 10-04-PLAN.md — useMapCenter unit tests with preset priority and region calculation (HOOK-06) - 100% coverage, 10 tests
-- [x] 10-05-PLAN.md — useBackendStatus unit tests with health check and polling (HOOK-02) - 100% coverage, 18 tests
-- [x] 10-06-PLAN.md — useKeyboardShortcuts unit tests with navigation and input bypass (HOOK-05) - 97% coverage, 43 tests
-- [x] 10-07-PLAN.md — useEventSocket unit tests with connection lifecycle and events (HOOK-04) - 96% coverage, 27 tests
-- [x] 10-08-PLAN.md — useCachedQuery unit tests with network/cache fallback (HOOK-03) - 100% coverage, 18 tests
-- [x] 10-09-PLAN.md — useAchievements unit tests with milestone detection and persistence (HOOK-01) - 100% coverage, 24 tests
-- [x] 10-10-PLAN.md — usePersonalization unit tests with eligibility and cold start (HOOK-07) - 100% coverage, 15 tests
-**UI hint**: yes
+  1. k6 test scripts exist for critical endpoints (news, auth, AI, bookmarks)
+  2. System maintains stability under 10,000 concurrent virtual users
+  3. Load tests run automatically as part of CI pipeline on demand
+  4. Performance baselines documented with p95 and p99 latency thresholds
+  5. Bottlenecks identified and addressed or documented for future optimization
+**Plans**: TBD
 
-### Phase 11: E2E Tests
-**Goal**: Critical user flows verified end-to-end
-**Depends on**: Phase 10
-**Requirements**: E2E-01, E2E-02, E2E-03, E2E-04, E2E-05, E2E-06, E2E-07, E2E-08, E2E-09, E2E-10
+### Phase 22: SMTP Production
+**Goal**: Production email delivery with verified flows and bounce handling
+**Depends on**: Phase 21 (Load Testing)
+**Requirements**: SMTP-01, SMTP-02, SMTP-03
 **Success Criteria** (what must be TRUE):
-  1. Dashboard page E2E tests verify news feed loading and filtering
-  2. Analysis page E2E tests verify AI Q&A and cluster interactions
-  3. Monitor and Timeline pages E2E tests verify real-time data display
-  4. EventMap and Community pages E2E tests verify map interactions and social features
-  5. User account pages E2E tests verify bookmarks, settings, history flows
-**Plans:** 8 plans
-Plans:
-- [x] 11-01-PLAN.md — Auth setup with storageState for authenticated tests (3 tasks, 4 files)
-- [x] 11-02-PLAN.md — Dashboard E2E tests (news feed, view toggle, trend filters)
-- [x] 11-03-PLAN.md — Analysis E2E tests (clusters, compare mode, charts) - 11 tests
-- [x] 11-04-PLAN.md — Community E2E tests (tabs, contribution types, leaderboard) - 12 tests
-- [x] 11-05-PLAN.md — Profile E2E tests (stats, quick actions, password change) - 12 tests [auth required]
-- [x] 11-06-PLAN.md — Bookmarks E2E tests (empty state, article grid, clear all) - 8 tests
-- [x] 11-07-PLAN.md — Settings E2E tests (theme, language, export/import) - 13 tests [auth required]
-- [x] 11-08-PLAN.md — ReadingHistory E2E tests (timeline groups, filters, clear) - 15 tests [auth required]
-**Note:** E2E-03 (Monitor), E2E-04 (Timeline), E2E-05 (EventMap) already covered by existing tests per D-02
-**UI hint**: yes
-
-### Phase 12: Bug Fixes & Code Quality
-**Goal**: Codebase meets quality standards and known bugs resolved
-**Depends on**: Phase 11
-**Requirements**: BUG-01, QUAL-01, QUAL-02, QUAL-03, QUAL-04
-**Success Criteria** (what must be TRUE):
-  1. B7 Article thumbnail fallback system shows placeholder when image fails
-  2. ESLint passes with zero errors across entire codebase
-  3. TypeScript strict mode enabled and compiles with zero errors
-  4. Dead code identified by static analysis and removed
-  5. Overall unit test coverage reaches 80%+ threshold
-**Plans:** 4 plans in 2 waves
-Plans:
-- [x] 12-01-PLAN.md — B7 Article thumbnail fallback fix (BUG-01)
-- [x] 12-02-PLAN.md — ESLint error fixes (QUAL-01) - 0 errors achieved, config + code fixes
-- [x] 12-03-PLAN.md — Dead code identification and removal (QUAL-03) - 89 lines removed
-- [x] 12-04-PLAN.md — Final quality verification (QUAL-02, QUAL-04) - 91.65% coverage
-**UI hint**: yes
-
-### v1.2 Performance & Scale (In Progress)
-
-**Milestone Goal:** Production-ready infrastructure with PostgreSQL, Redis, and Docker deployment
-
-### Phase 13: PostgreSQL Migration
-**Goal**: Replace SQLite with PostgreSQL for production-ready database
-**Depends on**: Phase 12
-**Requirements**: PERF-01, PERF-02
-**Success Criteria**:
-  1. Prisma adapter switched to PostgreSQL with connection pooling (10 connections, 5s timeout)
-  2. JSON String fields converted to native JSONB with GIN indexes
-  3. All tests pass with PostgreSQL (1051 unit + E2E)
-  4. /api/health/db endpoint for container orchestration
-  5. Docker Compose for local PostgreSQL development
-  6. Seed scripts for badges and AI personas
-**Plans:** 5 plans in 4 waves
-Plans:
-- [x] 13-01-PLAN.md — Docker Compose + PostgreSQL adapter + schema provider
-- [ ] 13-02-PLAN.md — JSONB field conversion with GIN indexes (Task 1 complete, Task 2 blocked: needs Docker + PostgreSQL)
-- [x] 13-03-PLAN.md — Database health endpoint and structured logging
-- [x] 13-04-PLAN.md — Seed scripts for badges and AI personas
-- [ ] 13-05-PLAN.md — Full test suite verification and human sign-off
-
-### Phase 14: Redis Caching
-**Goal**: Add Redis for JWT blacklisting, rate limiting, and AI response caching
-**Depends on**: Phase 13
-**Requirements**: PERF-02
-**Success Criteria**:
-  1. Redis connected and health-checked via /api/health/redis
-  2. JWT blacklisting on logout and password change (D-01, D-02)
-  3. Tiered rate limiting: auth 5/min, AI 10/min, news 100/min (D-05)
-  4. AI summaries cached in Redis with 30-minute TTL (D-07)
-  5. Graceful degradation when Redis unavailable (D-03)
-**Plans:** 5 plans in 3 waves
-Plans:
-- [x] 14-01-PLAN.md — Redis Docker + CacheService blacklist methods + /api/health/redis
-- [x] 14-02-PLAN.md — Rate limiting middleware with express-rate-limit + Redis store
-- [x] 14-03-PLAN.md — JWT blacklist integration in auth flow (logout, password change)
-- [x] 14-04-PLAN.md — AIService cache migration from in-memory Maps to Redis
-- [x] 14-05-PLAN.md — Tests and human verification of Redis features (human approved)
-
-### Phase 14 Complete (2026-04-22)
-All 5 plans executed. Redis caching layer operational with rate limiting, JWT blacklisting, and AI cache.
-
-### Phase 15: Query Optimization
-**Goal**: Optimize database queries and API response times
-**Depends on**: Phase 14
-**Requirements**: PERF-05
-**Success Criteria**:
-  1. N+1 queries eliminated in leaderboard routes
-  2. Server-Timing headers on all API responses for p95 monitoring
-  3. Chunked parallel saves in newsAggregator (50 articles per chunk)
-  4. API p95 response time < 200ms
-**Plans:** 4 plans in 2 waves
-Plans:
-- [ ] 15-01-PLAN.md — Server-Timing middleware + chunk utility function
-- [ ] 15-02-PLAN.md — Leaderboard N+1 elimination with Prisma include
-- [ ] 15-03-PLAN.md — NewsAggregator chunked parallel saves
-- [ ] 15-04-PLAN.md — Verification and human sign-off
-
-### Phase 16: PWA / Service Worker
-**Goal**: Offline support and background sync capabilities
-**Depends on**: Phase 15
-**Requirements**: PERF-06, PERF-07
-**Success Criteria**:
-  1. Service worker caches static assets (30d static, 7d images, 5m API)
-  2. Offline fallback page with NewsHub cyber aesthetic
-  3. Background sync for bookmarks and reading history
-  4. App installable as PWA with engagement-based install prompt
-  5. Cache age indicator shows when serving stale data
-**Plans:** 6 plans in 4 waves
-Plans:
-- [x] 16-01-PLAN.md — Offline fallback page + VitePWA navigation fallback
-- [x] 16-02-PLAN.md — Service worker registration with workbox-window
-- [x] 16-03-PLAN.md — Background sync service with IndexedDB queue
-- [x] 16-04-PLAN.md — Backend sync endpoints (bookmarks, history)
-- [x] 16-05-PLAN.md — Install prompt banner with engagement tracking
-- [x] 16-06-PLAN.md — Cache age indicator + verification checkpoint
-
-### Phase 17: Docker Deployment
-**Goal**: Containerized deployment with Docker Compose
-**Depends on**: Phase 16
-**Requirements**: DEPLOY-01, DEPLOY-02
-**Success Criteria**:
-  1. Dockerfile for app (multi-stage build with node:22-alpine3.19)
-  2. docker-compose.yml with app, PostgreSQL, Redis services
-  3. Health checks with service_healthy dependencies
-  4. Environment variable management via env_file
-  5. Production build with tsup for server, Vite for frontend
-**Plans:** 3 plans in 2 waves
-Plans:
-- [x] 17-01-PLAN.md — Dockerfile + .dockerignore + tsup.config.ts (build infrastructure)
-- [x] 17-02-PLAN.md — package.json scripts + server static file serving
-- [x] 17-03-PLAN.md — docker-compose.yml app service + .env.example + verification
-
-### Phase 17 Complete (2026-04-23)
-All 3 plans executed. Docker deployment stack operational with multi-stage build, health checks, and production static serving.
+  1. Production SMTP provider configured (SendGrid, SES, or equivalent)
+  2. Email verification flow delivers emails and tokens work in production
+  3. Password reset flow delivers emails and reset links work in production
+  4. Bounce handling marks undeliverable addresses and prevents retry spam
+**Plans**: TBD
 
 ## Progress
 
@@ -266,12 +131,17 @@ All 3 plans executed. Docker deployment stack operational with multi-stage build
 | 10. Frontend Hook & Library Tests | v1.1 | 10/10 | Complete | 2026-04-21 |
 | 11. E2E Tests | v1.1 | 8/8 | Complete | 2026-04-22 |
 | 12. Bug Fixes & Code Quality | v1.1 | 4/4 | Complete | 2026-04-22 |
-| 13. PostgreSQL Migration | v1.2 | 3/5 | In Progress | - |
+| 13. PostgreSQL Migration | v1.2 | 5/5 | Complete | 2026-04-22 |
 | 14. Redis Caching | v1.2 | 5/5 | Complete | 2026-04-22 |
 | 15. Query Optimization | v1.2 | 4/4 | Complete | 2026-04-22 |
 | 16. PWA / Service Worker | v1.2 | 6/6 | Complete | 2026-04-22 |
 | 17. Docker Deployment | v1.2 | 3/3 | Complete | 2026-04-23 |
+| 18. CI/CD Pipeline | v1.3 | 0/? | Not started | - |
+| 19. Sentry Error Tracking | v1.3 | 0/? | Not started | - |
+| 20. Monitoring & Alerting | v1.3 | 0/? | Not started | - |
+| 21. Load Testing | v1.3 | 0/? | Not started | - |
+| 22. SMTP Production | v1.3 | 0/? | Not started | - |
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-23 — v1.2 milestone complete*
+*Last updated: 2026-04-23 — v1.3 phases 18-22 added*
