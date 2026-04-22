@@ -510,7 +510,7 @@ describe('useAchievements', () => {
 
     it('skips effect check when dependencies change within 5 seconds', () => {
       // Start with 10 articles
-      let historyLength = 10;
+      const historyLength = 10;
       let bookmarkLength = 0;
       mockUseAppStore.mockImplementation(() => ({
         readingHistory: createHistoryEntries(historyLength),
