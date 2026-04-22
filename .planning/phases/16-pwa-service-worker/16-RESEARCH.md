@@ -657,22 +657,19 @@ class SyncService {
 
 > All claims in this research were verified via WebSearch (official docs), npm registry, or existing codebase inspection. No assumptions requiring user confirmation.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Bookmark sync endpoint availability**
-   - What we know: Store has `bookmarkedArticles` array persisted to localStorage, `toggleBookmark()` action exists
-   - What's unclear: Does `/api/bookmarks` POST endpoint exist for server sync? Or is it client-only?
-   - Recommendation: Check `server/routes/` for bookmarks endpoint. If missing, create it as part of this phase.
+1. **Bookmark sync endpoint availability** ✅
+   - Resolution: Endpoints do NOT exist. Plan 16-04 creates `POST /api/bookmarks` and `POST /api/history` endpoints.
+   - Decision: Create both endpoints as part of PWA phase for full background sync support.
 
-2. **Reading history sync endpoint availability**
-   - What we know: Store has `readingHistory` array with `addToReadingHistory()` action
-   - What's unclear: Does `/api/history` POST endpoint exist for server sync?
-   - Recommendation: Verify endpoint exists. Reading history may be intentionally client-only (privacy concern).
+2. **Reading history sync endpoint availability** ✅
+   - Resolution: Endpoint does NOT exist. Plan 16-04 creates `POST /api/history` endpoint.
+   - Decision: Create endpoint with authentication — privacy handled by user login scope.
 
-3. **Install prompt dismissal persistence**
-   - What we know: D-10 specifies "reappears after 7 days if dismissed"
-   - What's unclear: Should dismissal persist across devices (server sync) or stay client-only (localStorage)?
-   - Recommendation: Start with localStorage (simpler). Add server sync in future phase if multi-device consistency is needed.
+3. **Install prompt dismissal persistence** ✅
+   - Resolution: CONTEXT.md D-10 specifies 7-day cooldown after dismissal.
+   - Decision: localStorage only (client-side). No server sync needed for dismissal state.
 
 ## Environment Availability
 
