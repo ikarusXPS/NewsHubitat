@@ -190,7 +190,7 @@ Plans:
 - [x] 14-01-PLAN.md — Redis Docker + CacheService blacklist methods + /api/health/redis
 - [ ] 14-02-PLAN.md — Rate limiting middleware with express-rate-limit + Redis store
 - [x] 14-03-PLAN.md — JWT blacklist integration in auth flow (logout, password change)
-- [ ] 14-04-PLAN.md — AIService cache migration from in-memory Maps to Redis
+- [x] 14-04-PLAN.md — AIService cache migration from in-memory Maps to Redis
 - [ ] 14-05-PLAN.md — Tests and human verification of Redis features
 
 ### Phase 15: Query Optimization
@@ -243,8 +243,8 @@ Plans:
 | 11. E2E Tests | v1.1 | 8/8 | Complete | 2026-04-22 |
 | 12. Bug Fixes & Code Quality | v1.1 | 4/4 | Complete | 2026-04-22 |
 | 13. PostgreSQL Migration | v1.2 | 3/5 | In Progress | - |
-| 14. Redis Caching | v1.2 | 2/5 | In Progress | - |
+| 14. Redis Caching | v1.2 | 3/5 | In Progress | - |
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-22 — Phase 14 Plan 03 complete (Auth blacklist integration)*
+*Last updated: 2026-04-22 — Phase 14 Plan 04 complete (AI cache migration)*
