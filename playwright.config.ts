@@ -17,10 +17,11 @@ export default defineConfig({
     { name: 'setup', testMatch: /.*\.setup\.ts/ },
 
     // Unauthenticated tests (no dependencies)
+    // Note: bookmarks.spec.ts moved here - page uses client-side localStorage, not server auth
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
-      testIgnore: ['**/profile.spec.ts', '**/bookmarks.spec.ts', '**/settings.spec.ts', '**/history.spec.ts'],
+      testIgnore: ['**/profile.spec.ts', '**/settings.spec.ts', '**/history.spec.ts'],
     },
 
     // Authenticated tests (depend on setup)
@@ -30,7 +31,7 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         storageState: 'playwright/.auth/user.json',
       },
-      testMatch: ['**/profile.spec.ts', '**/bookmarks.spec.ts', '**/settings.spec.ts', '**/history.spec.ts'],
+      testMatch: ['**/profile.spec.ts', '**/settings.spec.ts', '**/history.spec.ts'],
       dependencies: ['setup'],
     },
   ],
