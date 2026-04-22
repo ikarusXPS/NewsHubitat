@@ -65,7 +65,7 @@ const BADGE_SEEDS = [
   { name: 'Fact Checker-platinum', description: 'Verify 50 submissions', tier: 'platinum', category: 'behavior', iconType: 'check-circle', threshold: 50 },
 ];
 
-async function seedBadges() {
+export async function seedBadges(): Promise<void> {
   console.log('Seeding badges...');
 
   for (const badge of BADGE_SEEDS) {
@@ -80,6 +80,9 @@ async function seedBadges() {
   console.log(`Seeded ${count} badges`);
 }
 
-seedBadges()
-  .catch(console.error)
-  .finally(() => prisma.$disconnect());
+// Allow running standalone
+if (import.meta.url === `file://${process.argv[1]}`) {
+  seedBadges()
+    .catch(console.error)
+    .finally(() => prisma.$disconnect());
+}
