@@ -3,7 +3,7 @@
 ## Milestones
 
 - [x] **v1.0 AI Analysis & User Features** - Phases 1-6 (shipped 2026-04-20)
-- [ ] **v1.1 Quality & Testing** - Phases 7-12 (in progress)
+- [x] **v1.1 Quality & Testing** - Phases 7-12 (completed 2026-04-22)
 
 ## Phases
 
@@ -28,7 +28,7 @@
 - [x] **Phase 9: Extension Service Tests** - personaService, sharingService, stealthScraper, translationService, websocketService (5/5 complete)
 - [x] **Phase 10: Frontend Hook & Library Tests** - All hooks and utility libraries (10/10 complete)
 - [x] **Phase 11: E2E Tests** - Critical user flow verification (8/8 complete, 62 tests)
-- [ ] **Phase 12: Bug Fixes & Code Quality** - B7 fix, linting, type coverage, dead code
+- [x] **Phase 12: Bug Fixes & Code Quality** - B7 fix, linting, type coverage, dead code (4/4 complete)
 
 ## Phase Details
 
@@ -147,8 +147,8 @@ Plans:
 Plans:
 - [x] 12-01-PLAN.md — B7 Article thumbnail fallback fix (BUG-01)
 - [x] 12-02-PLAN.md — ESLint error fixes (QUAL-01) - 0 errors achieved, config + code fixes
-- [ ] 12-03-PLAN.md — Dead code identification and removal (QUAL-03)
-- [ ] 12-04-PLAN.md — Final quality verification (QUAL-02, QUAL-04)
+- [x] 12-03-PLAN.md — Dead code identification and removal (QUAL-03) - 89 lines removed
+- [x] 12-04-PLAN.md — Final quality verification (QUAL-02, QUAL-04) - 91.65% coverage
 **UI hint**: yes
 
 ## Progress
@@ -166,8 +166,8 @@ Plans:
 | 9. Extension Service Tests | v1.1 | 5/5 | Complete | 2026-04-21 |
 | 10. Frontend Hook & Library Tests | v1.1 | 10/10 | Complete | 2026-04-21 |
 | 11. E2E Tests | v1.1 | 8/8 | Complete | 2026-04-22 |
-| 12. Bug Fixes & Code Quality | v1.1 | 2/4 | In progress | - |
+| 12. Bug Fixes & Code Quality | v1.1 | 4/4 | Complete | 2026-04-22 |
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-22 after 12-02 complete (ESLint errors resolved - 0 errors)*
+*Last updated: 2026-04-22 — v1.1 Quality & Testing milestone complete*
