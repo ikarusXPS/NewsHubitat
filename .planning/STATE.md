@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Performance & Scale
 status: executing
-last_updated: "2026-04-22T13:14:14Z"
+last_updated: "2026-04-22T14:58:16Z"
 last_activity: 2026-04-22
 progress:
   total_phases: 5
@@ -65,9 +65,10 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Completed 13-04-PLAN.md (seed scripts for badges and AI personas)
-**Next step:** Execute 13-05-PLAN.md (full test suite verification)
-**Resume file:** None
+**Last action:** Executed 13-05-PLAN.md Tasks 1-2, reached checkpoint at Task 3
+**Next step:** Resume 13-05-PLAN.md Task 3 (human-verify) when database available
+**Resume file:** .planning/phases/13-postgresql-migration/13-05-PLAN.md
+**Checkpoint:** human-verify - awaiting PostgreSQL connectivity
 
 ## Decisions
 
@@ -87,6 +88,8 @@ Items acknowledged and carried forward from previous milestone close:
 - **2026-04-22:** JsonbPathOps operator class for GIN indexes (optimal for @> containment queries)
 - **2026-04-22:** Use SELECT 1 for minimal database connectivity check in /api/health/db endpoint
 - **2026-04-22:** Deterministic IDs for AIPersona using slugified name; export pattern with standalone execution guard
+- **2026-04-22:** Unit tests with Prisma mocks are independent of database connectivity
+- **2026-04-22:** E2E auth tests require live database for user registration/login setup
 
 ## Performance Metrics
 
@@ -111,11 +114,13 @@ Items acknowledged and carried forward from previous milestone close:
 | 2026-04-22 | 13 | 02 | 4 | 1 | 1 |
 | 2026-04-22 | 13 | 03 | 3 | 2 | 2 |
 | 2026-04-22 | 13 | 04 | 5 | 3 | 4 |
+| 2026-04-22 | 13 | 05 | 11 | 2 | 0 |
 
 ## Open Issues
 
 - **13-02 Task 2:** Blocked - Docker Desktop not running, DATABASE_URL still SQLite
+- **13-05 Task 3:** Checkpoint reached - E2E auth tests blocked by database unavailability (26/62 passed)
 
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-22 — Phase 13 Plan 04 complete (seed scripts for badges and AI personas)*
+*Last updated: 2026-04-22 — Phase 13 Plan 05 checkpoint reached (unit tests pass, E2E partial)*
