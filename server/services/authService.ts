@@ -4,6 +4,7 @@ import { prisma } from '../db/prisma';
 import { generateSecureToken, hashToken, getTokenExpiry, isTokenExpired } from '../utils/tokenUtils';
 import { isDisposableEmail } from '../utils/disposableEmail';
 import { EmailService } from './emailService';
+import { CacheService, CACHE_TTL } from './cacheService';
 
 interface UserPreferences {
   language: 'de' | 'en';
@@ -540,6 +541,18 @@ export class AuthService {
   async getUserCount(): Promise<number> {
     return prisma.user.count();
   }
+
+  /**
+   * Blacklist a token (D-01, D-02)
+   * Called on logout and password change
+   * @param token - The JWT token to blacklist
+   * @returns true if blacklisted, false if Redis unavailable
+   */
+  async blacklistToken(token: string): Promise<boolean> {
+    const cacheService = CacheService.getInstance();
+    // Use WEEK TTL to match JWT_EXPIRES_IN = '7d'
+    return cacheService.blacklistToken(token, CACHE_TTL.WEEK);
+  }
 }
 
 // Middleware for protected routes
@@ -561,6 +574,15 @@ export async function authMiddleware(
 
   if (!payload) {
     res.status(401).json({ success: false, error: 'Invalid or expired token' });
+    return;
+  }
+
+  // D-01, D-02: Check token blacklist (Redis)
+  // D-03: Graceful degradation - if Redis unavailable, skip check
+  const cacheService = CacheService.getInstance();
+  const isBlacklisted = await cacheService.isTokenBlacklisted(token);
+  if (isBlacklisted) {
+    res.status(401).json({ success: false, error: 'Token revoked' });
     return;
   }
 
