@@ -42,6 +42,12 @@ npm run seed             # Run all seed scripts (badges + personas)
 npm run seed:badges      # Seed gamification badges only
 npm run seed:personas    # Seed AI personas only
 
+# Docker (Production)
+docker compose build app          # Build app container
+docker compose up -d              # Start all services (app, postgres, redis)
+docker compose ps                 # Check container health
+docker compose logs -f app        # Watch app logs
+
 # Run Single Tests
 npm run test -- src/lib/utils.test.ts           # Single unit test file
 npm run test -- -t "mapCentering"               # Tests matching pattern
@@ -73,9 +79,10 @@ npx playwright test e2e/auth.spec.ts            # Single E2E test file
 - **Data Flow**: RSS/HTML crawl → Dedup → Sentiment → Translation → Database/Cache
 - **Database**: PostgreSQL via Prisma, schema at `prisma/schema.prisma`
 - **Generated Client**: `src/generated/prisma/` (do not edit)
-- **Caching**: In-memory Maps with configurable TTL (summaries, topics)
+- **Caching**: Redis for JWT blacklist, rate limits, AI responses; in-memory fallback
 - **Real-time**: WebSocket service for live updates via Socket.io
 - **Background Jobs**: Cleanup service for expired tokens and unverified accounts
+- **Rate Limiting**: Tiered (auth 5/min, AI 10/min, news 100/min) via express-rate-limit + Redis
 
 ### Key Services (`server/services/`)
 | Service | Purpose |
@@ -89,6 +96,7 @@ npx playwright test e2e/auth.spec.ts            # Single E2E test file
 | `personaService.ts` | AI persona management |
 | `emailService.ts` | Email digest and notifications |
 | `syncService.ts` | Background sync with IndexedDB queue for offline actions |
+| `cacheService.ts` | Redis wrapper with JWT blacklist and graceful degradation |
 
 ### Key Directories
 | Directory | Purpose |
@@ -236,6 +244,8 @@ interface ApiResponse<T> {
 | `/api/news/sentiment` | GET | Sentiment statistics by region |
 | `/api/analysis/framing` | GET | Framing comparison by topic |
 | `/api/health` | GET | Server status |
+| `/api/health/db` | GET | PostgreSQL connectivity (for Docker healthcheck) |
+| `/api/health/redis` | GET | Redis connectivity and stats |
 | `/api/bookmarks` | POST | Create bookmark (auth required, idempotent) |
 | `/api/history` | POST | Create reading history entry (auth required) |
 
@@ -270,7 +280,8 @@ Auth-required tests (`profile.spec.ts`, `settings.spec.ts`, `history.spec.ts`) r
 ```bash
 # Required
 PORT=3001
-DATABASE_URL="postgresql://newshub:newshub_dev@localhost:5432/newshub?schema=public"
+DATABASE_URL="postgresql://newshub:newshub_dev@localhost:5433/newshub?schema=public"
+REDIS_URL=redis://localhost:6379
 
 # AI (ONE required, priority: Gemini → OpenRouter → Anthropic)
 GEMINI_API_KEY=           # FREE tier - 1500 req/day (recommended)
