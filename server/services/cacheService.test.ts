@@ -3,7 +3,7 @@
  * Tests singleton pattern, connection state, get/set/del operations, getOrSet, incr, and CacheKeys builders
  */
 
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { vi, describe, it, expect, afterEach } from 'vitest';
 
 // Mock ioredis before importing CacheService
 vi.mock('ioredis', () => {

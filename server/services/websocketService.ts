@@ -130,15 +130,16 @@ export class WebSocketService {
       });
 
       // Handle authentication
-      socket.on('authenticate', (token) => {
+       
+      socket.on('authenticate', (_token: string) => {
         // TODO: Verify JWT token and set userId
         try {
-          // const decoded = verifyToken(token);
+          // const decoded = verifyToken(_token);
           // socket.data.userId = decoded.userId;
           socket.data.authenticatedAt = new Date();
           socket.join('authenticated');
           logger.debug(`Client ${clientId} authenticated`);
-        } catch (err) {
+        } catch {
           logger.debug(`Client ${clientId} authentication failed`);
         }
       });

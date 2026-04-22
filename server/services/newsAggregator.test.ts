@@ -5,8 +5,8 @@
  */
 
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
-import type { NewsArticle, NewsSource } from '../../src/types';
-import { getMockNewsArticle, getMockNewsSource, getMockArticleSet, resetIdCounter } from '../../src/test/factories';
+import type { NewsArticle } from '../../src/types';
+import { getMockNewsArticle, getMockNewsSource, resetIdCounter } from '../../src/test/factories';
 
 // Mock all singleton service dependencies per D-04
 vi.mock('./translationService', () => ({

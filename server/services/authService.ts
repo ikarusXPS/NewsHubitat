@@ -119,8 +119,9 @@ export class AuthService {
     // Generate JWT token
     const jwtToken = this.generateToken(user);
 
-    // Return user without password
-    const { passwordHash: _, verificationTokenHash: __, resetTokenHash: ___, ...safeUser } = user;
+    // Return user without password (omit hash fields)
+     
+    const { passwordHash: _ph, verificationTokenHash: _vth, resetTokenHash: _rth, ...safeUser } = user;
     return { user: safeUser as SafeUser, token: jwtToken, emailSent };
   }
 
@@ -143,7 +144,7 @@ export class AuthService {
     const token = this.generateToken(user);
 
     // Return user without password
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+     
     const { passwordHash: _, ...safeUser } = user;
     return { user: safeUser, token };
   }
@@ -166,7 +167,7 @@ export class AuthService {
     });
     if (!user) return null;
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+     
     const { passwordHash: _, ...safeUser } = user;
     return {
       ...safeUser,

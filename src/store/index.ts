@@ -266,7 +266,7 @@ export const useAppStore = create<AppState>()(
             },
           };
         }),
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+       
       toggleAllSourcesInRegion: (_region, _enabled) =>
         set((state) => {
           // This requires access to sources - handled at component level
