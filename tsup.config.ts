@@ -18,8 +18,8 @@ export default defineConfig({
     'pg',
     'ioredis',
   ],
-  // Don't bundle node_modules for server
-  noExternal: [],
+  // Force bundle packages that have ESM/JSON import issues in Node 22
+  noExternal: ['disposable-email-domains'],
   // ESM output without CJS shims
   shims: false,
 });
