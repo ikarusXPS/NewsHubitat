@@ -70,6 +70,7 @@ model User {
   name         String
   createdAt    DateTime @default(now())
   bookmarks    Bookmark[]
+  readingHistory ReadingHistory[]
   preferences  Json?    // D-13: JSONB stores user preferences
 
   // Email verification (AUTH-01 per D-51)
@@ -116,13 +117,27 @@ model User {
 
 model Bookmark {
   id        String   @id @default(cuid())
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
   articleId String
   createdAt DateTime @default(now())
 
   @@unique([userId, articleId])
   @@index([userId])
+}
+
+model ReadingHistory {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  articleId String
+  title     String?
+  source    String?
+  readAt    DateTime @default(now())
+
+  @@unique([userId, articleId, readAt])
+  @@index([userId])
+  @@index([readAt])
 }
 
 model StoryCluster {
