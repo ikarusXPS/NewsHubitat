@@ -4,7 +4,7 @@
 
 - [x] **v1.0 AI Analysis & User Features** - Phases 1-6 (shipped 2026-04-20)
 - [x] **v1.1 Quality & Testing** - Phases 7-12 (completed 2026-04-22)
-- [ ] **v1.2 Performance & Scale** - Phases 13-17 (in progress)
+- [x] **v1.2 Performance & Scale** - Phases 13-17 (completed 2026-04-23)
 
 ## Phases
 
@@ -243,9 +243,12 @@ Plans:
   5. Production build with tsup for server, Vite for frontend
 **Plans:** 3 plans in 2 waves
 Plans:
-- [ ] 17-01-PLAN.md — Dockerfile + .dockerignore + tsup.config.ts (build infrastructure)
-- [ ] 17-02-PLAN.md — package.json scripts + server static file serving
-- [ ] 17-03-PLAN.md — docker-compose.yml app service + .env.example + verification
+- [x] 17-01-PLAN.md — Dockerfile + .dockerignore + tsup.config.ts (build infrastructure)
+- [x] 17-02-PLAN.md — package.json scripts + server static file serving
+- [x] 17-03-PLAN.md — docker-compose.yml app service + .env.example + verification
+
+### Phase 17 Complete (2026-04-23)
+All 3 plans executed. Docker deployment stack operational with multi-stage build, health checks, and production static serving.
 
 ## Progress
 
@@ -267,8 +270,8 @@ Plans:
 | 14. Redis Caching | v1.2 | 5/5 | Complete | 2026-04-22 |
 | 15. Query Optimization | v1.2 | 4/4 | Complete | 2026-04-22 |
 | 16. PWA / Service Worker | v1.2 | 6/6 | Complete | 2026-04-22 |
-| 17. Docker Deployment | v1.2 | 0/3 | Planned | - |
+| 17. Docker Deployment | v1.2 | 3/3 | Complete | 2026-04-23 |
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-23 — Phase 17 planned (3 plans in 2 waves)*
+*Last updated: 2026-04-23 — v1.2 milestone complete*
