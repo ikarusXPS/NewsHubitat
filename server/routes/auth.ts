@@ -214,6 +214,40 @@ authRoutes.get('/verify', authMiddleware, (req: AuthRequest, res: Response) => {
   });
 });
 
+// Logout - blacklist current token (D-01, D-02)
+authRoutes.post('/logout', authMiddleware, async (req: AuthRequest, res: Response) => {
+  try {
+    // Get the token from the request
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      // Shouldn't happen since authMiddleware passed, but be defensive
+      res.json({ success: true, data: { message: 'Logged out' } });
+      return;
+    }
+
+    const token = authHeader.slice(7); // Remove 'Bearer '
+    const blacklisted = await authService.blacklistToken(token);
+
+    if (blacklisted) {
+      console.log(`logout:blacklisted userId=${req.user!.userId}`);
+    } else {
+      console.log(`logout:redis_unavailable userId=${req.user!.userId}`);
+    }
+
+    res.json({
+      success: true,
+      data: { message: 'Logged out successfully' },
+    });
+  } catch (err) {
+    console.error('logout:error', err);
+    // Still return success - user intended to log out
+    res.json({
+      success: true,
+      data: { message: 'Logged out' },
+    });
+  }
+});
+
 // Change password
 authRoutes.put('/password', authMiddleware, async (req: AuthRequest, res: Response) => {
   const result = changePasswordSchema.safeParse(req.body);
