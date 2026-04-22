@@ -169,7 +169,7 @@ Plans:
   6. Seed scripts for badges and AI personas
 **Plans:** 5 plans in 4 waves
 Plans:
-- [ ] 13-01-PLAN.md — Docker Compose + PostgreSQL adapter + schema provider
+- [x] 13-01-PLAN.md — Docker Compose + PostgreSQL adapter + schema provider
 - [ ] 13-02-PLAN.md — JSONB field conversion with GIN indexes
 - [ ] 13-03-PLAN.md — Database health endpoint and structured logging
 - [ ] 13-04-PLAN.md — Seed scripts for badges and AI personas
@@ -235,8 +235,8 @@ Plans:
 | 10. Frontend Hook & Library Tests | v1.1 | 10/10 | Complete | 2026-04-21 |
 | 11. E2E Tests | v1.1 | 8/8 | Complete | 2026-04-22 |
 | 12. Bug Fixes & Code Quality | v1.1 | 4/4 | Complete | 2026-04-22 |
-| 13. PostgreSQL Migration | v1.2 | 0/5 | In Progress | - |
+| 13. PostgreSQL Migration | v1.2 | 1/5 | In Progress | - |
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-22 — Phase 13 planned with 5 plans*
+*Last updated: 2026-04-22 — Phase 13 Plan 01 complete*
