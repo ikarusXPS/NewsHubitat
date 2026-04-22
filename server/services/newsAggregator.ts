@@ -9,6 +9,7 @@ import { AIService } from './aiService';
 import { prisma } from '../db/prisma';
 import logger from '../utils/logger';
 import { hashString } from '../utils/hash';
+import { chunk } from '../utils/array';
 
 const parser = new Parser({
   timeout: 10000,
@@ -24,6 +25,7 @@ export class NewsAggregator {
   private articles: NewsArticle[] = [];
   private updateInterval: number = 60 * 60 * 1000; // 60 minutes
   private maxArticles: number = 1000;
+  private readonly CHUNK_SIZE = 50;  // D-07: Safe for pool of 10 connections
   private intervalId: NodeJS.Timeout | null = null;
   private translationService: TranslationService;
   private lastFetchTime: Map<string, number> = new Map();
@@ -230,21 +232,28 @@ export class NewsAggregator {
     // Deduplicate by title similarity (result used in logging below)
     this.deduplicateArticles([...newArticles, ...this.articles]);
 
-    // Persist to database
-    logger.info(`Saving ${newArticles.length} new articles to database...`);
-    for (const article of newArticles) {
-      try {
-        // Ensure source exists before saving article (prevents P2003 foreign key error)
-        await this.ensureSourceExists(article.source);
+    // Persist to database with chunked parallel execution (D-07, D-08)
+    logger.info(`Saving ${newArticles.length} new articles to database in chunks of ${this.CHUNK_SIZE}...`);
+    const articleChunks = chunk(newArticles, this.CHUNK_SIZE);
 
-        await prisma.newsArticle.upsert({
-          where: { id: article.id },
-          update: this.toPrismaArticle(article),
-          create: this.toPrismaArticle(article),
-        });
-      } catch (err) {
-        logger.error(`Failed to save article ${article.id}:`, err);
-      }
+    for (const articleChunk of articleChunks) {
+      // Process each chunk in parallel
+      await Promise.all(
+        articleChunk.map(async (article) => {
+          try {
+            // Ensure source exists before saving article (prevents P2003 foreign key error)
+            await this.ensureSourceExists(article.source);
+
+            await prisma.newsArticle.upsert({
+              where: { id: article.id },
+              update: this.toPrismaArticle(article),
+              create: this.toPrismaArticle(article),
+            });
+          } catch (err) {
+            logger.error(`Failed to save article ${article.id}:`, err);
+          }
+        })
+      );
     }
 
     // Reload from DB to ensure consistency and limit
