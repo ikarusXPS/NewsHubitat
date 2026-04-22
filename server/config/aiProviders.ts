@@ -43,11 +43,11 @@ export const AI_CONFIG = {
 
   /**
    * Cache settings
+   * TTLs in seconds for Redis compatibility
    */
   cache: {
-    summaryTTL: 30 * 60 * 1000,       // 30 minutes
-    topicTTL: 24 * 60 * 60 * 1000,    // 24 hours
-    cleanupInterval: 10 * 60 * 1000,  // 10 minutes
+    summaryTTLSeconds: 30 * 60,        // 30 minutes (D-07)
+    topicTTLSeconds: 5 * 60,           // 5 minutes (Claude's discretion - news freshness)
   },
 
   /**
