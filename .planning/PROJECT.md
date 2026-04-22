@@ -134,25 +134,31 @@ This document evolves at phase transitions and milestone boundaries.
 - Core Value confirmed: multi-perspective comparison is the differentiator
 - Gamification and personalization added as key engagement features
 
-## Current Milestone: v1.2 Performance & Scale
+## Current Milestone: v1.3 Production Ready
 
-**Goal:** Production-ready infrastructure with PostgreSQL, Redis, and Docker deployment
+**Goal:** Production-grade deployment infrastructure with CI/CD, error tracking, monitoring, and performance validation
 
 **Target features:**
-- PostgreSQL migration (replace SQLite)
-- Redis caching (sessions, rate limiting, AI cache)
-- Query optimization (indexes, N+1 fixes)
-- PWA / Service Worker (offline support)
-- Docker Compose deployment
+- CI/CD Pipeline (GitHub Actions for build, test, deploy)
+- Sentry Error Tracking (frontend + backend)
+- Production Monitoring & Alerting (health checks, uptime, metrics)
+- Load Testing (10k concurrent users target)
+- SMTP Production (email flows live verification)
 
-**Baseline (2026-04-22):**
+**Baseline (2026-04-23):**
 - Unit tests: 1051 passing, 91.65% coverage
 - E2E tests: 62 passing
-- Database: SQLite (dev.db)
-- Caching: In-memory Maps
-- Deployment: Manual
+- Database: PostgreSQL (Docker)
+- Caching: Redis
+- Deployment: Docker Compose (manual)
 
 ## Completed Milestones
+
+### v1.2 Performance & Scale (2026-04-23)
+- PostgreSQL migration
+- Redis caching (sessions, rate limiting, AI cache)
+- Docker Compose deployment
+- PWA / Service Worker
 
 ### v1.1 Quality & Testing (2026-04-22)
 - 1051 unit tests, 62 E2E tests
@@ -165,4 +171,4 @@ This document evolves at phase transitions and milestone boundaries.
 - Gamification and personalization
 
 ---
-*Last updated: 2026-04-22 after v1.2 milestone started*
+*Last updated: 2026-04-23 after v1.3 milestone started*
