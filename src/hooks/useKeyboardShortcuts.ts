@@ -1,38 +1,5 @@
 import { useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAppStore } from '../store';
-
-interface ShortcutHandler {
-  key: string;
-  ctrlKey?: boolean;
-  shiftKey?: boolean;
-  altKey?: boolean;
-  handler: () => void;
-  description: string;
-}
-
-export const KEYBOARD_SHORTCUTS: ShortcutHandler[] = [
-  // Navigation
-  { key: '1', handler: () => {}, description: 'Go to Dashboard' },
-  { key: '2', handler: () => {}, description: 'Go to Analysis' },
-  { key: '3', handler: () => {}, description: 'Go to Monitor' },
-  { key: '4', handler: () => {}, description: 'Go to Timeline' },
-  { key: '5', handler: () => {}, description: 'Go to Event Map' },
-  { key: '6', handler: () => {}, description: 'Go to Community' },
-
-  // Actions
-  { key: '/', handler: () => {}, description: 'Focus search' },
-  { key: 'r', handler: () => {}, description: 'Refresh data' },
-  { key: 'Escape', handler: () => {}, description: 'Close modal/panel' },
-  { key: '?', shiftKey: true, handler: () => {}, description: 'Show keyboard shortcuts' },
-
-  // Feed navigation
-  { key: 'j', handler: () => {}, description: 'Next article' },
-  { key: 'k', handler: () => {}, description: 'Previous article' },
-  { key: 'o', handler: () => {}, description: 'Open article' },
-  { key: 'b', handler: () => {}, description: 'Bookmark article' },
-  { key: 'm', handler: () => {}, description: 'Mark as read' },
-];
 
 export function useKeyboardShortcuts(options?: {
   enabled?: boolean;
@@ -47,7 +14,6 @@ export function useKeyboardShortcuts(options?: {
   onMarkRead?: () => void;
 }) {
   const navigate = useNavigate();
-  const { commandPaletteEnabled } = useAppStore();
   const enabled = options?.enabled ?? true;
 
   const handleKeyDown = useCallback(
@@ -181,7 +147,7 @@ export function useKeyboardShortcuts(options?: {
           break;
       }
     },
-    [navigate, enabled, options, commandPaletteEnabled]
+    [navigate, enabled, options]
   );
 
   useEffect(() => {
