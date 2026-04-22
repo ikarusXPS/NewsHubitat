@@ -277,6 +277,16 @@ authRoutes.put('/password', authMiddleware, async (req: AuthRequest, res: Respon
       return;
     }
 
+    // D-02: Blacklist current token after password change
+    const authHeader = req.headers.authorization;
+    if (authHeader) {
+      const token = authHeader.slice(7);
+      const blacklisted = await authService.blacklistToken(token);
+      if (blacklisted) {
+        console.log(`password_change:blacklisted userId=${req.user!.userId}`);
+      }
+    }
+
     res.json({
       success: true,
       data: { message: 'Password changed successfully' },
