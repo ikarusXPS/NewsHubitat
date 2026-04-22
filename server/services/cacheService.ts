@@ -3,6 +3,7 @@
  * Provides caching layer for API responses, sessions, and frequently accessed data
  */
 
+import crypto from 'crypto';
 import Redis from 'ioredis';
 import logger from '../utils/logger';
 
@@ -109,6 +110,59 @@ export class CacheService {
    */
   isAvailable(): boolean {
     return this.isConnected && this.client !== null;
+  }
+
+  /**
+   * Get raw Redis client for advanced operations (rate-limit-redis adapter)
+   * Returns null if Redis not available
+   */
+  getClient(): Redis | null {
+    return this.isAvailable() ? this.client : null;
+  }
+
+  /**
+   * Hash token securely using SHA-256 (never store raw tokens)
+   */
+  private hashToken(token: string): string {
+    return crypto.createHash('sha256').update(token).digest('hex');
+  }
+
+  /**
+   * Blacklist a JWT token (D-01, D-02)
+   * @param token - The full JWT token string
+   * @param ttlSeconds - Time until token expires (remaining lifetime, max 7 days = 604800)
+   * @returns true if blacklisted, false if Redis unavailable
+   */
+  async blacklistToken(token: string, ttlSeconds: number): Promise<boolean> {
+    if (!this.isAvailable()) {
+      logger.warn('Redis unavailable, cannot blacklist token');
+      return false;
+    }
+
+    const tokenHash = this.hashToken(token);
+    const key = CacheKeys.blacklist(tokenHash);
+
+    // Cap TTL to WEEK (604800 seconds) to match JWT_EXPIRES_IN = '7d'
+    const safeTtl = Math.min(Math.max(ttlSeconds, 0), CACHE_TTL.WEEK);
+
+    return this.set(key, { blacklisted: true, at: Date.now() }, safeTtl);
+  }
+
+  /**
+   * Check if a token is blacklisted (D-03: graceful degradation)
+   * Returns false (not blacklisted) if Redis unavailable
+   */
+  async isTokenBlacklisted(token: string): Promise<boolean> {
+    if (!this.isAvailable()) {
+      logger.debug('Redis unavailable, skipping blacklist check (D-03)');
+      return false; // Graceful degradation per D-03
+    }
+
+    const tokenHash = this.hashToken(token);
+    const key = CacheKeys.blacklist(tokenHash);
+
+    const result = await this.get(key);
+    return result !== null;
   }
 
   /**
@@ -329,6 +383,9 @@ export const CacheKeys = {
 
   // Rate limiting
   rateLimit: (ip: string, endpoint: string) => `ratelimit:${ip}:${endpoint}`,
+
+  // Token blacklist (uses SHA-256 hash of token)
+  blacklist: (tokenHash: string) => `blacklist:${tokenHash}`,
 } as const;
 
 export default CacheService;
