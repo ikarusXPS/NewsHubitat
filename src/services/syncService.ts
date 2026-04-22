@@ -68,7 +68,8 @@ class SyncService {
 
     try {
       const registration = await navigator.serviceWorker.ready;
-      await registration.sync.register('sync-queue');
+      // Background Sync API types not in standard lib - cast after runtime check
+      await (registration as ServiceWorkerRegistration & { sync: { register: (tag: string) => Promise<void> } }).sync.register('sync-queue');
       return true;
     } catch (error) {
       console.warn('Background Sync registration failed:', error);
