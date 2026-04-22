@@ -21,6 +21,7 @@ import { badgeRoutes } from './routes/badges';
 import { leaderboardRoutes } from './routes/leaderboard';
 import { accountRoutes } from './routes/account';
 import { authLimiter, aiLimiter, newsLimiter } from './middleware/rateLimiter';
+import { serverTimingMiddleware } from './middleware/serverTiming';
 import { NewsAggregator } from './services/newsAggregator';
 import { WebSocketService } from './services/websocketService';
 import { CacheService } from './services/cacheService';
@@ -64,6 +65,9 @@ app.use(cors({
 
 // Compression middleware - gzip responses over 1KB
 app.use(compression({ threshold: 1024 }));
+
+// Server-Timing header for p95 latency monitoring (D-05, D-06)
+app.use(serverTimingMiddleware);
 
 app.use(express.json());
 
