@@ -20,6 +20,8 @@ import { profileRoutes } from './routes/profile';
 import { badgeRoutes } from './routes/badges';
 import { leaderboardRoutes } from './routes/leaderboard';
 import { accountRoutes } from './routes/account';
+import bookmarksRoutes from './routes/bookmarks';
+import historyRoutes from './routes/history';
 import { authLimiter, aiLimiter, newsLimiter } from './middleware/rateLimiter';
 import { serverTimingMiddleware } from './middleware/serverTiming';
 import { NewsAggregator } from './services/newsAggregator';
@@ -112,6 +114,8 @@ app.use('/api/profile', profileRoutes);
 app.use('/api/badges', badgeRoutes);
 app.use('/api/leaderboard', leaderboardRoutes);
 app.use('/api/account', accountRoutes);
+app.use('/api/bookmarks', bookmarksRoutes);
+app.use('/api/history', historyRoutes);
 
 // Make services available to routes
 app.locals.wsService = wsService;
