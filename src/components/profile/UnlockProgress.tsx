@@ -9,11 +9,18 @@ interface UnlockProgressProps {
 }
 
 const REGION_COLORS: Record<PerspectiveRegion, string> = {
-  western: '#00f0ff',
-  'middle-east': '#ff6600',
-  turkish: '#ff0044',
-  russian: '#bf00ff',
-  chinese: '#ffee00',
+  usa: '#00f0ff',
+  europa: '#3b82f6',
+  deutschland: '#00f0ff',
+  nahost: '#ff6600',
+  tuerkei: '#ff0044',
+  russland: '#bf00ff',
+  china: '#ffee00',
+  asien: '#f59e0b',
+  afrika: '#10b981',
+  lateinamerika: '#ec4899',
+  ozeanien: '#6366f1',
+  kanada: '#ef4444',
   alternative: '#00ff88',
 };
 

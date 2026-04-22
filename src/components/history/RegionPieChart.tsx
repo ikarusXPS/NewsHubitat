@@ -61,7 +61,7 @@ export function RegionPieChart({ data }: RegionPieChartProps) {
             fontSize: '12px',
             fontFamily: 'JetBrains Mono, monospace',
           }}
-          formatter={(value: number, name: string) => [`${value} articles`, name]}
+          formatter={(value) => [`${value} articles`, '']}
         />
       </PieChart>
     </ResponsiveContainer>

@@ -18,11 +18,18 @@ interface AvatarPickerProps {
 }
 
 const REGIONS: { id: PerspectiveRegion; label: string }[] = [
-  { id: 'western', label: 'Western' },
-  { id: 'middle-east', label: 'Middle East' },
-  { id: 'turkish', label: 'Turkish' },
-  { id: 'russian', label: 'Russian' },
-  { id: 'chinese', label: 'Chinese' },
+  { id: 'usa', label: 'USA' },
+  { id: 'europa', label: 'Europa' },
+  { id: 'deutschland', label: 'Deutschland' },
+  { id: 'nahost', label: 'Middle East' },
+  { id: 'tuerkei', label: 'Turkey' },
+  { id: 'russland', label: 'Russia' },
+  { id: 'china', label: 'China' },
+  { id: 'asien', label: 'Asia' },
+  { id: 'afrika', label: 'Africa' },
+  { id: 'lateinamerika', label: 'Latin America' },
+  { id: 'ozeanien', label: 'Oceania' },
+  { id: 'kanada', label: 'Canada' },
   { id: 'alternative', label: 'Alternative' },
 ];
 

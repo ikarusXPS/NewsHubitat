@@ -146,7 +146,7 @@ export function Leaderboard() {
       )}
 
       {/* Opt-out message */}
-      {isAuthenticated && user && !user.showOnLeaderboard && (
+      {isAuthenticated && user && !(user as { showOnLeaderboard?: boolean }).showOnLeaderboard && (
         <p className="text-center text-sm text-gray-500">
           {language === 'de'
             ? 'Du bist nicht auf der Rangliste sichtbar. Aktiviere dies in den Einstellungen.'
