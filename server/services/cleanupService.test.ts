@@ -41,7 +41,7 @@ vi.mock('../utils/logger', () => ({
 import { CleanupService } from './cleanupService';
 import { EmailService } from './emailService';
 import { prisma } from '../db/prisma';
-import { generateSecureToken, getTokenExpiry } from '../utils/tokenUtils';
+import { generateSecureToken } from '../utils/tokenUtils';
 import logger from '../utils/logger';
 
 describe('CleanupService', () => {

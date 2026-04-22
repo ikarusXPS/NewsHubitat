@@ -132,7 +132,7 @@ test.describe('Reading History Page (Authenticated)', () => {
       if (await searchInput.isVisible().catch(() => false)) {
         await expect(searchInput).toBeVisible();
         // Should have search icon nearby
-        const searchIcon = page.locator('svg').filter({ has: page.locator('[class*="lucide-search"]') }).first();
+        const _searchIcon = page.locator('svg').filter({ has: page.locator('[class*="lucide-search"]') }).first();
         // Icon might be inside a div with the input
       }
     }

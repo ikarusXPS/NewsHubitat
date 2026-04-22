@@ -108,7 +108,7 @@ export function Settings() {
   };
 
   const deletePreset = (name: string) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+     
     const { [name]: _, ...rest } = savedPresets;
     setSavedPresets(rest);
     localStorage.setItem('newshub-filter-presets', JSON.stringify(rest));

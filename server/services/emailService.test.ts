@@ -4,7 +4,7 @@
  * bilingual content verification, retry logic, and urgency-based subjects
  */
 
-import { vi, describe, it, expect, beforeAll, beforeEach, afterEach } from 'vitest';
+import { vi, describe, it, expect, beforeAll, afterEach } from 'vitest';
 
 // Mock nodemailer before importing EmailService
 vi.mock('nodemailer', () => ({
