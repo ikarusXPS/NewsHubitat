@@ -146,7 +146,7 @@ Plans:
 **Plans:** 4 plans in 2 waves
 Plans:
 - [x] 12-01-PLAN.md — B7 Article thumbnail fallback fix (BUG-01)
-- [ ] 12-02-PLAN.md — ESLint error fixes (QUAL-01)
+- [x] 12-02-PLAN.md — ESLint error fixes (QUAL-01) - 0 errors achieved, config + code fixes
 - [ ] 12-03-PLAN.md — Dead code identification and removal (QUAL-03)
 - [ ] 12-04-PLAN.md — Final quality verification (QUAL-02, QUAL-04)
 **UI hint**: yes
@@ -166,8 +166,8 @@ Plans:
 | 9. Extension Service Tests | v1.1 | 5/5 | Complete | 2026-04-21 |
 | 10. Frontend Hook & Library Tests | v1.1 | 10/10 | Complete | 2026-04-21 |
 | 11. E2E Tests | v1.1 | 8/8 | Complete | 2026-04-22 |
-| 12. Bug Fixes & Code Quality | v1.1 | 1/4 | In progress | - |
+| 12. Bug Fixes & Code Quality | v1.1 | 2/4 | In progress | - |
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-22 after Phase 11 complete (E2E Tests - 62 tests passing)*
+*Last updated: 2026-04-22 after 12-02 complete (ESLint errors resolved - 0 errors)*
