@@ -2,9 +2,13 @@
  * Email Subscription API Routes
  */
 
-import { Router } from 'express';
+import { Router, Request } from 'express';
 import { EmailService } from '../services/emailService';
 import logger from '../utils/logger';
+
+interface AuthenticatedRequest extends Request {
+  userId?: string;
+}
 
 const router = Router();
 const emailService = EmailService.getInstance();
@@ -49,7 +53,7 @@ router.get('/status', async (req, res) => {
 router.get('/subscription', (req, res) => {
   try {
     // TODO: Get userId from auth middleware
-    const userId = (req as any).userId || req.query.userId;
+    const userId = (req as AuthenticatedRequest).userId || req.query.userId;
     if (!userId) {
       return res.status(401).json({ success: false, error: 'Authentication required' });
     }
@@ -73,7 +77,7 @@ router.get('/subscription', (req, res) => {
 router.post('/subscription', (req, res) => {
   try {
     // TODO: Get userId from auth middleware
-    const userId = (req as any).userId || req.body.userId;
+    const userId = (req as AuthenticatedRequest).userId || req.body.userId;
     if (!userId) {
       return res.status(401).json({ success: false, error: 'Authentication required' });
     }
@@ -117,7 +121,7 @@ router.post('/subscription', (req, res) => {
  */
 router.put('/subscription', (req, res) => {
   try {
-    const userId = (req as any).userId || req.body.userId;
+    const userId = (req as AuthenticatedRequest).userId || req.body.userId;
     if (!userId) {
       return res.status(401).json({ success: false, error: 'Authentication required' });
     }
@@ -154,7 +158,7 @@ router.put('/subscription', (req, res) => {
  */
 router.delete('/subscription', (req, res) => {
   try {
-    const userId = (req as any).userId || req.query.userId;
+    const userId = (req as AuthenticatedRequest).userId || req.query.userId;
     if (!userId) {
       return res.status(401).json({ success: false, error: 'Authentication required' });
     }

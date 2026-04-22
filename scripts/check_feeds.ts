@@ -13,7 +13,7 @@ async function testAllFeeds() {
   console.log('--- News Feed Diagnostic ---');
   
   const regions = [...new Set(NEWS_SOURCES.map(s => s.region))];
-  const resultsByRegion: Record<string, { total: number, functional: number, failing: number, noEndpoint: number, details: any[] }> = {};
+  const resultsByRegion: Record<string, { total: number, functional: number, failing: number, noEndpoint: number, details: { id: string; name: string; status: string; error?: string }[] }> = {};
 
   for (const region of regions) {
     resultsByRegion[region] = { total: 0, functional: 0, failing: 0, noEndpoint: 0, details: [] };
@@ -37,9 +37,9 @@ async function testAllFeeds() {
           await parser.parseURL(source.apiEndpoint);
           resultsByRegion[region].functional++;
           resultsByRegion[region].details.push({ id: source.id, name: source.name, status: 'OK' });
-        } catch (err: any) {
+        } catch (err) {
           resultsByRegion[region].failing++;
-          resultsByRegion[region].details.push({ id: source.id, name: source.name, status: 'FAIL', error: err.message });
+          resultsByRegion[region].details.push({ id: source.id, name: source.name, status: 'FAIL', error: err instanceof Error ? err.message : String(err) });
         }
     }));
   }

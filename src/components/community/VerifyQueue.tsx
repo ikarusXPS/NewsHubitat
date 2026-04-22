@@ -85,6 +85,7 @@ export function VerifyQueue({ onVerify }: VerifyQueueProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const formatTimeAgo = (date: Date) => {
+    // eslint-disable-next-line react-hooks/purity -- Date.now() for relative time display
     const minutes = Math.floor((Date.now() - date.getTime()) / 60000);
     if (minutes < 60) return `${minutes}m ago`;
     const hours = Math.floor(minutes / 60);

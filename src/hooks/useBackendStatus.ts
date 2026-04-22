@@ -60,6 +60,7 @@ export function useBackendStatus() {
 
   // Initial check on mount
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Health check on mount is standard pattern
     checkHealth();
   }, [checkHealth]);
 

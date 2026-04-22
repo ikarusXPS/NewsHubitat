@@ -39,7 +39,7 @@ describe('Factory Functions', () => {
 
       expect(source.id).toBe('source-1');
       expect(source.name).toBe('Mock News Source');
-      expect(source.region).toBe('western');
+      expect(source.region).toBe('deutschland');
       expect(source.bias.political).toBe(0);
       expect(source.bias.reliability).toBe(8);
     });
@@ -85,7 +85,7 @@ describe('Factory Functions', () => {
       const source = getMockStateSource();
 
       expect(source.bias.ownership).toBe('state');
-      expect(source.region).toBe('russian');
+      expect(source.region).toBe('russland');
     });
   });
 
@@ -163,7 +163,7 @@ describe('Factory Functions', () => {
     it('creates valid SentimentData', () => {
       const data = getMockSentimentData();
 
-      expect(data.region).toBe('western');
+      expect(data.region).toBe('usa');
       expect(data.positive + data.negative + data.neutral).toBe(100);
     });
   });

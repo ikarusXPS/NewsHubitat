@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Flame, Calendar, TrendingUp, Globe2 } from 'lucide-react';
 import { useAppStore } from '../../store';
 import type { NewsArticle, PerspectiveRegion } from '../../types';
@@ -19,9 +19,11 @@ const REGION_COLORS: Record<PerspectiveRegion, string> = {
 export function ReadingInsights({ articles }: ReadingInsightsProps) {
   const { readingHistory, language } = useAppStore();
 
+  // Stable timestamp for calculations (lazy init)
+  const [now] = useState(() => Date.now());
+
   // Calculate daily streak per D-33
   const { dailyStreak, weeklyActivity, totalArticles } = useMemo(() => {
-    const now = Date.now();
     const DAY = 24 * 60 * 60 * 1000;
 
     // Group by day
@@ -57,7 +59,7 @@ export function ReadingInsights({ articles }: ReadingInsightsProps) {
     }
 
     return { dailyStreak: streak, weeklyActivity, totalArticles: readingHistory.length };
-  }, [readingHistory]);
+  }, [readingHistory, now]);
 
   // Calculate favorite regions
   const favoriteRegions = useMemo(() => {

@@ -23,8 +23,8 @@ test.describe('Search', () => {
     // Wait for initial articles to load
     await page.waitForLoadState('networkidle');
 
-    // Get initial article count
-    const articlesBeforeSearch = page.locator('[class*="article"], [data-testid="article-card"]');
+    // Wait for initial articles
+    await page.locator('[class*="article"], [data-testid="article-card"]').first().waitFor({ state: 'attached', timeout: 5000 }).catch(() => {/* may not have articles */});
 
     // Type search query
     await searchInput.fill('test search query');

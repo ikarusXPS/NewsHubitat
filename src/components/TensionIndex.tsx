@@ -40,7 +40,7 @@ function calculateTensionIndex(articles: NewsArticle[]): TensionData {
     const recencyFactor = Math.max(0, 1 - age / sevenDaysMs);
 
     // Base sentiment score (increased from 3 to 10 for negative)
-    let sentimentScore = 0;
+    let sentimentScore: number;
     if (article.sentiment === 'negative') sentimentScore = 10;
     else if (article.sentiment === 'neutral') sentimentScore = 3;
     else sentimentScore = 0;

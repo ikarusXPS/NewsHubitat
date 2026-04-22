@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { X, TrendingUp, AlertTriangle, Globe2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { FocusSuggestion } from '../types/focus';
@@ -28,8 +28,11 @@ export function FocusSuggestions() {
     staleTime: 4 * 60 * 1000, // 4 minutes
   });
 
-  // Filter out dismissed suggestions
-  const suggestions = data?.data?.filter((s) => !dismissedIds.has(s.id)) || [];
+  // Filter out dismissed suggestions - memoized to stabilize reference
+  const suggestions = useMemo(
+    () => data?.data?.filter((s) => !dismissedIds.has(s.id)) || [],
+    [data?.data, dismissedIds]
+  );
 
   // Auto-dismiss suggestions after 30 seconds
   useEffect(() => {

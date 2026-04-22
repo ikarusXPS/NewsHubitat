@@ -69,7 +69,7 @@ export function PropagandaDetector({ article, className }: PropagandaDetectorPro
       const data = await response.json();
       setAnalysis(data);
       setIsExpanded(true);
-    } catch (err) {
+    } catch {
       setError('Analyse fehlgeschlagen. Bitte erneut versuchen.');
     } finally {
       setIsLoading(false);

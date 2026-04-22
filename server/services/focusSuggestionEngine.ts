@@ -1,5 +1,5 @@
-import type { PerspectiveRegion } from '../../src/types';
-import type { FocusSuggestion, FocusPreset } from '../../src/types/focus';
+import type { PerspectiveRegion, NewsArticle } from '../../src/types';
+import type { FocusSuggestion } from '../../src/types/focus';
 import { NewsAggregator } from './newsAggregator';
 import { FOCUS_PRESETS } from '../../src/config/focusPresets';
 
@@ -256,8 +256,8 @@ export class FocusSuggestionEngine {
    * Calculate tension scores (negative sentiment) by region
    */
   private calculateRegionTension(
-    currentArticles: any[],
-    baselineArticles: any[]
+    currentArticles: NewsArticle[],
+    baselineArticles: NewsArticle[]
   ): TensionScore[] {
     const scores: TensionScore[] = [];
 
@@ -296,8 +296,8 @@ export class FocusSuggestionEngine {
    * Calculate topic frequency changes
    */
   private calculateTopicFrequency(
-    currentArticles: any[],
-    baselineArticles: any[]
+    currentArticles: NewsArticle[],
+    baselineArticles: NewsArticle[]
   ): TopicFrequency[] {
     const frequencies: TopicFrequency[] = [];
 

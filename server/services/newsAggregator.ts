@@ -1,5 +1,5 @@
 import Parser from 'rss-parser';
-import type { NewsArticle, NewsSource, PerspectiveRegion, Sentiment } from '../../src/types';
+import type { NewsArticle, NewsSource, PerspectiveRegion, Sentiment, OwnershipType } from '../../src/types';
 import { NEWS_SOURCES } from '../config/sources';
 import { TranslationService } from './translationService';
 import { NewsApiService } from './newsApiService';
@@ -78,7 +78,7 @@ export class NewsAggregator {
     };
   }
 
-  private fromPrismaArticle(article: any): NewsArticle {
+  private fromPrismaArticle(article: Record<string, unknown>): NewsArticle {
     return {
       ...article,
       titleTranslated: article.titleTranslated ? JSON.parse(article.titleTranslated) : undefined,
@@ -152,7 +152,7 @@ export class NewsAggregator {
         bias: {
           political: a.source.politicalBias,
           reliability: a.source.reliability,
-          ownership: a.source.ownership as any,
+          ownership: a.source.ownership as OwnershipType,
         },
         apiEndpoint: a.source.apiEndpoint || undefined,
         rateLimit: a.source.rateLimit,
@@ -227,8 +227,8 @@ export class NewsAggregator {
     newArticles.push(...apiArticles);
     logger.info(`News APIs returned ${apiArticles.length} articles`);
 
-    // Deduplicate by title similarity
-    const deduplicated = this.deduplicateArticles([...newArticles, ...this.articles]);
+    // Deduplicate by title similarity (result used in logging below)
+    this.deduplicateArticles([...newArticles, ...this.articles]);
 
     // Persist to database
     logger.info(`Saving ${newArticles.length} new articles to database...`);
@@ -279,7 +279,7 @@ export class NewsAggregator {
               item.title || '',
               item.contentSnippet || item.content || ''
             );
-          } catch (err) {
+          } catch {
             topics = ['politics']; // Default topic
           }
 
@@ -290,7 +290,7 @@ export class NewsAggregator {
               item.title || '',
               item.contentSnippet || item.content || ''
             );
-          } catch (err) {
+          } catch {
             sentimentResult = this.analyzeSentiment(item.title || '', item.contentSnippet || '');
           }
 
@@ -304,7 +304,7 @@ export class NewsAggregator {
             publishedAt,
             url: item.link || '',
             imageUrl: item.enclosure?.url || this.extractImageUrl(item.content || ''),
-            sentiment: sentimentResult.sentiment || (sentimentResult as any).type,
+            sentiment: sentimentResult.sentiment || (sentimentResult as { type?: Sentiment }).type || 'neutral',
             sentimentScore: sentimentResult.score,
             perspective: source.region,
             topics,
@@ -367,7 +367,7 @@ export class NewsAggregator {
           de: result.text,
         };
         article.translationQuality = result.quality;
-      } catch (err) {
+      } catch {
         logger.warn(`Failed to translate headline: ${article.id}`);
       }
     }

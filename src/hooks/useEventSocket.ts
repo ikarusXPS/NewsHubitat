@@ -55,13 +55,18 @@ export function useEventSocket(options: UseEventSocketOptions = {}): EventSocket
         socketRef.current.disconnect();
         socketRef.current = null;
       }
-      setIsConnected(false);
-      setIsConnecting(false);
+      // Use queueMicrotask to avoid synchronous setState in effect
+      queueMicrotask(() => {
+        setIsConnected(false);
+        setIsConnecting(false);
+      });
       return;
     }
 
-    setIsConnecting(true);
-    setError(null);
+    queueMicrotask(() => {
+      setIsConnecting(true);
+      setError(null);
+    });
 
     // Initialize socket connection
     const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(SOCKET_URL, {

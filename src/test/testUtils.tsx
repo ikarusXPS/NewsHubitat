@@ -2,6 +2,7 @@
  * Custom test utilities with all providers wrapped
  * Re-exports @testing-library/react for convenience
  */
+/* eslint-disable react-refresh/only-export-components -- Test utilities export components and helpers */
 
 import type { ReactElement, ReactNode } from 'react';
 import { render } from '@testing-library/react';

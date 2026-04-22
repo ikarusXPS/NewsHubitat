@@ -98,7 +98,7 @@ export class CacheService {
         this.isConnected = false;
         logger.debug('Redis connection closed');
       });
-    } catch (err) {
+    } catch {
       logger.warn('Redis initialization failed, running without cache');
       this.client = null;
     }
@@ -214,7 +214,7 @@ export class CacheService {
     try {
       await this.client!.expire(key, ttlSeconds);
       return true;
-    } catch (err) {
+    } catch {
       return false;
     }
   }
@@ -228,7 +228,7 @@ export class CacheService {
     try {
       await this.client!.zadd(key, score, member);
       return true;
-    } catch (err) {
+    } catch {
       return false;
     }
   }
@@ -241,7 +241,7 @@ export class CacheService {
 
     try {
       return await this.client!.zrevrange(key, start, stop);
-    } catch (err) {
+    } catch {
       return [];
     }
   }
@@ -255,7 +255,7 @@ export class CacheService {
     try {
       await this.client!.publish(channel, JSON.stringify(message));
       return true;
-    } catch (err) {
+    } catch {
       return false;
     }
   }
@@ -278,7 +278,7 @@ export class CacheService {
         keys: dbsize,
         memory: memoryMatch?.[1] || 'unknown',
       };
-    } catch (err) {
+    } catch {
       return null;
     }
   }

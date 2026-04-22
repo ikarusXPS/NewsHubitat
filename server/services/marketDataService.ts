@@ -78,7 +78,7 @@ export class MarketDataService {
           });
 
           console.log(`[Markets] ${symbol}: $${price} (${changePercent.toFixed(2)}%)`);
-        } catch (err) {
+        } catch {
           console.warn(`[Markets] Failed to fetch ${symbol}, using fallback`);
           // Use fallback for this symbol
           const fallback = this.getFallbackData().find(d => d.symbol === this.formatSymbol(symbol));

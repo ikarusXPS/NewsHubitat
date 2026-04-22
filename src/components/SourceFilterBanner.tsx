@@ -12,10 +12,11 @@ export function SourceFilterBanner({ sources = [] }: SourceFilterBannerProps) {
   const { feedState, setActiveSourceFilter } = useAppStore();
   const [sourceName, setSourceName] = useState<string | null>(null);
 
-  // Find source name when filter is active
+  // Find source name when filter is active - derived state from props/store
   useEffect(() => {
     if (feedState.activeSourceFilter) {
       const source = sources.find((s) => s.id === feedState.activeSourceFilter);
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Derived state from store filter
       setSourceName(source?.name || feedState.activeSourceFilter);
     } else {
       setSourceName(null);

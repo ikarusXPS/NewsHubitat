@@ -207,11 +207,4 @@ export function HistoryFilters({ filters, onFiltersChange }: HistoryFiltersProps
   );
 }
 
-export const defaultHistoryFilters: HistoryFilters = {
-  search: '',
-  regions: [],
-  datePreset: 'all',
-  customDateFrom: null,
-  customDateTo: null,
-  sentiment: null,
-};
+// Default filters exported from separate file: historyFilterDefaults.ts

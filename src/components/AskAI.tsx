@@ -15,6 +15,8 @@ import {
   Trash2,
 } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { getTopRelevantArticles, estimateContextTokens } from '../lib/articleRelevance';
+import { prepareOptimizedHistory, estimateHistoryTokens } from '../lib/historySummarizer';
 import type { NewsArticle } from '../types';
 
 interface Message {
@@ -164,26 +166,36 @@ export function AskAI({ articles }: AskAIProps) {
     setIsLoading(true);
 
     try {
-      // Build conversation history (exclude sources, only role + content)
-      const conversationHistory = messages.map((m) => ({
-        role: m.role,
-        content: m.content,
+      // Select top 10 relevant articles based on question (reduced from 20)
+      const relevantArticles = getTopRelevantArticles(articles, userMessage.content, 10);
+
+      // Prepare optimized history (summarize older messages, keep recent 2)
+      const conversationHistory = prepareOptimizedHistory(
+        messages.map(m => ({ role: m.role, content: m.content })),
+        2
+      );
+
+      // Prepare compact context (title + truncated summary only)
+      const context = relevantArticles.map((a) => ({
+        id: a.id,
+        title: a.title,
+        summary: (a.summary || a.content).substring(0, 150),
+        source: a.source.name,
+        perspective: a.perspective,
+        url: a.url,
       }));
+
+      // Log token estimates for monitoring
+      const contextTokens = estimateContextTokens(relevantArticles);
+      const historyTokens = estimateHistoryTokens(conversationHistory);
+      console.log(`[AI] Articles: ${context.length}, History: ${conversationHistory.length}, Tokens: ~${contextTokens + historyTokens + 400}`);
 
       const response = await fetch('/api/ai/ask', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           question: userMessage.content,
-          context: articles.slice(0, 20).map((a) => ({
-            id: a.id,
-            title: a.title,
-            summary: a.summary || a.content.substring(0, 500),
-            source: a.source.name,
-            perspective: a.perspective,
-            sentiment: a.sentiment,
-            url: a.url,
-          })),
+          context,
           conversationHistory,
         }),
       });
@@ -201,7 +213,7 @@ export function AskAI({ articles }: AskAIProps) {
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
-    } catch (error) {
+    } catch {
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',

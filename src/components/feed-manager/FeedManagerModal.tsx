@@ -302,7 +302,6 @@ export function FeedManagerModal({ isOpen, onClose, sources }: FeedManagerModalP
                               source={source}
                               isEnabled={feedState.enabledSources[source.id] !== false}
                               onToggle={() => toggleSource(source.id)}
-                              color={color}
                             />
                           ))}
                         </div>

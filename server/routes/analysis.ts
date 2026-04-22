@@ -214,7 +214,7 @@ analysisRoutes.get('/coverage-gaps', (req: Request, res: Response) => {
   // Identify gaps (perspectives with <40% of average coverage)
   const gapThreshold = avgCoverage * 0.4;
   const gaps = Object.entries(coverageByPerspective)
-    .filter(([_perspective, count]) => count < gapThreshold)
+    .filter(([, count]) => count < gapThreshold)
     .sort((a, b) => a[1] - b[1])
     .map(([perspective, count]) => ({
       perspective,
@@ -226,7 +226,7 @@ analysisRoutes.get('/coverage-gaps', (req: Request, res: Response) => {
 
   // Identify over-represented perspectives (>150% of average)
   const overRepresented = Object.entries(coverageByPerspective)
-    .filter(([_perspective, count]) => count > avgCoverage * 1.5)
+    .filter(([, count]) => count > avgCoverage * 1.5)
     .sort((a, b) => b[1] - a[1])
     .map(([perspective, count]) => ({
       perspective,

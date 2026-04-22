@@ -16,15 +16,12 @@ type VerifyState = 'loading' | 'success' | 'already-verified' | 'expired' | 'inv
 export function VerifyEmail() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
-  const [state, setState] = useState<VerifyState>('loading');
+  const [state, setState] = useState<VerifyState>(() => token ? 'loading' : 'invalid');
   const [isResending, setIsResending] = useState(false);
   const [resendSuccess, setResendSuccess] = useState(false);
 
   useEffect(() => {
-    if (!token) {
-      setState('invalid');
-      return;
-    }
+    if (!token) return;
 
     const verify = async () => {
       try {

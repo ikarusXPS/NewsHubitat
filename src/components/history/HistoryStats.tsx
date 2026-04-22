@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { BarChart3, Globe2, TrendingUp, Clock } from 'lucide-react';
 import { RegionPieChart } from './RegionPieChart';
 import { ActivitySparkline } from './ActivitySparkline';
@@ -31,6 +32,9 @@ const REGION_LABELS: Record<PerspectiveRegion, string> = {
 };
 
 export function HistoryStats({ history, articles }: HistoryStatsProps) {
+  // Stable timestamp for activity calculation (lazy init)
+  const [now] = useState(() => Date.now());
+
   // Calculate total articles
   const totalArticles = history.length;
 
@@ -71,7 +75,6 @@ export function HistoryStats({ history, articles }: HistoryStatsProps) {
     .slice(0, 3);
 
   // Calculate 7-day activity
-  const now = Date.now();
   const DAY = 24 * 60 * 60 * 1000;
   const activityData = [];
   for (let i = 6; i >= 0; i--) {
