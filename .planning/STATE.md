@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Performance & Scale
 status: executing
-last_updated: "2026-04-22T17:07:00Z"
+last_updated: "2026-04-22T17:14:28Z"
 last_activity: 2026-04-22
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 5
-  completed_plans: 3
-  percent: 60
+  completed_plans: 4
+  percent: 80
 ---
 
 # State: NewsHub
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-04-20)
 ## Current Position
 
 Phase: 14 of 17 (Redis Caching)
-Plans: 3/5 plans complete
+Plans: 4/5 plans complete
 Status: Executing Phase 14
 Last activity: 2026-04-22
 
@@ -65,9 +65,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Completed 14-04-PLAN.md (AI cache migration)
-**Next step:** Execute 14-02-PLAN.md (Rate limiting middleware)
-**Resume file:** .planning/phases/14-redis-caching/14-02-PLAN.md
+**Last action:** Completed 14-02-PLAN.md (Rate limiting middleware)
+**Next step:** Execute 14-05-PLAN.md (Integration testing)
+**Resume file:** .planning/phases/14-redis-caching/14-05-PLAN.md
 **Checkpoint:** None
 
 ## Decisions
@@ -93,6 +93,7 @@ Items acknowledged and carried forward from previous milestone close:
 - **2026-04-22:** SHA-256 hash JWT tokens before storing in Redis blacklist (T-14-01 security mitigation)
 - **2026-04-22:** Blacklist check in authMiddleware placed after JWT verification but before tokenVersion check for efficiency
 - **2026-04-22:** Changed AIService topicTTL from 24h to 5min for news freshness alignment with TanStack Query stale time
+- **2026-04-22:** IP-based rate limiting for auth/news, user-based for AI endpoints; graceful degradation when Redis unavailable (D-03)
 
 ## Performance Metrics
 
@@ -121,6 +122,7 @@ Items acknowledged and carried forward from previous milestone close:
 | 2026-04-22 | 14 | 01 | 3 | 3 | 3 |
 | 2026-04-22 | 14 | 03 | 7 | 3 | 2 |
 | 2026-04-22 | 14 | 04 | 14 | 3 | 3 |
+| 2026-04-22 | 14 | 02 | 23 | 4 | 4 |
 
 ## Open Issues
 
@@ -129,4 +131,4 @@ Items acknowledged and carried forward from previous milestone close:
 
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-22 — Phase 14 Plan 04 complete (AI cache migration)*
+*Last updated: 2026-04-22 — Phase 14 Plan 02 complete (Rate limiting middleware)*
