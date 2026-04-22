@@ -386,6 +386,10 @@ export const CacheKeys = {
 
   // Token blacklist (uses SHA-256 hash of token)
   blacklist: (tokenHash: string) => `blacklist:${tokenHash}`,
+
+  // AI cache (D-07)
+  aiSummary: (clusterKey: string) => `ai:summary:${clusterKey}`,
+  aiTopics: (contentHash: string) => `ai:topics:${contentHash}`,
 } as const;
 
 export default CacheService;
