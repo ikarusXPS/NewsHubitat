@@ -122,7 +122,7 @@ Plans:
   5. User account pages E2E tests verify bookmarks, settings, history flows
 **Plans:** 8 plans
 Plans:
-- [ ] 11-01-PLAN.md — Auth setup with storageState for authenticated tests
+- [x] 11-01-PLAN.md — Auth setup with storageState for authenticated tests (3 tasks, 4 files)
 - [ ] 11-02-PLAN.md — Dashboard E2E tests (news feed, view toggle, trend filters)
 - [ ] 11-03-PLAN.md — Analysis E2E tests (clusters, compare mode, charts)
 - [ ] 11-04-PLAN.md — Community E2E tests (tabs, contribution types, leaderboard)
@@ -160,9 +160,9 @@ Plans:
 | 8. Data Pipeline Service Tests | v1.1 | 6/6 | Complete | 2026-04-21 |
 | 9. Extension Service Tests | v1.1 | 5/5 | Complete | 2026-04-21 |
 | 10. Frontend Hook & Library Tests | v1.1 | 10/10 | Complete | 2026-04-21 |
-| 11. E2E Tests | v1.1 | 0/8 | Planning complete | - |
+| 11. E2E Tests | v1.1 | 1/8 | In progress | - |
 | 12. Bug Fixes & Code Quality | v1.1 | 0/? | Not started | - |
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-22 after Phase 11 planning complete (8 plans)*
+*Last updated: 2026-04-22 after Phase 11 Plan 01 complete (Playwright Auth Infrastructure)*
