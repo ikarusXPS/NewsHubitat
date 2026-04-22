@@ -123,7 +123,11 @@
       "Bash(npm view:*)",
       "Bash(npm run test:coverage:*)",
       "Skill(gsd-execute-phase)",
-      "Skill(gsd-plan-phase)"
+      "Skill(gsd-plan-phase)",
+      "Bash(docker compose:*)",
+      "Bash(docker info:*)",
+      "Bash(docker ps:*)",
+      "Bash(docker images:*)"
     ]
   }
 }
