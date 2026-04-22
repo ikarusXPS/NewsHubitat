@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.1
-milestone_name: Quality & Testing
-status: complete
-last_updated: "2026-04-22T12:55:00.000Z"
+milestone: v1.2
+milestone_name: Performance & Scale
+status: planning
+last_updated: "2026-04-22T13:05:00.000Z"
 last_activity: 2026-04-22
 progress:
-  total_phases: 6
-  completed_phases: 6
-  total_plans: 35
-  completed_plans: 35
-  percent: 100
+  total_phases: 5
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # State: NewsHub
@@ -20,23 +20,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-20)
 
 **Core value:** Users can see how the same story is covered by different regional perspectives
-**Current focus:** v1.1 Quality & Testing
+**Current focus:** v1.2 Performance & Scale
 
 ## Current Position
 
-Phase: 12 of 12 (Bug Fixes & Code Quality) ✓ COMPLETE
-Plans: 4/4 plans complete
-Status: v1.1 Milestone Complete
+Phase: 13 of 17 (PostgreSQL Migration)
+Plans: 0/0 plans (not yet planned)
+Status: Ready to plan Phase 13
 Last activity: 2026-04-22
 
-Progress: [██████████] 100%
+Progress: [░░░░░░░░░░] 0%
 
 ## Milestone Progress
 
-**Milestone:** v1.1 - Quality & Testing ✓ COMPLETE
-**Goal:** Establish comprehensive test coverage and code quality baseline
-**Status:** Complete (2026-04-22)
-**Previous:** v1.0 shipped 2026-04-20
+**Milestone:** v1.2 - Performance & Scale
+**Goal:** Production-ready infrastructure with PostgreSQL, Redis, Docker
+**Status:** Planning
+**Previous:** v1.1 complete 2026-04-22
 
 **Phases:**
 
@@ -65,8 +65,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Completed Phase 12 and v1.1 milestone
-**Next step:** Plan v1.2 milestone (if desired)
+**Last action:** Started v1.2 Performance & Scale milestone
+**Next step:** /gsd-plan-phase 13 (PostgreSQL Migration)
 **Resume file:** None
 
 ## Decisions

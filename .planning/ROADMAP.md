@@ -4,6 +4,7 @@
 
 - [x] **v1.0 AI Analysis & User Features** - Phases 1-6 (shipped 2026-04-20)
 - [x] **v1.1 Quality & Testing** - Phases 7-12 (completed 2026-04-22)
+- [ ] **v1.2 Performance & Scale** - Phases 13-17 (in progress)
 
 ## Phases
 
@@ -150,6 +151,65 @@ Plans:
 - [x] 12-03-PLAN.md — Dead code identification and removal (QUAL-03) - 89 lines removed
 - [x] 12-04-PLAN.md — Final quality verification (QUAL-02, QUAL-04) - 91.65% coverage
 **UI hint**: yes
+
+### v1.2 Performance & Scale (In Progress)
+
+**Milestone Goal:** Production-ready infrastructure with PostgreSQL, Redis, and Docker deployment
+
+### Phase 13: PostgreSQL Migration
+**Goal**: Replace SQLite with PostgreSQL for production-ready database
+**Depends on**: Phase 12
+**Requirements**: PERF-01, PERF-02
+**Success Criteria**:
+  1. Prisma adapter switched to PostgreSQL
+  2. All existing data migrated successfully
+  3. All tests pass with PostgreSQL
+  4. Connection pooling configured
+**Plans:** TBD (run /gsd-plan-phase 13)
+
+### Phase 14: Redis Caching
+**Goal**: Add Redis for sessions, rate limiting, and AI response caching
+**Depends on**: Phase 13
+**Requirements**: PERF-03, PERF-04
+**Success Criteria**:
+  1. Redis connected and health-checked
+  2. Session storage moved to Redis
+  3. Rate limiting per-IP implemented
+  4. AI summaries cached in Redis with TTL
+**Plans:** TBD
+
+### Phase 15: Query Optimization
+**Goal**: Optimize database queries and API response times
+**Depends on**: Phase 14
+**Requirements**: PERF-05
+**Success Criteria**:
+  1. N+1 queries eliminated
+  2. Proper indexes on frequently queried columns
+  3. API p95 response time < 200ms
+**Plans:** TBD
+
+### Phase 16: PWA / Service Worker
+**Goal**: Offline support and background sync capabilities
+**Depends on**: Phase 15
+**Requirements**: PERF-06, PERF-07
+**Success Criteria**:
+  1. Service worker caches static assets
+  2. Offline fallback page works
+  3. Background sync for bookmarks
+  4. App installable as PWA
+**Plans:** TBD
+
+### Phase 17: Docker Deployment
+**Goal**: Containerized deployment with Docker Compose
+**Depends on**: Phase 16
+**Requirements**: DEPLOY-01, DEPLOY-02
+**Success Criteria**:
+  1. Dockerfile for app (multi-stage build)
+  2. docker-compose.yml with app, PostgreSQL, Redis
+  3. Health checks configured
+  4. Environment variable management
+  5. Production build optimized
+**Plans:** TBD
 
 ## Progress
 

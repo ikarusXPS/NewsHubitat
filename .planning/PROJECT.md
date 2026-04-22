@@ -134,21 +134,35 @@ This document evolves at phase transitions and milestone boundaries.
 - Core Value confirmed: multi-perspective comparison is the differentiator
 - Gamification and personalization added as key engagement features
 
-## Current Milestone: v1.1 Quality & Testing
+## Current Milestone: v1.2 Performance & Scale
 
-**Goal:** Establish comprehensive test coverage and code quality baseline
+**Goal:** Production-ready infrastructure with PostgreSQL, Redis, and Docker deployment
 
 **Target features:**
-- Unit test coverage from 52% → 80%+ (balanced across backend services, frontend hooks, utilities)
-- E2E tests for critical user flows (auth, bookmarks, reading history, personalization)
-- Fix deferred bug B7 (article thumbnail fallback)
-- Code quality improvements (linting, type coverage, dead code cleanup)
+- PostgreSQL migration (replace SQLite)
+- Redis caching (sessions, rate limiting, AI cache)
+- Query optimization (indexes, N+1 fixes)
+- PWA / Service Worker (offline support)
+- Docker Compose deployment
 
-**Baseline (2026-04-20):**
-- Unit coverage: 52% statements, 47% branches, 71% functions
-- E2E tests: 55 tests across 6 spec files
-- Unit test files: 5 (utils, config, ai route, mapCentering, factories)
-- TypeScript: Clean (no errors)
+**Baseline (2026-04-22):**
+- Unit tests: 1051 passing, 91.65% coverage
+- E2E tests: 62 passing
+- Database: SQLite (dev.db)
+- Caching: In-memory Maps
+- Deployment: Manual
+
+## Completed Milestones
+
+### v1.1 Quality & Testing (2026-04-22)
+- 1051 unit tests, 62 E2E tests
+- 91.65% statement coverage
+- All quality gates passing
+
+### v1.0 AI Analysis & User Features (2026-04-20)
+- Core multi-perspective news analysis
+- AI Q&A with citations
+- Gamification and personalization
 
 ---
-*Last updated: 2026-04-20 after v1.1 milestone started*
+*Last updated: 2026-04-22 after v1.2 milestone started*
