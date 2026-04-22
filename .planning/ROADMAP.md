@@ -161,11 +161,19 @@ Plans:
 **Depends on**: Phase 12
 **Requirements**: PERF-01, PERF-02
 **Success Criteria**:
-  1. Prisma adapter switched to PostgreSQL
-  2. All existing data migrated successfully
-  3. All tests pass with PostgreSQL
-  4. Connection pooling configured
-**Plans:** TBD (run /gsd-plan-phase 13)
+  1. Prisma adapter switched to PostgreSQL with connection pooling (10 connections, 5s timeout)
+  2. JSON String fields converted to native JSONB with GIN indexes
+  3. All tests pass with PostgreSQL (1051 unit + E2E)
+  4. /api/health/db endpoint for container orchestration
+  5. Docker Compose for local PostgreSQL development
+  6. Seed scripts for badges and AI personas
+**Plans:** 5 plans in 4 waves
+Plans:
+- [ ] 13-01-PLAN.md — Docker Compose + PostgreSQL adapter + schema provider
+- [ ] 13-02-PLAN.md — JSONB field conversion with GIN indexes
+- [ ] 13-03-PLAN.md — Database health endpoint and structured logging
+- [ ] 13-04-PLAN.md — Seed scripts for badges and AI personas
+- [ ] 13-05-PLAN.md — Full test suite verification and human sign-off
 
 ### Phase 14: Redis Caching
 **Goal**: Add Redis for sessions, rate limiting, and AI response caching
@@ -227,7 +235,8 @@ Plans:
 | 10. Frontend Hook & Library Tests | v1.1 | 10/10 | Complete | 2026-04-21 |
 | 11. E2E Tests | v1.1 | 8/8 | Complete | 2026-04-22 |
 | 12. Bug Fixes & Code Quality | v1.1 | 4/4 | Complete | 2026-04-22 |
+| 13. PostgreSQL Migration | v1.2 | 0/5 | In Progress | - |
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-22 — v1.1 Quality & Testing milestone complete*
+*Last updated: 2026-04-22 — Phase 13 planned with 5 plans*
