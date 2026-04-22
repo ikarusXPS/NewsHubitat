@@ -88,6 +88,7 @@ npx playwright test e2e/auth.spec.ts            # Single E2E test file
 | `stealthScraper.ts` | Puppeteer-based scraping with stealth plugins |
 | `personaService.ts` | AI persona management |
 | `emailService.ts` | Email digest and notifications |
+| `syncService.ts` | Background sync with IndexedDB queue for offline actions |
 
 ### Key Directories
 | Directory | Purpose |
@@ -202,7 +203,7 @@ className={cn('base-class', isActive && 'active-class', variant)}
 ## Core Types
 
 ```typescript
-type PerspectiveRegion = 'western' | 'middle-east' | 'turkish' | 'russian' | 'chinese' | 'alternative';
+type PerspectiveRegion = 'usa' | 'europa' | 'deutschland' | 'nahost' | 'tuerkei' | 'russland' | 'china' | 'asien' | 'afrika' | 'lateinamerika' | 'ozeanien' | 'kanada' | 'alternative';
 type Sentiment = 'positive' | 'negative' | 'neutral';
 type EventSeverity = 'critical' | 'high' | 'medium' | 'low';
 type EventCategory = 'conflict' | 'humanitarian' | 'political' | 'economic' | 'military' | 'protest';
@@ -235,6 +236,8 @@ interface ApiResponse<T> {
 | `/api/news/sentiment` | GET | Sentiment statistics by region |
 | `/api/analysis/framing` | GET | Framing comparison by topic |
 | `/api/health` | GET | Server status |
+| `/api/bookmarks` | POST | Create bookmark (auth required, idempotent) |
+| `/api/history` | POST | Create reading history entry (auth required) |
 
 ## E2E Testing Structure
 
@@ -293,7 +296,7 @@ Edit `server/config/sources.ts`:
   id: 'source-id',
   name: 'Source Name',
   country: 'XX',
-  region: 'western' | 'middle-east' | 'turkish' | 'russian' | 'chinese' | 'alternative',
+  region: 'usa' | 'europa' | 'deutschland' | 'nahost' | 'tuerkei' | 'russland' | 'china' | 'asien' | 'afrika' | 'lateinamerika' | 'ozeanien' | 'kanada' | 'alternative',
   language: 'en',
   bias: { political: 0, reliability: 8, ownership: 'private' },
   apiEndpoint: 'https://example.com/rss.xml',
