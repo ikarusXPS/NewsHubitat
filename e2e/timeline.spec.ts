@@ -23,9 +23,8 @@ test.describe('Timeline', () => {
   });
 
   test('should show loading state initially', async ({ page }) => {
-    // Check for loader on fresh navigation
-    const loader = page.locator('[class*="animate-spin"], [class*="Loader"]');
-    // Loader might be visible briefly
+    // Check for loader on fresh navigation - may be visible briefly
+    await page.locator('[class*="animate-spin"], [class*="Loader"]').first().waitFor({ state: 'attached', timeout: 1000 }).catch(() => {/* loader may pass quickly */});
     await page.waitForLoadState('networkidle');
   });
 

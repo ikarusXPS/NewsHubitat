@@ -129,11 +129,12 @@ export function BiasRadarChart({ articles, className }: BiasRadarChartProps) {
                 Math.max(perspectiveArticles.length, 1)) *
               100;
             break;
-          case 'Themenbreite':
+          case 'Themenbreite': {
             const uniqueTopics = new Set(perspectiveArticles.flatMap((a) => a.topics));
             metric[key] = Math.min(uniqueTopics.size * 10, 100);
             break;
-          case 'Aktualität':
+          }
+          case 'Aktualität': {
             const now = Date.now();
             const avgAge =
               perspectiveArticles.reduce((sum, a) => {
@@ -146,6 +147,7 @@ export function BiasRadarChart({ articles, className }: BiasRadarChartProps) {
             const hourAge = avgAge / (1000 * 60 * 60);
             metric[key] = Math.max(0, 100 - hourAge * 2);
             break;
+          }
         }
       });
 

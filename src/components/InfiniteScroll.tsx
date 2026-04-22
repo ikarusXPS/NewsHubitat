@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- Exports component and hook */
 import { useEffect, useState, useCallback } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { Loader2 } from 'lucide-react';
@@ -99,7 +100,9 @@ export function useInfiniteScroll<T>(
 
   // Reset when dependencies change
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Reset on deps change is intentional
     reset();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- deps is dynamic by design
   }, deps);
 
   return {

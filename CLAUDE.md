@@ -49,7 +49,7 @@ npx playwright test e2e/auth.spec.ts            # Single E2E test file
 - **Visualization**: Recharts, globe.gl, Leaflet
 - **Backend**: Express 5 (TypeScript, ES modules)
 - **Database**: SQLite via Prisma (adapter: better-sqlite3)
-- **AI**: Multi-provider (Gemini free → OpenRouter paid → Anthropic premium)
+- **AI**: Multi-provider fallback (OpenRouter → Gemini → Anthropic)
 - **Translation**: Multi-provider chain (DeepL → Google → LibreTranslate → Claude)
 
 ## Architecture
@@ -65,7 +65,8 @@ npx playwright test e2e/auth.spec.ts            # Single E2E test file
 - **Data Flow**: RSS/HTML crawl → Dedup → Sentiment → Translation → Database/Cache
 - **Database**: SQLite via Prisma, schema at `prisma/schema.prisma`
 - **Generated Client**: `src/generated/prisma/` (do not edit)
-- **Caching**: In-memory Maps with 60-min refresh interval
+- **Caching**: In-memory Maps with configurable TTL (summaries, topics)
+- **Models**: NewsArticle, NewsSource, User, Bookmark, StoryCluster, EmailSubscription, EmailDigest, AIPersona, UserPersona, SharedContent, ShareClick
 
 ### Key Directories
 | Directory | Purpose |
@@ -78,6 +79,7 @@ npx playwright test e2e/auth.spec.ts            # Single E2E test file
 | `server/services/` | Business logic (NewsAggregator, TranslationService, AiService) |
 | `server/config/sources.ts` | 130 news source configurations |
 | `prisma/schema.prisma` | Database schema |
+| `server/config/aiProviders.ts` | AI model and cache configuration |
 
 ## Store State Slices
 
@@ -127,9 +129,11 @@ refetchInterval: 2 * 60_000
 
 ### Multi-Provider AI Fallback
 The AI service (`server/services/aiService.ts`) uses a fallback chain:
-1. **Gemini** (free tier, 1500 req/day) - Primary
-2. **OpenRouter** (paid, cheapest) - Secondary
+1. **OpenRouter** (multi-model, paid) - Primary
+2. **Gemini** (free tier, 1500 req/day) - Secondary
 3. **Anthropic** (premium) - Fallback
+
+If all providers fail, keyword-based analysis is used as final fallback.
 
 ### Graceful Degradation
 Components that might fail should return `null` on error:
@@ -180,6 +184,9 @@ interface ApiResponse<T> {
 | `/api/analysis/clusters` | GET | Topic clustering (`?summaries=true` for AI) |
 | `/api/ai/ask` | POST | RAG Q&A `{question, context[]}` |
 | `/api/events/geo` | GET | Geo-located events |
+| `/api/events/timeline` | GET | Historical event timeline |
+| `/api/news/sentiment` | GET | Sentiment statistics by region |
+| `/api/analysis/framing` | GET | Framing comparison by topic |
 | `/api/health` | GET | Server status |
 
 ## UI Design System
@@ -196,10 +203,10 @@ interface ApiResponse<T> {
 PORT=3001
 DATABASE_URL="file:./dev.db"
 
-# AI (ONE required, priority: Gemini → OpenRouter → Anthropic)
-GEMINI_API_KEY=           # Recommended - FREE tier
-OPENROUTER_API_KEY=       # Paid - cheapest
-ANTHROPIC_API_KEY=        # Premium
+# AI (ONE required, priority: OpenRouter → Gemini → Anthropic)
+OPENROUTER_API_KEY=       # Paid - multi-model access
+GEMINI_API_KEY=           # FREE tier - 1500 req/day
+ANTHROPIC_API_KEY=        # Premium fallback
 
 # Translation (at least one recommended)
 DEEPL_API_KEY=
@@ -230,7 +237,7 @@ Edit `server/config/sources.ts`:
 
 ### AI Service Not Available
 **Problem**: AI features return errors.
-**Solution**: Configure at least one AI provider in `.env` (Gemini recommended - free).
+**Solution**: Configure at least one AI provider in `.env`. The service falls back to keyword-based analysis if all providers fail.
 
 ### Articles Not Clickable in Clusters
 **Problem**: Articles appear as plain text.

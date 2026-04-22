@@ -7,7 +7,6 @@ interface SourceRowProps {
   source: NewsSource;
   isEnabled: boolean;
   onToggle: () => void;
-  color: string;
 }
 
 // Convert country code to flag emoji
@@ -20,7 +19,7 @@ function getCountryFlag(countryCode: string): string {
   return String.fromCodePoint(...codePoints);
 }
 
-export function SourceRow({ source, isEnabled, onToggle, color: _color }: SourceRowProps) {
+export function SourceRow({ source, isEnabled, onToggle }: SourceRowProps) {
   const { setActiveSourceFilter } = useAppStore();
 
   const handleFilterBySource = (e: React.MouseEvent) => {

@@ -1,6 +1,6 @@
 import * as cheerio from 'cheerio';
 import axios from 'axios';
-import type { NewsArticle, NewsSource, PerspectiveRegion } from '../../src/types';
+import type { NewsArticle, NewsSource } from '../../src/types';
 import { hashString } from '../utils/hash';
 
 interface CrawlConfig {

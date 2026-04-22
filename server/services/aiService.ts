@@ -597,7 +597,7 @@ Response format: ["topic1", "topic2", ...]`;
       this.topicCache.set(cacheKey, { topics: result, timestamp: Date.now() });
 
       return result;
-    } catch (err) {
+    } catch {
       // Silently fall back to keyword-based classification (don't spam console)
       return this.extractTopicsKeyword(title, content);
     }

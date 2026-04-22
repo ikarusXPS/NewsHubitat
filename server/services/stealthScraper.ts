@@ -3,7 +3,7 @@ import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import AdblockerPlugin from 'puppeteer-extra-plugin-adblocker';
 import type { Browser, Page } from 'puppeteer';
 import * as cheerio from 'cheerio';
-import type { NewsArticle, NewsSource, PerspectiveRegion } from '../../src/types';
+import type { NewsArticle, NewsSource } from '../../src/types';
 import { hashString } from '../utils/hash';
 
 // Add stealth plugin to avoid detection
@@ -352,7 +352,7 @@ export class StealthScraper {
           entities: this.extractEntities(title, content),
           cached: false,
         });
-      } catch (err) {
+      } catch {
         // Skip invalid articles
       }
     });

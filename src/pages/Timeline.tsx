@@ -293,7 +293,8 @@ function EventDetailPanel({
   useEffect(() => {
     if (event.relatedArticles.length === 0) return;
 
-    setIsLoadingArticles(true);
+    // Use queueMicrotask to avoid synchronous setState in effect
+    queueMicrotask(() => setIsLoadingArticles(true));
     fetch(`/api/events/${event.id}`)
       .then(res => res.json())
       .then(data => {

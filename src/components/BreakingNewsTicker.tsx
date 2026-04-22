@@ -52,10 +52,7 @@ export function BreakingNewsTicker() {
     retry: 1,
   });
 
-  // Don't render if there's an error
-  if (error) return null;
-
-  // Scroll animation effect
+  // Scroll animation effect - must be before early returns
   useEffect(() => {
     if (!articles || articles.length === 0) return;
 
@@ -80,7 +77,8 @@ export function BreakingNewsTicker() {
     return () => cancelAnimationFrame(animationFrame);
   }, [articles, isPaused]);
 
-  if (!articles || articles.length === 0) return null;
+  // Don't render if there's an error or no articles
+  if (error || !articles || articles.length === 0) return null;
 
   // Duplicate articles for seamless loop
   const displayArticles = [...articles, ...articles];

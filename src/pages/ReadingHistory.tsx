@@ -6,9 +6,9 @@ import { NewsCard } from '../components/NewsCard';
 import { HistoryStats } from '../components/history/HistoryStats';
 import {
   HistoryFilters as HistoryFiltersComponent,
-  defaultHistoryFilters,
   type HistoryFilters as HistoryFiltersType,
 } from '../components/history/HistoryFilters';
+import { defaultHistoryFilters } from '../components/history/historyFilterDefaults';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import type { NewsArticle, PerspectiveRegion, Sentiment } from '../types';
 
@@ -118,13 +118,16 @@ export function ReadingHistory() {
     staleTime: 2 * 60 * 1000,
   });
 
+  // Stable timestamp for filtering (lazy init)
+  const [filterTimestamp] = useState(() => Date.now());
+
   // Apply filters
   const filteredHistory = useMemo(() => {
     let filtered = [...enrichedHistory];
 
     // Date filter
     if (filters.datePreset !== 'all') {
-      const now = Date.now();
+      const now = filterTimestamp;
       const DAY = 24 * 60 * 60 * 1000;
       const presetDays: Record<string, number> = {
         today: 1,
@@ -169,7 +172,7 @@ export function ReadingHistory() {
     }
 
     return filtered;
-  }, [enrichedHistory, filters, articlesMap]);
+  }, [enrichedHistory, filters, articlesMap, filterTimestamp]);
 
   const groups = useMemo(() => groupByDate(filteredHistory), [filteredHistory]);
 

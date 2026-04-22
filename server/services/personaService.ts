@@ -349,7 +349,7 @@ Antworte im Stil deiner Persona und beziehe dich auf den gegebenen Kontext.`;
 // Helper to extend AIService with persona support
 AIService.prototype.analyzeText = async function (prompt: string): Promise<string | null> {
   // Use the existing callWithFallback method
-  return (this as any).callWithFallback(prompt);
+  return (this as unknown as { callWithFallback: (p: string) => Promise<string | null> }).callWithFallback(prompt);
 };
 
 export default PersonaService;

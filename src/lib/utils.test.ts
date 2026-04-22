@@ -144,24 +144,24 @@ describe('getSentimentColor', () => {
 });
 
 describe('getRegionColor', () => {
-  it('returns correct color for western region', () => {
-    const result = getRegionColor('western');
+  it('returns correct color for usa region', () => {
+    const result = getRegionColor('usa');
     expect(result).toBe('bg-blue-500');
   });
 
-  it('returns correct color for middle-east region', () => {
-    const result = getRegionColor('middle-east');
+  it('returns correct color for nahost region', () => {
+    const result = getRegionColor('nahost');
     expect(result).toBe('bg-orange-500');
   });
 
-  it('returns correct color for turkish region', () => {
-    const result = getRegionColor('turkish');
+  it('returns correct color for tuerkei region', () => {
+    const result = getRegionColor('tuerkei');
     expect(result).toBe('bg-red-500');
   });
 
-  it('returns correct color for russian region', () => {
-    const result = getRegionColor('russian');
-    expect(result).toBe('bg-purple-500');
+  it('returns correct color for russland region', () => {
+    const result = getRegionColor('russland');
+    expect(result).toBe('bg-red-600');
   });
 
   it('returns correct color for china region', () => {
@@ -181,13 +181,13 @@ describe('getRegionColor', () => {
 });
 
 describe('getRegionLabel', () => {
-  it('returns correct label for western region', () => {
-    const result = getRegionLabel('western');
-    expect(result).toBe('Westliche Medien');
+  it('returns correct label for usa region', () => {
+    const result = getRegionLabel('usa');
+    expect(result).toBe('USA');
   });
 
-  it('returns correct label for middle-east region', () => {
-    const result = getRegionLabel('middle-east');
+  it('returns correct label for nahost region', () => {
+    const result = getRegionLabel('nahost');
     expect(result).toBe('Nahost');
   });
 

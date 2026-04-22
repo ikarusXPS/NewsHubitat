@@ -19,7 +19,7 @@ export function ResetPassword() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
 
-  const [state, setState] = useState<PageState>('validating');
+  const [state, setState] = useState<PageState>(() => token ? 'validating' : 'invalid');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -29,10 +29,7 @@ export function ResetPassword() {
 
   // Validate token on mount
   useEffect(() => {
-    if (!token) {
-      setState('invalid');
-      return;
-    }
+    if (!token) return;
 
     const validateToken = async () => {
       try {

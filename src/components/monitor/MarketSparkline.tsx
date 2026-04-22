@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- Exports component and utility */
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 

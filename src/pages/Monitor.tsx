@@ -279,6 +279,7 @@ export function Monitor() {
               {filteredEvents.slice(0, 8).map((event) => {
                 // Format time ago
                 const eventTime = new Date(event.timestamp);
+                // eslint-disable-next-line react-hooks/purity -- Date.now() for relative time display
                 const minutesAgo = Math.floor((Date.now() - eventTime.getTime()) / 60000);
                 const timeLabel = minutesAgo < 60
                   ? `${minutesAgo}m`

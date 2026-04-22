@@ -2,9 +2,13 @@
  * AI Personas API Routes
  */
 
-import { Router } from 'express';
+import { Router, Request } from 'express';
 import { PersonaService } from '../services/personaService';
 import logger from '../utils/logger';
+
+interface AuthenticatedRequest extends Request {
+  userId?: string;
+}
 
 const router = Router();
 const personaService = PersonaService.getInstance();
@@ -96,7 +100,7 @@ router.post('/:id/analyze', async (req, res) => {
 router.get('/user/active', (req, res) => {
   try {
     // TODO: Get userId from auth middleware
-    const userId = (req as any).userId || 'anonymous';
+    const userId = (req as AuthenticatedRequest).userId || 'anonymous';
     const persona = personaService.getUserActivePersona(userId);
     res.json({ success: true, data: persona });
   } catch (err) {
@@ -117,7 +121,7 @@ router.post('/user/active', (req, res) => {
     }
 
     // TODO: Get userId from auth middleware
-    const userId = (req as any).userId || 'anonymous';
+    const userId = (req as AuthenticatedRequest).userId || 'anonymous';
     const success = personaService.setUserActivePersona(userId, personaId);
 
     if (!success) {

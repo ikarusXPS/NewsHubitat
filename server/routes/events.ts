@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import type { NewsAggregator } from '../services/newsAggregator';
 import { EventsService } from '../services/eventsService';
 import { NEWS_SOURCES } from '../config/sources';
-import type { PerspectiveRegion, TimelineEvent } from '../../src/types';
+import type { PerspectiveRegion, TimelineEvent, EventCategory, EventSeverity } from '../../src/types';
 import {
   getHistoricalEvents,
   getHistoricalEventsByDateRange,
@@ -99,8 +99,8 @@ eventsRoutes.get('/geo', (req: Request, res: Response) => {
       id: event.id,
       title: event.title,
       description: event.description,
-      category: event.category as any,
-      severity: (event.severity >= 8 ? 'critical' : event.severity >= 6 ? 'high' : event.severity >= 4 ? 'medium' : 'low') as any,
+      category: event.category as EventCategory,
+      severity: (event.severity >= 8 ? 'critical' : event.severity >= 6 ? 'high' : event.severity >= 4 ? 'medium' : 'low') as EventSeverity,
       location: event.location!,
       timestamp: event.date,
       sourceArticles: event.relatedArticles,
@@ -192,7 +192,7 @@ eventsRoutes.get('/historical', (req: Request, res: Response) => {
 
   // Apply filters
   if (category && ['military', 'diplomacy', 'humanitarian', 'protest', 'other'].includes(category)) {
-    events = getHistoricalEventsByCategory(category as any);
+    events = getHistoricalEventsByCategory(category as EventCategory);
   }
 
   if (startDate && endDate) {
