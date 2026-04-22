@@ -259,8 +259,8 @@ if (process.env.NODE_ENV === 'production') {
 
   // SPA fallback - serve index.html for all non-API routes
   // This enables client-side routing (React Router)
-  // Note: Express 5 requires '/*' instead of '*' for catch-all routes
-  app.get('/*', (req, res) => {
+  // Note: Express 5 with path-to-regexp v8 requires '{*path}' syntax
+  app.get('{*path}', (req, res) => {
     // Only handle non-API routes
     if (!req.path.startsWith('/api')) {
       res.sendFile(path.join(staticPath, 'index.html'));
