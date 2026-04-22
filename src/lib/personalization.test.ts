@@ -12,7 +12,7 @@ import {
   formatTopicBadge,
 } from './personalization';
 import { getMockNewsArticle, getMockArticleFromRegion, resetIdCounter } from '../test/factories';
-import type { PerspectiveRegion, NewsArticle } from '../types';
+import type { NewsArticle } from '../types';
 
 interface HistoryEntry {
   articleId: string;

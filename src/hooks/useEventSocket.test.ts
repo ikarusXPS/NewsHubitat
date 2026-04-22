@@ -7,13 +7,12 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useEventSocket } from './useEventSocket';
 import { getMockGeoEvent, resetIdCounter } from '../test/factories';
-import type { GeoEvent } from '../types';
 
 // Capture event handlers for testing
-const eventHandlers = new Map<string, Function>();
+const eventHandlers = new Map<string, (...args: unknown[]) => void>();
 
 const mockSocket = {
-  on: vi.fn((event: string, handler: Function) => {
+  on: vi.fn((event: string, handler: (...args: unknown[]) => void) => {
     eventHandlers.set(event, handler);
     return mockSocket;
   }),
@@ -43,7 +42,7 @@ describe('useEventSocket', () => {
     eventHandlers.clear();
     resetIdCounter();
     // Reset mock socket methods
-    mockSocket.on.mockImplementation((event: string, handler: Function) => {
+    mockSocket.on.mockImplementation((event: string, handler: (...args: unknown[]) => void) => {
       eventHandlers.set(event, handler);
       return mockSocket;
     });

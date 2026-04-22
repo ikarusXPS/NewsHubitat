@@ -8,9 +8,6 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { Server as HttpServer } from 'http';
 import type { NewsArticle, GeoEvent } from '../../src/types';
 
-// Store the connection handler for manual triggering
-const connectionHandler: ((socket: MockSocket) => void) | null = null;
-
 // Socket event handlers storage
 const socketHandlers = new Map<string, Map<string, (...args: unknown[]) => void>>();
 
