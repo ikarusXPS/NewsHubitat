@@ -176,15 +176,22 @@ Plans:
 - [ ] 13-05-PLAN.md — Full test suite verification and human sign-off
 
 ### Phase 14: Redis Caching
-**Goal**: Add Redis for sessions, rate limiting, and AI response caching
+**Goal**: Add Redis for JWT blacklisting, rate limiting, and AI response caching
 **Depends on**: Phase 13
 **Requirements**: PERF-03, PERF-04
 **Success Criteria**:
-  1. Redis connected and health-checked
-  2. Session storage moved to Redis
-  3. Rate limiting per-IP implemented
-  4. AI summaries cached in Redis with TTL
-**Plans:** TBD
+  1. Redis connected and health-checked via /api/health/redis
+  2. JWT blacklisting on logout and password change (D-01, D-02)
+  3. Tiered rate limiting: auth 5/min, AI 10/min, news 100/min (D-05)
+  4. AI summaries cached in Redis with 30-minute TTL (D-07)
+  5. Graceful degradation when Redis unavailable (D-03)
+**Plans:** 5 plans in 3 waves
+Plans:
+- [ ] 14-01-PLAN.md — Redis Docker + CacheService blacklist methods + /api/health/redis
+- [ ] 14-02-PLAN.md — Rate limiting middleware with express-rate-limit + Redis store
+- [ ] 14-03-PLAN.md — JWT blacklist integration in auth flow (logout, password change)
+- [ ] 14-04-PLAN.md — AIService cache migration from in-memory Maps to Redis
+- [ ] 14-05-PLAN.md — Tests and human verification of Redis features
 
 ### Phase 15: Query Optimization
 **Goal**: Optimize database queries and API response times
@@ -236,7 +243,8 @@ Plans:
 | 11. E2E Tests | v1.1 | 8/8 | Complete | 2026-04-22 |
 | 12. Bug Fixes & Code Quality | v1.1 | 4/4 | Complete | 2026-04-22 |
 | 13. PostgreSQL Migration | v1.2 | 3/5 | In Progress | - |
+| 14. Redis Caching | v1.2 | 0/5 | Planned | - |
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-22 — Phase 13 Plan 04 complete (seed scripts for badges and AI personas)*
+*Last updated: 2026-04-22 — Phase 14 plans created (5 plans in 3 waves)*
