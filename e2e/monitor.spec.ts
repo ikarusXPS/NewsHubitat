@@ -1,9 +1,9 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 test.describe('Monitor Page', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/monitor');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('should load the Monitor page', async ({ page }) => {
@@ -116,7 +116,7 @@ test.describe('Monitor Page', () => {
 
     // Check for loading indicator (if visible during load)
     // This might be too fast to catch, so we'll just verify the page loads
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // After loading, stats should be visible
     const statBoxes = page.locator('.stat-box');

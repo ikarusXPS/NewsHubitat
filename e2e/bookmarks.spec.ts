@@ -1,26 +1,10 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 // Bookmarks page tests
 // Note: Bookmarks page uses localStorage (Zustand) for state, not server-side auth
-// The chromium-auth project provides storageState with hasCompletedOnboarding
 
 test.describe('Bookmarks Page', () => {
   test.beforeEach(async ({ page }) => {
-    // Set up localStorage with Zustand format to bypass onboarding
-    await page.addInitScript(() => {
-      localStorage.setItem('newshub-storage', JSON.stringify({
-        state: {
-          hasCompletedOnboarding: true,
-          theme: 'dark',
-          language: 'de',
-          bookmarkedArticles: [],
-          readingHistory: [],
-          filters: { regions: [], topics: [] }
-        },
-        version: 0
-      }));
-    });
-
     await page.goto('/bookmarks');
     // Use domcontentloaded instead of networkidle to avoid WebSocket timeouts
     await page.waitForLoadState('domcontentloaded');

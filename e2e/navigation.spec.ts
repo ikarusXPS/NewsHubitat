@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 test.describe('Navigation', () => {
   test.beforeEach(async ({ page }) => {
@@ -9,7 +9,7 @@ test.describe('Navigation', () => {
     // Dashboard is the news feed - check for main content area
     await expect(page).toHaveURL('/');
     // Wait for page to load and check for news feed elements
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     // Should have search input in header with English placeholder
     const searchInput = page.locator('input[placeholder*="Search signals"]');
     await expect(searchInput).toBeVisible();
@@ -25,7 +25,7 @@ test.describe('Navigation', () => {
     // Note: /map route exists but has no sidebar link
     await page.goto('/map');
     await expect(page).toHaveURL('/map');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page.locator('h1')).toContainText('Konflikt-Karte');
   });
 

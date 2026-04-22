@@ -1,20 +1,7 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 test.describe('Community Page', () => {
   test.beforeEach(async ({ page }) => {
-    // Set localStorage to bypass onboarding modal before navigation
-    await page.addInitScript(() => {
-      const state = {
-        state: {
-          hasCompletedOnboarding: true,
-          theme: 'dark',
-          language: 'en',
-        },
-        version: 0,
-      };
-      localStorage.setItem('newshub-storage', JSON.stringify(state));
-    });
-
     await page.goto('/community');
     // Wait for page to load (load event fires after lazy components are loaded)
     await page.waitForLoadState('load');

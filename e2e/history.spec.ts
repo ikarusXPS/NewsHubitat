@@ -1,15 +1,10 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 // These tests run with storageState from auth.setup.ts
 // User is already authenticated when tests start
 
 test.describe('Reading History Page (Authenticated)', () => {
   test.beforeEach(async ({ page }) => {
-    // Bypass onboarding modal if it appears
-    await page.addInitScript(() => {
-      localStorage.setItem('newshub-onboarding-complete', 'true');
-    });
-
     await page.goto('/history');
     await page.waitForLoadState('domcontentloaded');
 

@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 test.describe('Timeline', () => {
   test.beforeEach(async ({ page }) => {
@@ -11,7 +11,7 @@ test.describe('Timeline', () => {
 
   test('should show category filter buttons', async ({ page }) => {
     // Wait for page to load
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Check for filter buttons
     const alleButton = page.locator('button:has-text("Alle")');
@@ -25,11 +25,11 @@ test.describe('Timeline', () => {
   test('should show loading state initially', async ({ page }) => {
     // Check for loader on fresh navigation - may be visible briefly
     await page.locator('[class*="animate-spin"], [class*="Loader"]').first().waitFor({ state: 'attached', timeout: 1000 }).catch(() => {/* loader may pass quickly */});
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('should filter events by category', async ({ page }) => {
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Click on Militar category
     const militarButton = page.locator('button:has-text("Militar")');
@@ -42,7 +42,7 @@ test.describe('Timeline', () => {
   });
 
   test('should show "Alle" filter as default active', async ({ page }) => {
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const alleButton = page.locator('button:has-text("Alle")');
     await expect(alleButton).toHaveClass(/bg-blue/);
@@ -54,7 +54,7 @@ test.describe('Timeline', () => {
   });
 
   test('should show event cards or empty state', async ({ page }) => {
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Either show events or empty state
     const hasEvents = await page.locator('[class*="rounded-lg"][class*="border"]').count() > 2;
@@ -66,7 +66,7 @@ test.describe('Timeline', () => {
   });
 
   test('should display event stats when data is available', async ({ page }) => {
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Check for stats section
     const statsSection = page.locator('text=/\\d+ Ereignisse gefunden/');

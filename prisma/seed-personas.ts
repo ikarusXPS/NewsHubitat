@@ -1,6 +1,4 @@
-import { PrismaClient } from '../src/generated/prisma';
-
-const prisma = new PrismaClient();
+import { prisma } from '../server/db/prisma';
 
 // Default AI personas for news analysis
 const PERSONA_SEEDS = [

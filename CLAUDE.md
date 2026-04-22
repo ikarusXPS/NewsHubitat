@@ -29,12 +29,18 @@ npm run test:coverage    # Coverage report (80% threshold)
 # E2E Testing (Playwright)
 npm run test:e2e         # Playwright headless
 npm run test:e2e:headed  # Playwright with browser visible
+npm run test:e2e:ui      # Interactive UI mode
 
 # Database (Prisma + PostgreSQL)
 docker compose up -d     # Start PostgreSQL container
 npx prisma generate      # Generate Prisma client
 npx prisma db push       # Sync schema to PostgreSQL
 npx prisma studio        # Database GUI (localhost:5555)
+
+# Seed Data
+npm run seed             # Run all seed scripts (badges + personas)
+npm run seed:badges      # Seed gamification badges only
+npm run seed:personas    # Seed AI personas only
 
 # Run Single Tests
 npm run test -- src/lib/utils.test.ts           # Single unit test file
@@ -44,20 +50,21 @@ npx playwright test e2e/auth.spec.ts            # Single E2E test file
 
 ## Tech Stack
 
-- **Frontend**: React 19 + Vite 7 + TypeScript + Tailwind CSS v4
+- **Frontend**: React 19.2 + Vite 8 + TypeScript 6 + Tailwind CSS v4
 - **State**: Zustand v5 (persisted to localStorage under `newshub-storage`)
 - **Server State**: TanStack Query v5 (5-min refetch, 2-min stale time)
-- **Visualization**: Recharts, globe.gl, Leaflet
+- **Visualization**: Recharts 3, globe.gl 2, Leaflet 1.9
 - **Backend**: Express 5 (TypeScript, ES modules)
-- **Database**: PostgreSQL via Prisma (adapter: @prisma/adapter-pg)
-- **AI**: Multi-provider fallback (OpenRouter → Gemini → Anthropic)
+- **Database**: PostgreSQL via Prisma 7 (adapter: @prisma/adapter-pg)
+- **Real-time**: Socket.io for WebSocket updates
+- **AI**: Multi-provider fallback (Gemini → OpenRouter → Anthropic)
 - **Translation**: Multi-provider chain (DeepL → Google → LibreTranslate → Claude)
 
 ## Architecture
 
 ### Frontend (`src/`)
 - **Routing**: React Router v7 with lazy-loaded pages via Suspense
-- **State**: Zustand store for UI (theme, language, filters, bookmarks, feed settings)
+- **State**: Zustand store for UI (theme, language, filters, bookmarks, feed settings, reading history)
 - **Data Fetching**: TanStack Query with error/loading states
 - **Auth**: Context API with JWT in localStorage
 
@@ -67,7 +74,20 @@ npx playwright test e2e/auth.spec.ts            # Single E2E test file
 - **Database**: PostgreSQL via Prisma, schema at `prisma/schema.prisma`
 - **Generated Client**: `src/generated/prisma/` (do not edit)
 - **Caching**: In-memory Maps with configurable TTL (summaries, topics)
-- **Models**: NewsArticle, NewsSource, User, Bookmark, StoryCluster, EmailSubscription, EmailDigest, AIPersona, UserPersona, SharedContent, ShareClick
+- **Real-time**: WebSocket service for live updates via Socket.io
+- **Background Jobs**: Cleanup service for expired tokens and unverified accounts
+
+### Key Services (`server/services/`)
+| Service | Purpose |
+|---------|---------|
+| `newsAggregator.ts` | Orchestrates RSS fetching, dedup, and storage |
+| `aiService.ts` | Multi-provider AI with fallback chain |
+| `translationService.ts` | Multi-provider translation chain |
+| `websocketService.ts` | Real-time updates via Socket.io |
+| `cleanupService.ts` | Background cleanup for tokens/accounts |
+| `stealthScraper.ts` | Puppeteer-based scraping with stealth plugins |
+| `personaService.ts` | AI persona management |
+| `emailService.ts` | Email digest and notifications |
 
 ### Key Directories
 | Directory | Purpose |
@@ -77,10 +97,29 @@ npx playwright test e2e/auth.spec.ts            # Single E2E test file
 | `src/store/` | Zustand store with state slices |
 | `src/types/` | TypeScript definitions |
 | `server/routes/` | API endpoints (news, translate, auth, ai, events) |
-| `server/services/` | Business logic (NewsAggregator, TranslationService, AiService) |
+| `server/services/` | Business logic services |
 | `server/config/sources.ts` | 130 news source configurations |
 | `prisma/schema.prisma` | Database schema |
 | `server/config/aiProviders.ts` | AI model and cache configuration |
+
+## Database Models
+
+### Core Models
+- `NewsArticle` - Articles with translations stored as JSONB (`titleTranslated`, `contentTranslated`)
+- `NewsSource` - 130 configured news sources with bias metadata
+- `User` - Authentication with email verification, password reset, token versioning
+- `Bookmark` - User article bookmarks
+
+### Feature Models
+- `StoryCluster` - Topic clustering with perspective analysis
+- `EmailSubscription` / `EmailDigest` - Email digest feature
+- `AIPersona` / `UserPersona` - Customizable AI personalities (8 built-in)
+- `SharedContent` / `ShareClick` - Social sharing analytics
+
+### Gamification Models
+- `Badge` - Achievement badges with tiers (bronze, silver, gold, platinum)
+- `UserBadge` - User earned badges with progress tracking
+- `LeaderboardSnapshot` - Periodic leaderboard snapshots (weekly, monthly, all-time)
 
 ## Store State Slices
 
@@ -106,6 +145,10 @@ interface AppState {
     hideReadArticles: boolean;   // toggle to hide read articles
   };
 
+  // Reading History (with pause/resume)
+  readingHistory: ReadingHistoryEntry[];
+  isHistoryPaused: boolean;
+
   // User Features
   bookmarkedArticles: string[];
   activeFocusPreset: FocusPreset | null;
@@ -113,7 +156,7 @@ interface AppState {
 }
 ```
 
-Key actions: `toggleSource()`, `markAsRead()`, `toggleHideReadArticles()`, `setActiveSourceFilter()`
+Key actions: `toggleSource()`, `markAsRead()`, `toggleHideReadArticles()`, `setActiveSourceFilter()`, `pauseHistory()`, `resumeHistory()`
 
 ## Key Patterns
 
@@ -130,8 +173,8 @@ refetchInterval: 2 * 60_000
 
 ### Multi-Provider AI Fallback
 The AI service (`server/services/aiService.ts`) uses a fallback chain:
-1. **OpenRouter** (multi-model, paid) - Primary
-2. **Gemini** (free tier, 1500 req/day) - Secondary
+1. **Gemini** (free tier, 1500 req/day) - Primary
+2. **OpenRouter** (multi-model, paid) - Secondary
 3. **Anthropic** (premium) - Fallback
 
 If all providers fail, keyword-based analysis is used as final fallback.
@@ -180,8 +223,11 @@ interface ApiResponse<T> {
 | `/api/news/:id` | GET | Single article |
 | `/api/news/sources` | GET | All 130 sources |
 | `/api/translate` | POST | Translate text `{text, targetLang}` |
+| `/api/auth/register` | POST | Create account (triggers email verification) |
 | `/api/auth/login` | POST | Login (returns JWT) |
 | `/api/auth/me` | GET | Current user (Bearer token) |
+| `/api/auth/verify-email` | POST | Verify email with token |
+| `/api/auth/request-password-reset` | POST | Request password reset email |
 | `/api/analysis/clusters` | GET | Topic clustering (`?summaries=true` for AI) |
 | `/api/ai/ask` | POST | RAG Q&A `{question, context[]}` |
 | `/api/events/geo` | GET | Geo-located events |
@@ -189,6 +235,25 @@ interface ApiResponse<T> {
 | `/api/news/sentiment` | GET | Sentiment statistics by region |
 | `/api/analysis/framing` | GET | Framing comparison by topic |
 | `/api/health` | GET | Server status |
+
+## E2E Testing Structure
+
+Playwright tests are split into authenticated and unauthenticated projects:
+
+```typescript
+// playwright.config.ts
+projects: [
+  { name: 'setup', testMatch: /.*\.setup\.ts/ },  // Creates auth state
+  { name: 'chromium', ... },                       // Unauthenticated tests
+  {
+    name: 'chromium-auth',
+    storageState: 'playwright/.auth/user.json',   // Auth state file
+    dependencies: ['setup'],                       // Runs after setup
+  },
+]
+```
+
+Auth-required tests (`profile.spec.ts`, `settings.spec.ts`, `history.spec.ts`) run in `chromium-auth` project.
 
 ## UI Design System
 
@@ -204,14 +269,20 @@ interface ApiResponse<T> {
 PORT=3001
 DATABASE_URL="postgresql://newshub:newshub_dev@localhost:5432/newshub?schema=public"
 
-# AI (ONE required, priority: OpenRouter → Gemini → Anthropic)
+# AI (ONE required, priority: Gemini → OpenRouter → Anthropic)
+GEMINI_API_KEY=           # FREE tier - 1500 req/day (recommended)
 OPENROUTER_API_KEY=       # Paid - multi-model access
-GEMINI_API_KEY=           # FREE tier - 1500 req/day
 ANTHROPIC_API_KEY=        # Premium fallback
 
 # Translation (at least one recommended)
 DEEPL_API_KEY=
 GOOGLE_TRANSLATE_API_KEY=
+
+# Email (for verification and digests)
+SMTP_HOST=
+SMTP_PORT=
+SMTP_USER=
+SMTP_PASS=
 ```
 
 ## Adding New Sources
@@ -243,3 +314,7 @@ Edit `server/config/sources.ts`:
 ### Articles Not Clickable in Clusters
 **Problem**: Articles appear as plain text.
 **Solution**: Ensure backend includes `url` field and frontend renders as `<a>` tags.
+
+### Email Verification Not Working
+**Problem**: Users can't verify email.
+**Solution**: Configure SMTP environment variables. Check `cleanupService.ts` for token expiration handling.
