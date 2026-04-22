@@ -139,6 +139,48 @@ app.get('/api/health/db', async (_req, res) => {
   }
 });
 
+// Redis health check - dedicated endpoint for container orchestration (D-09)
+app.get('/api/health/redis', async (_req, res) => {
+  console.log('[HEALTH/REDIS] Received Redis health request');
+  res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+
+  const start = Date.now();
+
+  if (!cacheService.isAvailable()) {
+    const duration = Date.now() - start;
+    res.status(503).json({
+      status: 'unhealthy',
+      latency_ms: duration,
+      error: 'Redis not connected',
+      timestamp: new Date().toISOString(),
+    });
+    return;
+  }
+
+  try {
+    const stats = await cacheService.getStats();
+    const duration = Date.now() - start;
+
+    res.json({
+      status: 'healthy',
+      latency_ms: duration,
+      keys: stats?.keys || 0,
+      memory: stats?.memory || 'unknown',
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    const duration = Date.now() - start;
+    const err = error instanceof Error ? error : new Error(String(error));
+
+    res.status(503).json({
+      status: 'unhealthy',
+      latency_ms: duration,
+      error: err.message,
+      timestamp: new Date().toISOString(),
+    });
+  }
+});
+
 // Health check - no caching for real-time status
 app.get('/api/health', async (_req, res) => {
   console.log('[HEALTH] Received health request');
