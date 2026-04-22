@@ -14,9 +14,9 @@ datasource db {
 model NewsArticle {
   id                String   @id
   title             String
-  titleTranslated   String?  // JSON string: { de?: string, en?: string }
+  titleTranslated   Json?    // D-13: JSONB stores { de?: string, en?: string }
   content           String
-  contentTranslated String?  // JSON string: { de?: string, en?: string }
+  contentTranslated Json?    // D-13: JSONB stores { de?: string, en?: string }
   summary           String?
   originalLanguage  String
   publishedAt       DateTime
@@ -25,8 +25,8 @@ model NewsArticle {
   sentiment         String
   sentimentScore    Float
   perspective       String
-  topics            String   // JSON string: string[]
-  entities          String   // JSON string: string[]
+  topics            Json     // D-13: JSONB stores string[]
+  entities          Json     // D-13: JSONB stores string[]
   translationQuality Float?
   cached            Boolean  @default(false)
   confidence        Int?
@@ -42,6 +42,8 @@ model NewsArticle {
   @@index([sourceId])
   @@index([publishedAt, perspective])  // Dashboard: filtered timeline
   @@index([sentiment, publishedAt])    // Sentiment charts
+  @@index([topics(ops: JsonbPathOps)], type: Gin)    // D-14: GIN for topics
+  @@index([entities(ops: JsonbPathOps)], type: Gin)  // D-14: GIN for entities
 }
 
 model NewsSource {
@@ -68,7 +70,7 @@ model User {
   name         String
   createdAt    DateTime @default(now())
   bookmarks    Bookmark[]
-  preferences  String?  // JSON string
+  preferences  Json?    // D-13: JSONB stores user preferences
 
   // Email verification (AUTH-01 per D-51)
   emailVerified          Boolean   @default(false)
@@ -124,15 +126,15 @@ model Bookmark {
 }
 
 model StoryCluster {
-  id              String   @id @default(cuid())
-  canonicalTitle  String
-  articles        String   // JSON string array of IDs
-  perspectives    String   // Comma separated or JSON
-  biasDistribution String  // JSON string
-  framingDifferences String // JSON string
-  significance    Float?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id                 String   @id @default(cuid())
+  canonicalTitle     String
+  articles           Json     // D-13: JSONB stores string[] of article IDs
+  perspectives       Json     // D-13: JSONB stores string[]
+  biasDistribution   Json     // D-13: JSONB stores object
+  framingDifferences Json     // D-13: JSONB stores object
+  significance       Float?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
   @@index([createdAt])
 }
@@ -147,8 +149,8 @@ model EmailSubscription {
   userId        String
   email         String
   frequency     String   // daily, weekly, realtime
-  regions       String   // JSON array of regions to include
-  topics        String   // JSON array of topics to include
+  regions       Json     // D-13: JSONB array of regions to include
+  topics        Json     // D-13: JSONB array of topics to include
   minSeverity   String   @default("medium") // critical, high, medium, low
   isActive      Boolean  @default(true)
   lastSentAt    DateTime?
@@ -164,7 +166,7 @@ model EmailDigest {
   id            String   @id @default(cuid())
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId        String
-  articleIds    String   // JSON array of article IDs included
+  articleIds    Json     // D-13: JSONB array of article IDs included
   subject       String
   htmlContent   String
   sentAt        DateTime?
@@ -293,7 +295,7 @@ model LeaderboardSnapshot {
   id        String   @id @default(cuid())
   date      DateTime
   timeframe String   // all-time, monthly, weekly (D-57)
-  rankings  String   // JSON string of top 100 users (D-51)
+  rankings  Json     // D-13: JSONB stores top 100 users (D-51)
   createdAt DateTime @default(now())
 
   @@index([date, timeframe])
