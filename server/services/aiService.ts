@@ -5,6 +5,7 @@ import type { NewsArticle, PerspectiveRegion, Sentiment } from '../../src/types'
 import logger from '../utils/logger';
 import { hashString } from '../utils/hash';
 import { AI_CONFIG } from '../config/aiProviders';
+import { CacheService, CacheKeys } from './cacheService';
 
 interface ClusterSummary {
   topic: string;
@@ -32,12 +33,7 @@ export class AIService {
   private openrouterClient: OpenAI | null = null;
   private geminiClient: GoogleGenerativeAI | null = null;
   private activeProvider: AIProvider = 'none';
-  private cache: Map<string, { summary: ClusterSummary; timestamp: number }> = new Map();
-  private topicCache: Map<string, { topics: string[]; timestamp: number }> = new Map();
-  private readonly CACHE_TTL = AI_CONFIG.cache.summaryTTL;
-  private readonly TOPIC_CACHE_TTL = AI_CONFIG.cache.topicTTL;
-  private readonly CLEANUP_INTERVAL = AI_CONFIG.cache.cleanupInterval;
-  private cleanupTimer: ReturnType<typeof setInterval> | null = null;
+  private readonly cacheService = CacheService.getInstance();
 
   private constructor() {
     // Priority: Gemini (free) → OpenRouter (cheap) → Anthropic (premium)
@@ -78,63 +74,12 @@ export class AIService {
       logger.warn('  Fallback: Keyword-based analysis only');
     }
 
-    // Start periodic cache cleanup to prevent memory leaks
-    this.startCacheCleanup();
   }
 
   /**
-   * Start periodic cache cleanup
-   */
-  private startCacheCleanup(): void {
-    this.cleanupTimer = setInterval(() => {
-      this.cleanupCaches();
-    }, this.CLEANUP_INTERVAL);
-
-    // Don't prevent process exit
-    if (this.cleanupTimer.unref) {
-      this.cleanupTimer.unref();
-    }
-  }
-
-  /**
-   * Remove expired entries from all caches
-   */
-  private cleanupCaches(): void {
-    const now = Date.now();
-    let cleanedSummaries = 0;
-    let cleanedTopics = 0;
-
-    // Cleanup summary cache
-    for (const [key, value] of this.cache) {
-      if (now - value.timestamp > this.CACHE_TTL) {
-        this.cache.delete(key);
-        cleanedSummaries++;
-      }
-    }
-
-    // Cleanup topic cache
-    for (const [key, value] of this.topicCache) {
-      if (now - value.timestamp > this.TOPIC_CACHE_TTL) {
-        this.topicCache.delete(key);
-        cleanedTopics++;
-      }
-    }
-
-    if (cleanedSummaries > 0 || cleanedTopics > 0) {
-      logger.debug(`Cache cleanup: removed ${cleanedSummaries} summaries, ${cleanedTopics} topics`);
-    }
-  }
-
-  /**
-   * Shutdown the service and cleanup resources
+   * Shutdown the service (no cleanup needed - Redis handles cache expiration)
    */
   shutdown(): void {
-    if (this.cleanupTimer) {
-      clearInterval(this.cleanupTimer);
-      this.cleanupTimer = null;
-    }
-    this.cache.clear();
-    this.topicCache.clear();
     logger.info('AI Service shutdown complete');
   }
 
@@ -200,11 +145,11 @@ export class AIService {
       return this.generateMockSummary(cluster);
     }
 
-    // Check cache
-    const cacheKey = this.getCacheKey(cluster);
-    const cached = this.cache.get(cacheKey);
-    if (cached && Date.now() - cached.timestamp < this.CACHE_TTL) {
-      return cached.summary;
+    // Check Redis cache (D-07)
+    const cacheKey = CacheKeys.aiSummary(this.getCacheKey(cluster));
+    const cached = await this.cacheService.get<ClusterSummary>(cacheKey);
+    if (cached) {
+      return cached;
     }
 
     try {
@@ -217,8 +162,8 @@ export class AIService {
 
       const summary = this.parseResponse(responseText, cluster);
 
-      // Cache the result
-      this.cache.set(cacheKey, { summary, timestamp: Date.now() });
+      // Cache in Redis with 30-minute TTL (D-07)
+      await this.cacheService.set(cacheKey, summary, AI_CONFIG.cache.summaryTTLSeconds);
 
       return summary;
     } catch (err) {
@@ -540,12 +485,12 @@ async batchAnalyzeSentiment(articles: NewsArticle[]): Promise<Map<string, {
    */
   async classifyTopics(title: string, content: string): Promise<string[]> {
     // Generate cache key from title + content
-    const cacheKey = hashString(title + content);
-    const cached = this.topicCache.get(cacheKey);
+    const cacheKey = CacheKeys.aiTopics(hashString(title + content));
 
-    // Return cached result if still valid
-    if (cached && Date.now() - cached.timestamp < this.TOPIC_CACHE_TTL) {
-      return cached.topics;
+    // Check Redis cache
+    const cached = await this.cacheService.get<string[]>(cacheKey);
+    if (cached) {
+      return cached;
     }
 
     // Fallback to keyword matching if AI not available
@@ -591,10 +536,10 @@ Response format: ["topic1", "topic2", ...]`;
         'climate',
       ];
       const filtered = topics.filter((t) => validTopics.includes(t));
-
-      // Cache result
       const result = filtered.length > 0 ? filtered : ['politics']; // Default to politics if empty
-      this.topicCache.set(cacheKey, { topics: result, timestamp: Date.now() });
+
+      // Cache in Redis with 5-minute TTL (D-07, Claude's discretion)
+      await this.cacheService.set(cacheKey, result, AI_CONFIG.cache.topicTTLSeconds);
 
       return result;
     } catch {
