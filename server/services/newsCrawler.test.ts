@@ -306,7 +306,7 @@ describe('NewsCrawler', () => {
       await promise1;
 
       // Start second request immediately
-      const startTime = Date.now();
+      const _startTime = Date.now();
       const promise2 = crawler.crawlSource({ ...testConfig, source: { ...testConfig.source, id: 'source2' } });
 
       // Advance past rate limit delay
@@ -381,7 +381,7 @@ describe('NewsCrawler', () => {
       // Run with timer advancement
       const promise = crawler.crawlAll();
       await vi.advanceTimersByTimeAsync(20000);
-      const articles = await promise;
+      const _articles = await promise;
 
       // Should still have articles from other sources
       expect(mockAxiosGet.mock.calls.length).toBeGreaterThan(1);

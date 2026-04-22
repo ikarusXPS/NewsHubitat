@@ -250,7 +250,7 @@ describe('useCachedQuery', () => {
       // But hook still runs queryFn - it's the effect that loads cache
       const queryFn = vi.fn().mockRejectedValue(new Error('Should use cache'));
 
-      const { result } = renderHook(
+      const { result: _result } = renderHook(
         () =>
           useCachedQuery<NewsArticle[]>({
             queryKey: ['offline-test'],
