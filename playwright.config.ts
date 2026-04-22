@@ -13,9 +13,25 @@ export default defineConfig({
     screenshot: 'only-on-failure',
   },
   projects: [
+    // Setup project - runs first, creates auth state
+    { name: 'setup', testMatch: /.*\.setup\.ts/ },
+
+    // Unauthenticated tests (no dependencies)
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
+      testIgnore: ['**/profile.spec.ts', '**/bookmarks.spec.ts', '**/settings.spec.ts', '**/history.spec.ts'],
+    },
+
+    // Authenticated tests (depend on setup)
+    {
+      name: 'chromium-auth',
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: 'playwright/.auth/user.json',
+      },
+      testMatch: ['**/profile.spec.ts', '**/bookmarks.spec.ts', '**/settings.spec.ts', '**/history.spec.ts'],
+      dependencies: ['setup'],
     },
   ],
   webServer: {
