@@ -30,9 +30,10 @@ npm run test:coverage    # Coverage report (80% threshold)
 npm run test:e2e         # Playwright headless
 npm run test:e2e:headed  # Playwright with browser visible
 
-# Database (Prisma + SQLite)
+# Database (Prisma + PostgreSQL)
+docker compose up -d     # Start PostgreSQL container
 npx prisma generate      # Generate Prisma client
-npx prisma db push       # Sync schema to dev.db
+npx prisma db push       # Sync schema to PostgreSQL
 npx prisma studio        # Database GUI (localhost:5555)
 
 # Run Single Tests
@@ -48,7 +49,7 @@ npx playwright test e2e/auth.spec.ts            # Single E2E test file
 - **Server State**: TanStack Query v5 (5-min refetch, 2-min stale time)
 - **Visualization**: Recharts, globe.gl, Leaflet
 - **Backend**: Express 5 (TypeScript, ES modules)
-- **Database**: SQLite via Prisma (adapter: better-sqlite3)
+- **Database**: PostgreSQL via Prisma (adapter: @prisma/adapter-pg)
 - **AI**: Multi-provider fallback (OpenRouter → Gemini → Anthropic)
 - **Translation**: Multi-provider chain (DeepL → Google → LibreTranslate → Claude)
 
@@ -63,7 +64,7 @@ npx playwright test e2e/auth.spec.ts            # Single E2E test file
 ### Backend (`server/`)
 - **Singleton Services**: All services use `getInstance()` pattern
 - **Data Flow**: RSS/HTML crawl → Dedup → Sentiment → Translation → Database/Cache
-- **Database**: SQLite via Prisma, schema at `prisma/schema.prisma`
+- **Database**: PostgreSQL via Prisma, schema at `prisma/schema.prisma`
 - **Generated Client**: `src/generated/prisma/` (do not edit)
 - **Caching**: In-memory Maps with configurable TTL (summaries, topics)
 - **Models**: NewsArticle, NewsSource, User, Bookmark, StoryCluster, EmailSubscription, EmailDigest, AIPersona, UserPersona, SharedContent, ShareClick
@@ -201,7 +202,7 @@ interface ApiResponse<T> {
 ```bash
 # Required
 PORT=3001
-DATABASE_URL="file:./dev.db"
+DATABASE_URL="postgresql://newshub:newshub_dev@localhost:5432/newshub?schema=public"
 
 # AI (ONE required, priority: OpenRouter → Gemini → Anthropic)
 OPENROUTER_API_KEY=       # Paid - multi-model access
