@@ -1,9 +1,9 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 test.describe('Dashboard Page', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('should load the Dashboard page', async ({ page }) => {
@@ -112,7 +112,7 @@ test.describe('Dashboard Page', () => {
   test('should navigate from sidebar', async ({ page }) => {
     // Navigate away first
     await page.goto('/monitor');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Click home/dashboard link in sidebar
     const homeLink = page.locator('a[href="/"]').first();

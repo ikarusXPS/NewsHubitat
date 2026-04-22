@@ -1,6 +1,4 @@
-import { PrismaClient } from '../src/generated/prisma';
-
-const prisma = new PrismaClient();
+import { prisma } from '../server/db/prisma';
 
 // Badge definitions per D-41, D-42, D-45
 const BADGE_SEEDS = [

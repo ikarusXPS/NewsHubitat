@@ -1,23 +1,10 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 // These tests run with storageState from auth.setup.ts
 // User is already authenticated when tests start
 
 test.describe('Settings Page (Authenticated)', () => {
   test.beforeEach(async ({ page }) => {
-    // Bypass FocusOnboarding modal
-    // Zustand persist format: { state: {...}, version: N }
-    await page.addInitScript(() => {
-      localStorage.setItem('newshub-storage', JSON.stringify({
-        state: {
-          hasCompletedOnboarding: true,
-          theme: 'dark',
-          language: 'de'
-        },
-        version: 0
-      }));
-    });
-
     await page.goto('/settings');
     await page.waitForLoadState('domcontentloaded');
     // Wait for page heading to be visible as proxy for page ready

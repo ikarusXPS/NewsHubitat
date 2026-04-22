@@ -1,20 +1,7 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 test.describe('Analysis Page', () => {
   test.beforeEach(async ({ page }) => {
-    // Set localStorage to bypass onboarding modal before navigating
-    await page.addInitScript(() => {
-      const state = {
-        state: {
-          hasCompletedOnboarding: true,
-          theme: 'dark',
-          language: 'de',
-        },
-        version: 0,
-      };
-      localStorage.setItem('newshub-storage', JSON.stringify(state));
-    });
-
     await page.goto('/analysis');
     // Use domcontentloaded instead of networkidle to avoid timeout from WebSocket connections
     await page.waitForLoadState('domcontentloaded');

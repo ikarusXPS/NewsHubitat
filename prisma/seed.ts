@@ -1,8 +1,7 @@
-import { PrismaClient } from '../src/generated/prisma';
+import 'dotenv/config';
+import { prisma } from '../server/db/prisma';
 import { seedBadges } from './seed-badges';
 import { seedPersonas } from './seed-personas';
-
-const prisma = new PrismaClient();
 
 async function main(): Promise<void> {
   console.log('Starting database seeding...\n');
