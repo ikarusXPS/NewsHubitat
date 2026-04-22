@@ -65,6 +65,9 @@ RUN npx prisma generate
 # Copy built artifacts
 COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
 
+# Create logs directory with proper permissions for winston
+RUN mkdir -p logs && chown nodejs:nodejs logs
+
 # Switch to non-root user
 USER nodejs
 
