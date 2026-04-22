@@ -236,12 +236,16 @@ Plans:
 **Depends on**: Phase 16
 **Requirements**: DEPLOY-01, DEPLOY-02
 **Success Criteria**:
-  1. Dockerfile for app (multi-stage build)
-  2. docker-compose.yml with app, PostgreSQL, Redis
-  3. Health checks configured
-  4. Environment variable management
-  5. Production build optimized
-**Plans:** TBD
+  1. Dockerfile for app (multi-stage build with node:22-alpine3.19)
+  2. docker-compose.yml with app, PostgreSQL, Redis services
+  3. Health checks with service_healthy dependencies
+  4. Environment variable management via env_file
+  5. Production build with tsup for server, Vite for frontend
+**Plans:** 3 plans in 2 waves
+Plans:
+- [ ] 17-01-PLAN.md — Dockerfile + .dockerignore + tsup.config.ts (build infrastructure)
+- [ ] 17-02-PLAN.md — package.json scripts + server static file serving
+- [ ] 17-03-PLAN.md — docker-compose.yml app service + .env.example + verification
 
 ## Progress
 
@@ -263,7 +267,8 @@ Plans:
 | 14. Redis Caching | v1.2 | 5/5 | Complete | 2026-04-22 |
 | 15. Query Optimization | v1.2 | 4/4 | Complete | 2026-04-22 |
 | 16. PWA / Service Worker | v1.2 | 6/6 | Complete | 2026-04-22 |
+| 17. Docker Deployment | v1.2 | 0/3 | Planned | - |
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-22 — Phase 16 complete (6/6 plans)*
+*Last updated: 2026-04-23 — Phase 17 planned (3 plans in 2 waves)*
