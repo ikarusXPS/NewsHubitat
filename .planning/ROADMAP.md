@@ -172,7 +172,7 @@ Plans:
 - [x] 13-01-PLAN.md — Docker Compose + PostgreSQL adapter + schema provider
 - [ ] 13-02-PLAN.md — JSONB field conversion with GIN indexes (Task 1 complete, Task 2 blocked: needs Docker + PostgreSQL)
 - [x] 13-03-PLAN.md — Database health endpoint and structured logging
-- [ ] 13-04-PLAN.md — Seed scripts for badges and AI personas
+- [x] 13-04-PLAN.md — Seed scripts for badges and AI personas
 - [ ] 13-05-PLAN.md — Full test suite verification and human sign-off
 
 ### Phase 14: Redis Caching
@@ -235,8 +235,8 @@ Plans:
 | 10. Frontend Hook & Library Tests | v1.1 | 10/10 | Complete | 2026-04-21 |
 | 11. E2E Tests | v1.1 | 8/8 | Complete | 2026-04-22 |
 | 12. Bug Fixes & Code Quality | v1.1 | 4/4 | Complete | 2026-04-22 |
-| 13. PostgreSQL Migration | v1.2 | 2/5 | In Progress | - |
+| 13. PostgreSQL Migration | v1.2 | 3/5 | In Progress | - |
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-22 — Phase 13 Plan 03 complete (database health endpoint + structured logging)*
+*Last updated: 2026-04-22 — Phase 13 Plan 04 complete (seed scripts for badges and AI personas)*

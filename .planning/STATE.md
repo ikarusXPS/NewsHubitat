@@ -9,8 +9,8 @@ progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 5
-  completed_plans: 2
-  percent: 40
+  completed_plans: 3
+  percent: 60
 ---
 
 # State: NewsHub
@@ -25,11 +25,11 @@ See: .planning/PROJECT.md (updated 2026-04-20)
 ## Current Position
 
 Phase: 13 of 17 (PostgreSQL Migration)
-Plans: 2/5 plans complete
+Plans: 3/5 plans complete
 Status: Executing Phase 13
 Last activity: 2026-04-22
 
-Progress: [####░░░░░░] 40%
+Progress: [######░░░░] 60%
 
 ## Milestone Progress
 
@@ -65,8 +65,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Completed 13-03-PLAN.md (database health endpoint and structured logging)
-**Next step:** Execute 13-04-PLAN.md (seed scripts for badges and AI personas)
+**Last action:** Completed 13-04-PLAN.md (seed scripts for badges and AI personas)
+**Next step:** Execute 13-05-PLAN.md (full test suite verification)
 **Resume file:** None
 
 ## Decisions
@@ -86,6 +86,7 @@ Items acknowledged and carried forward from previous milestone close:
 - **2026-04-22:** PrismaPg adapter with inline pool configuration (max: 10, connectionTimeoutMillis: 5000, idleTimeoutMillis: 300000)
 - **2026-04-22:** JsonbPathOps operator class for GIN indexes (optimal for @> containment queries)
 - **2026-04-22:** Use SELECT 1 for minimal database connectivity check in /api/health/db endpoint
+- **2026-04-22:** Deterministic IDs for AIPersona using slugified name; export pattern with standalone execution guard
 
 ## Performance Metrics
 
@@ -109,6 +110,7 @@ Items acknowledged and carried forward from previous milestone close:
 | 2026-04-22 | 13 | 01 | 8 | 3 | 7 |
 | 2026-04-22 | 13 | 02 | 4 | 1 | 1 |
 | 2026-04-22 | 13 | 03 | 3 | 2 | 2 |
+| 2026-04-22 | 13 | 04 | 5 | 3 | 4 |
 
 ## Open Issues
 
@@ -116,4 +118,4 @@ Items acknowledged and carried forward from previous milestone close:
 
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-22 — Phase 13 Plan 03 complete (database health endpoint + structured logging)*
+*Last updated: 2026-04-22 — Phase 13 Plan 04 complete (seed scripts for badges and AI personas)*
