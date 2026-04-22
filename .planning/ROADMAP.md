@@ -201,10 +201,16 @@ All 5 plans executed. Redis caching layer operational with rate limiting, JWT bl
 **Depends on**: Phase 14
 **Requirements**: PERF-05
 **Success Criteria**:
-  1. N+1 queries eliminated
-  2. Proper indexes on frequently queried columns
-  3. API p95 response time < 200ms
-**Plans:** TBD
+  1. N+1 queries eliminated in leaderboard routes
+  2. Server-Timing headers on all API responses for p95 monitoring
+  3. Chunked parallel saves in newsAggregator (50 articles per chunk)
+  4. API p95 response time < 200ms
+**Plans:** 4 plans in 2 waves
+Plans:
+- [ ] 15-01-PLAN.md — Server-Timing middleware + chunk utility function
+- [ ] 15-02-PLAN.md — Leaderboard N+1 elimination with Prisma include
+- [ ] 15-03-PLAN.md — NewsAggregator chunked parallel saves
+- [ ] 15-04-PLAN.md — Verification and human sign-off
 
 ### Phase 16: PWA / Service Worker
 **Goal**: Offline support and background sync capabilities
@@ -246,8 +252,9 @@ All 5 plans executed. Redis caching layer operational with rate limiting, JWT bl
 | 11. E2E Tests | v1.1 | 8/8 | Complete | 2026-04-22 |
 | 12. Bug Fixes & Code Quality | v1.1 | 4/4 | Complete | 2026-04-22 |
 | 13. PostgreSQL Migration | v1.2 | 3/5 | In Progress | - |
-| 14. Redis Caching | v1.2 | 4/5 | In Progress | - |
+| 14. Redis Caching | v1.2 | 5/5 | Complete | 2026-04-22 |
+| 15. Query Optimization | v1.2 | 0/4 | Planning | - |
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-22 — Phase 14 Plan 02 complete (Rate limiting middleware)*
+*Last updated: 2026-04-22 — Phase 15 planned (4 plans)*
