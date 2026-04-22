@@ -143,7 +143,12 @@ Plans:
   3. TypeScript strict mode enabled and compiles with zero errors
   4. Dead code identified by static analysis and removed
   5. Overall unit test coverage reaches 80%+ threshold
-**Plans**: TBD
+**Plans:** 4 plans in 2 waves
+Plans:
+- [ ] 12-01-PLAN.md — B7 Article thumbnail fallback fix (BUG-01)
+- [ ] 12-02-PLAN.md — ESLint error fixes (QUAL-01)
+- [ ] 12-03-PLAN.md — Dead code identification and removal (QUAL-03)
+- [ ] 12-04-PLAN.md — Final quality verification (QUAL-02, QUAL-04)
 **UI hint**: yes
 
 ## Progress
