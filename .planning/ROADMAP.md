@@ -224,12 +224,12 @@ Plans:
   5. Cache age indicator shows when serving stale data
 **Plans:** 6 plans in 4 waves
 Plans:
-- [ ] 16-01-PLAN.md — Offline fallback page + VitePWA navigation fallback
-- [ ] 16-02-PLAN.md — Service worker registration with workbox-window
-- [ ] 16-03-PLAN.md — Background sync service with IndexedDB queue
-- [ ] 16-04-PLAN.md — Backend sync endpoints (bookmarks, history)
-- [ ] 16-05-PLAN.md — Install prompt banner with engagement tracking
-- [ ] 16-06-PLAN.md — Cache age indicator + verification checkpoint
+- [x] 16-01-PLAN.md — Offline fallback page + VitePWA navigation fallback
+- [x] 16-02-PLAN.md — Service worker registration with workbox-window
+- [x] 16-03-PLAN.md — Background sync service with IndexedDB queue
+- [x] 16-04-PLAN.md — Backend sync endpoints (bookmarks, history)
+- [x] 16-05-PLAN.md — Install prompt banner with engagement tracking
+- [x] 16-06-PLAN.md — Cache age indicator + verification checkpoint
 
 ### Phase 17: Docker Deployment
 **Goal**: Containerized deployment with Docker Compose
@@ -261,9 +261,9 @@ Plans:
 | 12. Bug Fixes & Code Quality | v1.1 | 4/4 | Complete | 2026-04-22 |
 | 13. PostgreSQL Migration | v1.2 | 3/5 | In Progress | - |
 | 14. Redis Caching | v1.2 | 5/5 | Complete | 2026-04-22 |
-| 15. Query Optimization | v1.2 | 0/4 | Planning | - |
-| 16. PWA / Service Worker | v1.2 | 0/6 | Planning | - |
+| 15. Query Optimization | v1.2 | 4/4 | Complete | 2026-04-22 |
+| 16. PWA / Service Worker | v1.2 | 6/6 | Complete | 2026-04-22 |
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-22 — Phase 16 planned (6 plans)*
+*Last updated: 2026-04-22 — Phase 16 complete (6/6 plans)*
