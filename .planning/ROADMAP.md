@@ -120,7 +120,17 @@ Plans:
   3. Monitor and Timeline pages E2E tests verify real-time data display
   4. EventMap and Community pages E2E tests verify map interactions and social features
   5. User account pages E2E tests verify bookmarks, settings, history flows
-**Plans**: TBD
+**Plans:** 8 plans
+Plans:
+- [ ] 11-01-PLAN.md — Auth setup with storageState for authenticated tests
+- [ ] 11-02-PLAN.md — Dashboard E2E tests (news feed, view toggle, trend filters)
+- [ ] 11-03-PLAN.md — Analysis E2E tests (clusters, compare mode, charts)
+- [ ] 11-04-PLAN.md — Community E2E tests (tabs, contribution types, leaderboard)
+- [ ] 11-05-PLAN.md — Profile E2E tests (stats, quick actions, password change) [auth required]
+- [ ] 11-06-PLAN.md — Bookmarks E2E tests (empty state, article grid, clear all) [auth required]
+- [ ] 11-07-PLAN.md — Settings E2E tests (theme, language, export/import) [auth required]
+- [ ] 11-08-PLAN.md — ReadingHistory E2E tests (timeline groups, filters, clear) [auth required]
+**Note:** E2E-03 (Monitor), E2E-04 (Timeline), E2E-05 (EventMap) already covered by existing tests per D-02
 **UI hint**: yes
 
 ### Phase 12: Bug Fixes & Code Quality
@@ -150,9 +160,9 @@ Plans:
 | 8. Data Pipeline Service Tests | v1.1 | 6/6 | Complete | 2026-04-21 |
 | 9. Extension Service Tests | v1.1 | 5/5 | Complete | 2026-04-21 |
 | 10. Frontend Hook & Library Tests | v1.1 | 10/10 | Complete | 2026-04-21 |
-| 11. E2E Tests | v1.1 | 0/? | Not started | - |
+| 11. E2E Tests | v1.1 | 0/8 | Planning complete | - |
 | 12. Bug Fixes & Code Quality | v1.1 | 0/? | Not started | - |
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-21 after Phase 10 execution complete (244 tests, 80%+ coverage)*
+*Last updated: 2026-04-22 after Phase 11 planning complete (8 plans)*
