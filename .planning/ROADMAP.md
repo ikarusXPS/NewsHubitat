@@ -66,7 +66,12 @@
   3. Merges to main branch automatically deploy to staging environment
   4. Production deployments require manual approval before execution
   5. Deployment status visible in GitHub PR/commit interface
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 18-01-PLAN.md — GitHub Actions workflow with quality gates and Docker build
+- [ ] 18-02-PLAN.md — SSH deployment to staging (auto) and production (approval)
+- [ ] 18-03-PLAN.md — End-to-end pipeline verification
 
 ### Phase 19: Sentry Error Tracking
 **Goal**: Comprehensive error capture and performance monitoring across frontend and backend
@@ -136,7 +141,7 @@
 | 15. Query Optimization | v1.2 | 4/4 | Complete | 2026-04-22 |
 | 16. PWA / Service Worker | v1.2 | 6/6 | Complete | 2026-04-22 |
 | 17. Docker Deployment | v1.2 | 3/3 | Complete | 2026-04-23 |
-| 18. CI/CD Pipeline | v1.3 | 0/? | Not started | - |
+| 18. CI/CD Pipeline | v1.3 | 0/3 | Planned | - |
 | 19. Sentry Error Tracking | v1.3 | 0/? | Not started | - |
 | 20. Monitoring & Alerting | v1.3 | 0/? | Not started | - |
 | 21. Load Testing | v1.3 | 0/? | Not started | - |
@@ -144,4 +149,4 @@
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-23 — v1.3 phases 18-22 added*
+*Last updated: 2026-04-23 — Phase 18 planned (3 plans)*
