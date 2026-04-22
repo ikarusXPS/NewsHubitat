@@ -33,3 +33,6 @@ dist-ssr
 # Database
 dev.db
 *.db
+
+# Playwright auth state (security: contains session tokens)
+playwright/.auth/user.json
