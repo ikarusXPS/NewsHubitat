@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Performance & Scale
 status: executing
-last_updated: "2026-04-22T12:57:58Z"
+last_updated: "2026-04-22T13:07:00Z"
 last_activity: 2026-04-22
 progress:
   total_phases: 5
@@ -65,9 +65,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Completed 13-01-PLAN.md (PostgreSQL adapter setup)
-**Next step:** Execute 13-02-PLAN.md (JSONB field conversion)
-**Resume file:** .planning/phases/13-postgresql-migration/13-02-PLAN.md
+**Last action:** Partial 13-02-PLAN.md (Task 1 complete, Task 2 blocked by Docker/PostgreSQL)
+**Next step:** Start Docker Desktop, run `docker compose up -d`, update .env, run `npx prisma db push`
+**Resume file:** .planning/phases/13-postgresql-migration/13-02-PLAN.md (Task 2)
 
 ## Decisions
 
@@ -84,6 +84,7 @@ Items acknowledged and carried forward from previous milestone close:
 - **2026-04-22:** Serial test mode for Profile page tests to avoid auth state race conditions between parallel workers
 - **2026-04-22:** ESLint config: allow underscore prefix for unused vars; disable no-explicit-any for test files
 - **2026-04-22:** PrismaPg adapter with inline pool configuration (max: 10, connectionTimeoutMillis: 5000, idleTimeoutMillis: 300000)
+- **2026-04-22:** JsonbPathOps operator class for GIN indexes (optimal for @> containment queries)
 
 ## Performance Metrics
 
@@ -105,11 +106,12 @@ Items acknowledged and carried forward from previous milestone close:
 | 2026-04-22 | 12 | 01 | 5 | 1 | 1 |
 | 2026-04-22 | 12 | 02 | 8 | 3 | 17 |
 | 2026-04-22 | 13 | 01 | 8 | 3 | 7 |
+| 2026-04-22 | 13 | 02 | 4 | 1 | 1 |
 
 ## Open Issues
 
-- None (B7 resolved in 12-01)
+- **13-02 Task 2:** Blocked - Docker Desktop not running, DATABASE_URL still SQLite
 
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-22 — Phase 13 Plan 01 complete (PostgreSQL adapter setup)*
+*Last updated: 2026-04-22 — Phase 13 Plan 02 partial (Task 1 complete, Task 2 blocked by PostgreSQL)*

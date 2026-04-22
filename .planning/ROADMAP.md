@@ -170,7 +170,7 @@ Plans:
 **Plans:** 5 plans in 4 waves
 Plans:
 - [x] 13-01-PLAN.md — Docker Compose + PostgreSQL adapter + schema provider
-- [ ] 13-02-PLAN.md — JSONB field conversion with GIN indexes
+- [ ] 13-02-PLAN.md — JSONB field conversion with GIN indexes (Task 1 complete, Task 2 blocked: needs Docker + PostgreSQL)
 - [ ] 13-03-PLAN.md — Database health endpoint and structured logging
 - [ ] 13-04-PLAN.md — Seed scripts for badges and AI personas
 - [ ] 13-05-PLAN.md — Full test suite verification and human sign-off
@@ -239,4 +239,4 @@ Plans:
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-22 — Phase 13 Plan 01 complete*
+*Last updated: 2026-04-22 — Phase 13 Plan 02 partial (JSONB conversion complete, db push blocked)*
