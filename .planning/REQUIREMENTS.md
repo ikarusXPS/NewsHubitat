@@ -57,7 +57,7 @@ Requirements for Quality & Testing milestone. Each maps to roadmap phases.
 
 ### Bug Fixes
 
-- [ ] **BUG-01**: B7 Article thumbnail fallback system implemented
+- [x] **BUG-01**: B7 Article thumbnail fallback system implemented
 
 ### Code Quality
 
@@ -135,7 +135,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | E2E-08 | Phase 11 | Pending |
 | E2E-09 | Phase 11 | Pending |
 | E2E-10 | Phase 11 | Pending |
-| BUG-01 | Phase 12 | Pending |
+| BUG-01 | Phase 12 | Complete |
 | QUAL-01 | Phase 12 | Pending |
 | QUAL-02 | Phase 12 | Pending |
 | QUAL-03 | Phase 12 | Pending |

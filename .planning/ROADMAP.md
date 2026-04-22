@@ -145,7 +145,7 @@ Plans:
   5. Overall unit test coverage reaches 80%+ threshold
 **Plans:** 4 plans in 2 waves
 Plans:
-- [ ] 12-01-PLAN.md — B7 Article thumbnail fallback fix (BUG-01)
+- [x] 12-01-PLAN.md — B7 Article thumbnail fallback fix (BUG-01)
 - [ ] 12-02-PLAN.md — ESLint error fixes (QUAL-01)
 - [ ] 12-03-PLAN.md — Dead code identification and removal (QUAL-03)
 - [ ] 12-04-PLAN.md — Final quality verification (QUAL-02, QUAL-04)
@@ -166,7 +166,7 @@ Plans:
 | 9. Extension Service Tests | v1.1 | 5/5 | Complete | 2026-04-21 |
 | 10. Frontend Hook & Library Tests | v1.1 | 10/10 | Complete | 2026-04-21 |
 | 11. E2E Tests | v1.1 | 8/8 | Complete | 2026-04-22 |
-| 12. Bug Fixes & Code Quality | v1.1 | 0/? | Not started | - |
+| 12. Bug Fixes & Code Quality | v1.1 | 1/4 | In progress | - |
 
 ---
 *Roadmap created: 2026-04-18*
