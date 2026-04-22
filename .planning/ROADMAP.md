@@ -187,7 +187,7 @@ Plans:
   5. Graceful degradation when Redis unavailable (D-03)
 **Plans:** 5 plans in 3 waves
 Plans:
-- [ ] 14-01-PLAN.md — Redis Docker + CacheService blacklist methods + /api/health/redis
+- [x] 14-01-PLAN.md — Redis Docker + CacheService blacklist methods + /api/health/redis
 - [ ] 14-02-PLAN.md — Rate limiting middleware with express-rate-limit + Redis store
 - [ ] 14-03-PLAN.md — JWT blacklist integration in auth flow (logout, password change)
 - [ ] 14-04-PLAN.md — AIService cache migration from in-memory Maps to Redis
@@ -243,8 +243,8 @@ Plans:
 | 11. E2E Tests | v1.1 | 8/8 | Complete | 2026-04-22 |
 | 12. Bug Fixes & Code Quality | v1.1 | 4/4 | Complete | 2026-04-22 |
 | 13. PostgreSQL Migration | v1.2 | 3/5 | In Progress | - |
-| 14. Redis Caching | v1.2 | 0/5 | Planned | - |
+| 14. Redis Caching | v1.2 | 1/5 | In Progress | - |
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-22 — Phase 14 plans created (5 plans in 3 waves)*
+*Last updated: 2026-04-22 — Phase 14 Plan 01 complete (Redis infrastructure)*
