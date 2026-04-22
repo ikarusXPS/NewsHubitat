@@ -501,6 +501,127 @@ describe('CacheService', () => {
       await expect(service.shutdown()).resolves.not.toThrow();
     });
   });
+
+  describe('Token Blacklist (D-01, D-02, D-03)', () => {
+    const testToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxMjMifQ.test';
+
+    describe('blacklistToken', () => {
+      it('should blacklist a token with SHA-256 hash', async () => {
+        const cacheService = CacheService.getInstance();
+        (cacheService as any).isConnected = true;
+        const mockClient = { setex: vi.fn().mockResolvedValue('OK') };
+        (cacheService as any).client = mockClient;
+
+        const result = await cacheService.blacklistToken(testToken, 3600);
+
+        expect(result).toBe(true);
+        // Verify key is SHA-256 hash format (64 hex chars)
+        expect(mockClient.setex).toHaveBeenCalledWith(
+          expect.stringMatching(/^blacklist:[a-f0-9]{64}$/),
+          3600,
+          expect.stringContaining('"blacklisted":true')
+        );
+      });
+
+      it('should return false if Redis unavailable (D-03)', async () => {
+        const cacheService = CacheService.getInstance();
+        (cacheService as any).isConnected = false;
+
+        const result = await cacheService.blacklistToken(testToken, 3600);
+
+        expect(result).toBe(false);
+      });
+
+      it('should cap TTL to WEEK (604800 seconds)', async () => {
+        const cacheService = CacheService.getInstance();
+        (cacheService as any).isConnected = true;
+        const mockClient = { setex: vi.fn().mockResolvedValue('OK') };
+        (cacheService as any).client = mockClient;
+
+        await cacheService.blacklistToken(testToken, 1000000);  // > WEEK
+
+        expect(mockClient.setex).toHaveBeenCalledWith(
+          expect.any(String),
+          604800,  // Capped to WEEK
+          expect.any(String)
+        );
+      });
+
+      it('should handle negative TTL by setting to 0', async () => {
+        const cacheService = CacheService.getInstance();
+        (cacheService as any).isConnected = true;
+        const mockClient = { setex: vi.fn().mockResolvedValue('OK') };
+        (cacheService as any).client = mockClient;
+
+        await cacheService.blacklistToken(testToken, -100);
+
+        expect(mockClient.setex).toHaveBeenCalledWith(
+          expect.any(String),
+          0,  // Clamped to 0
+          expect.any(String)
+        );
+      });
+    });
+
+    describe('isTokenBlacklisted', () => {
+      it('should return true for blacklisted token', async () => {
+        const cacheService = CacheService.getInstance();
+        (cacheService as any).isConnected = true;
+        const mockClient = { get: vi.fn().mockResolvedValue('{"blacklisted":true}') };
+        (cacheService as any).client = mockClient;
+
+        const result = await cacheService.isTokenBlacklisted(testToken);
+
+        expect(result).toBe(true);
+        // Verify key is SHA-256 hash format
+        expect(mockClient.get).toHaveBeenCalledWith(
+          expect.stringMatching(/^blacklist:[a-f0-9]{64}$/)
+        );
+      });
+
+      it('should return false for non-blacklisted token', async () => {
+        const cacheService = CacheService.getInstance();
+        (cacheService as any).isConnected = true;
+        const mockClient = { get: vi.fn().mockResolvedValue(null) };
+        (cacheService as any).client = mockClient;
+
+        const result = await cacheService.isTokenBlacklisted(testToken);
+
+        expect(result).toBe(false);
+      });
+
+      it('should return false if Redis unavailable (D-03 graceful degradation)', async () => {
+        const cacheService = CacheService.getInstance();
+        (cacheService as any).isConnected = false;
+
+        const result = await cacheService.isTokenBlacklisted(testToken);
+
+        expect(result).toBe(false);
+      });
+    });
+
+    describe('getClient', () => {
+      it('should return Redis client when available', () => {
+        const cacheService = CacheService.getInstance();
+        (cacheService as any).isConnected = true;
+        const mockClient = { ping: vi.fn() };
+        (cacheService as any).client = mockClient;
+
+        const client = cacheService.getClient();
+
+        expect(client).toBe(mockClient);
+      });
+
+      it('should return null when Redis unavailable', () => {
+        const cacheService = CacheService.getInstance();
+        (cacheService as any).isConnected = false;
+
+        const client = cacheService.getClient();
+
+        expect(client).toBeNull();
+      });
+    });
+  });
 });
 
 describe('CacheKeys', () => {
