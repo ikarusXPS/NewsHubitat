@@ -8,11 +8,7 @@ import { renderHook } from '@testing-library/react';
 import { fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import type { ReactNode } from 'react';
-import {
-  useKeyboardShortcuts,
-  KEYBOARD_SHORTCUTS,
-  getShortcutGroups,
-} from './useKeyboardShortcuts';
+import { useKeyboardShortcuts, getShortcutGroups } from './useKeyboardShortcuts';
 
 // Mock useNavigate
 const mockNavigate = vi.fn();
@@ -347,52 +343,4 @@ describe('getShortcutGroups', () => {
   });
 });
 
-describe('KEYBOARD_SHORTCUTS', () => {
-  it('exports array of shortcut definitions', () => {
-    expect(Array.isArray(KEYBOARD_SHORTCUTS)).toBe(true);
-    expect(KEYBOARD_SHORTCUTS.length).toBeGreaterThan(0);
-  });
-
-  it('each shortcut has key, handler, and description', () => {
-    KEYBOARD_SHORTCUTS.forEach((shortcut) => {
-      expect(shortcut).toHaveProperty('key');
-      expect(typeof shortcut.key).toBe('string');
-      expect(shortcut).toHaveProperty('handler');
-      expect(typeof shortcut.handler).toBe('function');
-      expect(shortcut).toHaveProperty('description');
-      expect(typeof shortcut.description).toBe('string');
-    });
-  });
-
-  it('contains navigation shortcuts (1-6)', () => {
-    const navigationKeys = ['1', '2', '3', '4', '5', '6'];
-    navigationKeys.forEach((key) => {
-      const shortcut = KEYBOARD_SHORTCUTS.find((s) => s.key === key);
-      expect(shortcut).toBeDefined();
-    });
-  });
-
-  it('contains action shortcuts', () => {
-    const actionKeys = ['/', 'r', 'Escape'];
-    actionKeys.forEach((key) => {
-      const shortcut = KEYBOARD_SHORTCUTS.find((s) => s.key === key);
-      expect(shortcut).toBeDefined();
-    });
-  });
-
-  it('contains feed navigation shortcuts', () => {
-    const feedKeys = ['j', 'k', 'o', 'b', 'm'];
-    feedKeys.forEach((key) => {
-      const shortcut = KEYBOARD_SHORTCUTS.find((s) => s.key === key);
-      expect(shortcut).toBeDefined();
-    });
-  });
-
-  it('has Shift+? shortcut with shiftKey modifier', () => {
-    const helpShortcut = KEYBOARD_SHORTCUTS.find(
-      (s) => s.key === '?' && s.shiftKey === true
-    );
-    expect(helpShortcut).toBeDefined();
-    expect(helpShortcut?.description).toContain('keyboard');
-  });
-});
+// KEYBOARD_SHORTCUTS constant was removed - getShortcutGroups() provides the same data
