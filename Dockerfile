@@ -8,7 +8,8 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install all dependencies (including devDependencies for build)
-RUN npm ci --frozen-lockfile
+# Note: --legacy-peer-deps needed for vite-plugin-pwa peer dep conflict with vite@8
+RUN npm ci --frozen-lockfile --legacy-peer-deps
 
 # =============================================================================
 # Stage 2: Builder
@@ -52,7 +53,7 @@ RUN addgroup -S nodejs && adduser -S nodejs -G nodejs
 
 # Copy production dependencies only (reinstall without devDeps)
 COPY package*.json ./
-RUN npm ci --frozen-lockfile --omit=dev
+RUN npm ci --frozen-lockfile --omit=dev --legacy-peer-deps
 
 # Copy Prisma schema and generated client
 COPY --from=builder /app/prisma ./prisma
