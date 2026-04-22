@@ -53,6 +53,31 @@ vi.mock('../utils/hash', () => ({
   hashString: vi.fn((str: string) => `hash-${str.slice(0, 10)}`)
 }));
 
+// Mock CacheService for Redis caching (Phase 14-04 migration)
+// Use vi.hoisted() to avoid hoisting issues with vi.mock factory
+const { mockCacheStore, mockCacheService } = vi.hoisted(() => {
+  const store = new Map<string, unknown>();
+  const service = {
+    getInstance: () => service,
+    isAvailable: () => true,
+    get: async (key: string) => store.get(key) ?? null,
+    set: async (key: string, value: unknown) => {
+      store.set(key, value);
+      return true;
+    },
+    del: async () => true,
+  };
+  return { mockCacheStore: store, mockCacheService: service };
+});
+
+vi.mock('./cacheService', () => ({
+  CacheService: mockCacheService,
+  CacheKeys: {
+    aiSummary: (key: string) => `ai:summary:${key}`,
+    aiTopics: (hash: string) => `ai:topics:${hash}`,
+  },
+}));
+
 // Import after mocks
 import { AIService } from './aiService';
 
@@ -61,6 +86,9 @@ describe('AIService', () => {
     // Clear all mocks before each test
     vi.clearAllMocks();
     vi.unstubAllEnvs();
+
+    // Clear mock cache store (Phase 14-04: Redis migration)
+    mockCacheStore.clear();
 
     // Reset mock functions to default behavior
     mockGeminiModel.generateContent.mockReset();
@@ -73,6 +101,8 @@ describe('AIService', () => {
     (AIService as unknown as { instance: AIService | null }).instance = null;
     vi.unstubAllEnvs();
     vi.clearAllMocks();
+    // Clear mock cache store
+    mockCacheStore.clear();
   });
 
   describe('Singleton Pattern', () => {
@@ -338,8 +368,9 @@ describe('AIService', () => {
       await service.generateClusterSummary(cluster);
       expect(mockGeminiModel.generateContent).toHaveBeenCalledTimes(1);
 
-      // Advance time by 31 minutes (cache TTL is 30 minutes)
-      vi.advanceTimersByTime(31 * 60 * 1000);
+      // Simulate cache expiration (Redis handles TTL internally, so we clear mock store)
+      // In production, Redis auto-expires after 30 minutes per AI_CONFIG.cache.summaryTTLSeconds
+      mockCacheStore.clear();
 
       // Second call - cache expired, should regenerate
       await service.generateClusterSummary(cluster);
