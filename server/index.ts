@@ -2,6 +2,11 @@
 import 'dotenv/config';
 
 import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 import { createServer } from 'http';
 import cors from 'cors';
 import compression from 'compression';
@@ -234,8 +239,37 @@ app.get('/api/health', async (_req, res) => {
   });
 });
 
+// =============================================================================
+// Production Static File Serving (D-07)
+// =============================================================================
+// In production, serve frontend from dist/ via Express
+// This enables single-container deployment where one Express server handles
+// both API routes and static frontend files
+if (process.env.NODE_ENV === 'production') {
+  // Path to Vite build output (dist/ at project root, relative to dist/server/)
+  const staticPath = path.join(__dirname, '../');
+
+  // Serve static files with aggressive caching
+  // Assets have content hashes so can be cached indefinitely
+  app.use(express.static(staticPath, {
+    maxAge: '7d',
+    etag: true,
+    index: false,  // Don't serve index.html for directory requests (SPA handles this)
+  }));
+
+  // SPA fallback - serve index.html for all non-API routes
+  // This enables client-side routing (React Router)
+  app.get('*', (req, res) => {
+    // Only handle non-API routes
+    if (!req.path.startsWith('/api')) {
+      res.sendFile(path.join(staticPath, 'index.html'));
+    }
+  });
+
+  console.log('[STATIC] Production mode: serving frontend from dist/');
+}
+
 // Error handler
- 
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error('Server error:', err);
   res.status(500).json({
