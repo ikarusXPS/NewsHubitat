@@ -47,6 +47,16 @@
 **User's choice:** System Chromium (Recommended)
 **Notes:** System chromium reduces image size significantly
 
+### Non-root User (Session 2 Update)
+
+| Option | Description | Selected |
+|--------|-------------|----------|
+| Yes, create node user (Recommended) | Add USER node instruction — security best practice | ✓ |
+| No, run as root | Simpler but less secure | |
+
+**User's choice:** Yes, create node user (Recommended)
+**Notes:** Added as D-05 in context — security best practice for production containers
+
 ---
 
 ## Docker Compose Orchestration
@@ -71,6 +81,28 @@
 
 **User's choice:** Express static serve (Recommended)
 **Notes:** Single container keeps deployment simple for current scale
+
+### Container Networking (Session 2 Update)
+
+| Option | Description | Selected |
+|--------|-------------|----------|
+| Default bridge network (Recommended) | Services communicate via container names (postgres, redis) | ✓ |
+| Custom network with alias | Create newshub-network with explicit aliases | |
+| Host network mode | Containers share host networking (simpler but less isolated) | |
+
+**User's choice:** Default bridge network (Recommended)
+**Notes:** Services will communicate using container names as hostnames
+
+### Restart Policy (Session 2 Update)
+
+| Option | Description | Selected |
+|--------|-------------|----------|
+| unless-stopped (Recommended) | Restart on failure, respect manual stops — matches existing services | ✓ |
+| always | Always restart, even after manual stops | |
+| on-failure:5 | Restart up to 5 times on failure, then stop | |
+
+**User's choice:** unless-stopped (Recommended)
+**Notes:** Matches existing postgres and redis services for consistency
 
 ---
 
@@ -98,6 +130,17 @@
 **User's choice:** Single compose + env override (Recommended)
 **Notes:** Minimizes file count, environment vars control behavior
 
+### DATABASE_URL Format (Session 2 Update)
+
+| Option | Description | Selected |
+|--------|-------------|----------|
+| Use compose service name (Recommended) | DATABASE_URL=postgresql://newshub:newshub_dev@postgres:5432/newshub | ✓ |
+| Keep localhost with port mapping | App uses host network to reach postgres via localhost:5433 | |
+| Make it configurable | Document both patterns in .env.example | |
+
+**User's choice:** Use compose service name (Recommended)
+**Notes:** Container-to-container communication via service names
+
 ---
 
 ## Production Build
@@ -113,16 +156,16 @@
 **User's choice:** node dist/server/index.js (Recommended)
 **Notes:** Docker handles restarts via restart policy, PM2 redundant
 
-### Port Configuration
+### Port Configuration (Updated Session 2)
 
 | Option | Description | Selected |
 |--------|-------------|----------|
-| 3001 (internal), map to 80 (Recommended) | App runs on 3001 inside container, compose maps to host 80. Standard HTTP. | ✓ |
-| 3001 both | Keep same port inside and out. Simpler for development parity. | |
-| 8080 both | Use 8080, common container convention. | |
+| Port 3001 (Recommended) | Match dev environment — consistent for local Docker testing | ✓ |
+| Port 80 | Standard HTTP — requires no port in URL | |
+| Port 8080 | Common alternative — no root privileges needed | |
 
-**User's choice:** 3001 (internal), map to 80 (Recommended)
-**Notes:** Standard HTTP port for production access
+**User's choice:** Port 3001 (Recommended)
+**Notes:** Changed from 80 to 3001 for development/production consistency
 
 ---
 
@@ -131,8 +174,8 @@
 - Exact Dockerfile layer ordering for optimal caching
 - Alpine package versions for Chromium dependencies
 - Health check intervals and retry counts
-- Network configuration (bridge vs custom)
+- Container name (suggested: newshub-app)
 
 ## Deferred Ideas
 
-None
+None — discussion stayed within phase scope
