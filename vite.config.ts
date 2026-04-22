@@ -23,7 +23,7 @@ export default defineConfig({
     // PWA with Service Worker
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'robots.txt'],
+      includeAssets: ['favicon.ico', 'robots.txt', 'offline.html'],
       manifest: {
         name: 'NewsHub - Multi-Perspective News',
         short_name: 'NewsHub',
@@ -53,6 +53,9 @@ export default defineConfig({
       workbox: {
         // Increase max size to include globe-vendor chunk (~2.5MB)
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024, // 3MB
+        // Offline fallback page for failed navigations
+        navigateFallback: '/offline.html',
+        navigateFallbackDenylist: [/^\/api/],  // Don't intercept API calls
         // Cache strategies for different resource types
         runtimeCaching: [
           {
