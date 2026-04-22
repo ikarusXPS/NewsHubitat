@@ -123,8 +123,8 @@ Plans:
 **Plans:** 8 plans
 Plans:
 - [x] 11-01-PLAN.md — Auth setup with storageState for authenticated tests (3 tasks, 4 files)
-- [ ] 11-02-PLAN.md — Dashboard E2E tests (news feed, view toggle, trend filters)
-- [ ] 11-03-PLAN.md — Analysis E2E tests (clusters, compare mode, charts)
+- [x] 11-02-PLAN.md — Dashboard E2E tests (news feed, view toggle, trend filters)
+- [x] 11-03-PLAN.md — Analysis E2E tests (clusters, compare mode, charts) - 11 tests
 - [ ] 11-04-PLAN.md — Community E2E tests (tabs, contribution types, leaderboard)
 - [ ] 11-05-PLAN.md — Profile E2E tests (stats, quick actions, password change) [auth required]
 - [ ] 11-06-PLAN.md — Bookmarks E2E tests (empty state, article grid, clear all) [auth required]
@@ -160,9 +160,9 @@ Plans:
 | 8. Data Pipeline Service Tests | v1.1 | 6/6 | Complete | 2026-04-21 |
 | 9. Extension Service Tests | v1.1 | 5/5 | Complete | 2026-04-21 |
 | 10. Frontend Hook & Library Tests | v1.1 | 10/10 | Complete | 2026-04-21 |
-| 11. E2E Tests | v1.1 | 1/8 | In progress | - |
+| 11. E2E Tests | v1.1 | 3/8 | In progress | - |
 | 12. Bug Fixes & Code Quality | v1.1 | 0/? | Not started | - |
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-22 after Phase 11 Plan 01 complete (Playwright Auth Infrastructure)*
+*Last updated: 2026-04-22 after Phase 11 Plan 03 complete (Analysis Page E2E Tests)*
