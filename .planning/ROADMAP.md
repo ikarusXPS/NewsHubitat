@@ -27,7 +27,7 @@
 - [x] **Phase 8: Data Pipeline Service Tests** - eventsService, focusSuggestionEngine, marketDataService, newsAggregator, newsCrawler, newsApiService (6/6 complete)
 - [x] **Phase 9: Extension Service Tests** - personaService, sharingService, stealthScraper, translationService, websocketService (5/5 complete)
 - [x] **Phase 10: Frontend Hook & Library Tests** - All hooks and utility libraries (10/10 complete)
-- [ ] **Phase 11: E2E Tests** - Critical user flow verification
+- [x] **Phase 11: E2E Tests** - Critical user flow verification (8/8 complete, 62 tests)
 - [ ] **Phase 12: Bug Fixes & Code Quality** - B7 fix, linting, type coverage, dead code
 
 ## Phase Details
@@ -125,11 +125,11 @@ Plans:
 - [x] 11-01-PLAN.md — Auth setup with storageState for authenticated tests (3 tasks, 4 files)
 - [x] 11-02-PLAN.md — Dashboard E2E tests (news feed, view toggle, trend filters)
 - [x] 11-03-PLAN.md — Analysis E2E tests (clusters, compare mode, charts) - 11 tests
-- [ ] 11-04-PLAN.md — Community E2E tests (tabs, contribution types, leaderboard)
-- [ ] 11-05-PLAN.md — Profile E2E tests (stats, quick actions, password change) [auth required]
-- [ ] 11-06-PLAN.md — Bookmarks E2E tests (empty state, article grid, clear all) [auth required]
-- [ ] 11-07-PLAN.md — Settings E2E tests (theme, language, export/import) [auth required]
-- [ ] 11-08-PLAN.md — ReadingHistory E2E tests (timeline groups, filters, clear) [auth required]
+- [x] 11-04-PLAN.md — Community E2E tests (tabs, contribution types, leaderboard) - 12 tests
+- [x] 11-05-PLAN.md — Profile E2E tests (stats, quick actions, password change) - 12 tests [auth required]
+- [x] 11-06-PLAN.md — Bookmarks E2E tests (empty state, article grid, clear all) - 8 tests
+- [x] 11-07-PLAN.md — Settings E2E tests (theme, language, export/import) - 13 tests [auth required]
+- [x] 11-08-PLAN.md — ReadingHistory E2E tests (timeline groups, filters, clear) - 15 tests [auth required]
 **Note:** E2E-03 (Monitor), E2E-04 (Timeline), E2E-05 (EventMap) already covered by existing tests per D-02
 **UI hint**: yes
 
@@ -160,9 +160,9 @@ Plans:
 | 8. Data Pipeline Service Tests | v1.1 | 6/6 | Complete | 2026-04-21 |
 | 9. Extension Service Tests | v1.1 | 5/5 | Complete | 2026-04-21 |
 | 10. Frontend Hook & Library Tests | v1.1 | 10/10 | Complete | 2026-04-21 |
-| 11. E2E Tests | v1.1 | 3/8 | In progress | - |
+| 11. E2E Tests | v1.1 | 8/8 | Complete | 2026-04-22 |
 | 12. Bug Fixes & Code Quality | v1.1 | 0/? | Not started | - |
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-22 after Phase 11 Plan 03 complete (Analysis Page E2E Tests)*
+*Last updated: 2026-04-22 after Phase 11 complete (E2E Tests - 62 tests passing)*
