@@ -25,6 +25,8 @@ import { WebSocketService } from './services/websocketService';
 import { CacheService } from './services/cacheService';
 import { AIService } from './services/aiService';
 import { CleanupService } from './services/cleanupService';
+import { prisma } from './db/prisma';
+import { logDbHealthCheck } from './utils/dbLogger';
 
 const app = express();
 const httpServer = createServer(app);
@@ -104,6 +106,39 @@ app.get('/api/ping', (_req, res) => {
   res.json({ status: 'pong' });
 });
 
+// Database health check - dedicated endpoint for container orchestration (D-05)
+app.get('/api/health/db', async (_req, res) => {
+  console.log('[HEALTH/DB] Received database health request');
+  res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+
+  const start = Date.now();
+  try {
+    // Simple connectivity check - SELECT 1
+    await prisma.$queryRaw`SELECT 1`;
+    const duration = Date.now() - start;
+
+    logDbHealthCheck(true, duration);
+
+    res.json({
+      status: 'healthy',
+      latency_ms: duration,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    const duration = Date.now() - start;
+    const err = error instanceof Error ? error : new Error(String(error));
+
+    logDbHealthCheck(false, duration, err);
+
+    res.status(503).json({
+      status: 'unhealthy',
+      latency_ms: duration,
+      error: err.message,
+      timestamp: new Date().toISOString(),
+    });
+  }
+});
+
 // Health check - no caching for real-time status
 app.get('/api/health', async (_req, res) => {
   console.log('[HEALTH] Received health request');
@@ -116,6 +151,9 @@ app.get('/api/health', async (_req, res) => {
     timestamp: new Date().toISOString(),
     articlesCount: newsAggregator.getArticleCount(),
     services: {
+      database: {
+        available: true,  // Detailed check at /api/health/db
+      },
       websocket: {
         available: wsService.isAvailable(),
         clients: wsService.getClientCount(),
