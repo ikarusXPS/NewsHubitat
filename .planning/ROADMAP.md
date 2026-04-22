@@ -217,11 +217,19 @@ Plans:
 **Depends on**: Phase 15
 **Requirements**: PERF-06, PERF-07
 **Success Criteria**:
-  1. Service worker caches static assets
-  2. Offline fallback page works
-  3. Background sync for bookmarks
-  4. App installable as PWA
-**Plans:** TBD
+  1. Service worker caches static assets (30d static, 7d images, 5m API)
+  2. Offline fallback page with NewsHub cyber aesthetic
+  3. Background sync for bookmarks and reading history
+  4. App installable as PWA with engagement-based install prompt
+  5. Cache age indicator shows when serving stale data
+**Plans:** 6 plans in 4 waves
+Plans:
+- [ ] 16-01-PLAN.md — Offline fallback page + VitePWA navigation fallback
+- [ ] 16-02-PLAN.md — Service worker registration with workbox-window
+- [ ] 16-03-PLAN.md — Background sync service with IndexedDB queue
+- [ ] 16-04-PLAN.md — Backend sync endpoints (bookmarks, history)
+- [ ] 16-05-PLAN.md — Install prompt banner with engagement tracking
+- [ ] 16-06-PLAN.md — Cache age indicator + verification checkpoint
 
 ### Phase 17: Docker Deployment
 **Goal**: Containerized deployment with Docker Compose
@@ -254,7 +262,8 @@ Plans:
 | 13. PostgreSQL Migration | v1.2 | 3/5 | In Progress | - |
 | 14. Redis Caching | v1.2 | 5/5 | Complete | 2026-04-22 |
 | 15. Query Optimization | v1.2 | 0/4 | Planning | - |
+| 16. PWA / Service Worker | v1.2 | 0/6 | Planning | - |
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-22 — Phase 15 planned (4 plans)*
+*Last updated: 2026-04-22 — Phase 16 planned (6 plans)*
