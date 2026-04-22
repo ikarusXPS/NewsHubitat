@@ -20,6 +20,7 @@ import { profileRoutes } from './routes/profile';
 import { badgeRoutes } from './routes/badges';
 import { leaderboardRoutes } from './routes/leaderboard';
 import { accountRoutes } from './routes/account';
+import { authLimiter, aiLimiter, newsLimiter } from './middleware/rateLimiter';
 import { NewsAggregator } from './services/newsAggregator';
 import { WebSocketService } from './services/websocketService';
 import { CacheService } from './services/cacheService';
@@ -78,14 +79,27 @@ const newsAggregator = NewsAggregator.getInstance();
 // Make aggregator available to routes
 app.locals.newsAggregator = newsAggregator;
 
-// Routes
-app.use('/api/news', newsRoutes);
-app.use('/api/translate', translationRoutes);
-app.use('/api/analysis', analysisRoutes);
-app.use('/api/events', eventsRoutes);
+// Routes with rate limiting (D-05)
+
+// Auth endpoints - strict (5 req/min per IP) - D-05
+// Apply to sensitive auth paths before the main authRoutes handler
+app.use('/api/auth/login', authLimiter);
+app.use('/api/auth/register', authLimiter);
+app.use('/api/auth/request-reset', authLimiter);
+app.use('/api/auth/reset-password', authLimiter);
 app.use('/api/auth', authRoutes);
-app.use('/api/ai', aiRoutes);
-app.use('/api/markets', marketsRoutes);
+
+// AI endpoints - moderate (10 req/min per user) - D-05
+app.use('/api/ai', aiLimiter, aiRoutes);
+app.use('/api/analysis', aiLimiter, analysisRoutes);
+
+// News/Events endpoints - relaxed (100 req/min per IP) - D-05
+app.use('/api/news', newsLimiter, newsRoutes);
+app.use('/api/events', newsLimiter, eventsRoutes);
+app.use('/api/markets', newsLimiter, marketsRoutes);
+
+// Other routes (no rate limiting)
+app.use('/api/translate', translationRoutes);
 app.use('/api/focus', focusRoutes);
 app.use('/api/personas', personasRoutes);
 app.use('/api/share', sharingRoutes);
