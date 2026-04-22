@@ -1,13 +1,17 @@
+import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../../src/generated/prisma/client';
-import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
-import path from 'path';
 
-// Use absolute path for SQLite database
-const dbPath = path.resolve(process.cwd(), 'dev.db');
+const connectionString = process.env.DATABASE_URL;
 
-// In Prisma 7, the adapter takes a config object with url
-const adapter = new PrismaBetterSqlite3({ 
-  url: `file:${dbPath}` 
+if (!connectionString) {
+  throw new Error('DATABASE_URL environment variable is required');
+}
+
+const adapter = new PrismaPg({
+  connectionString,
+  max: 10,                        // D-02: Pool size = 10 connections
+  connectionTimeoutMillis: 5_000, // D-04: Connection timeout = 5 seconds
+  idleTimeoutMillis: 300_000,     // D-06: Idle timeout = 5 minutes
 });
 
 const prisma = new PrismaClient({ adapter });
