@@ -178,7 +178,7 @@ Plans:
 ### Phase 14: Redis Caching
 **Goal**: Add Redis for JWT blacklisting, rate limiting, and AI response caching
 **Depends on**: Phase 13
-**Requirements**: PERF-03, PERF-04
+**Requirements**: PERF-02
 **Success Criteria**:
   1. Redis connected and health-checked via /api/health/redis
   2. JWT blacklisting on logout and password change (D-01, D-02)
