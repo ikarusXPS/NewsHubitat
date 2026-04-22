@@ -7,6 +7,7 @@ import { ReadingProgressBar } from './ReadingProgressBar';
 import { OfflineBanner } from './OfflineBanner';
 import { BreakingNewsTicker } from './BreakingNewsTicker';
 import { KeyboardShortcutsHelp } from './KeyboardShortcutsHelp';
+import { InstallPromptBanner } from './InstallPromptBanner';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 
 interface LayoutProps {
@@ -48,6 +49,7 @@ export function Layout({ children }: LayoutProps) {
         <Header onMenuClick={() => setSidebarOpen(true)} />
         <BreakingNewsTicker />
         <OfflineBanner />
+        <InstallPromptBanner />
         <main
           ref={mainRef}
           className="flex-1 overflow-y-auto p-6 relative"
