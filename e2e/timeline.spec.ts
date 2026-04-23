@@ -5,7 +5,10 @@ const _isCI = !!process.env.CI; // Prefixed to satisfy no-unused-vars
 test.describe('Timeline', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/timeline');
-    await page.waitForLoadState('networkidle');
+    // Use domcontentloaded instead of networkidle - WebSocket connections never go idle
+    await page.waitForLoadState('domcontentloaded');
+    // Wait for the main heading to be visible as a proxy for page ready
+    await page.locator('h1').waitFor({ state: 'visible', timeout: 15000 });
   });
 
   test('should display timeline page header', async ({ page }) => {
