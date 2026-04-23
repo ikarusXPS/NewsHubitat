@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-04-23)
 ## Current Position
 
 Phase: 22 - SMTP Production (in progress)
-Current Plan: 22-02 (complete)
-Status: Plan complete
-Last activity: 2026-04-23 — Plan 22-02 complete (webhook endpoint with ECDSA signature verification)
+Current Plan: 22-03 (checkpoint pending)
+Status: Awaiting human verification
+Last activity: 2026-04-23 — Plan 22-03 tasks 1-2 complete (alert rules, setup documentation)
 
 ```
-v1.3 Progress: [##################  ] 93% (2/3 plans in Phase 22)
+v1.3 Progress: [################### ] 97% (3/3 plans in Phase 22, checkpoint pending)
 ```
 
 ## Milestone Progress
@@ -66,10 +66,10 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Plan 22-02 complete (webhook endpoint with ECDSA signature verification, event handlers, idempotency)
-**Next step:** Plan 22-03 (Prometheus alert rules, setup documentation)
-**Resume file:** None
-**Checkpoint:** None
+**Last action:** Plan 22-03 tasks 1-2 complete (alert rules, setup documentation)
+**Next step:** Plan 22-03 Task 3 checkpoint (human verification of production email flows)
+**Resume file:** .planning/phases/22-smtp-production/22-03-PLAN.md
+**Checkpoint:** human-verify (production email flow verification)
 
 ## Accumulated Context
 
