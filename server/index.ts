@@ -197,7 +197,7 @@ app.get('/metrics', async (_req, res) => {
   try {
     res.set('Content-Type', metricsService.getContentType());
     res.end(await metricsService.getMetrics());
-  } catch (error) {
+  } catch (_error) {
     res.status(500).end();
   }
 });
