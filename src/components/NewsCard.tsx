@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Bookmark, ExternalLink, Globe, Languages, Loader2, Shield, Search, AlertTriangle, X, CheckCircle, Info, ImageOff } from 'lucide-react';
-import { cn, timeAgo, getRegionColor, getSentimentColor, truncate } from '../lib/utils';
+import { cn, getRegionColor, getSentimentColor, truncate } from '../lib/utils';
+import { formatDateTime } from '../lib/formatters';
 import { useAppStore } from '../store';
 import type { NewsArticle } from '../types';
 
@@ -232,7 +233,7 @@ export function NewsCard({ article, onTranslate }: NewsCardProps) {
       <div className="flex items-center justify-between text-xs">
         <div className="flex items-center gap-3">
           <span className="text-gray-500">
-            {timeAgo(localArticle.publishedAt, language)}
+            {formatDateTime(localArticle.publishedAt)}
           </span>
           <span className={cn('font-medium', getSentimentColor(localArticle.sentiment))}>
             {localArticle.sentiment === 'positive' && '+ Positiv'}
