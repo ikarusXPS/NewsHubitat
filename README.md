@@ -641,6 +641,8 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 
 *Break the bubble. See the bigger picture.*
 
+<!-- CI/CD Pipeline: Automated testing and deployment via GitHub Actions -->
+
 [![GitHub stars](https://img.shields.io/github/stars/ikarusXPS/NewsHubitat?style=social)](https://github.com/ikarusXPS/NewsHubitat)
 
 </div>
