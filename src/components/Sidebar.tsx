@@ -1,5 +1,7 @@
+import { useMemo } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Activity,
@@ -60,16 +62,7 @@ async function fetchEventStats(): Promise<EventStats> {
   }
 }
 
-const navItems = [
-  { to: '/', icon: Activity, label: 'Live Feed', badge: 'live' },
-  { to: '/monitor', icon: Globe2, label: 'The Monitor', badge: null },
-  { to: '/events', icon: MapPin, label: 'Event Map', badge: 'events' }, // Dynamic event count
-  { to: '/community', icon: Users, label: 'Community', badge: 'new' },
-  { to: '/analysis', icon: BarChart3, label: 'Analytics' },
-  { to: '/timeline', icon: Clock, label: 'Timeline' },
-  { to: '/history', icon: History, label: 'History' },
-  { to: '/bookmarks', icon: Bookmark, label: 'Saved' },
-];
+// navItems moved inside component to use useTranslation
 
 interface SidebarProps {
   isOpen?: boolean;
@@ -77,9 +70,22 @@ interface SidebarProps {
 }
 
 export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
+  const { t } = useTranslation('common');
   const { user, isAuthenticated } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+
+  const navItems = useMemo(() => [
+    { to: '/', icon: Activity, label: t('navigation.dashboard'), badge: 'live' as const },
+    { to: '/monitor', icon: Globe2, label: t('navigation.monitor'), badge: null },
+    { to: '/events', icon: MapPin, label: t('navigation.events'), badge: 'events' as const },
+    { to: '/community', icon: Users, label: t('navigation.community'), badge: 'new' as const },
+    { to: '/analysis', icon: BarChart3, label: t('navigation.analysis') },
+    { to: '/timeline', icon: Clock, label: t('navigation.timeline') },
+    { to: '/history', icon: History, label: t('navigation.history') },
+    { to: '/bookmarks', icon: Bookmark, label: t('navigation.bookmarks') },
+  ], [t]);
+
   const { data: eventStats, dataUpdatedAt } = useQuery({
     queryKey: ['geo-events-stats'], // Separate stats query but same source
     queryFn: fetchEventStats,
@@ -259,7 +265,7 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
           ) : (
             <>
               <User className="h-4 w-4" />
-              <span>Profile</span>
+              <span>{t('navigation.profile')}</span>
             </>
           )}
         </NavLink>
@@ -277,7 +283,7 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
           )}
         >
           <Settings className="h-4 w-4" />
-          <span>Settings</span>
+          <span>{t('navigation.settings')}</span>
         </button>
 
         {/* Version & Legal */}
