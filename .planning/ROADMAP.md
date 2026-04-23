@@ -84,7 +84,7 @@
   5. Adding new languages requires only translation JSON files (no code changes)
 **Plans**: 4 plans
 Plans:
-- [ ] 23-01-PLAN.md - Install i18n dependencies and create core infrastructure
+- [x] 23-01-PLAN.md - Install i18n dependencies and create core infrastructure
 - [ ] 23-02-PLAN.md - Create translation JSON files (namespaces for EN/DE)
 - [ ] 23-03-PLAN.md - Create locale-aware formatters and Zustand sync
 - [ ] 23-04-PLAN.md - Refactor components to use i18n translations
@@ -180,7 +180,7 @@ Plans:
 | 20. Monitoring & Alerting | v1.3 | 3/3 | Complete | 2026-04-23 |
 | 21. Load Testing | v1.3 | 3/3 | Complete | 2026-04-23 |
 | 22. SMTP Production | v1.3 | 3/3 | Complete | 2026-04-23 |
-| 23. i18n Foundation | v1.4 | 0/4 | Planned | - |
+| 23. i18n Foundation | v1.4 | 1/4 | In Progress | - |
 | 24. Mobile Responsive | v1.4 | 0/? | Not started | - |
 | 25. Social Sharing | v1.4 | 0/? | Not started | - |
 | 26. OAuth Integration | v1.4 | 0/? | Not started | - |
@@ -243,4 +243,4 @@ v1.7 Advanced          -> Bedarfsabhangig erweitern
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-23 — Phase 23 i18n Foundation planned (4 plans)*
+*Last updated: 2026-04-23 — Phase 23-01 i18n core infrastructure complete (1/4 plans)*
