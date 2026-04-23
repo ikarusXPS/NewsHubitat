@@ -9,24 +9,24 @@ Requirements for Production Ready milestone. Each maps to roadmap phases.
 
 ### CI/CD Pipeline
 
-- [ ] **CICD-01**: Build und Tests laufen automatisch bei Pull Requests
-- [ ] **CICD-02**: Docker Image wird gebaut und zu Registry gepusht
-- [ ] **CICD-03**: Automatisches Deployment zu Staging bei merge to main
-- [ ] **CICD-04**: Automatisches Deployment zu Production mit Approval-Gate
+- [x] **CICD-01**: Build und Tests laufen automatisch bei Pull Requests
+- [x] **CICD-02**: Docker Image wird gebaut und zu Registry gepusht
+- [x] **CICD-03**: Automatisches Deployment zu Staging bei merge to main
+- [x] **CICD-04**: Automatisches Deployment zu Production mit Approval-Gate
 
 ### Sentry Error Tracking
 
-- [ ] **SNTR-01**: Frontend Errors werden via React Error Boundary + Sentry SDK erfasst
-- [ ] **SNTR-02**: Backend Errors werden via Express Error Handler + Sentry SDK erfasst
-- [ ] **SNTR-03**: Source Maps sind hochgeladen für lesbare Stack Traces
-- [ ] **SNTR-04**: Performance Monitoring zeigt Transaction Traces und API Latency
+- [x] **SNTR-01**: Frontend Errors werden via React Error Boundary + Sentry SDK erfasst
+- [x] **SNTR-02**: Backend Errors werden via Express Error Handler + Sentry SDK erfasst
+- [x] **SNTR-03**: Source Maps sind hochgeladen für lesbare Stack Traces
+- [x] **SNTR-04**: Performance Monitoring zeigt Transaction Traces und API Latency
 
 ### Monitoring & Alerting
 
-- [ ] **MNTR-01**: Health Endpoints existieren (/health, /health/db, /health/redis, /readiness)
-- [ ] **MNTR-02**: Metriken werden im Prometheus-Format exportiert
-- [ ] **MNTR-03**: Externe Uptime-Checks mit Alerting sind konfiguriert
-- [ ] **MNTR-04**: Grafana Dashboard visualisiert alle Metriken
+- [x] **MNTR-01**: Health Endpoints existieren (/health, /health/db, /health/redis, /readiness)
+- [x] **MNTR-02**: Metriken werden im Prometheus-Format exportiert
+- [x] **MNTR-03**: Externe Uptime-Checks mit Alerting sind konfiguriert
+- [x] **MNTR-04**: Grafana Dashboard visualisiert alle Metriken
 
 ### Load Testing
 
@@ -76,18 +76,18 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CICD-01 | Phase 18 | Pending |
-| CICD-02 | Phase 18 | Pending |
-| CICD-03 | Phase 18 | Pending |
-| CICD-04 | Phase 18 | Pending |
-| SNTR-01 | Phase 19 | Pending |
-| SNTR-02 | Phase 19 | Pending |
-| SNTR-03 | Phase 19 | Pending |
-| SNTR-04 | Phase 19 | Pending |
-| MNTR-01 | Phase 20 | Pending |
-| MNTR-02 | Phase 20 | Pending |
-| MNTR-03 | Phase 20 | Pending |
-| MNTR-04 | Phase 20 | Pending |
+| CICD-01 | Phase 18 | Complete |
+| CICD-02 | Phase 18 | Complete |
+| CICD-03 | Phase 18 | Complete |
+| CICD-04 | Phase 18 | Complete |
+| SNTR-01 | Phase 19 | Complete |
+| SNTR-02 | Phase 19 | Complete |
+| SNTR-03 | Phase 19 | Complete |
+| SNTR-04 | Phase 19 | Complete |
+| MNTR-01 | Phase 20 | Complete |
+| MNTR-02 | Phase 20 | Complete |
+| MNTR-03 | Phase 20 | Complete |
+| MNTR-04 | Phase 20 | Complete |
 | LOAD-01 | Phase 21 | Complete (Plan 21-01) |
 | LOAD-02 | Phase 21 | Pending |
 | LOAD-03 | Phase 21 | Complete (Plan 21-02) |
