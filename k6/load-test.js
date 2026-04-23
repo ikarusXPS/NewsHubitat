@@ -24,39 +24,48 @@ http.setResponseCallback(
   http.expectedStatuses(200, 201, 429, { min: 200, max: 299 })
 );
 
-// D-04, D-11, D-13, D-20, D-25: Scenario configuration
-export const options = {
-  scenarios: {
-    // D-13: Smoke test - quick validation (1 minute, 10 VUs)
-    smoke: {
-      executor: 'ramping-vus',
-      startVUs: 0,
-      stages: [
-        { duration: '30s', target: 10 },
-        { duration: '30s', target: 10 },
-      ],
-      gracefulRampDown: '10s',
-      exec: 'userJourney',
-      env: { SCENARIO: 'smoke' },
-    },
+// D-13: Smoke test scenario definition
+const smokeScenario = {
+  executor: 'ramping-vus',
+  startVUs: 0,
+  stages: [
+    { duration: '30s', target: 10 },
+    { duration: '30s', target: 10 },
+  ],
+  gracefulRampDown: '10s',
+  exec: 'userJourney',
+  env: { SCENARIO: 'smoke' },
+};
 
-    // D-04, D-11: Full load test (10 minutes, 0→10k VUs)
-    load: {
-      executor: 'ramping-vus',
-      startVUs: 0,
-      stages: [
-        { duration: '2m', target: 1000 },   // Ramp to 1k
-        { duration: '3m', target: 5000 },   // Ramp to 5k
-        { duration: '3m', target: 10000 },  // Ramp to 10k (D-18: hard requirement)
-        { duration: '2m', target: 10000 },  // Hold at 10k peak
-        { duration: '2m', target: 0 },      // Ramp down
-      ],
-      gracefulRampDown: '30s',
-      exec: 'userJourney',
-      env: { SCENARIO: 'load' },
-      startTime: '2m',  // Start after smoke test completes
-    },
-  },
+// D-04, D-11: Full load test scenario definition
+const loadScenario = {
+  executor: 'ramping-vus',
+  startVUs: 0,
+  stages: [
+    { duration: '2m', target: 1000 },   // Ramp to 1k
+    { duration: '3m', target: 5000 },   // Ramp to 5k
+    { duration: '3m', target: 10000 },  // Ramp to 10k (D-18: hard requirement)
+    { duration: '2m', target: 10000 },  // Hold at 10k peak
+    { duration: '2m', target: 0 },      // Ramp down
+  ],
+  gracefulRampDown: '30s',
+  exec: 'userJourney',
+  env: { SCENARIO: 'load' },
+};
+
+// D-04, D-11, D-13, D-20, D-25: Scenario configuration
+// Select scenario based on K6_SCENARIO env var (smoke, load, or both)
+const selectedScenario = __ENV.K6_SCENARIO || 'both';
+const scenarios = {};
+if (selectedScenario === 'smoke' || selectedScenario === 'both') {
+  scenarios.smoke = smokeScenario;
+}
+if (selectedScenario === 'load' || selectedScenario === 'both') {
+  scenarios.load = { ...loadScenario, startTime: selectedScenario === 'both' ? '2m' : '0s' };
+}
+
+export const options = {
+  scenarios,
 
   // D-36, D-37, D-38, D-39: Performance baselines (thresholds)
   thresholds: {
