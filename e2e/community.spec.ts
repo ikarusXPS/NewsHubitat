@@ -127,7 +127,7 @@ test.describe('Community Page', () => {
   test('should navigate from sidebar', async ({ page }) => {
     // Navigate away first
     await page.goto('/');
-    await page.waitForLoadState('load');
+    await page.waitForLoadState('domcontentloaded');
     // Wait for sidebar to be visible
     await page.locator('a[href="/community"]').waitFor({ state: 'visible', timeout: 15000 });
 

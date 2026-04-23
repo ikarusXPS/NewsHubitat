@@ -476,6 +476,7 @@ export function CompareMode({ articles, isOpen, onClose }: CompareModeProps) {
           <button
             onClick={onClose}
             className="p-2 text-gray-400 hover:text-[#ff0044] rounded-lg hover:bg-gray-800/50 transition-colors"
+            data-testid="compare-mode-close"
           >
             <X className="h-5 w-5" />
           </button>

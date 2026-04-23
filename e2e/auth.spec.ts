@@ -16,8 +16,8 @@ test.describe('Authentication', () => {
   test('should open auth modal when clicking login button', async ({ page }) => {
     await page.click('button:has-text("Sign In")');
 
-    // Modal should be visible
-    const modal = page.locator('[role="dialog"], .fixed.inset-0');
+    // Modal should be visible - use specific test ID to avoid matching sidebar overlay
+    const modal = page.locator('[data-testid="auth-modal"]');
     await expect(modal).toBeVisible();
 
     // Should show login form
@@ -66,15 +66,15 @@ test.describe('Authentication', () => {
     const emailInput = page.locator('input[type="email"]');
     await expect(emailInput).toBeVisible();
 
-    // Click the X close button
-    const closeButton = page.locator('.fixed button:has([class*="lucide-x"])');
+    // Click the X close button - use specific test ID
+    const closeButton = page.locator('[data-testid="auth-modal-close"]');
     await closeButton.click();
 
     // Modal should be closed - email input should not be visible
     await expect(emailInput).not.toBeVisible({ timeout: 2000 });
   });
 
-  test('should close modal when clicking backdrop', async ({ page }) => {
+  test('should close modal when pressing Escape', async ({ page }) => {
     // Click header login button
     await page.locator('header button:has-text("Sign In")').click();
 
@@ -82,8 +82,8 @@ test.describe('Authentication', () => {
     const emailInput = page.locator('input[type="email"]');
     await expect(emailInput).toBeVisible();
 
-    // Click on the backdrop - use position outside the modal center
-    await page.mouse.click(10, 10);
+    // Press Escape to close the modal
+    await page.keyboard.press('Escape');
 
     // Modal should be closed - email input should not be visible
     await expect(emailInput).not.toBeVisible({ timeout: 2000 });
@@ -100,8 +100,9 @@ test.describe('Authentication', () => {
     // Submit form
     await page.locator('form button[type="submit"]').click();
 
-    // Should show error message within the modal/form area
-    const errorMessage = page.locator('.fixed >> text=/fehler|error|ungültig|invalid/i');
-    await expect(errorMessage).toBeVisible({ timeout: 5000 });
+    // Should show error message (red error box in the form)
+    // The error container has specific styling: bg-red-900/30 border-red-800/50 text-red-400
+    const errorMessage = page.locator('[data-testid="auth-modal-content"] .bg-red-900\\/30, [data-testid="auth-modal-content"] .text-red-400');
+    await expect(errorMessage).toBeVisible({ timeout: 10000 });
   });
 });

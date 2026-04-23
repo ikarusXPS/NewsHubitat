@@ -57,8 +57,8 @@ test.describe('Analysis Page', () => {
     const isVisible = await modalContent.isVisible().catch(() => false);
 
     if (isVisible) {
-      // Find and click close button (X icon in the modal header)
-      const closeBtn = page.locator('.fixed.z-50 button').first();
+      // Find and click close button using specific test ID
+      const closeBtn = page.locator('[data-testid="compare-mode-close"]');
       await closeBtn.click();
       await page.waitForTimeout(500);
 
