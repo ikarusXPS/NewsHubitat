@@ -6,7 +6,9 @@ import { onCLS, onINP, onLCP, onFCP, onTTFB } from 'web-vitals';
 import { Layout } from './components/Layout';
 import { Dashboard } from './pages/Dashboard';
 import { AuthProvider } from './contexts/AuthContext';
+import { ConsentProvider } from './contexts/ConsentContext';
 import { VerificationBanner } from './components/VerificationBanner';
+import { ConsentBanner } from './components/ConsentBanner';
 import { cacheService } from './services/cacheService';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { FocusSuggestions } from './components/FocusSuggestions';
@@ -155,21 +157,26 @@ export default function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <BrowserRouter>
-          {/* Show onboarding for first-time users */}
-          {!hasCompletedOnboarding && <FocusOnboarding />}
+      <ConsentProvider>
+        <AuthProvider>
+          <BrowserRouter>
+            {/* Show onboarding for first-time users */}
+            {!hasCompletedOnboarding && <FocusOnboarding />}
 
-          {/* Verification banner for unverified users */}
-          <VerificationBanner />
+            {/* Verification banner for unverified users */}
+            <VerificationBanner />
 
-          <Layout>
-            <AppRoutes />
-          </Layout>
-          {/* Global Focus Suggestions - overlays on all pages */}
-          <FocusSuggestions />
-        </BrowserRouter>
-      </AuthProvider>
+            <Layout>
+              <AppRoutes />
+            </Layout>
+            {/* Global Focus Suggestions - overlays on all pages */}
+            <FocusSuggestions />
+
+            {/* GDPR Consent Banner */}
+            <ConsentBanner />
+          </BrowserRouter>
+        </AuthProvider>
+      </ConsentProvider>
     </QueryClientProvider>
   );
 }
