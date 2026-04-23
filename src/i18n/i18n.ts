@@ -35,11 +35,35 @@ i18n
     },
   });
 
-// Sync i18next language changes to Zustand store (per RESEARCH.md Pattern 3)
+// Sync i18next -> Zustand when language changes via i18n.changeLanguage()
 i18n.on('languageChanged', (lng: string) => {
   const validLng = lng === 'de' || lng === 'en' ? lng : 'en';
-  const setLanguage = useAppStore.getState().setLanguage;
-  setLanguage(validLng);
+  const currentStoreLang = useAppStore.getState().language;
+  // Only update if different to avoid loops
+  if (currentStoreLang !== validLng) {
+    useAppStore.getState().setLanguage(validLng);
+  }
 });
+
+// Sync Zustand -> i18next when store language changes (e.g., from persisted state)
+// This runs after hydration when Zustand loads from localStorage
+let previousLanguage = useAppStore.getState().language;
+useAppStore.subscribe((state) => {
+  const language = state.language;
+  // Only change if different to avoid loops
+  if (language !== previousLanguage && (language === 'de' || language === 'en')) {
+    previousLanguage = language;
+    if (i18n.language !== language) {
+      i18n.changeLanguage(language);
+    }
+  }
+});
+
+// Initial sync: if Zustand has a persisted language, apply it to i18next
+// This handles the case where i18next detector hasn't run yet
+const initialLanguage = useAppStore.getState().language;
+if (initialLanguage && initialLanguage !== i18n.language) {
+  i18n.changeLanguage(initialLanguage);
+}
 
 export default i18n;
