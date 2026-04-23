@@ -21,13 +21,33 @@ vi.mock('../utils/logger', () => ({
   default: { info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() }
 }));
 
+// Mock prisma for bounce/optout checks
+vi.mock('../db/prisma', () => ({
+  prisma: {
+    user: {
+      findUnique: vi.fn().mockResolvedValue(null),
+    },
+  },
+}));
+
+// Mock metricsService for email counters
+vi.mock('./metricsService', () => ({
+  MetricsService: {
+    getInstance: vi.fn(() => ({
+      incrementEmailSent: vi.fn(),
+      incrementEmailBounced: vi.fn(),
+      incrementEmailDelivered: vi.fn(),
+      incrementEmailComplained: vi.fn(),
+    })),
+  },
+}));
+
 import { EmailService } from './emailService';
 import type { DigestOptions } from './emailService';
 
 describe('EmailService', () => {
   beforeAll(() => {
-    vi.stubEnv('SMTP_USER', 'test@example.com');
-    vi.stubEnv('SMTP_PASS', 'test-password');
+    vi.stubEnv('SENDGRID_API_KEY', 'SG.test-api-key');
     vi.stubEnv('APP_URL', 'http://localhost:5173');
   });
 
