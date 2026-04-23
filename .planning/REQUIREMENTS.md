@@ -43,6 +43,38 @@ Requirements for User & Community Features milestone. Each maps to roadmap phase
 - [ ] **COLLAB-02**: Teams haben gemeinsame Bookmark-Sammlungen
 - [ ] **COLLAB-03**: Team-Rollen (Owner, Admin, Member) mit unterschiedlichen Permissions
 
+## Traceability
+
+Which phases cover which requirements. Updated during roadmap creation.
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| I18N-01 | Phase 23 | Pending |
+| I18N-02 | Phase 23 | Pending |
+| I18N-03 | Phase 23 | Pending |
+| MOBILE-01 | Phase 24 | Pending |
+| MOBILE-02 | Phase 24 | Pending |
+| MOBILE-03 | Phase 24 | Pending |
+| SHARE-01 | Phase 25 | Pending |
+| SHARE-02 | Phase 25 | Pending |
+| SHARE-03 | Phase 25 | Pending |
+| OAUTH-01 | Phase 26 | Pending |
+| OAUTH-02 | Phase 26 | Pending |
+| OAUTH-03 | Phase 26 | Pending |
+| COMM-01 | Phase 27 | Pending |
+| COMM-02 | Phase 27 | Pending |
+| COMM-03 | Phase 27 | Pending |
+| COLLAB-01 | Phase 28 | Pending |
+| COLLAB-02 | Phase 28 | Pending |
+| COLLAB-03 | Phase 28 | Pending |
+
+**Coverage:**
+- v1.4 requirements: 18 total
+- Mapped to phases: 18
+- Unmapped: 0
+
+---
+
 ## Future Requirements
 
 Planned for v1.5+ milestones. Requirements defined, phases TBD during milestone planning.
@@ -91,36 +123,6 @@ Explicitly excluded. No current plans.
 | Blockchain/Web3 integration | No clear use case |
 | AR/VR news experience | Premature, no demand |
 | Enterprise SSO (SAML/SCIM) | Defer to enterprise tier |
-
-## Traceability
-
-Which phases cover which requirements. Updated during roadmap creation.
-
-| Requirement | Phase | Status |
-|-------------|-------|--------|
-| I18N-01 | TBD | Pending |
-| I18N-02 | TBD | Pending |
-| I18N-03 | TBD | Pending |
-| MOBILE-01 | TBD | Pending |
-| MOBILE-02 | TBD | Pending |
-| MOBILE-03 | TBD | Pending |
-| SHARE-01 | TBD | Pending |
-| SHARE-02 | TBD | Pending |
-| SHARE-03 | TBD | Pending |
-| OAUTH-01 | TBD | Pending |
-| OAUTH-02 | TBD | Pending |
-| OAUTH-03 | TBD | Pending |
-| COMM-01 | TBD | Pending |
-| COMM-02 | TBD | Pending |
-| COMM-03 | TBD | Pending |
-| COLLAB-01 | TBD | Pending |
-| COLLAB-02 | TBD | Pending |
-| COLLAB-03 | TBD | Pending |
-
-**Coverage:**
-- v1.4 requirements: 18 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 18
 
 ---
 
@@ -187,4 +189,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-04-23*
-*Last updated: 2026-04-23 — v1.4 requirements defined (18 total)*
+*Last updated: 2026-04-23 — v1.4 traceability complete (18/18 mapped)*

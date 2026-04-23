@@ -2,11 +2,11 @@
 gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: User & Community Features
-status: defining_requirements
-last_updated: "2026-04-23T18:00:00Z"
+status: roadmap_complete
+last_updated: "2026-04-23T19:00:00Z"
 last_activity: 2026-04-23
 progress:
-  total_phases: 0
+  total_phases: 6
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -24,27 +24,58 @@ See: .planning/PROJECT.md (updated 2026-04-23)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 23 (i18n Foundation) - Not started
 Current Plan: —
-Status: Defining requirements
-Last activity: 2026-04-23 — Milestone v1.4 started
+Status: Roadmap complete, ready for planning
+Last activity: 2026-04-23 — Roadmap v1.4 phases 23-28 defined
 
 ```
-v1.4 Progress: [                    ] 0% (requirements phase)
+v1.4 Progress: [                    ] 0% (6 phases, 0 complete)
 ```
 
 ## Milestone Progress
 
 **Milestone:** v1.4 - User & Community Features
 **Goal:** Reduce onboarding friction, expand target audience, and increase user engagement
-**Status:** Defining requirements
+**Status:** Roadmap complete
 **Previous:** v1.3 complete 2026-04-23
 
 ### Phase Summary
 
 | Phase | Name | Requirements | Status |
 |-------|------|--------------|--------|
-| — | TBD | — | Defining requirements |
+| 23 | i18n Foundation | I18N-01, I18N-02, I18N-03 | Not started |
+| 24 | Mobile Responsive | MOBILE-01, MOBILE-02, MOBILE-03 | Not started |
+| 25 | Social Sharing | SHARE-01, SHARE-02, SHARE-03 | Not started |
+| 26 | OAuth Integration | OAUTH-01, OAUTH-02, OAUTH-03 | Not started |
+| 27 | Comments System | COMM-01, COMM-02, COMM-03 | Not started |
+| 28 | Team Collaboration | COLLAB-01, COLLAB-02, COLLAB-03 | Not started |
+
+### Phase Dependencies
+
+```
+Phase 22 (v1.3 complete)
+    |
+Phase 23: i18n Foundation
+    |
+Phase 24: Mobile Responsive
+    |
+Phase 25: Social Sharing
+    |
+Phase 26: OAuth Integration
+    |
+Phase 27: Comments System
+    |
+Phase 28: Team Collaboration
+```
+
+### Research Flags
+
+From research SUMMARY.md:
+- Phase 25 (Sharing): Needs SSR investigation for SPA OG tag limitation
+- Phase 26 (OAuth): Account linking requires security review
+- Phase 27 (Comments): Moderation strategy needs finalization (AI vs manual vs hybrid)
+- Phase 28 (Teams): Enterprise features (SSO/SCIM) deferred to v1.5+
 
 ## Deferred Items
 
@@ -64,14 +95,14 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Milestone v1.4 started (combined v1.4 + v1.5 scope)
-**Next step:** Define requirements and create roadmap
+**Last action:** Roadmap v1.4 created with phases 23-28
+**Next step:** Run `/gsd-plan-phase 23` to plan i18n Foundation
 **Resume file:** —
 **Checkpoint:** —
 
 ## Accumulated Context
 
-Carried forward from v1.2:
+Carried forward from v1.3:
 
 - PostgreSQL with PrismaPg adapter (max: 10 connections)
 - Redis for JWT blacklist, rate limits, AI cache
@@ -79,6 +110,17 @@ Carried forward from v1.2:
 - 91.65% test coverage baseline
 - Dockerfile with multi-stage build (node:22-alpine3.19)
 - Production static file serving via Express
+- CI/CD pipeline with GitHub Actions
+- Sentry error tracking (frontend + backend)
+- Prometheus + Grafana monitoring
+- SendGrid SMTP with bounce handling
+
+v1.4 Stack Decisions (from research):
+- OAuth: passport-google-oauth20 + passport-github2
+- i18n: react-i18next (hooks-based, lazy loading)
+- Responsive: Tailwind CSS v4 mobile-first utilities
+- Comments: Custom with Socket.io (existing WebSocket infrastructure)
+- Teams: Custom RBAC with CASL (owner/admin/member)
 
 ## Decisions
 
@@ -96,7 +138,7 @@ Carried forward from v1.2:
 | Environment per deploy job | Distinguish staging/production errors | SENTRY_ENVIRONMENT set in each deploy step |
 | prom-client 15.1.3 | Prometheus metrics collection | MetricsService singleton with registry |
 | 15s scrape interval | Balance freshness vs overhead | Prometheus scrapes app:3001/metrics |
-| Route normalization | Prevent label cardinality explosion | UUID/numeric/ObjectId → :id in metricsMiddleware |
+| Route normalization | Prevent label cardinality explosion | UUID/numeric/ObjectId -> :id in metricsMiddleware |
 | 3s dependency timeout | Prevent cascade failures | /readiness checks DB and Redis with timeout |
 | HighErrorRate threshold | Alert on 5xx > 1% for 5m | prometheus/alert.rules.yml |
 | HighLatency threshold | Alert on p95 > 2s for 5m | prometheus/alert.rules.yml |
@@ -122,4 +164,4 @@ Carried forward from v1.2:
 
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-23 — Milestone v1.4 started*
+*Last updated: 2026-04-23 — Roadmap v1.4 phases 23-28 defined*
