@@ -6,12 +6,13 @@ test.describe('Authentication', () => {
   });
 
   test('should show login button when not authenticated', async ({ page }) => {
-    const loginButton = page.locator('button:has-text("Anmelden")');
+    // Header button shows "Sign In" (English)
+    const loginButton = page.locator('button:has-text("Sign In")');
     await expect(loginButton).toBeVisible();
   });
 
   test('should open auth modal when clicking login button', async ({ page }) => {
-    await page.click('button:has-text("Anmelden")');
+    await page.click('button:has-text("Sign In")');
 
     // Modal should be visible
     const modal = page.locator('[role="dialog"], .fixed.inset-0');
@@ -23,8 +24,8 @@ test.describe('Authentication', () => {
   });
 
   test('should switch between login and register modes', async ({ page }) => {
-    // Click header login button
-    await page.locator('header button:has-text("Anmelden")').click();
+    // Click header login button (shows "Sign In" in English)
+    await page.locator('header button:has-text("Sign In")').click();
 
     // Should start in login mode
     const loginHeading = page.locator('h2:has-text("Anmelden")');
@@ -44,7 +45,7 @@ test.describe('Authentication', () => {
   });
 
   test('should show validation error for empty login', async ({ page }) => {
-    await page.click('button:has-text("Anmelden")');
+    await page.click('button:has-text("Sign In")');
 
     // Try to submit empty form
     const submitButton = page.locator('button[type="submit"]:has-text("Anmelden")');
@@ -57,7 +58,7 @@ test.describe('Authentication', () => {
 
   test('should close modal when clicking close button', async ({ page }) => {
     // Click header login button
-    await page.locator('header button:has-text("Anmelden")').click();
+    await page.locator('header button:has-text("Sign In")').click();
 
     // Wait for modal to appear
     const emailInput = page.locator('input[type="email"]');
@@ -73,7 +74,7 @@ test.describe('Authentication', () => {
 
   test('should close modal when clicking backdrop', async ({ page }) => {
     // Click header login button
-    await page.locator('header button:has-text("Anmelden")').click();
+    await page.locator('header button:has-text("Sign In")').click();
 
     // Wait for modal to appear
     const emailInput = page.locator('input[type="email"]');
@@ -88,7 +89,7 @@ test.describe('Authentication', () => {
 
   test('should show error for invalid credentials', async ({ page }) => {
     // Click header login button
-    await page.locator('header button:has-text("Anmelden")').click();
+    await page.locator('header button:has-text("Sign In")').click();
 
     // Fill in invalid credentials
     await page.fill('input[type="email"]', 'invalid@test.com');
