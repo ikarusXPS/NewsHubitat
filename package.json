@@ -30,7 +30,8 @@
     "test:e2e:headed": "playwright test --headed",
     "seed": "npx tsx prisma/seed.ts",
     "seed:badges": "npx tsx prisma/seed-badges.ts",
-    "seed:personas": "npx tsx prisma/seed-personas.ts"
+    "seed:personas": "npx tsx prisma/seed-personas.ts",
+    "validate:ci": "npx --yes action-validator .github/workflows/ci.yml"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",
