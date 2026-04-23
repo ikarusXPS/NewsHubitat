@@ -1,6 +1,6 @@
 import { test, expect } from './fixtures';
 
-const isCI = !!process.env.CI;
+const _isCI = !!process.env.CI; // Prefixed to satisfy no-unused-vars
 
 test.describe('Timeline', () => {
   test.beforeEach(async ({ page }) => {

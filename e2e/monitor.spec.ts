@@ -40,7 +40,6 @@ test.describe('Monitor Page', () => {
 
   test.skip(isCI, 'should toggle between globe and map views', async ({ page }) => {
     // Skip in CI - WebGL globe doesn't render in headless mode
-    const globeButton = page.locator('button:has-text("3D Globe")');
     const mapButton = page.locator('button:has-text("2D Map")');
     await mapButton.click();
     await page.waitForTimeout(500);
