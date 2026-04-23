@@ -19,8 +19,8 @@ export function login(email, password, baseUrl) {
 
   const success = check(res, {
     'login success': (r) => r.status === 200,
-    'has token': (r) => r.json('token') !== undefined,
+    'has token': (r) => r.json('data.token') !== undefined,
   });
 
-  return success ? res.json('token') : null;
+  return success ? res.json('data.token') : null;
 }
