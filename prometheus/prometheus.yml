@@ -1,0 +1,22 @@
+# Prometheus configuration for NewsHub monitoring
+# See: .planning/phases/20-monitoring-alerting/20-CONTEXT.md
+
+global:
+  scrape_interval: 15s      # D-16: 15-second scrape interval
+  evaluation_interval: 15s  # D-20: 15-second alert evaluation
+
+rule_files:
+  - 'alert.rules.yml'       # D-17: Alert rules in separate file
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ['alertmanager:9093']
+
+scrape_configs:
+  - job_name: 'newshub'
+    static_configs:
+      - targets: ['app:3001']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    scrape_timeout: 10s
