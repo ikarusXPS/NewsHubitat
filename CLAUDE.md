@@ -44,9 +44,17 @@ npm run seed:personas    # Seed AI personas only
 
 # Docker (Production)
 docker compose build app          # Build app container
-docker compose up -d              # Start all services (app, postgres, redis)
+docker compose up -d              # Start all services (app, postgres, redis, prometheus, grafana)
 docker compose ps                 # Check container health
 docker compose logs -f app        # Watch app logs
+
+# Monitoring Stack (included in docker compose)
+# Prometheus: localhost:9090 - metrics scraping from /api/metrics
+# Grafana:    localhost:3000 - dashboards (admin/admin)
+# Alertmanager: localhost:9093 - alert routing
+
+# CI
+npm run validate:ci               # Validate GitHub Actions workflow syntax
 
 # Run Single Tests
 npm run test -- src/lib/utils.test.ts           # Single unit test file
@@ -66,6 +74,7 @@ npx playwright test e2e/auth.spec.ts            # Single E2E test file
 - **AI**: Multi-provider fallback (OpenRouter → Gemini → Anthropic)
 - **Translation**: Multi-provider chain (DeepL → Google → LibreTranslate → Claude)
 - **Testing**: Vitest (unit, 80% coverage threshold) + Playwright (E2E)
+- **Monitoring**: Prometheus + Grafana + Alertmanager; Sentry for error tracking
 
 ## Architecture
 
@@ -249,6 +258,7 @@ interface ApiResponse<T> {
 | `/api/health/redis` | GET | Redis connectivity and stats |
 | `/api/bookmarks` | POST | Create bookmark (auth required, idempotent) |
 | `/api/history` | POST | Create reading history entry (auth required) |
+| `/api/metrics` | GET | Prometheus metrics (prom-client format) |
 
 ## E2E Testing Structure
 
