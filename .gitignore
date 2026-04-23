@@ -36,3 +36,6 @@ dev.db
 
 # Playwright auth state (security: contains session tokens)
 playwright/.auth/user.json
+
+# Load test data with plain passwords
+k6/data/users.json
