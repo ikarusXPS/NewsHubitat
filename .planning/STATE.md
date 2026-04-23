@@ -7,9 +7,9 @@ last_updated: "2026-04-23T10:37:47Z"
 last_activity: 2026-04-23
 progress:
   total_phases: 5
-  completed_phases: 1
-  total_plans: 3
-  completed_plans: 3
+  completed_phases: 2
+  total_plans: 6
+  completed_plans: 6
   percent: 100
 ---
 
@@ -24,13 +24,13 @@ See: .planning/PROJECT.md (updated 2026-04-23)
 
 ## Current Position
 
-Phase: 19 - Sentry Error Tracking (complete)
-Current Plan: 19-03 (complete)
+Phase: 20 - Monitoring & Alerting (complete)
+Current Plan: 20-03 (complete)
 Status: Phase complete
-Last activity: 2026-04-23 — Plan 19-03 complete (CI source map upload)
+Last activity: 2026-04-23 — Phase 20 complete (Prometheus, Alertmanager, Grafana, health endpoints)
 
 ```
-v1.3 Progress: [####################] 100% (3/3 plans in Phase 19)
+v1.3 Progress: [####################] 100% (3/3 plans in Phase 20)
 ```
 
 ## Milestone Progress
@@ -46,7 +46,7 @@ v1.3 Progress: [####################] 100% (3/3 plans in Phase 19)
 |-------|------|--------------|--------|
 | 18 | CI/CD Pipeline | CICD-01, CICD-02, CICD-03, CICD-04 | Planned (3 plans) |
 | 19 | Sentry Error Tracking | SNTR-01, SNTR-02, SNTR-03, SNTR-04 | Complete (3/3 plans) |
-| 20 | Monitoring & Alerting | MNTR-01, MNTR-02, MNTR-03, MNTR-04 | Not started |
+| 20 | Monitoring & Alerting | MNTR-01, MNTR-02, MNTR-03, MNTR-04 | Complete (3/3 plans) |
 | 21 | Load Testing | LOAD-01, LOAD-02, LOAD-03, LOAD-04 | Not started |
 | 22 | SMTP Production | SMTP-01, SMTP-02, SMTP-03 | Not started |
 
@@ -66,8 +66,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Plan 19-03 complete (CI source map upload, 3 tasks, 3 commits)
-**Next step:** Phase 19 complete; ready for Phase 20 (Monitoring & Alerting)
+**Last action:** Phase 20 complete (3 plans, MetricsService, Prometheus, Alertmanager, Grafana)
+**Next step:** Phase 20 complete; ready for Phase 21 (Load Testing)
 **Resume file:** None (phase complete)
 **Checkpoint:** None
 
@@ -96,7 +96,14 @@ Carried forward from v1.2:
 | Hidden source maps | Generate maps without bundling | sourcemap: 'hidden' in vite.config.ts |
 | Release format newshub@sha | Git commit traceability | SENTRY_RELEASE: newshub@${{ github.sha }} |
 | Environment per deploy job | Distinguish staging/production errors | SENTRY_ENVIRONMENT set in each deploy step |
+| prom-client 15.1.3 | Prometheus metrics collection | MetricsService singleton with registry |
+| 15s scrape interval | Balance freshness vs overhead | Prometheus scrapes app:3001/metrics |
+| Route normalization | Prevent label cardinality explosion | UUID/numeric/ObjectId → :id in metricsMiddleware |
+| 3s dependency timeout | Prevent cascade failures | /readiness checks DB and Redis with timeout |
+| HighErrorRate threshold | Alert on 5xx > 1% for 5m | prometheus/alert.rules.yml |
+| HighLatency threshold | Alert on p95 > 2s for 5m | prometheus/alert.rules.yml |
+| Grafana admin/admin | Default credentials for dev | Change in production |
 
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-23 — Plan 19-03 complete (CI source map upload)*
+*Last updated: 2026-04-23 — Phase 20 complete (Monitoring & Alerting)*
