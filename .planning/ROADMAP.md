@@ -83,7 +83,12 @@ Plans:
   3. Source maps are uploaded to Sentry enabling readable stack traces in production
   4. Transaction traces show API latency and frontend performance metrics
   5. Error alerts notify team when new issues occur
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 19-01-PLAN.md — SDK installation + frontend error capture and performance
+- [ ] 19-02-PLAN.md — Backend error capture and ESM instrumentation
+- [ ] 19-03-PLAN.md — CI source map upload and release configuration
 
 ### Phase 20: Monitoring & Alerting
 **Goal**: Production observability with health checks, metrics, and alerting
@@ -142,11 +147,11 @@ Plans:
 | 16. PWA / Service Worker | v1.2 | 6/6 | Complete | 2026-04-22 |
 | 17. Docker Deployment | v1.2 | 3/3 | Complete | 2026-04-23 |
 | 18. CI/CD Pipeline | v1.3 | 0/3 | Planned | - |
-| 19. Sentry Error Tracking | v1.3 | 0/? | Not started | - |
+| 19. Sentry Error Tracking | v1.3 | 0/3 | Planned | - |
 | 20. Monitoring & Alerting | v1.3 | 0/? | Not started | - |
 | 21. Load Testing | v1.3 | 0/? | Not started | - |
 | 22. SMTP Production | v1.3 | 0/? | Not started | - |
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-23 — Phase 18 planned (3 plans)*
+*Last updated: 2026-04-23 — Phase 19 planned (3 plans)*
