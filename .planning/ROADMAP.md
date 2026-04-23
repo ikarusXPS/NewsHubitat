@@ -6,6 +6,11 @@
 - [x] **v1.1 Quality & Testing** - Phases 7-12 (completed 2026-04-22)
 - [x] **v1.2 Performance & Scale** - Phases 13-17 (completed 2026-04-23)
 - [ ] **v1.3 Production Ready** - Phases 18-22 (in progress)
+- [ ] **v1.4 User Features** - OAuth, i18n, Mobile (planned)
+- [ ] **v1.5 Community Features** - Sharing, Comments, Collaboration (planned)
+- [ ] **v1.6 Scale & Infrastructure** - Kubernetes, Multi-Region, Log Aggregation (planned)
+- [ ] **v1.7 Growth & Monetization** - A/B Testing, Subscriptions (planned)
+- [ ] **v1.8 Advanced Features** - Native App, Video, Chat (demand-driven)
 
 ## Phases
 
@@ -168,5 +173,76 @@ Plans:
 | 22. SMTP Production | v1.3 | 3/3 | Checkpoint Pending | - |
 
 ---
+
+## Future Milestones
+
+### v1.4 User Features (Planned)
+
+**Goal:** Reduce onboarding friction and expand target audience
+
+| Requirement | Feature | Rationale |
+|-------------|---------|-----------|
+| OAUTH-01 | Google OAuth Login | Reduce signup friction |
+| OAUTH-02 | GitHub OAuth Login | Developer audience |
+| I18N-01 | Multi-Language UI | Expand beyond DE/EN |
+| MOBILE-01 | Mobile Responsive Layouts | Optimize mobile UX |
+
+### v1.5 Community Features (Planned)
+
+**Goal:** Increase user engagement and enable collaboration
+
+| Requirement | Feature | Rationale |
+|-------------|---------|-----------|
+| SHARE-01 | Social Media Sharing | Virality, reach |
+| COMM-01 | Article Comments | Discussion, engagement |
+| COLLAB-01 | Team Collaboration | B2B use case |
+
+### v1.6 Scale & Infrastructure (Planned)
+
+**Goal:** Prepare for growth and ensure reliability at scale
+
+| Requirement | Feature | Rationale |
+|-------------|---------|-----------|
+| SCALE-01 | Kubernetes Deployment | Horizontal scaling, auto-healing |
+| SCALE-02 | Multi-Region Deployment | Latency optimization, redundancy |
+| SCALE-03 | Log Aggregation (Loki/ELK) | Debugging at scale |
+| SCALE-04 | CDN for Static Assets | Global performance |
+
+### v1.7 Growth & Monetization (Planned)
+
+**Goal:** Enable data-driven decisions and generate revenue
+
+| Requirement | Feature | Rationale |
+|-------------|---------|-----------|
+| GROW-01 | A/B Testing Infrastructure | Data-driven decisions |
+| GROW-02 | Analytics Dashboard | User behavior insights |
+| PAID-01 | Subscription Tiers | Revenue stream |
+| PAID-02 | Premium Export Features | Paid user value |
+
+### v1.8 Advanced Features (Demand-Driven)
+
+**Goal:** Expand capabilities based on validated user demand
+
+| Requirement | Feature | Rationale |
+|-------------|---------|-----------|
+| ADV-01 | Native Mobile App | Only if PWA insufficient |
+| ADV-02 | Video Content | Only if validated |
+| ADV-03 | Real-time Chat | Only if community demands |
+
+### Milestone Sequence Logic
+
+```
+v1.4 User Features     → Nutzer gewinnen (OAuth, i18n, Mobile)
+         ↓
+v1.5 Community         → Nutzer engagieren (Share, Comment, Collab)
+         ↓
+v1.6 Scale             → Infrastruktur skalieren (K8s, Multi-Region)
+         ↓
+v1.7 Monetization      → Revenue generieren (Subscriptions, A/B)
+         ↓
+v1.8 Advanced          → Bedarfsabhängig erweitern
+```
+
+---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-23 — Plan 22-03 tasks complete (alert rules, setup docs), awaiting human verification*
+*Last updated: 2026-04-23 — Future milestones v1.4-v1.8 added*
