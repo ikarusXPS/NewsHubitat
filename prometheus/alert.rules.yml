@@ -40,3 +40,28 @@ groups:
         annotations:
           summary: "NewsHub service is down"
           description: "The NewsHub application has been down for more than 1 minute"
+
+      # High email bounce rate alert (D-13)
+      - alert: HighEmailBounceRate
+        expr: |
+          (
+            sum(rate(email_bounced_total[5m]))
+            /
+            sum(rate(email_sent_total[5m]))
+          ) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Email bounce rate above 5%"
+          description: "Bounce rate is {{ $value | humanizePercentage }} over the last 5 minutes"
+
+      # Low email delivery rate alert (D-14)
+      - alert: LowEmailDeliveryRate
+        expr: email_delivery_success_rate < 0.95
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "Email delivery success below 95%"
+          description: "Delivery rate is {{ $value | humanizePercentage }} over the last hour"
