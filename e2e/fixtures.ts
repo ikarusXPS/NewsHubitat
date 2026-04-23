@@ -23,6 +23,7 @@ export const test = base.extend({
       localStorage.setItem('newshub-storage', JSON.stringify(parsed));
     });
 
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     await use(page);
   },
 });

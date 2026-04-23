@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Workbox } from 'workbox-window';
 
 interface ServiceWorkerState {
@@ -13,7 +13,7 @@ export function useServiceWorker() {
     isRegistered: false,
     error: null,
   });
-  const [wb, setWb] = useState<Workbox | null>(null);
+  const wbRef = useRef<Workbox | null>(null);
 
   useEffect(() => {
     // Only register in production
@@ -37,12 +37,12 @@ export function useServiceWorker() {
         setState((prev) => ({ ...prev, error: errorMessage }));
       });
 
-    setWb(workbox);
+    wbRef.current = workbox;
   }, []);
 
   const updateServiceWorker = () => {
-    if (!wb) return;
-    wb.messageSkipWaiting();
+    if (!wbRef.current) return;
+    wbRef.current.messageSkipWaiting();
     window.location.reload();
   };
 
