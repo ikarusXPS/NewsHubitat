@@ -83,7 +83,15 @@ app.use(serverTimingMiddleware);
 // Prometheus metrics collection (D-05)
 app.use(metricsMiddleware);
 
-app.use(express.json());
+// JSON parser with raw body preservation for webhook signature verification (Phase 22)
+app.use(express.json({
+  verify: (req: express.Request, _res, buf) => {
+    // Preserve raw body for routes that need signature verification
+    if (buf && buf.length) {
+      (req as express.Request & { rawBody?: string }).rawBody = buf.toString('utf8');
+    }
+  },
+}));
 
 // Debug middleware to log all requests
 app.use((req, _res, next) => {
