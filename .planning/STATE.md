@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Production Ready
 status: executing
-last_updated: "2026-04-23T10:37:47Z"
+last_updated: "2026-04-23T17:43:17Z"
 last_activity: 2026-04-23
 progress:
   total_phases: 5
-  completed_phases: 2
-  total_plans: 6
-  completed_plans: 6
-  percent: 100
+  completed_phases: 4
+  total_plans: 15
+  completed_plans: 14
+  percent: 93
 ---
 
 # State: NewsHub
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-04-23)
 ## Current Position
 
 Phase: 22 - SMTP Production (in progress)
-Current Plan: 22-01 (complete)
+Current Plan: 22-02 (complete)
 Status: Plan complete
-Last activity: 2026-04-23 — Plan 22-01 complete (SendGrid SMTP config, bounce/optout checks, email metrics)
+Last activity: 2026-04-23 — Plan 22-02 complete (webhook endpoint with ECDSA signature verification)
 
 ```
-v1.3 Progress: [################    ] 80% (1/3 plans in Phase 22)
+v1.3 Progress: [##################  ] 93% (2/3 plans in Phase 22)
 ```
 
 ## Milestone Progress
@@ -66,8 +66,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Plan 22-01 complete (SendGrid SMTP config, bounce/optout checks, email metrics)
-**Next step:** Plan 22-02 (webhook endpoint with ECDSA signature verification)
+**Last action:** Plan 22-02 complete (webhook endpoint with ECDSA signature verification, event handlers, idempotency)
+**Next step:** Plan 22-03 (Prometheus alert rules, setup documentation)
 **Resume file:** None
 **Checkpoint:** None
 
@@ -112,7 +112,16 @@ Carried forward from v1.2:
 | STAGING_URL secret | CI tests staging only | D-34: Prevent accidental production load |
 | GitHub Actions summary | p95, p99, error rate table | D-35: At-a-glance metrics |
 | 30-day artifact retention | JSON + HTML reports | D-32: Historical analysis |
+| @sendgrid/eventwebhook 8.0.0 | ECDSA signature verification | Official SendGrid package for webhook security |
+| express.json verify callback | Raw body preservation | Avoids separate middleware, follows Express patterns |
+| 24h webhook idempotency TTL | Match SendGrid retry window | Prevent duplicate event processing |
+
+## Reports
+
+| Report | Path | Generated |
+|--------|------|-----------|
+| v1.3 Milestone Summary | .planning/reports/MILESTONE_SUMMARY-v1.3.md | 2026-04-23 |
 
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-23 — Plan 22-01 complete (SendGrid SMTP, bounce checks, email metrics)*
+*Last updated: 2026-04-23 — Milestone v1.3 summary generated*
