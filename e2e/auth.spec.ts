@@ -3,12 +3,14 @@ import { test, expect } from './fixtures';
 test.describe('Authentication', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
+    // Wait for header to be fully rendered
+    await page.waitForSelector('header', { state: 'visible' });
   });
 
   test('should show login button when not authenticated', async ({ page }) => {
-    // Header button shows "Sign In" (English)
-    const loginButton = page.locator('button:has-text("Sign In")');
-    await expect(loginButton).toBeVisible();
+    // Header button shows "Sign In" (English) - use header scope for specificity
+    const loginButton = page.locator('header button:has-text("Sign In")');
+    await expect(loginButton).toBeVisible({ timeout: 10000 });
   });
 
   test('should open auth modal when clicking login button', async ({ page }) => {
