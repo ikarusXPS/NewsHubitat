@@ -74,6 +74,7 @@ npx playwright test e2e/auth.spec.ts            # Single E2E test file
 - **State**: Zustand store for UI (theme, language, filters, bookmarks, feed settings, reading history)
 - **Data Fetching**: TanStack Query with error/loading states
 - **Auth**: Context API with JWT in localStorage
+- **Offline Sync**: `src/services/syncService.ts` queues actions in IndexedDB when offline
 
 ### Backend (`server/`)
 - **Singleton Services**: All services use `getInstance()` pattern
@@ -96,7 +97,6 @@ npx playwright test e2e/auth.spec.ts            # Single E2E test file
 | `stealthScraper.ts` | Puppeteer-based scraping with stealth plugins |
 | `personaService.ts` | AI persona management |
 | `emailService.ts` | Email digest and notifications |
-| `syncService.ts` | Background sync with IndexedDB queue for offline actions |
 | `cacheService.ts` | Redis wrapper with JWT blacklist and graceful degradation |
 
 ### Key Directories
