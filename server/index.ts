@@ -30,7 +30,9 @@ import bookmarksRoutes from './routes/bookmarks';
 import historyRoutes from './routes/history';
 import { authLimiter, aiLimiter, newsLimiter } from './middleware/rateLimiter';
 import { serverTimingMiddleware } from './middleware/serverTiming';
+import { metricsMiddleware } from './middleware/metricsMiddleware';
 import { NewsAggregator } from './services/newsAggregator';
+import { MetricsService } from './services/metricsService';
 import { WebSocketService } from './services/websocketService';
 import { CacheService } from './services/cacheService';
 import { AIService } from './services/aiService';
@@ -47,6 +49,7 @@ const wsService = WebSocketService.getInstance();
 wsService.initialize(httpServer);
 const cacheService = CacheService.getInstance();
 const aiService = AIService.getInstance();
+const metricsService = MetricsService.getInstance();
 
 // CORS configuration - production-ready with whitelist
 const allowedOrigins = process.env.ALLOWED_ORIGINS
@@ -76,6 +79,9 @@ app.use(compression({ threshold: 1024 }));
 
 // Server-Timing header for p95 latency monitoring (D-05, D-06)
 app.use(serverTimingMiddleware);
+
+// Prometheus metrics collection (D-05)
+app.use(metricsMiddleware);
 
 app.use(express.json());
 
@@ -132,6 +138,68 @@ app.locals.aiService = aiService;
 app.get('/api/ping', (_req, res) => {
   console.log('[PING] Received ping request');
   res.json({ status: 'pong' });
+});
+
+// Liveness probe - container orchestration (D-25, D-29, D-30, D-31)
+app.get('/health', (_req, res) => {
+  res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.json({
+    status: 'healthy',
+    version: process.env.BUILD_VERSION || 'unknown',
+    commit: process.env.BUILD_COMMIT || 'unknown',
+    uptime_seconds: Math.floor(process.uptime()),
+  });
+});
+
+// Readiness probe - dependency check (D-26, D-28, D-29, D-30, D-31)
+const DEPENDENCY_TIMEOUT = 3000; // D-28
+
+app.get('/readiness', async (_req, res) => {
+  res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+
+  const checkDb = async (): Promise<number> => {
+    const start = Date.now();
+    await Promise.race([
+      prisma.$queryRaw`SELECT 1`,
+      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), DEPENDENCY_TIMEOUT)),
+    ]);
+    return Date.now() - start;
+  };
+
+  const checkRedis = async (): Promise<number> => {
+    const start = Date.now();
+    if (!cacheService.isAvailable()) throw new Error('not connected');
+    await Promise.race([
+      cacheService.getStats(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), DEPENDENCY_TIMEOUT)),
+    ]);
+    return Date.now() - start;
+  };
+
+  try {
+    const [dbLatency, redisLatency] = await Promise.all([checkDb(), checkRedis()]);
+    res.json({
+      status: 'ready',
+      db_latency_ms: dbLatency,
+      redis_latency_ms: redisLatency,
+    });
+  } catch (error) {
+    const err = error instanceof Error ? error : new Error(String(error));
+    res.status(503).json({
+      status: 'not ready',
+      error: err.message,
+    });
+  }
+});
+
+// Prometheus metrics endpoint (D-03)
+app.get('/metrics', async (_req, res) => {
+  try {
+    res.set('Content-Type', metricsService.getContentType());
+    res.end(await metricsService.getMetrics());
+  } catch (error) {
+    res.status(500).end();
+  }
 });
 
 // Database health check - dedicated endpoint for container orchestration (D-05)
@@ -294,6 +362,11 @@ httpServer.listen(PORT, () => {
   // Start cleanup service for unverified account management (D-18)
   const cleanupService = CleanupService.getInstance();
   cleanupService.start();
+
+  // Update WebSocket metrics periodically
+  setInterval(() => {
+    metricsService.setWebSocketConnections(wsService.getClientCount());
+  }, 10000);
 });
 
 httpServer.on('error', (error: NodeJS.ErrnoException) => {
