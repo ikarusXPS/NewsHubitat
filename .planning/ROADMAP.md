@@ -100,7 +100,12 @@ Plans:
   3. External uptime monitoring alerts team when services are down or degraded
   4. Grafana dashboard visualizes all key metrics with historical trends
   5. Alert rules trigger notifications for error spikes and latency anomalies
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 20-01-PLAN.md — MetricsService, metricsMiddleware, /health, /readiness, /metrics endpoints
+- [ ] 20-02-PLAN.md — Prometheus and Alertmanager Docker services with alert rules
+- [ ] 20-03-PLAN.md — Grafana dashboard and UptimeRobot documentation
 
 ### Phase 21: Load Testing
 **Goal**: Validate system handles 10,000 concurrent users with documented performance baselines
@@ -148,10 +153,10 @@ Plans:
 | 17. Docker Deployment | v1.2 | 3/3 | Complete | 2026-04-23 |
 | 18. CI/CD Pipeline | v1.3 | 0/3 | Planned | - |
 | 19. Sentry Error Tracking | v1.3 | 3/3 | Complete | 2026-04-23 |
-| 20. Monitoring & Alerting | v1.3 | 0/? | Not started | - |
+| 20. Monitoring & Alerting | v1.3 | 0/3 | Planned | - |
 | 21. Load Testing | v1.3 | 0/? | Not started | - |
 | 22. SMTP Production | v1.3 | 0/? | Not started | - |
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-23 — Phase 19 complete (Sentry Error Tracking)*
+*Last updated: 2026-04-23 — Phase 20 planned (Monitoring & Alerting)*
