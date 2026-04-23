@@ -1,4 +1,5 @@
 import { Suspense, lazy, useEffect } from 'react';
+import './i18n/i18n'; // Initialize i18n before App renders
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Radio } from 'lucide-react';
