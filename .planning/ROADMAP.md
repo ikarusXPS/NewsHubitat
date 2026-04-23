@@ -121,7 +121,7 @@ Plans:
 
 Plans:
 - [x] 21-01-PLAN.md — k6 test scripts, helper libraries, test data, user seeding script
-- [ ] 21-02-PLAN.md — GitHub Actions workflow, performance baseline documentation, npm scripts
+- [x] 21-02-PLAN.md — GitHub Actions workflow, performance baseline documentation, npm scripts
 - [ ] 21-03-PLAN.md — Smoke test execution and validation
 
 ### Phase 22: SMTP Production
@@ -159,9 +159,9 @@ Plans:
 | 18. CI/CD Pipeline | v1.3 | 0/3 | Planned | - |
 | 19. Sentry Error Tracking | v1.3 | 3/3 | Complete | 2026-04-23 |
 | 20. Monitoring & Alerting | v1.3 | 3/3 | Complete | 2026-04-23 |
-| 21. Load Testing | v1.3 | 1/3 | In Progress | 2026-04-23 |
+| 21. Load Testing | v1.3 | 2/3 | In Progress | 2026-04-23 |
 | 22. SMTP Production | v1.3 | 0/? | Not started | - |
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-23 — Phase 21 planned (Load Testing)*
+*Last updated: 2026-04-23 — Plan 21-02 complete (CI load testing integration)*

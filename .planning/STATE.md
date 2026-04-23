@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-04-23)
 ## Current Position
 
 Phase: 21 - Load Testing (in progress)
-Current Plan: 21-01 (complete)
+Current Plan: 21-02 (complete)
 Status: Plan complete
-Last activity: 2026-04-23 — Plan 21-01 complete (k6 test scripts, helper libraries, test data, user seeding)
+Last activity: 2026-04-23 — Plan 21-02 complete (GitHub Actions workflow, performance baseline documentation, npm scripts)
 
 ```
-v1.3 Progress: [######              ] 33% (1/3 plans in Phase 21)
+v1.3 Progress: [############        ] 67% (2/3 plans in Phase 21)
 ```
 
 ## Milestone Progress
@@ -66,8 +66,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Plan 21-01 complete (k6 test scripts, helper libraries, test data, user seeding)
-**Next step:** Plan 21-02 (GitHub Actions workflow, performance baseline documentation)
+**Last action:** Plan 21-02 complete (GitHub Actions workflow, performance baseline documentation, npm scripts)
+**Next step:** Plan 21-03 (if exists) or Phase 21 complete
 **Resume file:** None
 **Checkpoint:** None
 
@@ -108,7 +108,11 @@ Carried forward from v1.2:
 | 429 marked as expected | Rate limits not counted as failures | D-07: http.expectedStatuses(429) |
 | 100 test users seeded | Pre-created verified accounts | D-03: loadtest1-100@example.com |
 | Performance thresholds | p95 < 500ms (news), 5s (AI), 300ms (auth) | D-36, D-37, D-38: Baseline validation |
+| Manual load test dispatch | workflow_dispatch trigger | D-29: Expensive test, run on demand |
+| STAGING_URL secret | CI tests staging only | D-34: Prevent accidental production load |
+| GitHub Actions summary | p95, p99, error rate table | D-35: At-a-glance metrics |
+| 30-day artifact retention | JSON + HTML reports | D-32: Historical analysis |
 
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-23 — Plan 21-01 complete (k6 test scripts)*
+*Last updated: 2026-04-23 — Plan 21-02 complete (CI load testing integration)*

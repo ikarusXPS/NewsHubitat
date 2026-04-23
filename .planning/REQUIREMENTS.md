@@ -32,8 +32,8 @@ Requirements for Production Ready milestone. Each maps to roadmap phases.
 
 - [x] **LOAD-01**: k6 Test Scripts existieren für kritische Endpoints
 - [ ] **LOAD-02**: System hält 10.000 gleichzeitige User aus
-- [ ] **LOAD-03**: Load Tests laufen als Teil der CI Pipeline
-- [ ] **LOAD-04**: Performance Baselines sind dokumentiert (p95, p99 Latency)
+- [x] **LOAD-03**: Load Tests laufen als Teil der CI Pipeline
+- [x] **LOAD-04**: Performance Baselines sind dokumentiert (p95, p99 Latency)
 
 ### SMTP Production
 
@@ -88,10 +88,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MNTR-02 | Phase 20 | Pending |
 | MNTR-03 | Phase 20 | Pending |
 | MNTR-04 | Phase 20 | Pending |
-| LOAD-01 | Phase 21 | Pending |
+| LOAD-01 | Phase 21 | Complete (Plan 21-01) |
 | LOAD-02 | Phase 21 | Pending |
-| LOAD-03 | Phase 21 | Pending |
-| LOAD-04 | Phase 21 | Pending |
+| LOAD-03 | Phase 21 | Complete (Plan 21-02) |
+| LOAD-04 | Phase 21 | Complete (Plan 21-02) |
 | SMTP-01 | Phase 22 | Pending |
 | SMTP-02 | Phase 22 | Pending |
 | SMTP-03 | Phase 22 | Pending |
