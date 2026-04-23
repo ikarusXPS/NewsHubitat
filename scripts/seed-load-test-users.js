@@ -2,7 +2,9 @@
  * Seed 100 test users for load testing
  * Usage: npm run seed:load-test
  */
-import { PrismaClient } from '@prisma/client';
+import 'dotenv/config';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { PrismaClient } from '../src/generated/prisma/client.js';
 import bcrypt from 'bcryptjs';
 import fs from 'fs';
 import path from 'path';
@@ -11,7 +13,14 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const prisma = new PrismaClient();
+const connectionString = process.env.DATABASE_URL;
+
+if (!connectionString) {
+  throw new Error('DATABASE_URL environment variable is required');
+}
+
+const adapter = new PrismaPg({ connectionString, max: 10 });
+const prisma = new PrismaClient({ adapter });
 
 async function seedLoadTestUsers() {
   const users = [];
@@ -29,9 +38,9 @@ async function seedLoadTestUsers() {
       update: {},
       create: {
         email,
-        password: hashedPassword,
-        isEmailVerified: true,  // Skip email verification for load tests
-        username: `loadtest${i}`,
+        passwordHash: hashedPassword,
+        emailVerified: true,  // Skip email verification for load tests
+        name: `Load Test User ${i}`,
       },
     });
 
