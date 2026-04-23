@@ -136,7 +136,7 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 22-01-PLAN.md — Database schema, EmailService SendGrid config, MetricsService email counters
+- [x] 22-01-PLAN.md — Database schema, EmailService SendGrid config, MetricsService email counters
 - [ ] 22-02-PLAN.md — Webhook endpoint with ECDSA signature verification and event handlers
 - [ ] 22-03-PLAN.md — Prometheus alert rules, setup documentation, human verification
 
@@ -165,7 +165,7 @@ Plans:
 | 19. Sentry Error Tracking | v1.3 | 3/3 | Complete | 2026-04-23 |
 | 20. Monitoring & Alerting | v1.3 | 3/3 | Complete | 2026-04-23 |
 | 21. Load Testing | v1.3 | 3/3 | Complete | 2026-04-23 |
-| 22. SMTP Production | v1.3 | 0/3 | Planned | - |
+| 22. SMTP Production | v1.3 | 1/3 | In Progress | - |
 
 ---
 *Roadmap created: 2026-04-18*
