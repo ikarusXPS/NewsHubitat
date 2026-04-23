@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Production Ready
 status: executing
-last_updated: "2026-04-23T10:29:14Z"
+last_updated: "2026-04-23T10:37:47Z"
 last_activity: 2026-04-23
 progress:
   total_phases: 5
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 3
-  completed_plans: 2
-  percent: 67
+  completed_plans: 3
+  percent: 100
 ---
 
 # State: NewsHub
@@ -24,13 +24,13 @@ See: .planning/PROJECT.md (updated 2026-04-23)
 
 ## Current Position
 
-Phase: 19 - Sentry Error Tracking (executing)
-Current Plan: 19-03 (next)
-Status: Executing
-Last activity: 2026-04-23 — Plan 19-02 complete (backend Sentry integration)
+Phase: 19 - Sentry Error Tracking (complete)
+Current Plan: 19-03 (complete)
+Status: Phase complete
+Last activity: 2026-04-23 — Plan 19-03 complete (CI source map upload)
 
 ```
-v1.3 Progress: [#############.......] 67% (2/3 plans in Phase 19)
+v1.3 Progress: [####################] 100% (3/3 plans in Phase 19)
 ```
 
 ## Milestone Progress
@@ -45,7 +45,7 @@ v1.3 Progress: [#############.......] 67% (2/3 plans in Phase 19)
 | Phase | Name | Requirements | Status |
 |-------|------|--------------|--------|
 | 18 | CI/CD Pipeline | CICD-01, CICD-02, CICD-03, CICD-04 | Planned (3 plans) |
-| 19 | Sentry Error Tracking | SNTR-01, SNTR-02, SNTR-03, SNTR-04 | Executing (2/3 plans) |
+| 19 | Sentry Error Tracking | SNTR-01, SNTR-02, SNTR-03, SNTR-04 | Complete (3/3 plans) |
 | 20 | Monitoring & Alerting | MNTR-01, MNTR-02, MNTR-03, MNTR-04 | Not started |
 | 21 | Load Testing | LOAD-01, LOAD-02, LOAD-03, LOAD-04 | Not started |
 | 22 | SMTP Production | SMTP-01, SMTP-02, SMTP-03 | Not started |
@@ -66,9 +66,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Plan 19-02 complete (backend Sentry integration, 4 tasks, 4 commits)
-**Next step:** Execute Plan 19-03 (CI source map upload and release configuration)
-**Resume file:** .planning/phases/19-sentry-error-tracking/19-03-PLAN.md
+**Last action:** Plan 19-03 complete (CI source map upload, 3 tasks, 3 commits)
+**Next step:** Phase 19 complete; ready for Phase 20 (Monitoring & Alerting)
+**Resume file:** None (phase complete)
 **Checkpoint:** None
 
 ## Accumulated Context
@@ -92,7 +92,11 @@ Carried forward from v1.2:
 | @sentry/node 10.49.0 | Backend error capture needed | Works with Express 5 via setupExpressErrorHandler |
 | ESM instrumentation via .mjs | Node --import flag requires ESM | server/instrument.mjs loaded before app |
 | Backend Sentry env vars | Separate from frontend VITE_ vars | SENTRY_DSN, SENTRY_ENVIRONMENT, SENTRY_TRACES_SAMPLE_RATE |
+| @sentry/vite-plugin 5.2.0 | Source map upload during CI build | Conditional plugin, deletes maps after upload |
+| Hidden source maps | Generate maps without bundling | sourcemap: 'hidden' in vite.config.ts |
+| Release format newshub@sha | Git commit traceability | SENTRY_RELEASE: newshub@${{ github.sha }} |
+| Environment per deploy job | Distinguish staging/production errors | SENTRY_ENVIRONMENT set in each deploy step |
 
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-23 — Plan 19-02 complete (backend Sentry)*
+*Last updated: 2026-04-23 — Plan 19-03 complete (CI source map upload)*
