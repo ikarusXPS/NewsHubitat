@@ -112,6 +112,7 @@ npx playwright test e2e/auth.spec.ts            # Single E2E test file
 | `personaService.ts` | AI persona management |
 | `emailService.ts` | Email digest and notifications |
 | `cacheService.ts` | Redis wrapper with JWT blacklist and graceful degradation |
+| `cleanupService.ts` | Daily cleanup: unverified accounts (30d), analytics (90d), expired shares |
 
 ### Key Directories
 | Directory | Purpose |
@@ -356,3 +357,29 @@ Edit `server/config/sources.ts`:
 ### Email Verification Not Working
 **Problem**: Users can't verify email.
 **Solution**: Configure SMTP environment variables. Check `cleanupService.ts` for token expiration handling.
+
+## GDPR Compliance
+
+### Consent Management
+- `ConsentContext` manages 3 categories: essential (required), preferences, analytics
+- `ConsentBanner` shows on first visit, stores consent in `newshub-consent` localStorage key
+- Non-essential localStorage is cleared when consent is revoked
+
+### Data Retention (automated via cleanupService)
+| Data | Retention | Trigger |
+|------|-----------|---------|
+| Unverified accounts | 30 days | Daily cleanup |
+| ShareClick analytics | 90 days | Daily cleanup |
+| Expired SharedContent | On expiry | Daily cleanup |
+| JWT tokens | 7 days | Blacklist in Redis |
+
+### User Rights Implementation
+| Right | Endpoint |
+|-------|----------|
+| Data Export (Art. 20) | `GET /api/account/export?format=json\|csv` |
+| Account Deletion (Art. 17) | `POST /api/account/delete-request` (7-day grace) |
+| History Pause (Art. 18) | `isHistoryPaused` store toggle |
+
+### Legal Documentation
+- `docs/legal/README.md` - DPA checklist for third-party providers
+- `docs/legal/PROCESSING-RECORDS.md` - Art. 30 processing activities register
