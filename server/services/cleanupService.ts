@@ -12,6 +12,7 @@ import { generateSecureToken, getTokenExpiry } from '../utils/tokenUtils';
 import logger from '../utils/logger';
 
 const ACCOUNT_RETENTION_DAYS = 30;  // D-17
+const ANALYTICS_RETENTION_DAYS = 90; // GDPR: ShareClick analytics retention
 const REMINDER_DAYS = [7, 1];       // D-19: Send reminders at 7 days and 1 day before deletion
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
 const CLEANUP_INTERVAL_MS = DAY_IN_MS;  // D-18: Daily interval
@@ -82,6 +83,12 @@ export class CleanupService {
 
       // 2. Delete expired unverified accounts
       await this.deleteExpiredAccounts();
+
+      // 3. Delete old analytics data (GDPR compliance)
+      await this.deleteExpiredAnalytics();
+
+      // 4. Delete expired shared content
+      await this.deleteExpiredShares();
 
       logger.info('cleanup:complete');
     } catch (err) {
@@ -176,6 +183,44 @@ export class CleanupService {
   }
 
   /**
+   * Delete ShareClick analytics older than 90 days (GDPR compliance)
+   */
+  private async deleteExpiredAnalytics(): Promise<void> {
+    const cutoffDate = new Date(Date.now() - ANALYTICS_RETENTION_DAYS * DAY_IN_MS);
+
+    const result = await prisma.shareClick.deleteMany({
+      where: {
+        createdAt: {
+          lt: cutoffDate,
+        },
+      },
+    });
+
+    if (result.count > 0) {
+      logger.info(`cleanup:deleted_analytics count=${result.count} retention=${ANALYTICS_RETENTION_DAYS}d`);
+    }
+  }
+
+  /**
+   * Delete expired SharedContent records
+   */
+  private async deleteExpiredShares(): Promise<void> {
+    const now = new Date();
+
+    const result = await prisma.sharedContent.deleteMany({
+      where: {
+        expiresAt: {
+          lt: now,
+        },
+      },
+    });
+
+    if (result.count > 0) {
+      logger.info(`cleanup:deleted_expired_shares count=${result.count}`);
+    }
+  }
+
+  /**
    * Get statistics about pending cleanups (for monitoring)
    */
   async getStats(): Promise<{
@@ -183,13 +228,25 @@ export class CleanupService {
     expiringIn7Days: number;
     expiringIn1Day: number;
     expiredCount: number;
+    analyticsTotal: number;
+    analyticsExpiring: number;
+    expiredShares: number;
   }> {
     const now = new Date();
     const cutoffDate = new Date(now.getTime() - ACCOUNT_RETENTION_DAYS * DAY_IN_MS);
     const sevenDaysFromExpiry = new Date(now.getTime() - (ACCOUNT_RETENTION_DAYS - 7) * DAY_IN_MS);
     const oneDayFromExpiry = new Date(now.getTime() - (ACCOUNT_RETENTION_DAYS - 1) * DAY_IN_MS);
+    const analyticsCutoff = new Date(now.getTime() - ANALYTICS_RETENTION_DAYS * DAY_IN_MS);
 
-    const [unverifiedTotal, expiringIn7Days, expiringIn1Day, expiredCount] = await Promise.all([
+    const [
+      unverifiedTotal,
+      expiringIn7Days,
+      expiringIn1Day,
+      expiredCount,
+      analyticsTotal,
+      analyticsExpiring,
+      expiredShares,
+    ] = await Promise.all([
       prisma.user.count({ where: { emailVerified: false } }),
       prisma.user.count({
         where: {
@@ -209,6 +266,13 @@ export class CleanupService {
           createdAt: { lt: cutoffDate },
         },
       }),
+      prisma.shareClick.count(),
+      prisma.shareClick.count({
+        where: { createdAt: { lt: analyticsCutoff } },
+      }),
+      prisma.sharedContent.count({
+        where: { expiresAt: { lt: now } },
+      }),
     ]);
 
     return {
@@ -216,6 +280,9 @@ export class CleanupService {
       expiringIn7Days,
       expiringIn1Day,
       expiredCount,
+      analyticsTotal,
+      analyticsExpiring,
+      expiredShares,
     };
   }
 }
