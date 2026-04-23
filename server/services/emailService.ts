@@ -127,7 +127,7 @@ export class EmailService {
         logger.warn(`Email blocked - user opted out: ${to}`);
         return false;
       }
-    } catch (err) {
+    } catch (_err) {
       // Non-user emails (e.g., external addresses) can still be sent
       logger.debug(`Bounce check skipped for ${to}: not a registered user`);
     }
