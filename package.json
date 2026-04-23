@@ -31,6 +31,7 @@
     "seed": "npx tsx prisma/seed.ts",
     "seed:badges": "npx tsx prisma/seed-badges.ts",
     "seed:personas": "npx tsx prisma/seed-personas.ts",
+    "seed:load-test": "tsx scripts/seed-load-test-users.js",
     "validate:ci": "npx --yes action-validator .github/workflows/ci.yml"
   },
   "dependencies": {
