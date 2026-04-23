@@ -16,7 +16,7 @@
     "build": "npm run build:frontend && npm run build:server",
     "build:frontend": "vite build",
     "build:server": "tsup",
-    "start": "node dist/server/index.js",
+    "start": "node --import ./server/instrument.mjs dist/server/index.js",
     "lint": "eslint .",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
