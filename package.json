@@ -28,6 +28,7 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
+    "screenshots": "playwright test e2e/screenshots.spec.ts --project=chromium",
     "seed": "npx tsx prisma/seed.ts",
     "seed:badges": "npx tsx prisma/seed-badges.ts",
     "seed:personas": "npx tsx prisma/seed-personas.ts",
