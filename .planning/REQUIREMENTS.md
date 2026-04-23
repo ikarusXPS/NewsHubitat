@@ -50,7 +50,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | I18N-01 | Phase 23 | Pending |
-| I18N-02 | Phase 23 | Pending |
+| I18N-02 | Phase 23 | In Progress |
 | I18N-03 | Phase 23 | Pending |
 | MOBILE-01 | Phase 24 | Pending |
 | MOBILE-02 | Phase 24 | Pending |
