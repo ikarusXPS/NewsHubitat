@@ -1,0 +1,103 @@
+{
+  "title": "Settings",
+  "close": "Close",
+  "account": {
+    "title": "Account",
+    "notLoggedIn": "Not logged in",
+    "loginPrompt": "Sign in to sync your settings and access them on all devices.",
+    "security": "Security",
+    "logout": "Sign Out",
+    "readingHistory": "Reading History",
+    "articleCount": "{count, plural, =0 {No articles} one {# article} other {# articles}}",
+    "deleteHistory": "Delete",
+    "confirmDeleteHistory": "Do you want to delete your entire reading history?",
+    "historyDeleted": "Reading history deleted",
+    "exportData": "Export Data",
+    "deleteAccount": "Delete Account"
+  },
+  "profile": {
+    "title": "Edit Profile",
+    "changeAvatar": "Change Avatar",
+    "changeName": "Change Name",
+    "newName": "New Name",
+    "confirmPassword": "Confirm Password",
+    "nameUpdated": "Name updated",
+    "updateFailed": "Failed to update"
+  },
+  "reading": {
+    "title": "Reading & Personalization",
+    "personalization": "Personalized Recommendations",
+    "personalizationDesc": "'For You' suggestions based on reading history",
+    "pauseTracking": "Pause History Tracking",
+    "pauseTrackingDesc": "Reading activity will not be recorded"
+  },
+  "appearance": {
+    "title": "Appearance",
+    "darkMode": "Dark Mode",
+    "lightMode": "Light Mode"
+  },
+  "sorting": {
+    "title": "Sorting",
+    "sortBy": "Sort by",
+    "date": "Date",
+    "relevance": "Relevance",
+    "order": "Order",
+    "newestFirst": "Newest first",
+    "oldestFirst": "Oldest first"
+  },
+  "perspectives": {
+    "title": "Default Perspectives",
+    "description": "Select the perspectives that load automatically on startup",
+    "count": "{count, plural, one {# perspective} other {# perspectives}}"
+  },
+  "presets": {
+    "title": "Filter Presets",
+    "namePlaceholder": "Preset name...",
+    "saved": "Saved presets:",
+    "builtIn": "Built-in Presets",
+    "custom": "Custom Presets",
+    "createCustom": "Create Custom Preset",
+    "createHint": "Complete onboarding to create custom focus presets",
+    "confirmDelete": "Do you want to delete the preset \"{name}\"?",
+    "deleted": "Preset successfully deleted"
+  },
+  "focusManagement": {
+    "title": "Focus Management",
+    "description": "Manage your Focus Presets. Built-in presets cannot be edited."
+  },
+  "resetFilters": {
+    "title": "Reset Filters",
+    "button": "Reset all filters"
+  },
+  "commandPalette": {
+    "title": "Command Palette",
+    "show": "Show Command Palette",
+    "hint": "Quick access with"
+  },
+  "api": {
+    "title": "API Configuration",
+    "description": "Configure your API keys for extended features.",
+    "deeplKey": "DeepL API Key",
+    "deeplPlaceholder": "Enter API key...",
+    "deeplHint": "For automatic translations. Free at deepl.com/pro-api"
+  },
+  "dataCache": {
+    "title": "Data & Cache",
+    "exportTitle": "Export Settings",
+    "exportDesc": "Export all settings, presets, and preferences as JSON file",
+    "exportButton": "Export settings",
+    "importTitle": "Import Settings",
+    "importDesc": "Import previously exported settings",
+    "importButton": "Import settings",
+    "importSuccess": "Settings imported successfully",
+    "importError": "Error importing settings",
+    "clearCacheTitle": "Clear Cache",
+    "clearCacheDesc": "Remove cached article data and force a full reload",
+    "clearCacheButton": "Clear cache",
+    "confirmClearCache": "Do you really want to clear the entire cache?",
+    "cacheCleared": "Cache cleared successfully"
+  },
+  "toast": {
+    "loggedOut": "Successfully logged out"
+  }
+}
