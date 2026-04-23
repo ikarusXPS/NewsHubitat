@@ -169,20 +169,65 @@ Navigate the app without touching your mouse:
 
 ## 🎬 Demo
 
-> **Coming Soon:** Screenshots and live demo link
-
-<!--
 ### Screenshots
 
-<details>
-<summary>Click to expand screenshots</summary>
+<details open>
+<summary><strong>Dashboard — Multi-Perspective News Feed</strong></summary>
 
-| Dashboard | Monitor | Analysis |
-|-----------|---------|----------|
-| ![Dashboard](docs/screenshots/dashboard.png) | ![Monitor](docs/screenshots/monitor.png) | ![Analysis](docs/screenshots/analysis.png) |
+![Dashboard](docs/screenshots/dashboard.png)
+
+*Signal Cards with color-coded perspective badges, sentiment indicators, and source reliability scores.*
 
 </details>
--->
+
+<details>
+<summary><strong>Monitor — Real-Time Geopolitical Tracking</strong></summary>
+
+| 3D Globe View | Event Details |
+|---------------|---------------|
+| ![Globe](docs/screenshots/monitor-globe.png) | ![Events](docs/screenshots/monitor-events.png) |
+
+*Interactive WebGL globe with live event markers. Hover for details, click to filter by severity.*
+
+</details>
+
+<details>
+<summary><strong>Analysis — AI-Powered Topic Clustering</strong></summary>
+
+![Analysis](docs/screenshots/analysis.png)
+
+*Automatic topic clustering with perspective distribution. AI-generated summaries compare framing across regions.*
+
+</details>
+
+<details>
+<summary><strong>Timeline — Historical Event Explorer</strong></summary>
+
+![Timeline](docs/screenshots/timeline.png)
+
+*Chronological view of geopolitical events with category filtering and severity indicators.*
+
+</details>
+
+<details>
+<summary><strong>Community — Contribution Hub</strong></summary>
+
+![Community](docs/screenshots/community.png)
+
+*Submit tips, fact-checks, and translations. Earn badges and climb the leaderboard.*
+
+</details>
+
+<details>
+<summary><strong>Feed Manager & Dark Theme</strong></summary>
+
+| Feed Manager | Keyboard Shortcuts |
+|--------------|-------------------|
+| ![Feed Manager](docs/screenshots/feed-manager.png) | ![Shortcuts](docs/screenshots/shortcuts.png) |
+
+*Control your sources, create custom feeds, and navigate with keyboard shortcuts.*
+
+</details>
 
 ---
 
