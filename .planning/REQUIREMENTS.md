@@ -30,7 +30,7 @@ Requirements for Production Ready milestone. Each maps to roadmap phases.
 
 ### Load Testing
 
-- [ ] **LOAD-01**: k6 Test Scripts existieren für kritische Endpoints
+- [x] **LOAD-01**: k6 Test Scripts existieren für kritische Endpoints
 - [ ] **LOAD-02**: System hält 10.000 gleichzeitige User aus
 - [ ] **LOAD-03**: Load Tests laufen als Teil der CI Pipeline
 - [ ] **LOAD-04**: Performance Baselines sind dokumentiert (p95, p99 Latency)

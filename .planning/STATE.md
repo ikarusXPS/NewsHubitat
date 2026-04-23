@@ -24,13 +24,13 @@ See: .planning/PROJECT.md (updated 2026-04-23)
 
 ## Current Position
 
-Phase: 20 - Monitoring & Alerting (complete)
-Current Plan: 20-03 (complete)
-Status: Phase complete
-Last activity: 2026-04-23 — Phase 20 complete (Prometheus, Alertmanager, Grafana, health endpoints)
+Phase: 21 - Load Testing (in progress)
+Current Plan: 21-01 (complete)
+Status: Plan complete
+Last activity: 2026-04-23 — Plan 21-01 complete (k6 test scripts, helper libraries, test data, user seeding)
 
 ```
-v1.3 Progress: [####################] 100% (3/3 plans in Phase 20)
+v1.3 Progress: [######              ] 33% (1/3 plans in Phase 21)
 ```
 
 ## Milestone Progress
@@ -66,9 +66,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Phase 20 complete (3 plans, MetricsService, Prometheus, Alertmanager, Grafana)
-**Next step:** Phase 20 complete; ready for Phase 21 (Load Testing)
-**Resume file:** None (phase complete)
+**Last action:** Plan 21-01 complete (k6 test scripts, helper libraries, test data, user seeding)
+**Next step:** Plan 21-02 (GitHub Actions workflow, performance baseline documentation)
+**Resume file:** None
 **Checkpoint:** None
 
 ## Accumulated Context
@@ -103,7 +103,12 @@ Carried forward from v1.2:
 | HighErrorRate threshold | Alert on 5xx > 1% for 5m | prometheus/alert.rules.yml |
 | HighLatency threshold | Alert on p95 > 2s for 5m | prometheus/alert.rules.yml |
 | Grafana admin/admin | Default credentials for dev | Change in production |
+| k6 JavaScript scripts | No TypeScript build step needed | D-21: JavaScript for k6 simplicity |
+| SharedArray for test data | Memory-efficient data sharing | D-03, D-15: Load once, share across VUs |
+| 429 marked as expected | Rate limits not counted as failures | D-07: http.expectedStatuses(429) |
+| 100 test users seeded | Pre-created verified accounts | D-03: loadtest1-100@example.com |
+| Performance thresholds | p95 < 500ms (news), 5s (AI), 300ms (auth) | D-36, D-37, D-38: Baseline validation |
 
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-23 — Phase 20 complete (Monitoring & Alerting)*
+*Last updated: 2026-04-23 — Plan 21-01 complete (k6 test scripts)*
