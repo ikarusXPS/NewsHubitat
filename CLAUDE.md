@@ -63,7 +63,7 @@ npx playwright test e2e/auth.spec.ts            # Single E2E test file
 - **Backend**: Express 5 (TypeScript, ES modules)
 - **Database**: PostgreSQL via Prisma 7 (adapter: @prisma/adapter-pg)
 - **Real-time**: Socket.io for WebSocket updates
-- **AI**: Multi-provider fallback (Gemini → OpenRouter → Anthropic)
+- **AI**: Multi-provider fallback (OpenRouter → Gemini → Anthropic)
 - **Translation**: Multi-provider chain (DeepL → Google → LibreTranslate → Claude)
 
 ## Architecture
@@ -182,8 +182,8 @@ refetchInterval: 2 * 60_000
 
 ### Multi-Provider AI Fallback
 The AI service (`server/services/aiService.ts`) uses a fallback chain:
-1. **Gemini** (free tier, 1500 req/day) - Primary
-2. **OpenRouter** (multi-model, paid) - Secondary
+1. **OpenRouter** (multiple free models) - Primary
+2. **Gemini** (free tier, 1500 req/day) - Secondary
 3. **Anthropic** (premium) - Fallback
 
 If all providers fail, keyword-based analysis is used as final fallback.
@@ -282,10 +282,11 @@ Auth-required tests (`profile.spec.ts`, `settings.spec.ts`, `history.spec.ts`) r
 PORT=3001
 DATABASE_URL="postgresql://newshub:newshub_dev@localhost:5433/newshub?schema=public"
 REDIS_URL=redis://localhost:6379
+JWT_SECRET=               # Required, minimum 32 characters
 
-# AI (ONE required, priority: Gemini → OpenRouter → Anthropic)
-GEMINI_API_KEY=           # FREE tier - 1500 req/day (recommended)
-OPENROUTER_API_KEY=       # Paid - multi-model access
+# AI (ONE required, priority: OpenRouter → Gemini → Anthropic)
+OPENROUTER_API_KEY=       # FREE tier - multiple free models (recommended)
+GEMINI_API_KEY=           # FREE tier - 1500 req/day
 ANTHROPIC_API_KEY=        # Premium fallback
 
 # Translation (at least one recommended)
