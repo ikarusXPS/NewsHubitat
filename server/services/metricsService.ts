@@ -20,6 +20,13 @@ export class MetricsService {
   public dbConnectionsActive: Gauge<string>;
   public redisConnectionsActive: Gauge<string>;
 
+  // Email metrics (D-11, D-12 - Phase 22)
+  public emailSentTotal: Counter<string>;
+  public emailDeliveredTotal: Counter<string>;
+  public emailBouncedTotal: Counter<string>;
+  public emailComplainedTotal: Counter<string>;
+  public emailDeliverySuccessRate: Gauge<string>;
+
   private constructor() {
     this.registry = new Registry();
 
@@ -76,6 +83,42 @@ export class MetricsService {
       registers: [this.registry],
     });
 
+    // Email counters (D-11 - Phase 22)
+    this.emailSentTotal = new Counter({
+      name: 'email_sent_total',
+      help: 'Total number of emails sent',
+      labelNames: ['type'],
+      registers: [this.registry],
+    });
+
+    this.emailDeliveredTotal = new Counter({
+      name: 'email_delivered_total',
+      help: 'Total number of emails delivered',
+      labelNames: ['type'],
+      registers: [this.registry],
+    });
+
+    this.emailBouncedTotal = new Counter({
+      name: 'email_bounced_total',
+      help: 'Total number of bounced emails',
+      labelNames: ['type', 'bounce_type'],
+      registers: [this.registry],
+    });
+
+    this.emailComplainedTotal = new Counter({
+      name: 'email_complained_total',
+      help: 'Total number of spam complaints',
+      labelNames: ['type'],
+      registers: [this.registry],
+    });
+
+    // Email delivery success rate gauge (D-12 - Phase 22)
+    this.emailDeliverySuccessRate = new Gauge({
+      name: 'email_delivery_success_rate',
+      help: 'Email delivery success rate (delivered/sent)',
+      registers: [this.registry],
+    });
+
     logger.info('MetricsService initialized');
   }
 
@@ -113,6 +156,55 @@ export class MetricsService {
    */
   setRedisConnections(count: number): void {
     this.redisConnectionsActive.set(count);
+  }
+
+  /**
+   * Increment email sent counter (D-11 - Phase 22)
+   */
+  incrementEmailSent(type: string): void {
+    this.emailSentTotal.inc({ type });
+    this.updateDeliveryRate();
+  }
+
+  /**
+   * Increment email delivered counter (D-11 - Phase 22)
+   */
+  incrementEmailDelivered(type: string): void {
+    this.emailDeliveredTotal.inc({ type });
+    this.updateDeliveryRate();
+  }
+
+  /**
+   * Increment email bounced counter (D-11 - Phase 22)
+   */
+  incrementEmailBounced(type: string, bounceType: 'hard' | 'soft' | 'blocked'): void {
+    this.emailBouncedTotal.inc({ type, bounce_type: bounceType });
+    this.updateDeliveryRate();
+  }
+
+  /**
+   * Increment email complained counter (D-11 - Phase 22)
+   */
+  incrementEmailComplained(type: string): void {
+    this.emailComplainedTotal.inc({ type });
+  }
+
+  /**
+   * Update delivery success rate gauge (D-12 - Phase 22)
+   */
+  private async updateDeliveryRate(): Promise<void> {
+    try {
+      const sent = await this.emailSentTotal.get();
+      const delivered = await this.emailDeliveredTotal.get();
+
+      const totalSent = sent.values.reduce((sum, v) => sum + v.value, 0);
+      const totalDelivered = delivered.values.reduce((sum, v) => sum + v.value, 0);
+
+      const rate = totalSent > 0 ? totalDelivered / totalSent : 1.0;
+      this.emailDeliverySuccessRate.set(rate);
+    } catch (_err) {
+      // Ignore errors during rate calculation
+    }
   }
 }
 
