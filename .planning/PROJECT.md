@@ -134,25 +134,39 @@ This document evolves at phase transitions and milestone boundaries.
 - Core Value confirmed: multi-perspective comparison is the differentiator
 - Gamification and personalization added as key engagement features
 
-## Current Milestone: v1.3 Production Ready
+## Current Milestone: v1.4 User & Community Features
 
-**Goal:** Production-grade deployment infrastructure with CI/CD, error tracking, monitoring, and performance validation
+**Goal:** Reduce onboarding friction, expand target audience, and increase user engagement
 
 **Target features:**
-- CI/CD Pipeline (GitHub Actions for build, test, deploy)
-- Sentry Error Tracking (frontend + backend)
-- Production Monitoring & Alerting (health checks, uptime, metrics)
-- Load Testing (10k concurrent users target)
-- SMTP Production (email flows live verification)
+
+**User Features:**
+- Google OAuth Login (reduce signup friction)
+- GitHub OAuth Login (developer audience)
+- Multi-Language UI / i18n (expand beyond DE/EN)
+- Mobile Responsive Layouts (optimize mobile UX)
+
+**Community Features:**
+- Social Media Sharing (virality, reach)
+- Article Comments (discussion, engagement)
+- Team Collaboration (B2B use case)
 
 **Baseline (2026-04-23):**
 - Unit tests: 1051 passing, 91.65% coverage
 - E2E tests: 62 passing
 - Database: PostgreSQL (Docker)
 - Caching: Redis
-- Deployment: Docker Compose (manual)
+- Deployment: Docker Compose with CI/CD
+- Monitoring: Prometheus + Grafana + Sentry
 
 ## Completed Milestones
+
+### v1.3 Production Ready (2026-04-23)
+- CI/CD Pipeline (GitHub Actions)
+- Sentry Error Tracking (frontend + backend)
+- Prometheus + Grafana Monitoring
+- k6 Load Testing (10k users validated)
+- SMTP Production with SendGrid
 
 ### v1.2 Performance & Scale (2026-04-23)
 - PostgreSQL migration
@@ -171,4 +185,4 @@ This document evolves at phase transitions and milestone boundaries.
 - Gamification and personalization
 
 ---
-*Last updated: 2026-04-23 after v1.3 milestone started*
+*Last updated: 2026-04-23 after v1.4 milestone started*

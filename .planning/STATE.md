@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.3
-milestone_name: Production Ready
-status: executing
-last_updated: "2026-04-23T17:43:17Z"
+milestone: v1.4
+milestone_name: User & Community Features
+status: defining_requirements
+last_updated: "2026-04-23T18:00:00Z"
 last_activity: 2026-04-23
 progress:
-  total_phases: 5
-  completed_phases: 4
-  total_plans: 15
-  completed_plans: 14
-  percent: 93
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # State: NewsHub
@@ -20,35 +20,31 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-23)
 
 **Core value:** Users can see how the same story is covered by different regional perspectives
-**Current focus:** v1.3 Production Ready
+**Current focus:** v1.4 User & Community Features
 
 ## Current Position
 
-Phase: 22 - SMTP Production (in progress)
-Current Plan: 22-03 (checkpoint pending)
-Status: Awaiting human verification
-Last activity: 2026-04-23 — Plan 22-03 tasks 1-2 complete (alert rules, setup documentation)
+Phase: Not started (defining requirements)
+Current Plan: —
+Status: Defining requirements
+Last activity: 2026-04-23 — Milestone v1.4 started
 
 ```
-v1.3 Progress: [################### ] 97% (3/3 plans in Phase 22, checkpoint pending)
+v1.4 Progress: [                    ] 0% (requirements phase)
 ```
 
 ## Milestone Progress
 
-**Milestone:** v1.3 - Production Ready
-**Goal:** Production-grade deployment infrastructure with CI/CD, error tracking, monitoring, and performance validation
-**Status:** Ready to execute
-**Previous:** v1.2 complete 2026-04-23
+**Milestone:** v1.4 - User & Community Features
+**Goal:** Reduce onboarding friction, expand target audience, and increase user engagement
+**Status:** Defining requirements
+**Previous:** v1.3 complete 2026-04-23
 
 ### Phase Summary
 
 | Phase | Name | Requirements | Status |
 |-------|------|--------------|--------|
-| 18 | CI/CD Pipeline | CICD-01, CICD-02, CICD-03, CICD-04 | Planned (3 plans) |
-| 19 | Sentry Error Tracking | SNTR-01, SNTR-02, SNTR-03, SNTR-04 | Complete (3/3 plans) |
-| 20 | Monitoring & Alerting | MNTR-01, MNTR-02, MNTR-03, MNTR-04 | Complete (3/3 plans) |
-| 21 | Load Testing | LOAD-01, LOAD-02, LOAD-03, LOAD-04 | Not started |
-| 22 | SMTP Production | SMTP-01, SMTP-02, SMTP-03 | Planned (3 plans) |
+| — | TBD | — | Defining requirements |
 
 ## Deferred Items
 
@@ -58,18 +54,20 @@ Items acknowledged and carried forward from previous milestone close:
 |----------|------|--------|
 | verification | Phase 03 human verification | human_needed |
 | uat | Phase 06 UAT tests | blocked |
+| checkpoint | Phase 22-03 SMTP verification | deferred_to_production |
 
 **Note:** These are environmental/operational items, not code defects:
 
 - Phase 03: Email flows work but need SMTP server for production testing
 - Phase 06: UAT tests blocked by no live RSS feeds during testing
+- Phase 22-03: SMTP production verification deferred (infrastructure ready)
 
 ## Session Context
 
-**Last action:** Plan 22-03 tasks 1-2 complete (alert rules, setup documentation)
-**Next step:** Plan 22-03 Task 3 checkpoint (human verification of production email flows)
-**Resume file:** .planning/phases/22-smtp-production/22-03-PLAN.md
-**Checkpoint:** human-verify (production email flow verification)
+**Last action:** Milestone v1.4 started (combined v1.4 + v1.5 scope)
+**Next step:** Define requirements and create roadmap
+**Resume file:** —
+**Checkpoint:** —
 
 ## Accumulated Context
 
@@ -124,4 +122,4 @@ Carried forward from v1.2:
 
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-23 — Milestone v1.3 summary generated*
+*Last updated: 2026-04-23 — Milestone v1.4 started*
