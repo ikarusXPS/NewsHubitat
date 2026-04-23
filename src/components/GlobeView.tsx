@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { Loader2, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
@@ -52,7 +52,10 @@ export function GlobeView({
   });
 
   // Use internal data if useInternalQuery, otherwise use external props
-  const points = useInternalQuery ? (internalData ?? []) : (externalPoints ?? []);
+  const points = useMemo(
+    () => useInternalQuery ? (internalData ?? []) : (externalPoints ?? []),
+    [useInternalQuery, internalData, externalPoints]
+  );
   const isLoading = useInternalQuery ? internalLoading : externalLoading;
   const containerRef = useRef<HTMLDivElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- globe.gl returns complex untyped object
