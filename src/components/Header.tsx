@@ -1,17 +1,18 @@
 import { useState, useEffect } from 'react';
-import { Search, Globe, User, LogOut, Wifi, Clock, Menu } from 'lucide-react';
+import { Search, User, LogOut, Wifi, Clock, Menu } from 'lucide-react';
 import { useAppStore } from '../store';
 import { useAuth } from '../contexts/AuthContext';
 import { AuthModal } from './AuthModal';
 import { FocusSelector } from './FocusSelector';
 import { FeedManagerButton } from './FeedManagerButton';
+import { LanguageSwitcher } from './LanguageSwitcher';
 
 interface HeaderProps {
   onMenuClick?: () => void;
 }
 
 export function Header({ onMenuClick }: HeaderProps) {
-  const { language, setLanguage, filters, setSearchQuery } = useAppStore();
+  const { filters, setSearchQuery } = useAppStore();
   const { user, isAuthenticated, logout } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
 
@@ -113,14 +114,8 @@ export function Header({ onMenuClick }: HeaderProps) {
           {/* Focus Selector */}
           <FocusSelector />
 
-          {/* Language Toggle */}
-          <button
-            onClick={() => setLanguage(language === 'de' ? 'en' : 'de')}
-            className="btn-cyber py-1.5 px-3 rounded-md text-[10px]"
-          >
-            <Globe className="h-3.5 w-3.5 inline mr-1.5" />
-            {language.toUpperCase()}
-          </button>
+          {/* Language Switcher - per D-04: header only */}
+          <LanguageSwitcher />
 
           {/* Auth */}
           {isAuthenticated ? (
