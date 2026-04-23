@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import viteCompression from 'vite-plugin-compression'
 import { VitePWA } from 'vite-plugin-pwa'
+import { sentryVitePlugin } from '@sentry/vite-plugin'
 
 export default defineConfig({
   plugins: [
@@ -98,6 +99,23 @@ export default defineConfig({
         ],
       },
     }),
+    // Sentry plugin - uploads source maps in CI (per D-04)
+    // Only enabled when SENTRY_AUTH_TOKEN is set
+    ...(process.env.SENTRY_AUTH_TOKEN
+      ? [
+          sentryVitePlugin({
+            org: process.env.SENTRY_ORG,
+            project: process.env.SENTRY_PROJECT,
+            authToken: process.env.SENTRY_AUTH_TOKEN,
+            release: {
+              name: process.env.SENTRY_RELEASE,
+            },
+            sourcemaps: {
+              filesToDeleteAfterUpload: ['./dist/**/*.map'],
+            },
+          }),
+        ]
+      : []),
   ],
   test: {
     globals: true,
@@ -114,6 +132,7 @@ export default defineConfig({
     },
   },
   build: {
+    sourcemap: 'hidden', // Generate but don't expose in production (per D-06)
     rollupOptions: {
       output: {
         manualChunks(id: string) {
