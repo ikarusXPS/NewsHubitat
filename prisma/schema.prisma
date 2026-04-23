@@ -89,6 +89,12 @@ model User {
   // Session invalidation (D-27, D-28)
   tokenVersion           Int       @default(0)
 
+  // Phase 22: Email bounce/opt-out tracking (D-04, D-07, D-30)
+  emailBounced      Boolean   @default(false)
+  emailBouncedAt    DateTime?
+  emailOptOut       Boolean   @default(false)
+  emailOptOutAt     DateTime?
+
   // Required for cleanup job (D-17)
   updatedAt              DateTime  @updatedAt
 
