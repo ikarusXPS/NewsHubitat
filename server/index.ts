@@ -1,5 +1,6 @@
 // Load environment variables FIRST before any other imports
 import 'dotenv/config';
+import * as Sentry from '@sentry/node';
 
 import express from 'express';
 import path from 'path';
@@ -270,7 +271,10 @@ if (process.env.NODE_ENV === 'production') {
   console.log('[STATIC] Production mode: serving frontend from dist/');
 }
 
-// Error handler
+// Sentry error handler - captures errors and forwards to next handler (per D-02)
+Sentry.setupExpressErrorHandler(app);
+
+// Error handler (existing - formats response)
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error('Server error:', err);
   res.status(500).json({
