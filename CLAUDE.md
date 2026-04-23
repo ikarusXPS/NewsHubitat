@@ -21,10 +21,10 @@ npm run typecheck && npm run test:run && npm run build
 npm run typecheck        # TypeScript validation
 npm run lint             # ESLint validation
 
-# Unit Testing (Vitest)
+# Unit Testing (Vitest) - 80% coverage enforced
 npm run test             # Run unit tests
 npm run test:run         # Run tests once (CI mode)
-npm run test:coverage    # Coverage report (80% threshold)
+npm run test:coverage    # Coverage report (fails below 80%)
 
 # E2E Testing (Playwright)
 npm run test:e2e         # Playwright headless
@@ -56,7 +56,7 @@ npx playwright test e2e/auth.spec.ts            # Single E2E test file
 
 ## Tech Stack
 
-- **Frontend**: React 19.2 + Vite 8 + TypeScript 6 + Tailwind CSS v4
+- **Frontend**: React 19 + Vite 8 + TypeScript 6 + Tailwind CSS v4
 - **State**: Zustand v5 (persisted to localStorage under `newshub-storage`)
 - **Server State**: TanStack Query v5 (5-min refetch, 2-min stale time)
 - **Visualization**: Recharts 3, globe.gl 2, Leaflet 1.9
@@ -65,6 +65,7 @@ npx playwright test e2e/auth.spec.ts            # Single E2E test file
 - **Real-time**: Socket.io for WebSocket updates
 - **AI**: Multi-provider fallback (OpenRouter → Gemini → Anthropic)
 - **Translation**: Multi-provider chain (DeepL → Google → LibreTranslate → Claude)
+- **Testing**: Vitest (unit, 80% coverage threshold) + Playwright (E2E)
 
 ## Architecture
 
@@ -267,6 +268,13 @@ projects: [
 ```
 
 Auth-required tests (`profile.spec.ts`, `settings.spec.ts`, `history.spec.ts`) run in `chromium-auth` project.
+
+Debug E2E tests:
+```bash
+npx playwright test --debug                    # Step-through debugger
+npx playwright test --ui                       # Interactive UI mode
+npx playwright show-report                     # View last test report
+```
 
 ## UI Design System
 
