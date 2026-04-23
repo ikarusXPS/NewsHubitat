@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: User & Community Features
 status: roadmap_complete
-last_updated: "2026-04-23T21:16:56Z"
+last_updated: "2026-04-23T21:24:16Z"
 last_activity: 2026-04-23
 progress:
   total_phases: 6
   completed_phases: 0
-  total_plans: 2
-  completed_plans: 2
-  percent: 10
+  total_plans: 3
+  completed_plans: 3
+  percent: 15
 ---
 
 # State: NewsHub
@@ -24,13 +24,13 @@ See: .planning/PROJECT.md (updated 2026-04-23)
 
 ## Current Position
 
-Phase: 23 (i18n Foundation) - Plan 02 complete
-Current Plan: 02 (complete)
-Status: Plan 02 executed
-Last activity: 2026-04-23 — Completed 23-02 translation files
+Phase: 23 (i18n Foundation) - Plan 03 complete
+Current Plan: 03 (complete)
+Status: Plan 03 executed
+Last activity: 2026-04-23 — Completed 23-03 locale-aware formatters
 
 ```
-v1.4 Progress: [##                  ] 10% (6 phases, 0 complete, 2 plans done)
+v1.4 Progress: [###                 ] 15% (6 phases, 0 complete, 3 plans done)
 ```
 
 ## Milestone Progress
@@ -44,7 +44,7 @@ v1.4 Progress: [##                  ] 10% (6 phases, 0 complete, 2 plans done)
 
 | Phase | Name | Requirements | Status |
 |-------|------|--------------|--------|
-| 23 | i18n Foundation | I18N-01, I18N-02, I18N-03 | Plan 01 complete |
+| 23 | i18n Foundation | I18N-01, I18N-02, I18N-03 | Plan 03 complete |
 | 24 | Mobile Responsive | MOBILE-01, MOBILE-02, MOBILE-03 | Not started |
 | 25 | Social Sharing | SHARE-01, SHARE-02, SHARE-03 | Not started |
 | 26 | OAuth Integration | OAUTH-01, OAUTH-02, OAUTH-03 | Not started |
@@ -95,9 +95,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Completed 23-02 translation files (10 JSON files for EN/DE)
-**Next step:** Continue with Phase 23 Plan 03 (locale-aware formatters)
-**Resume file:** .planning/phases/23-i18n-foundation/23-02-SUMMARY.md
+**Last action:** Completed 23-03 locale-aware formatters and Zustand-i18next sync
+**Next step:** Continue with Phase 23 Plan 04 (component string extraction)
+**Resume file:** .planning/phases/23-i18n-foundation/23-03-SUMMARY.md
 **Checkpoint:** —
 
 ## Accumulated Context
@@ -156,6 +156,8 @@ v1.4 Stack Decisions (from research):
 | express.json verify callback | Raw body preservation | Avoids separate middleware, follows Express patterns |
 | 24h webhook idempotency TTL | Match SendGrid retry window | Prevent duplicate event processing |
 | react-i18next@17 + i18next@26 | i18n infrastructure for UI | ICU plurals, namespace lazy loading, browser detection |
+| 7-day relative date threshold | D-06 hybrid date format | < 7 days: relative ("5 min ago"), >= 7 days: absolute ("Apr 23, 2026") |
+| Bidirectional Zustand-i18next sync | Persist language across sessions | useAppStore.subscribe watches language, syncs to i18next on load |
 
 ## Reports
 
@@ -165,4 +167,4 @@ v1.4 Stack Decisions (from research):
 
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-23 — Completed 23-02 translation files*
+*Last updated: 2026-04-23 — Completed 23-03 locale-aware formatters*
