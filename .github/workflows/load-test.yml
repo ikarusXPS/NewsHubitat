@@ -1,0 +1,113 @@
+name: Load Test
+
+on:
+  workflow_dispatch:  # D-29: Manual dispatch only (expensive test)
+    inputs:
+      scenario:
+        description: 'Test scenario to run'
+        required: true
+        default: 'load'
+        type: choice
+        options:
+          - smoke
+          - load
+
+jobs:
+  load-test:
+    name: k6 Load Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30  # D-11: 10min test + buffer
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup k6
+        uses: grafana/setup-k6-action@v1  # D-33: Use grafana/k6-action
+        with:
+          k6-version: '0.53.0'
+
+      - name: Run k6 load test
+        env:
+          K6_BASE_URL: ${{ secrets.STAGING_URL }}  # D-34: Hit staging environment
+          K6_SCENARIO: ${{ github.event.inputs.scenario }}
+        run: |
+          # D-30: CI runs full load test (10k VUs, 10 minutes)
+          k6 run k6/load-test.js --out json=summary.json
+        continue-on-error: true  # D-31: Allow workflow to complete even if thresholds fail
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          # D-32: Artifacts uploaded with 30-day retention
+          name: k6-results-${{ github.event.inputs.scenario }}-${{ github.run_number }}
+          path: |
+            summary.json
+            summary.html
+          retention-days: 30
+
+      - name: Generate GitHub Actions Summary
+        if: always()
+        run: |
+          # D-35: Create GitHub Actions summary with p95, p99, pass/fail status
+          echo "## 📊 Load Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Scenario:** \`${{ github.event.inputs.scenario }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Target URL:** ${{ secrets.STAGING_URL }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Run ID:** ${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Triggered by:** @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Extract metrics from summary.json
+          if [ -f summary.json ]; then
+            P95=$(jq -r '.metrics.http_req_duration.values["p(95)"] // 0' summary.json)
+            P99=$(jq -r '.metrics.http_req_duration.values["p(99)"] // 0' summary.json)
+            ERROR_RATE=$(jq -r '(.metrics.http_req_failed.values.rate // 0) * 100' summary.json)
+            CHECKS_PASSED=$(jq -r '.metrics.checks.values.passes // 0' summary.json)
+            CHECKS_FAILED=$(jq -r '.metrics.checks.values.fails // 0' summary.json)
+            ITERATIONS=$(jq -r '.metrics.iterations.values.count // 0' summary.json)
+
+            # D-36, D-37, D-38, D-39: Status determination based on thresholds
+            if (( $(echo "$P95 < 500" | bc -l) )) && (( $(echo "$ERROR_RATE < 1" | bc -l) )); then
+              STATUS="✅ PASSED"
+            else
+              STATUS="❌ FAILED"
+            fi
+
+            echo "**Status:** $STATUS" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### 📈 Performance Metrics" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "| Metric | Value | Threshold | Status |" >> $GITHUB_STEP_SUMMARY
+            echo "|--------|-------|-----------|--------|" >> $GITHUB_STEP_SUMMARY
+            echo "| p95 latency | ${P95}ms | <500ms | $(if (( $(echo "$P95 < 500" | bc -l) )); then echo "✅"; else echo "❌"; fi) |" >> $GITHUB_STEP_SUMMARY
+            echo "| p99 latency | ${P99}ms | <1500ms | $(if (( $(echo "$P99 < 1500" | bc -l) )); then echo "✅"; else echo "❌"; fi) |" >> $GITHUB_STEP_SUMMARY
+            echo "| Error rate | ${ERROR_RATE}% | <1% | $(if (( $(echo "$ERROR_RATE < 1" | bc -l) )); then echo "✅"; else echo "❌"; fi) |" >> $GITHUB_STEP_SUMMARY
+            echo "| Checks passed | ${CHECKS_PASSED} | — | ✅ |" >> $GITHUB_STEP_SUMMARY
+            echo "| Checks failed | ${CHECKS_FAILED} | 0 | $(if [ "$CHECKS_FAILED" -eq 0 ]; then echo "✅"; else echo "❌"; fi) |" >> $GITHUB_STEP_SUMMARY
+            echo "| Total iterations | ${ITERATIONS} | — | — |" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "📄 [View full HTML report in artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Status:** Test execution failed - summary.json not generated" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Fail if thresholds breached
+        if: always()
+        run: |
+          # D-31: Workflow fails on threshold breach (blocks release)
+          if [ -f summary.json ]; then
+            # Check if any threshold was breached
+            THRESHOLD_FAILURES=$(jq -r '.metrics | to_entries | map(select(.value.thresholds != null)) | map(.value.thresholds | to_entries | map(select(.value.ok == false))) | flatten | length' summary.json)
+
+            if [ "$THRESHOLD_FAILURES" -gt 0 ]; then
+              echo "❌ $THRESHOLD_FAILURES threshold(s) breached - failing workflow"
+              exit 1
+            else
+              echo "✅ All thresholds passed"
+            fi
+          else
+            echo "❌ Test results not found"
+            exit 1
+          fi
