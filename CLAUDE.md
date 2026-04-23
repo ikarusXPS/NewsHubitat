@@ -56,7 +56,12 @@ docker compose logs -f app        # Watch app logs
 # CI
 npm run validate:ci               # Validate GitHub Actions workflow syntax
 
-# Run Single Tests
+# Load Testing (k6)
+npm run load:smoke                # Quick smoke test
+npm run load:full                 # Full load test
+npm run seed:load-test            # Seed test users for load testing
+
+# Run Single Tests (unit: src/**/*.test.ts, server/**/*.test.ts | e2e: e2e/*.spec.ts)
 npm run test -- src/lib/utils.test.ts           # Single unit test file
 npm run test -- -t "mapCentering"               # Tests matching pattern
 npx playwright test e2e/auth.spec.ts            # Single E2E test file
