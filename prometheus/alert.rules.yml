@@ -1,0 +1,42 @@
+# NewsHub Alert Rules
+# See: .planning/phases/20-monitoring-alerting/20-CONTEXT.md
+
+groups:
+  - name: newshub
+    rules:
+      # Error rate alert (D-18): 5xx/total > 1% over 5 minutes
+      - alert: HighErrorRate
+        expr: |
+          (
+            sum(rate(http_requests_total{status_code=~"5.."}[5m]))
+            /
+            sum(rate(http_requests_total[5m]))
+          ) > 0.01
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value | humanizePercentage }} over the last 5 minutes"
+
+      # Latency alert (D-19): p95 > 2 seconds over 5 minutes
+      - alert: HighLatency
+        expr: |
+          histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))
+          > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High p95 latency detected"
+          description: "p95 latency is {{ $value | humanizeDuration }}"
+
+      # Service down alert
+      - alert: ServiceDown
+        expr: up{service="newshub"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "NewsHub service is down"
+          description: "The NewsHub application has been down for more than 1 minute"
