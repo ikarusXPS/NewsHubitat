@@ -245,11 +245,16 @@ export class NewsAggregator {
             await this.ensureSourceExists(article.source);
 
             await prisma.newsArticle.upsert({
-              where: { id: article.id },
+              where: { url: article.url },
               update: this.toPrismaArticle(article),
               create: this.toPrismaArticle(article),
             });
           } catch (err) {
+            if (err instanceof Error && 'code' in err && err.code === 'P2002') {
+              // Race condition: another parallel upsert wrote the same url first.
+              // The other write has the same content, so silently skip.
+              return;
+            }
             logger.error(`Failed to save article ${article.id}:`, err);
           }
         })
