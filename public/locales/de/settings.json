@@ -22,7 +22,8 @@
     "newName": "Neuer Name",
     "confirmPassword": "Passwort bestatigen",
     "nameUpdated": "Name aktualisiert",
-    "updateFailed": "Fehler beim Aktualisieren"
+    "updateFailed": "Fehler beim Aktualisieren",
+    "avatarUpdated": "Avatar aktualisiert"
   },
   "reading": {
     "title": "Lesen & Personalisierung",

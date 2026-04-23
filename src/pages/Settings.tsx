@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import i18n from '../i18n/i18n';
 import { Command, Trash2, Save, Download, Upload, Plus, X, User, LogOut, ChevronRight, Mail, Shield, Loader2, Edit } from 'lucide-react';
 import { useAppStore } from '../store';
 import { useAuth } from '../contexts/AuthContext';
@@ -20,6 +22,7 @@ const ALL_REGIONS: PerspectiveRegion[] = [
 ];
 
 export function Settings() {
+  const { t } = useTranslation(['settings', 'common']);
   const navigate = useNavigate();
   const location = useLocation();
   const { user, isAuthenticated, logout } = useAuth();
@@ -29,8 +32,7 @@ export function Settings() {
   const {
     theme,
     toggleTheme,
-    language,
-    setLanguage,
+    // language and setLanguage REMOVED per D-04 - language switcher is in header only
     resetFilters,
     commandPaletteEnabled,
     setCommandPaletteEnabled,
@@ -140,15 +142,15 @@ export function Settings() {
       try {
         const settings = JSON.parse(event.target?.result as string);
         if (settings.theme && theme !== settings.theme) toggleTheme();
-        if (settings.language) setLanguage(settings.language);
+        if (settings.language) i18n.changeLanguage(settings.language);
         if (settings.commandPaletteEnabled !== undefined) setCommandPaletteEnabled(settings.commandPaletteEnabled);
         if (settings.presets) {
           setSavedPresets(settings.presets);
           localStorage.setItem('newshub-filter-presets', JSON.stringify(settings.presets));
         }
-        showToast('Einstellungen erfolgreich importiert', 'success');
+        showToast(t('settings:dataCache.importSuccess'), 'success');
       } catch {
-        showToast('Fehler beim Importieren der Einstellungen', 'error');
+        showToast(t('settings:dataCache.importError'), 'error');
       }
     };
     reader.readAsText(file);
@@ -156,11 +158,11 @@ export function Settings() {
 
   const clearCache = () => {
     showConfirm(
-      'Cache leeren',
-      'Möchten Sie wirklich den gesamten Cache leeren?',
+      t('settings:dataCache.clearCacheTitle'),
+      t('settings:dataCache.confirmClearCache'),
       () => {
         localStorage.removeItem('newshub-cache');
-        showToast('Cache erfolgreich geleert', 'success');
+        showToast(t('settings:dataCache.cacheCleared'), 'success');
         setConfirmDialog({ ...confirmDialog, isOpen: false });
       }
     );
@@ -170,12 +172,12 @@ export function Settings() {
     <div className="space-y-4 max-w-2xl">
       {/* Header with Close Button (hidden in modal mode since modal has its own close button) */}
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-xl font-bold text-white font-mono">Einstellungen</h1>
+        <h1 className="text-xl font-bold text-white font-mono">{t('settings:title')}</h1>
         {!isModalMode && (
           <button
             onClick={() => navigate(-1)}
             className="rounded-lg p-2 text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
-            aria-label="Schließen"
+            aria-label={t('settings:close')}
           >
             <X className="h-5 w-5" />
           </button>
@@ -186,7 +188,7 @@ export function Settings() {
       <div className="rounded-lg border border-gray-700 bg-gray-800 p-4">
         <h2 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
           <User className="h-5 w-5 text-[#00f0ff]" />
-          Konto
+          {t('settings:account.title')}
         </h2>
 
         {isAuthenticated && user ? (
@@ -218,17 +220,17 @@ export function Settings() {
                 className="flex items-center gap-2 p-3 rounded-lg bg-gray-700/50 hover:bg-gray-700 transition-colors"
               >
                 <Shield className="h-4 w-4 text-[#00f0ff]" />
-                <span className="text-sm text-white">Sicherheit</span>
+                <span className="text-sm text-white">{t('settings:account.security')}</span>
               </button>
               <button
                 onClick={() => {
                   logout();
-                  showToast('Erfolgreich abgemeldet', 'success');
+                  showToast(t('settings:toast.loggedOut'), 'success');
                 }}
                 className="flex items-center gap-2 p-3 rounded-lg bg-[#ff0044]/10 hover:bg-[#ff0044]/20 transition-colors"
               >
                 <LogOut className="h-4 w-4 text-[#ff0044]" />
-                <span className="text-sm text-[#ff0044]">Abmelden</span>
+                <span className="text-sm text-[#ff0044]">{t('settings:account.logout')}</span>
               </button>
             </div>
 
@@ -236,25 +238,25 @@ export function Settings() {
             <div className="p-3 rounded-lg bg-gray-700/30">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-400">Lesehistorie</p>
-                  <p className="text-lg font-bold text-white font-mono">{readingHistory?.length || 0} Artikel</p>
+                  <p className="text-sm text-gray-400">{t('settings:account.readingHistory')}</p>
+                  <p className="text-lg font-bold text-white font-mono">{t('settings:account.articleCount', { count: readingHistory?.length || 0 })}</p>
                 </div>
                 {readingHistory && readingHistory.length > 0 && (
                   <button
                     onClick={() => {
                       showConfirm(
-                        'Lesehistorie löschen',
-                        'Möchten Sie Ihre gesamte Lesehistorie löschen?',
+                        t('settings:account.readingHistory'),
+                        t('settings:account.confirmDeleteHistory'),
                         () => {
                           clearReadingHistory();
-                          showToast('Lesehistorie gelöscht', 'success');
+                          showToast(t('settings:account.historyDeleted'), 'success');
                           setConfirmDialog({ ...confirmDialog, isOpen: false });
                         }
                       );
                     }}
                     className="text-xs text-gray-500 hover:text-[#ff0044] transition-colors"
                   >
-                    Löschen
+                    {t('settings:account.deleteHistory')}
                   </button>
                 )}
               </div>
@@ -267,32 +269,32 @@ export function Settings() {
                 className="w-full flex items-center gap-3 p-3 rounded-lg bg-gray-700/50 hover:bg-gray-700 transition-colors"
               >
                 <Download className="h-4 w-4 text-[#00f0ff]" />
-                <span className="text-sm text-white">Daten exportieren</span>
+                <span className="text-sm text-white">{t('settings:account.exportData')}</span>
               </button>
               <button
                 onClick={() => setShowDeleteModal(true)}
                 className="w-full flex items-center gap-3 p-3 rounded-lg bg-[#ff0044]/10 hover:bg-[#ff0044]/20 transition-colors border border-[#ff0044]/30"
               >
                 <Trash2 className="h-4 w-4 text-[#ff0044]" />
-                <span className="text-sm text-[#ff0044]">Konto löschen</span>
+                <span className="text-sm text-[#ff0044]">{t('settings:account.deleteAccount')}</span>
               </button>
             </div>
           </div>
         ) : (
           <div className="text-center py-6">
             <User className="h-12 w-12 text-gray-600 mx-auto mb-3" />
-            <p className="text-gray-400 mb-4">Nicht angemeldet</p>
+            <p className="text-gray-400 mb-4">{t('settings:account.notLoggedIn')}</p>
             <p className="text-sm text-gray-500 mb-4">
-              Melden Sie sich an, um Ihre Einstellungen zu synchronisieren und auf allen Geräten zu nutzen.
+              {t('settings:account.loginPrompt')}
             </p>
             <button
               onClick={() => {
                 // TODO: Open auth modal
-                showToast('Login-Dialog kommt bald', 'info');
+                showToast('Login dialog coming soon', 'info');
               }}
               className="btn-cyber btn-cyber-primary px-6 py-2 rounded-lg text-sm"
             >
-              Anmelden
+              {t('common:buttons.signIn')}
             </button>
           </div>
         )}
@@ -303,7 +305,7 @@ export function Settings() {
         <div className="rounded-lg border border-gray-700 bg-gray-800 p-4">
           <h2 className="text-lg font-medium text-white mb-4 font-mono flex items-center gap-2">
             <Edit className="h-5 w-5 text-[#00f0ff]" />
-            {language === 'de' ? 'Profil bearbeiten' : 'Edit Profile'}
+            {t('settings:profile.title')}
           </h2>
 
           {/* Current Profile Display */}
@@ -322,7 +324,7 @@ export function Settings() {
             onClick={() => setShowAvatarPicker(true)}
             className="w-full mb-4 py-2 rounded-lg border border-gray-700 text-gray-300 hover:text-white hover:border-gray-600 transition-colors"
           >
-            {language === 'de' ? 'Avatar andern' : 'Change Avatar'}
+            {t('settings:profile.changeAvatar')}
           </button>
 
           {/* Name Change with Password per D-28 */}
@@ -334,13 +336,13 @@ export function Settings() {
               }}
               className="btn-cyber px-4 py-2 rounded-lg text-sm"
             >
-              {language === 'de' ? 'Namen andern' : 'Change Name'}
+              {t('settings:profile.changeName')}
             </button>
           ) : (
             <div className="space-y-4">
               <div>
                 <label className="block text-sm text-gray-400 mb-1">
-                  {language === 'de' ? 'Neuer Name' : 'New Name'}
+                  {t('settings:profile.newName')}
                 </label>
                 <input
                   type="text"
@@ -351,7 +353,7 @@ export function Settings() {
               </div>
               <div>
                 <label className="block text-sm text-gray-400 mb-1">
-                  {language === 'de' ? 'Passwort bestatigen' : 'Confirm Password'}
+                  {t('settings:profile.confirmPassword')}
                 </label>
                 <input
                   type="password"
@@ -374,11 +376,11 @@ export function Settings() {
                         body: JSON.stringify({ name: newName, currentPassword: namePassword }),
                       });
                       if (!response.ok) throw new Error('Failed to update');
-                      showToast(language === 'de' ? 'Name aktualisiert' : 'Name updated', 'success');
+                      showToast(t('settings:profile.nameUpdated'), 'success');
                       setIsEditingProfile(false);
                       setNamePassword('');
                     } catch {
-                      showToast(language === 'de' ? 'Fehler beim Aktualisieren' : 'Failed to update', 'error');
+                      showToast(t('settings:profile.updateFailed'), 'error');
                     } finally {
                       setIsUpdatingName(false);
                     }
@@ -390,7 +392,7 @@ export function Settings() {
                   )}
                 >
                   {isUpdatingName && <Loader2 className="h-4 w-4 animate-spin" />}
-                  {language === 'de' ? 'Speichern' : 'Save'}
+                  {t('common:buttons.save')}
                 </button>
                 <button
                   onClick={() => {
@@ -399,7 +401,7 @@ export function Settings() {
                   }}
                   className="btn-cyber px-4 py-2 rounded-lg text-sm"
                 >
-                  {language === 'de' ? 'Abbrechen' : 'Cancel'}
+                  {t('common:buttons.cancel')}
                 </button>
               </div>
             </div>
@@ -410,7 +412,7 @@ export function Settings() {
       {/* Reading & Personalization Section per D-14, D-65 */}
       <div className="rounded-lg border border-gray-700 bg-gray-800 p-4">
         <h2 className="text-lg font-medium text-white mb-4">
-          {language === 'de' ? 'Lesen & Personalisierung' : 'Reading & Personalization'}
+          {t('settings:reading.title')}
         </h2>
 
         <div className="space-y-4">
@@ -418,12 +420,10 @@ export function Settings() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-white text-sm">
-                {language === 'de' ? 'Personalisierte Empfehlungen' : 'Personalized Recommendations'}
+                {t('settings:reading.personalization')}
               </p>
               <p className="text-gray-500 text-xs">
-                {language === 'de'
-                  ? '"Für Dich"-Vorschläge basierend auf Leseverlauf'
-                  : '"For You" suggestions based on reading history'}
+                {t('settings:reading.personalizationDesc')}
               </p>
             </div>
             <button
@@ -446,12 +446,10 @@ export function Settings() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-white text-sm">
-                {language === 'de' ? 'Verlaufsverfolgung pausieren' : 'Pause History Tracking'}
+                {t('settings:reading.pauseTracking')}
               </p>
               <p className="text-gray-500 text-xs">
-                {language === 'de'
-                  ? 'Leseaktivität wird nicht aufgezeichnet'
-                  : 'Reading activity will not be recorded'}
+                {t('settings:reading.pauseTrackingDesc')}
               </p>
             </div>
             <button
@@ -474,7 +472,7 @@ export function Settings() {
 
       <div className="rounded-lg border border-gray-700 bg-gray-800 p-4 space-y-4">
         <div>
-          <h2 className="text-base font-medium text-white mb-3">Erscheinungsbild</h2>
+          <h2 className="text-base font-medium text-white mb-3">{t('settings:appearance.title')}</h2>
           <div className="flex gap-4">
             <button
               onClick={() => theme === 'light' && toggleTheme()}
@@ -486,7 +484,7 @@ export function Settings() {
               )}
             >
               <div className="mb-2 h-12 rounded bg-gray-900" />
-              <p className="text-sm text-white">Dark Mode</p>
+              <p className="text-sm text-white">{t('settings:appearance.darkMode')}</p>
             </button>
             <button
               onClick={() => theme === 'dark' && toggleTheme()}
@@ -498,44 +496,18 @@ export function Settings() {
               )}
             >
               <div className="mb-2 h-12 rounded bg-gray-200" />
-              <p className="text-sm text-white">Light Mode</p>
+              <p className="text-sm text-white">{t('settings:appearance.lightMode')}</p>
             </button>
           </div>
         </div>
 
-        <div>
-          <h2 className="text-base font-medium text-white mb-3">Sprache</h2>
-          <div className="flex gap-4">
-            <button
-              onClick={() => setLanguage('de')}
-              className={cn(
-                'rounded-lg border-2 px-6 py-3 transition-colors',
-                language === 'de'
-                  ? 'border-blue-500 bg-blue-600 text-white'
-                  : 'border-gray-600 text-gray-300 hover:border-gray-500'
-              )}
-            >
-              Deutsch
-            </button>
-            <button
-              onClick={() => setLanguage('en')}
-              className={cn(
-                'rounded-lg border-2 px-6 py-3 transition-colors',
-                language === 'en'
-                  ? 'border-blue-500 bg-blue-600 text-white'
-                  : 'border-gray-600 text-gray-300 hover:border-gray-500'
-              )}
-            >
-              English
-            </button>
-          </div>
-        </div>
+        {/* Language section REMOVED per D-04 - language switcher is in header only */}
 
         <div>
-          <h2 className="text-base font-medium text-white mb-3">Sortierung</h2>
+          <h2 className="text-base font-medium text-white mb-3">{t('settings:sorting.title')}</h2>
           <div className="space-y-3">
             <div>
-              <label className="block text-sm text-gray-400 mb-2">Sortieren nach</label>
+              <label className="block text-sm text-gray-400 mb-2">{t('settings:sorting.sortBy')}</label>
               <div className="flex gap-2">
                 <button
                   onClick={() => setSortBy('date')}
@@ -546,7 +518,7 @@ export function Settings() {
                       : 'border-gray-600 text-gray-300 hover:border-gray-500'
                   )}
                 >
-                  Datum
+                  {t('settings:sorting.date')}
                 </button>
                 <button
                   onClick={() => setSortBy('relevance')}
@@ -557,13 +529,13 @@ export function Settings() {
                       : 'border-gray-600 text-gray-300 hover:border-gray-500'
                   )}
                 >
-                  Relevanz
+                  {t('settings:sorting.relevance')}
                 </button>
               </div>
             </div>
 
             <div>
-              <label className="block text-sm text-gray-400 mb-2">Reihenfolge</label>
+              <label className="block text-sm text-gray-400 mb-2">{t('settings:sorting.order')}</label>
               <div className="flex gap-2">
                 <button
                   onClick={() => setSortOrder('desc')}
@@ -574,7 +546,7 @@ export function Settings() {
                       : 'border-gray-600 text-gray-300 hover:border-gray-500'
                   )}
                 >
-                  Neueste zuerst
+                  {t('settings:sorting.newestFirst')}
                 </button>
                 <button
                   onClick={() => setSortOrder('asc')}
@@ -585,7 +557,7 @@ export function Settings() {
                       : 'border-gray-600 text-gray-300 hover:border-gray-500'
                   )}
                 >
-                  Älteste zuerst
+                  {t('settings:sorting.oldestFirst')}
                 </button>
               </div>
             </div>
@@ -593,9 +565,9 @@ export function Settings() {
         </div>
 
         <div>
-          <h2 className="text-base font-medium text-white mb-3">Standard-Perspektiven</h2>
+          <h2 className="text-base font-medium text-white mb-3">{t('settings:perspectives.title')}</h2>
           <p className="text-sm text-gray-400 mb-3">
-            Wählen Sie die Perspektiven, die beim Start automatisch geladen werden
+            {t('settings:perspectives.description')}
           </p>
           <div className="flex flex-wrap gap-2">
             {ALL_REGIONS.map((region) => (
@@ -616,14 +588,14 @@ export function Settings() {
         </div>
 
         <div>
-          <h2 className="text-base font-medium text-white mb-3">Filter-Presets</h2>
+          <h2 className="text-base font-medium text-white mb-3">{t('settings:presets.title')}</h2>
           <div className="space-y-3">
             <div className="flex gap-2">
               <input
                 type="text"
                 value={presetName}
                 onChange={(e) => setPresetName(e.target.value)}
-                placeholder="Preset-Name..."
+                placeholder={t('settings:presets.namePlaceholder')}
                 className="flex-1 rounded-lg bg-gray-700 px-4 py-2 text-sm text-white placeholder-gray-500 outline-none ring-1 ring-gray-600 focus:ring-[#00f0ff]"
               />
               <button
@@ -637,13 +609,13 @@ export function Settings() {
                 )}
               >
                 <Save className="h-4 w-4" />
-                Speichern
+                {t('common:buttons.save')}
               </button>
             </div>
 
             {Object.keys(savedPresets).length > 0 && (
               <div className="space-y-2">
-                <p className="text-xs text-gray-400">Gespeicherte Presets:</p>
+                <p className="text-xs text-gray-400">{t('settings:presets.saved')}</p>
                 {Object.entries(savedPresets).map(([name, regions]) => (
                   <div
                     key={name}
@@ -652,7 +624,7 @@ export function Settings() {
                     <div>
                       <p className="text-sm text-white font-medium">{name}</p>
                       <p className="text-xs text-gray-400">
-                        {regions.length} {regions.length === 1 ? 'Perspektive' : 'Perspektiven'}
+                        {t('settings:perspectives.count', { count: regions.length })}
                       </p>
                     </div>
                     <div className="flex gap-2">
@@ -660,7 +632,7 @@ export function Settings() {
                         onClick={() => loadPreset(regions)}
                         className="rounded-lg bg-[#00f0ff]/20 px-3 py-1 text-xs text-[#00f0ff] hover:bg-[#00f0ff]/30 border border-[#00f0ff]/30"
                       >
-                        Laden
+                        {t('common:buttons.load')}
                       </button>
                       <button
                         onClick={() => deletePreset(name)}
@@ -677,16 +649,16 @@ export function Settings() {
         </div>
 
         <div>
-          <h2 className="text-base font-medium text-white mb-3">Focus Management</h2>
+          <h2 className="text-base font-medium text-white mb-3">{t('settings:focusManagement.title')}</h2>
           <p className="text-sm text-gray-400 mb-4">
-            Verwalte deine Focus Presets. Built-in Presets können nicht bearbeitet werden.
+            {t('settings:focusManagement.description')}
           </p>
 
           {/* Built-in Presets */}
           <div className="mb-6">
             <h3 className="text-sm font-medium text-white mb-3 flex items-center gap-2">
               <span className="h-px flex-1 bg-gradient-to-r from-[#00f0ff]/20 to-transparent" />
-              Built-in Presets
+              {t('settings:presets.builtIn')}
               <span className="h-px flex-1 bg-gradient-to-l from-[#00f0ff]/20 to-transparent" />
             </h3>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -706,7 +678,7 @@ export function Settings() {
             <div>
               <h3 className="text-sm font-medium text-white mb-3 flex items-center gap-2">
                 <span className="h-px flex-1 bg-gradient-to-r from-[#00f0ff]/20 to-transparent" />
-                Custom Presets
+                {t('settings:presets.custom')}
                 <span className="h-px flex-1 bg-gradient-to-l from-[#00f0ff]/20 to-transparent" />
               </h3>
               <div className="grid gap-3 sm:grid-cols-2">
@@ -718,11 +690,11 @@ export function Settings() {
                     onApply={() => setActiveFocus(preset)}
                     onDelete={() => {
                       showConfirm(
-                        'Preset löschen',
-                        `Möchten Sie das Preset "${preset.name}" wirklich löschen?`,
+                        t('common:buttons.delete'),
+                        t('settings:presets.confirmDelete', { name: preset.name }),
                         () => {
                           deleteCustomPreset(preset.id);
-                          showToast('Preset erfolgreich gelöscht', 'success');
+                          showToast(t('settings:presets.deleted'), 'success');
                           setConfirmDialog({ ...confirmDialog, isOpen: false });
                         }
                       );
@@ -742,35 +714,35 @@ export function Settings() {
               }}
             >
               <Plus className="h-5 w-5" />
-              <span className="text-sm font-mono">Create Custom Preset</span>
+              <span className="text-sm font-mono">{t('settings:presets.createCustom')}</span>
             </button>
             <p className="mt-2 text-center text-xs text-gray-500">
-              Complete onboarding to create custom focus presets
+              {t('settings:presets.createHint')}
             </p>
           </div>
         </div>
 
         <div>
-          <h2 className="text-base font-medium text-white mb-3">Filter zurücksetzen</h2>
+          <h2 className="text-base font-medium text-white mb-3">{t('settings:resetFilters.title')}</h2>
           <button
             onClick={resetFilters}
             className="rounded-lg bg-gray-700 px-4 py-2 text-sm text-gray-300 hover:bg-gray-600 flex items-center gap-2"
           >
             <Trash2 className="h-4 w-4" />
-            Alle Filter zurücksetzen
+            {t('settings:resetFilters.button')}
           </button>
         </div>
 
         <div>
-          <h2 className="text-base font-medium text-white mb-3">Command Palette</h2>
+          <h2 className="text-base font-medium text-white mb-3">{t('settings:commandPalette.title')}</h2>
           <div className="flex items-center justify-between rounded-lg bg-gray-700/50 p-4">
             <div className="flex items-center gap-3">
               <Command className="h-5 w-5 text-gray-400" />
               <div>
-                <p className="text-white">Command Palette anzeigen</p>
+                <p className="text-white">{t('settings:commandPalette.show')}</p>
                 <p className="text-xs text-gray-400">
-                  Schnellzugriff mit{' '}
-                  <kbd className="rounded bg-gray-600 px-1.5 py-0.5 text-xs font-mono">⌘K</kbd> oder{' '}
+                  {t('settings:commandPalette.hint')}{' '}
+                  <kbd className="rounded bg-gray-600 px-1.5 py-0.5 text-xs font-mono">⌘K</kbd> / {' '}
                   <kbd className="rounded bg-gray-600 px-1.5 py-0.5 text-xs font-mono">Ctrl+K</kbd>
                 </p>
               </div>
@@ -794,46 +766,46 @@ export function Settings() {
       </div>
 
       <div className="rounded-lg border border-gray-700 bg-gray-800 p-4">
-        <h2 className="text-lg font-medium text-white mb-4">API-Konfiguration</h2>
+        <h2 className="text-lg font-medium text-white mb-4">{t('settings:api.title')}</h2>
         <p className="text-sm text-gray-400 mb-4">
-          Konfiguriere deine API-Keys für erweiterte Funktionen.
+          {t('settings:api.description')}
         </p>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm text-gray-400 mb-1">DeepL API Key</label>
+            <label className="block text-sm text-gray-400 mb-1">{t('settings:api.deeplKey')}</label>
             <input
               type="password"
-              placeholder="API-Key eingeben..."
+              placeholder={t('settings:api.deeplPlaceholder')}
               className="w-full rounded-lg bg-gray-700 px-4 py-2 text-white placeholder-gray-500 outline-none ring-1 ring-gray-600 focus:ring-[#00f0ff]"
             />
             <p className="mt-1 text-xs text-gray-500">
-              Für automatische Übersetzungen. Kostenlos unter deepl.com/pro-api
+              {t('settings:api.deeplHint')}
             </p>
           </div>
         </div>
       </div>
 
       <div className="rounded-lg border border-gray-700 bg-gray-800 p-4 space-y-4">
-        <h2 className="text-lg font-medium text-white mb-4">Daten & Cache</h2>
+        <h2 className="text-lg font-medium text-white mb-4">{t('settings:dataCache.title')}</h2>
 
         <div>
-          <h3 className="text-sm font-medium text-white mb-2">Einstellungen exportieren</h3>
+          <h3 className="text-sm font-medium text-white mb-2">{t('settings:dataCache.exportTitle')}</h3>
           <p className="text-xs text-gray-400 mb-3">
-            Exportiere alle Einstellungen, Presets und Präferenzen als JSON-Datei
+            {t('settings:dataCache.exportDesc')}
           </p>
           <button
             onClick={exportSettings}
             className="rounded-lg bg-[#00f0ff]/20 px-4 py-2 text-sm text-[#00f0ff] hover:bg-[#00f0ff]/30 border border-[#00f0ff]/30 flex items-center gap-2"
           >
             <Download className="h-4 w-4" />
-            Einstellungen exportieren
+            {t('settings:dataCache.exportButton')}
           </button>
         </div>
 
         <div>
-          <h3 className="text-sm font-medium text-white mb-2">Einstellungen importieren</h3>
+          <h3 className="text-sm font-medium text-white mb-2">{t('settings:dataCache.importTitle')}</h3>
           <p className="text-xs text-gray-400 mb-3">
-            Importiere zuvor exportierte Einstellungen
+            {t('settings:dataCache.importDesc')}
           </p>
           <label className="inline-block cursor-pointer">
             <input
@@ -844,22 +816,22 @@ export function Settings() {
             />
             <span className="rounded-lg bg-[#00f0ff]/20 px-4 py-2 text-sm text-[#00f0ff] hover:bg-[#00f0ff]/30 border border-[#00f0ff]/30 flex items-center gap-2 w-fit">
               <Upload className="h-4 w-4" />
-              Einstellungen importieren
+              {t('settings:dataCache.importButton')}
             </span>
           </label>
         </div>
 
         <div>
-          <h3 className="text-sm font-medium text-white mb-2">Cache leeren</h3>
+          <h3 className="text-sm font-medium text-white mb-2">{t('settings:dataCache.clearCacheTitle')}</h3>
           <p className="text-xs text-gray-400 mb-3">
-            Entferne gecachte Artikel-Daten und erzwinge einen vollständigen Reload
+            {t('settings:dataCache.clearCacheDesc')}
           </p>
           <button
             onClick={clearCache}
             className="rounded-lg bg-[#ff0044]/20 px-4 py-2 text-sm text-[#ff0044] hover:bg-[#ff0044]/30 border border-[#ff0044]/30 flex items-center gap-2"
           >
             <Trash2 className="h-4 w-4" />
-            Cache leeren
+            {t('settings:dataCache.clearCacheButton')}
           </button>
         </div>
       </div>
@@ -908,7 +880,7 @@ export function Settings() {
             });
             if (!response.ok) throw new Error('Update failed');
           }
-          showToast(language === 'de' ? 'Avatar aktualisiert' : 'Avatar updated', 'success');
+          showToast(t('settings:profile.avatarUpdated', 'Avatar updated'), 'success');
         }}
         currentPresetId={null}
         articles={new Map()}
