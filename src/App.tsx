@@ -59,6 +59,9 @@ const VerifyEmail = lazy(() => import('./pages/VerifyEmail'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 
+// Legal pages
+const Privacy = lazy(() => import('./pages/Privacy').then(m => ({ default: m.Privacy })));
+
 // Loading fallback component - Cyber style
 function PageLoader() {
   return (
@@ -123,6 +126,8 @@ function AppRoutes() {
             <Route path="/reset-password" element={<ResetPassword />} />
             {/* Settings as full page when accessed directly */}
             <Route path="/settings" element={<Settings />} />
+            {/* Legal pages */}
+            <Route path="/privacy" element={<Privacy />} />
           </Routes>
         </Suspense>
       </ErrorBoundary>

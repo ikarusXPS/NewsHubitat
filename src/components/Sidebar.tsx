@@ -280,14 +280,22 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
           <span>Settings</span>
         </button>
 
-        {/* Version */}
-        <div className="mt-3 px-3 flex items-center justify-between">
-          <span className="text-[10px] font-mono text-gray-600 uppercase tracking-wider">
-            v2.0.0
-          </span>
-          <span className="text-[10px] font-mono text-[#00f0ff]/50 uppercase tracking-wider">
-            Premium
-          </span>
+        {/* Version & Legal */}
+        <div className="mt-3 px-3 space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-mono text-gray-600 uppercase tracking-wider">
+              v2.0.0
+            </span>
+            <span className="text-[10px] font-mono text-[#00f0ff]/50 uppercase tracking-wider">
+              Premium
+            </span>
+          </div>
+          <NavLink
+            to="/privacy"
+            className="text-[10px] font-mono text-gray-600 hover:text-[#00f0ff] transition-colors"
+          >
+            Datenschutz / Privacy
+          </NavLink>
         </div>
       </div>
     </motion.aside>
