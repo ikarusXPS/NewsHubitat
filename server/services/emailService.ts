@@ -7,6 +7,8 @@ import nodemailer from 'nodemailer';
 import type { Transporter } from 'nodemailer';
 import logger from '../utils/logger';
 import type { NewsArticle } from '../../src/types';
+import { prisma } from '../db/prisma';
+import { MetricsService } from './metricsService';
 
 export interface EmailConfig {
   host: string;
@@ -29,12 +31,12 @@ export interface DigestOptions {
 }
 
 const DEFAULT_CONFIG: EmailConfig = {
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: parseInt(process.env.SMTP_PORT || '587', 10),
-  secure: process.env.SMTP_SECURE === 'true',
+  host: 'smtp.sendgrid.net',
+  port: 587,
+  secure: false,
   auth: {
-    user: process.env.SMTP_USER || '',
-    pass: process.env.SMTP_PASS || '',
+    user: 'apikey',  // Literal string 'apikey' per SendGrid SMTP spec
+    pass: process.env.SENDGRID_API_KEY || '',
   },
   from: process.env.SMTP_FROM || 'NewsHub <noreply@newshub.app>',
 };
@@ -58,8 +60,8 @@ export class EmailService {
   }
 
   private initialize(): void {
-    if (!this.config.auth.user || !this.config.auth.pass) {
-      logger.warn('⚠ Email service not configured (SMTP_USER/SMTP_PASS missing)');
+    if (!this.config.auth.pass) {
+      logger.warn('⚠ Email service not configured (SENDGRID_API_KEY missing)');
       return;
     }
 
@@ -109,6 +111,27 @@ export class EmailService {
       return false;
     }
 
+    const metricsService = MetricsService.getInstance();
+
+    // D-05: Check if email is bounced
+    try {
+      const user = await prisma.user.findUnique({ where: { email: to } });
+      if (user?.emailBounced) {
+        logger.warn(`Email blocked - address bounced: ${to}`);
+        metricsService.incrementEmailBounced(this.getEmailType(subject), 'blocked');
+        return false;
+      }
+
+      // D-07: Check if user opted out
+      if (user?.emailOptOut) {
+        logger.warn(`Email blocked - user opted out: ${to}`);
+        return false;
+      }
+    } catch (err) {
+      // Non-user emails (e.g., external addresses) can still be sent
+      logger.debug(`Bounce check skipped for ${to}: not a registered user`);
+    }
+
     try {
       await this.transporter.sendMail({
         from: this.config.from,
@@ -119,11 +142,25 @@ export class EmailService {
       });
 
       logger.debug(`Email sent to ${to}: ${subject}`);
+
+      // D-11: Increment sent counter
+      metricsService.incrementEmailSent(this.getEmailType(subject));
+
       return true;
     } catch (err) {
       logger.error(`Failed to send email to ${to}:`, err);
       return false;
     }
+  }
+
+  /**
+   * Extract email type from subject for metrics labeling
+   */
+  private getEmailType(subject: string): string {
+    if (subject.includes('Verify') || subject.includes('Bestaetige')) return 'verification';
+    if (subject.includes('Reset') || subject.includes('zuruecksetzen')) return 'password_reset';
+    if (subject.includes('changed') || subject.includes('geaendert')) return 'password_change';
+    return 'other';
   }
 
   /**
