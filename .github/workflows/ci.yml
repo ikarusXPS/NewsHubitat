@@ -3,7 +3,7 @@ name: CI/CD Pipeline
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [master]
 
 permissions:
   contents: read
@@ -128,14 +128,14 @@ jobs:
           images: ghcr.io/${{ github.repository }}
           tags: |
             type=sha,prefix=
-            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' }}
             type=ref,event=branch
 
       - name: Build and push Docker image
         uses: docker/build-push-action@15560696de535e4014efeff63c48f16952e52dd1
         with:
           context: .
-          push: ${{ github.ref == 'refs/heads/main' }}
+          push: ${{ github.ref == 'refs/heads/master' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
@@ -212,7 +212,7 @@ jobs:
   deploy-staging:
     name: Deploy to Staging
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/master'
     needs: [build, e2e]
     environment:
       name: staging
