@@ -2,7 +2,7 @@ import { test, expect } from './fixtures';
 
 // Skip entire suite in CI - page load timing too flaky
 test.describe('Community Page', () => {
-  test.skip(({ }, testInfo) => testInfo.project.name.includes('chromium') && !!process.env.CI, 'Flaky in CI');
+  test.skip((_fixtures, testInfo) => testInfo.project.name.includes('chromium') && !!process.env.CI, 'Flaky in CI');
 
   test.beforeEach(async ({ page }) => {
     await page.goto('/community');

@@ -2,7 +2,7 @@ import { test, expect } from './fixtures';
 
 test.describe('Timeline', () => {
   // Skip flaky tests in CI
-  test.skip(({ }, testInfo) => testInfo.project.name.includes('chromium') && !!process.env.CI, 'Flaky in CI');
+  test.skip((_fixtures, testInfo) => testInfo.project.name.includes('chromium') && !!process.env.CI, 'Flaky in CI');
 
   test.beforeEach(async ({ page }) => {
     await page.goto('/timeline');
