@@ -1,0 +1,18 @@
+{
+  "title": "Gespeicherte Artikel",
+  "description": "Deine markierten Artikel zum spateren Lesen.",
+  "empty": {
+    "title": "Keine gespeicherten Artikel",
+    "description": "Klicke auf das Lesezeichen-Symbol bei einem Artikel, um ihn zu speichern."
+  },
+  "error": {
+    "loadFailed": "Fehler beim Laden der Artikel"
+  },
+  "actions": {
+    "clearAll": "Alle entfernen"
+  },
+  "status": {
+    "available": "{count} von {total} Artikel verfugbar",
+    "someUnavailable": "Einige Artikel sind nicht mehr verfugbar und wurden aus dem Server entfernt."
+  }
+}
