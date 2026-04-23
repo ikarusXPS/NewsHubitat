@@ -43,32 +43,83 @@ Requirements for Production Ready milestone. Each maps to roadmap phases.
 
 ## Future Requirements
 
-Deferred to v1.4+ milestones.
+Planned for v1.4+ milestones. Requirements defined, phases TBD during milestone planning.
 
-### User Features (v1.4)
+### v1.4 User Features
 
-- **OAUTH-01**: User can login with Google OAuth
-- **OAUTH-02**: User can login with GitHub OAuth
-- **I18N-01**: UI supports multiple languages beyond DE/EN
-- **MOBILE-01**: Mobile-optimized responsive layouts
+**Goal:** Reduce onboarding friction and expand target audience
 
-### Community Features (v1.5)
+- [ ] **OAUTH-01**: User kann sich mit Google OAuth anmelden
+- [ ] **OAUTH-02**: User kann sich mit GitHub OAuth anmelden
+- [ ] **I18N-01**: UI unterstützt weitere Sprachen (FR, ES, IT, PL)
+- [ ] **I18N-02**: Sprachumschaltung persistiert in User-Preferences
+- [ ] **MOBILE-01**: Mobile-optimierte responsive Layouts für alle Pages
+- [ ] **MOBILE-02**: Touch-optimierte Interaktionen (Swipe, Pull-to-refresh)
 
-- **SHARE-01**: User can share articles to social media
-- **COMM-01**: User can comment on articles
-- **COLLAB-01**: Teams can collaborate on analysis
+### v1.5 Community Features
+
+**Goal:** Increase user engagement and enable collaboration
+
+- [ ] **SHARE-01**: User kann Artikel zu Twitter/X teilen
+- [ ] **SHARE-02**: User kann Artikel zu LinkedIn teilen
+- [ ] **SHARE-03**: Share-Preview mit OpenGraph Meta-Tags
+- [ ] **COMM-01**: User kann Artikel kommentieren
+- [ ] **COMM-02**: Kommentare sind moderierbar (Report, Delete)
+- [ ] **COMM-03**: Kommentar-Benachrichtigungen per Email
+- [ ] **COLLAB-01**: Teams können erstellt und verwaltet werden
+- [ ] **COLLAB-02**: Team-Mitglieder sehen geteilte Bookmarks
+- [ ] **COLLAB-03**: Team-Analysen können gemeinsam erstellt werden
+
+### v1.6 Scale & Infrastructure
+
+**Goal:** Prepare for growth and ensure reliability at scale
+
+- [ ] **SCALE-01**: Kubernetes Deployment mit Helm Charts
+- [ ] **SCALE-02**: Horizontal Pod Autoscaling basierend auf CPU/Memory
+- [ ] **SCALE-03**: Multi-Region Deployment (EU, US)
+- [ ] **SCALE-04**: Database Read Replicas für Geo-Routing
+- [ ] **LOG-01**: Zentrales Log Aggregation (Loki oder ELK)
+- [ ] **LOG-02**: Structured Logging mit Correlation IDs
+- [ ] **LOG-03**: Log-basierte Alerting Rules
+- [ ] **CDN-01**: Static Assets über CDN ausgeliefert
+- [ ] **CDN-02**: Image Optimization und WebP Conversion
+
+### v1.7 Growth & Monetization
+
+**Goal:** Enable data-driven decisions and generate revenue
+
+- [ ] **AB-01**: A/B Testing Framework integriert
+- [ ] **AB-02**: Feature Flags für graduelle Rollouts
+- [ ] **AB-03**: Experiment-Dashboard mit statistischer Signifikanz
+- [ ] **ANALYTICS-01**: User Behavior Analytics Dashboard
+- [ ] **ANALYTICS-02**: Conversion Funnel Tracking
+- [ ] **PAID-01**: Subscription Tiers (Free, Pro, Team)
+- [ ] **PAID-02**: Stripe Payment Integration
+- [ ] **PAID-03**: Premium Export Features (PDF, Excel)
+- [ ] **PAID-04**: API Access für Pro/Team Tiers
+
+### v1.8 Advanced Features (Demand-Driven)
+
+**Goal:** Expand capabilities based on validated user demand
+
+- [ ] **NATIVE-01**: iOS App (React Native oder Swift)
+- [ ] **NATIVE-02**: Android App (React Native oder Kotlin)
+- [ ] **NATIVE-03**: Push Notifications für Breaking News
+- [ ] **VIDEO-01**: Video Content Integration
+- [ ] **VIDEO-02**: Video Transcription und Analyse
+- [ ] **CHAT-01**: Real-time Chat für Teams
+- [ ] **CHAT-02**: AI-Assisted Chat für Recherche
 
 ## Out of Scope
 
-Explicitly excluded. Documented to prevent scope creep.
+Explicitly excluded. No current plans.
 
 | Feature | Reason |
 |---------|--------|
-| Kubernetes deployment | Docker Compose sufficient for current scale |
-| Multi-region deployment | Single region sufficient for v1.x |
-| Real-time log aggregation | Sentry + basic logging sufficient |
 | Custom alerting rules UI | Static config sufficient |
-| A/B testing infrastructure | Not needed for v1.x |
+| Blockchain/Web3 integration | No clear use case |
+| AR/VR news experience | Premature, no demand |
+| Hardware integrations | Web-first approach |
 
 ## Traceability
 
