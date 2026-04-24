@@ -137,7 +137,7 @@ Plans:
   5. User can unlink OAuth provider and still log in with email/password
 **Plans**: 5 plans
 Plans:
-- [ ] 26-01-PLAN.md — Database schema and OAuth service (Prisma, oauthService.ts, passport.ts)
+- [x] 26-01-PLAN.md — Database schema and OAuth service (Prisma, oauthService.ts, passport.ts)
 - [ ] 26-02-PLAN.md — OAuth routes and server configuration (oauth.ts routes, server integration)
 - [ ] 26-03-PLAN.md — Frontend OAuth components (useOAuthPopup, OAuthButton, ReAuthModal, AuthContext)
 - [ ] 26-04-PLAN.md — UI integration (AuthModal OAuth buttons, ConnectedAccounts in Settings)
@@ -199,7 +199,7 @@ Plans:
 | 23. i18n Foundation | v1.4 | 4/4 | Complete | 2026-04-24 |
 | 24. Mobile Responsive | v1.4 | 5/5 | Complete | 2026-04-24 |
 | 25. Social Sharing | v1.4 | 2/3 | In Progress | - |
-| 26. OAuth Integration | v1.4 | 0/5 | Planned | - |
+| 26. OAuth Integration | v1.4 | 1/5 | In Progress | - |
 | 27. Comments System | v1.4 | 0/? | Not started | - |
 | 28. Team Collaboration | v1.4 | 0/? | Not started | - |
 
@@ -259,4 +259,4 @@ v1.7 Advanced          -> Bedarfsabhangig erweitern
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-24 — Phase 26 planned (5 plans for OAuth Integration)*
+*Last updated: 2026-04-24 — Phase 26-01 complete (OAuth database + service infrastructure)*
