@@ -22,6 +22,7 @@ import { useAppStore } from '../store';
 import { cn } from '../lib/utils';
 import { Toast } from '../components/Toast';
 import { ReadingInsights } from '../components/profile/ReadingInsights';
+import { MyShares } from '../components/profile/MyShares';
 import type { NewsArticle } from '../types';
 
 export function Profile() {
@@ -271,6 +272,14 @@ export function Profile() {
           <ReadingInsights articles={historyArticles} />
         </div>
       )}
+
+      {/* My Shares per D-11 */}
+      <div className="glass-panel rounded-xl p-6">
+        <h3 className="text-sm font-mono text-gray-500 uppercase tracking-wider mb-4">
+          {language === 'de' ? 'Meine Shares' : 'My Shares'}
+        </h3>
+        <MyShares />
+      </div>
 
       {/* Quick Actions */}
       <div className="glass-panel rounded-xl overflow-hidden">
