@@ -50,9 +50,11 @@ Exceptions: 44px minimum touch targets for OAuth buttons (WCAG 2.5.5 AAA complia
 | Role | Size | Weight | Line Height |
 |------|------|--------|-------------|
 | Body | 14px | 400 | 1.5 |
-| Label | 12px | 500 | 1.25 |
+| Label | 12px | 400 | 1.25 |
 | Heading | 20px | 700 | 1.2 |
 | Display | 24px | 700 | 1.2 |
+
+**Note:** Labels differentiate from Body via smaller size (12px vs 14px), not weight. This maintains a 2-weight system (400 regular, 700 bold).
 
 **Source:** Existing AuthModal.tsx patterns (text-sm=14px, text-2xl=24px, font-bold=700)
 
@@ -162,7 +164,7 @@ Accent reserved for: Focus rings on OAuth buttons, "Connected" status indicator,
 |                                          |
 |  [Password input field]                  |
 |                                          |
-|  [Cancel]            [Link Account]      |  <- Actions
+|  [Not Now]            [Link Account]     |  <- Actions
 +------------------------------------------+
 ```
 
@@ -211,6 +213,7 @@ Accent reserved for: Focus rings on OAuth buttons, "Connected" status indicator,
 | Error: OAuth failed | Sign in failed. Please try again or use email. | Anmeldung fehlgeschlagen. Bitte erneut versuchen oder E-Mail verwenden. | Claude's Discretion |
 | Error: Email mismatch (D-02) | Cannot link. OAuth email does not match your account email. | Verknuepfung nicht moeglich. OAuth-E-Mail stimmt nicht mit deiner Konto-E-Mail ueberein. | Derived from D-02 |
 | Re-auth prompt (D-01) | This email is already registered. Enter your password to link [Provider]. | Diese E-Mail ist bereits registriert. Gib dein Passwort ein, um [Provider] zu verknuepfen. | Derived from D-01 |
+| Re-auth dismiss | Not Now | Nicht jetzt | Default |
 | Link success | [Provider] account linked successfully. | [Provider]-Konto erfolgreich verknuepft. | Default |
 | Unlink success | [Provider] account unlinked. | [Provider]-Konto getrennt. | Default |
 | Unlink blocked (D-12) | Set a password before unlinking your only login method. | Lege zuerst ein Passwort fest, bevor du deine einzige Anmeldemethode trennst. | Derived from D-12 |
