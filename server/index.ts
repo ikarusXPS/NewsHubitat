@@ -29,6 +29,8 @@ import { accountRoutes } from './routes/account';
 import bookmarksRoutes from './routes/bookmarks';
 import historyRoutes from './routes/history';
 import { authLimiter, aiLimiter, newsLimiter } from './middleware/rateLimiter';
+import { isBot, generateOGHtml } from './middleware/botDetection';
+import { SharingService } from './services/sharingService';
 import { serverTimingMiddleware } from './middleware/serverTiming';
 import { metricsMiddleware } from './middleware/metricsMiddleware';
 import { NewsAggregator } from './services/newsAggregator';
@@ -314,6 +316,44 @@ app.get('/api/health', async (_req, res) => {
       },
     },
   });
+});
+
+// =============================================================================
+// Share Page Route (D-04, D-05) - serves OG HTML to bots, redirects humans
+// =============================================================================
+app.get('/s/:code', async (req, res) => {
+  const { code } = req.params;
+  const userAgent = req.get('User-Agent');
+
+  const sharingService = SharingService.getInstance();
+  const shared = await sharingService.getByCode(code);
+
+  if (!shared) {
+    if (isBot(userAgent)) {
+      return res.status(404).send('Share not found');
+    }
+    // Humans get redirected to home with error param
+    return res.redirect('/?error=share_not_found');
+  }
+
+  // Increment view count
+  await sharingService.incrementViews(code);
+
+  if (isBot(userAgent)) {
+    // Serve OG HTML for crawlers
+    const ogTags = sharingService.getOpenGraphTags(shared);
+    res.set('Content-Type', 'text/html');
+    return res.send(generateOGHtml(ogTags));
+  }
+
+  // Human visitors: redirect to content
+  if (shared.contentType === 'article') {
+    res.redirect(`/?article=${shared.contentId}`);
+  } else if (shared.contentType === 'cluster') {
+    res.redirect(`/analysis?cluster=${shared.contentId}`);
+  } else {
+    res.redirect('/');
+  }
 });
 
 // =============================================================================
