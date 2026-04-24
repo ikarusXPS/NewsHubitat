@@ -50,9 +50,11 @@ Exceptions: **44px touch targets** for mobile share buttons (WCAG 2.5.5 AAA comp
 | Role | Size | Weight | Line Height |
 |------|------|--------|-------------|
 | Body | 14px | 400 | 1.5 |
-| Label | 12px | 500 | 1.4 |
+| Label | 12px | 400 | 1.4 |
 | Heading | 16px | 600 | 1.25 |
-| Display | 20px | 700 | 1.2 |
+| Display | 20px | 600 | 1.2 |
+
+**Weight rationale:** 2 weights only (400 regular, 600 semibold) per design system constraint. Labels use regular weight for visual hierarchy through size differentiation rather than weight.
 
 **Note:** Share button labels use font-mono (JetBrains Mono) at 12px per existing `.btn-cyber` pattern.
 
