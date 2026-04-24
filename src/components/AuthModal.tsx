@@ -74,7 +74,20 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-md rounded-lg border border-gray-700 bg-gray-800 p-6 shadow-xl" data-testid="auth-modal-content">
+      <div
+        className={cn(
+          "relative w-full shadow-xl",
+          "max-w-none md:max-w-md", // Full-width mobile, constrained desktop (D-56)
+          "h-full md:h-auto", // Full-height mobile, auto desktop
+          "rounded-none md:rounded-lg", // No radius mobile, rounded desktop
+          "p-6",
+          "pt-[calc(var(--safe-area-top)+1.5rem)] md:pt-6", // Safe area top mobile (D-28)
+          "pb-[calc(var(--safe-area-bottom)+1.5rem)] md:pb-6", // Safe area bottom mobile
+          "border-0 md:border md:border-gray-700",
+          "bg-gray-800"
+        )}
+        data-testid="auth-modal-content"
+      >
         <button
           onClick={onClose}
           className="absolute right-4 top-4 text-gray-400 hover:text-white"
