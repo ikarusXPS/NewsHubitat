@@ -135,7 +135,13 @@ Plans:
   3. Existing email account user can link Google or GitHub after re-authentication
   4. OAuth login preserves existing user data (bookmarks, reading history, badges)
   5. User can unlink OAuth provider and still log in with email/password
-**Plans**: TBD
+**Plans**: 5 plans
+Plans:
+- [ ] 26-01-PLAN.md — Database schema and OAuth service (Prisma, oauthService.ts, passport.ts)
+- [ ] 26-02-PLAN.md — OAuth routes and server configuration (oauth.ts routes, server integration)
+- [ ] 26-03-PLAN.md — Frontend OAuth components (useOAuthPopup, OAuthButton, ReAuthModal, AuthContext)
+- [ ] 26-04-PLAN.md — UI integration (AuthModal OAuth buttons, ConnectedAccounts in Settings)
+- [ ] 26-05-PLAN.md — Testing and documentation (oauthService tests, hook tests, .env.example)
 **UI hint**: yes
 
 ### Phase 27: Comments System
@@ -193,7 +199,7 @@ Plans:
 | 23. i18n Foundation | v1.4 | 4/4 | Complete | 2026-04-24 |
 | 24. Mobile Responsive | v1.4 | 5/5 | Complete | 2026-04-24 |
 | 25. Social Sharing | v1.4 | 2/3 | In Progress | - |
-| 26. OAuth Integration | v1.4 | 0/? | Not started | - |
+| 26. OAuth Integration | v1.4 | 0/5 | Planned | - |
 | 27. Comments System | v1.4 | 0/? | Not started | - |
 | 28. Team Collaboration | v1.4 | 0/? | Not started | - |
 
@@ -253,4 +259,4 @@ v1.7 Advanced          -> Bedarfsabhangig erweitern
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-24 — Phase 25-02 complete (frontend sharing components)*
+*Last updated: 2026-04-24 — Phase 26 planned (5 plans for OAuth Integration)*
