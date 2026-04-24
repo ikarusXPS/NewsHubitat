@@ -45,7 +45,7 @@ export function useCreateShare() {
           article: {
             id: article.id,
             title: article.title,
-            summary: article.summary || article.content.slice(0, 200),
+            summary: article.summary || article.content?.slice(0, 200) || '',
             imageUrl: article.imageUrl,
           },
         }),
