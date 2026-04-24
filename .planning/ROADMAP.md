@@ -100,7 +100,13 @@ Plans:
   3. Images load responsively with appropriate sizes and lazy loading
   4. No horizontal scrolling required on any page
   5. Interactive elements have touch-friendly tap targets (min 44px)
-**Plans**: TBD
+**Plans**: 5 plans
+Plans:
+- [ ] 24-01-PLAN.md — Breakpoint migration (lg: → md:) and safe area CSS infrastructure
+- [ ] 24-02-PLAN.md — Mobile navigation (BottomNav + MobileDrawer with hooks)
+- [ ] 24-03-PLAN.md — Responsive images (ResponsiveImage + Cloudinary + NewsCard integration)
+- [ ] 24-04-PLAN.md — Touch interactions (SwipeableCard, PullToRefresh, ScrollToTopFAB)
+- [ ] 24-05-PLAN.md — Layout adaptations and verification
 **UI hint**: yes
 
 ### Phase 25: Social Sharing
@@ -181,7 +187,7 @@ Plans:
 | 21. Load Testing | v1.3 | 3/3 | Complete | 2026-04-23 |
 | 22. SMTP Production | v1.3 | 3/3 | Complete | 2026-04-23 |
 | 23. i18n Foundation | v1.4 | 4/4 | Complete | 2026-04-24 |
-| 24. Mobile Responsive | v1.4 | 0/? | Not started | - |
+| 24. Mobile Responsive | v1.4 | 0/5 | Not started | - |
 | 25. Social Sharing | v1.4 | 0/? | Not started | - |
 | 26. OAuth Integration | v1.4 | 0/? | Not started | - |
 | 27. Comments System | v1.4 | 0/? | Not started | - |
@@ -243,4 +249,4 @@ v1.7 Advanced          -> Bedarfsabhangig erweitern
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-23 — Phase 23-03 locale-aware formatters complete (3/4 plans)*
+*Last updated: 2026-04-24 — Phase 24 Mobile Responsive planned (5 plans)*
