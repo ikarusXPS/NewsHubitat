@@ -1,20 +1,26 @@
 import { useState, useEffect } from 'react';
-import { Search, User, LogOut, Wifi, Clock, Menu } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Search, User, LogOut, Wifi, Clock, Menu, Radio, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../store';
 import { useAuth } from '../contexts/AuthContext';
 import { AuthModal } from './AuthModal';
 import { FocusSelector } from './FocusSelector';
 import { FeedManagerButton } from './FeedManagerButton';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { cn } from '../lib/utils';
 
 interface HeaderProps {
   onMenuClick?: () => void;
 }
 
 export function Header({ onMenuClick }: HeaderProps) {
+  const navigate = useNavigate();
+  const { t } = useTranslation();
   const { filters, setSearchQuery } = useAppStore();
   const { user, isAuthenticated, logout } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [searchExpanded, setSearchExpanded] = useState(false);
 
   // Live clock
   const [time, setTime] = useState(new Date().toLocaleTimeString('en-US', {
@@ -51,14 +57,73 @@ export function Header({ onMenuClick }: HeaderProps) {
             <Menu className="h-5 w-5 text-[#00f0ff]" />
           </button>
 
-          {/* Search */}
+          {/* Radio Logo - Mobile Only (D-18) */}
+          <button
+            onClick={() => navigate('/')}
+            className="md:hidden p-1 hover:bg-white/5 rounded-md transition-colors"
+            aria-label="Go to Dashboard"
+          >
+            <Radio className="h-5 w-5 text-[#00f0ff]" />
+          </button>
+
+          {/* Mobile Search Icon (D-19) */}
+          <button
+            onClick={() => setSearchExpanded(true)}
+            className="md:hidden p-2 hover:bg-white/5 rounded-md transition-colors"
+            aria-label="Open search"
+          >
+            <Search className="h-5 w-5 text-[#00f0ff]" />
+          </button>
+
+          {/* Mobile Search Expanded Overlay (D-19) */}
+          {searchExpanded && (
+            <div className="fixed inset-0 bg-gray-900 z-50 p-4 pt-[var(--safe-area-top)] md:hidden">
+              <div className="flex items-center gap-2">
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    setSearchExpanded(false);
+                  }}
+                  className="flex-1 relative"
+                >
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#00f0ff]/50" />
+                  <input
+                    type="search"
+                    autoFocus
+                    placeholder={t('search.placeholder', 'Search signals...')}
+                    value={filters.searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 pl-10 text-white placeholder-gray-500 focus:border-[#00f0ff] focus:outline-none"
+                  />
+                  {filters.searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchQuery('')}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-[#ff0044] transition-colors"
+                    >
+                      ×
+                    </button>
+                  )}
+                </form>
+                <button
+                  onClick={() => setSearchExpanded(false)}
+                  className="p-2 text-gray-400 hover:text-white transition-colors"
+                  aria-label="Close search"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Desktop Search */}
           <form
             onSubmit={(e) => {
               e.preventDefault();
               // Search is already live-filtering via setSearchQuery
               // This ensures Enter doesn't reload the page
             }}
-            className="relative w-48 sm:w-64 md:w-80"
+            className="relative hidden md:block w-80"
           >
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#00f0ff]/50" />
             <input
@@ -108,14 +173,17 @@ export function Header({ onMenuClick }: HeaderProps) {
 
         {/* Right: Controls */}
         <div className="flex items-center gap-3">
-          {/* Feed Manager */}
-          <FeedManagerButton />
+          {/* Desktop controls - hidden on mobile (D-20) */}
+          <div className="hidden md:flex items-center gap-3">
+            {/* Feed Manager */}
+            <FeedManagerButton />
 
-          {/* Focus Selector */}
-          <FocusSelector />
+            {/* Focus Selector */}
+            <FocusSelector />
 
-          {/* Language Switcher - per D-04: header only */}
-          <LanguageSwitcher />
+            {/* Language Switcher */}
+            <LanguageSwitcher />
+          </div>
 
           {/* Auth */}
           {isAuthenticated ? (
