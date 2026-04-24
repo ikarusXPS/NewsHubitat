@@ -89,6 +89,11 @@ model User {
   // Session invalidation (D-27, D-28)
   tokenVersion           Int       @default(0)
 
+  // OAuth Integration (Phase 26)
+  googleIdHash     String?   @unique  // D-11: SHA-256 hash of Google provider ID
+  githubIdHash     String?   @unique  // D-11: SHA-256 hash of GitHub provider ID
+  hasPassword      Boolean   @default(true)  // D-03: false for OAuth-only accounts
+
   // Phase 22: Email bounce/opt-out tracking (D-04, D-07, D-30)
   emailBounced      Boolean   @default(false)
   emailBouncedAt    DateTime?
@@ -119,6 +124,8 @@ model User {
   @@index([verificationTokenHash])
   @@index([resetTokenHash])
   @@index([emailVerified, createdAt])  // For cleanup job queries
+  @@index([googleIdHash])
+  @@index([githubIdHash])
 }
 
 model Bookmark {
