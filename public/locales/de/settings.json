@@ -100,5 +100,12 @@
   },
   "toast": {
     "loggedOut": "Erfolgreich abgemeldet"
+  },
+  "connectedAccounts": {
+    "title": "Verbundene Konten",
+    "description": "Verknuepfe dein Google- oder GitHub-Konto fuer schnellere Anmeldung",
+    "noPasswordHint": "Du verwendest nur OAuth-Anmeldung. Lege zuerst ein Passwort in den Sicherheitseinstellungen fest, bevor du alle Anbieter trennst.",
+    "unlinkTitle": "{{provider}} trennen",
+    "unlinkMessage": "Moechtest du {{provider}} wirklich trennen? Du kannst jederzeit erneut verbinden."
   }
 }
