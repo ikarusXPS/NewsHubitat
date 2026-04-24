@@ -15,6 +15,9 @@ interface User {
     regions: string[];
   };
   emailVerified: boolean;
+  hasPassword?: boolean;
+  googleLinked?: boolean;
+  githubLinked?: boolean;
 }
 
 interface AuthContextType {
@@ -30,6 +33,7 @@ interface AuthContextType {
   addBookmark: (articleId: string) => Promise<void>;
   removeBookmark: (articleId: string) => Promise<void>;
   resendVerification: () => Promise<{ success: boolean; rateLimited?: boolean; minutesRemaining?: number }>;
+  loginWithOAuth: (token: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -233,6 +237,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { success: data.success };
   }, [token]);
 
+  const loginWithOAuth = useCallback(async (oauthToken: string) => {
+    // Store token and fetch user data
+    localStorage.setItem(TOKEN_KEY, oauthToken);
+    setToken(oauthToken);
+
+    try {
+      const response = await fetch('/api/auth/me', {
+        headers: {
+          Authorization: `Bearer ${oauthToken}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setUser(data.data);
+        Sentry.setUser({
+          id: data.data.id,
+          email: data.data.email,
+          username: data.data.name,
+        });
+      } else {
+        // Token invalid, clear it
+        localStorage.removeItem(TOKEN_KEY);
+        setToken(null);
+        throw new Error('Invalid token');
+      }
+    } catch (err) {
+      localStorage.removeItem(TOKEN_KEY);
+      setToken(null);
+      throw err;
+    }
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
@@ -248,6 +285,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         addBookmark,
         removeBookmark,
         resendVerification,
+        loginWithOAuth,
       }}
     >
       {children}
