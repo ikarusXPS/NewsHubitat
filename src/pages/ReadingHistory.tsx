@@ -264,12 +264,12 @@ export function ReadingHistory() {
                 {language === 'de' ? group.labelDe : group.label}
               </h2>
               <div className="grid gap-4 md:grid-cols-2 md:grid-cols-3">
-                {group.entries.map((entry) => {
+                {group.entries.map((entry, index) => {
                   const article = articlesMap?.get(entry.articleId);
                   if (!article) return null;
                   return (
                     <div key={entry.articleId} className="relative">
-                      <NewsCard article={article} />
+                      <NewsCard article={article} priority={index < 3} />
                       {/* Read count badge per D-02 */}
                       {entry.readCount && entry.readCount > 1 && (
                         <div className="absolute top-2 right-2 px-2 py-0.5 rounded bg-gray-800/80 text-xs font-mono text-gray-400">
