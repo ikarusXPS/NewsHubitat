@@ -13,7 +13,7 @@ i18n
   .init({
     fallbackLng: 'en',         // D-08: English fallback
     supportedLngs: ['de', 'en'],
-    ns: ['common'],            // Default namespace
+    ns: ['common', 'share'],   // Default namespace + share namespace
     defaultNS: 'common',
 
     backend: {
