@@ -79,7 +79,8 @@ export function NewsCard({ article, priority = false, onTranslate }: NewsCardPro
     }
   };
 
-  const handleShare = async () => {
+  const handleShare = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent SwipeableCard drag from intercepting
     if (shareUrls) return; // Already created
     if (isCreatingShare) return;
 
@@ -327,7 +328,7 @@ export function NewsCard({ article, priority = false, onTranslate }: NewsCardPro
             />
           ) : (
             <button
-              onClick={handleShare}
+              onClick={(e) => handleShare(e)}
               disabled={isCreatingShare}
               className={cn(
                 'flex items-center gap-1 rounded px-2 py-1 text-xs transition-all ml-2',
