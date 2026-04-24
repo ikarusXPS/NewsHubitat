@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { Bookmark, ExternalLink, Globe, Languages, Loader2, Shield, Search, AlertTriangle, X, CheckCircle, Info } from 'lucide-react';
+import { Bookmark, ExternalLink, Globe, Languages, Loader2, Shield, Search, AlertTriangle, X, CheckCircle, Info, Share2 } from 'lucide-react';
+import { ShareButtons } from './sharing';
+import { useCreateShare, type ShareUrls } from '../hooks/useShare';
 import { ResponsiveImage } from './ResponsiveImage';
 import { SwipeableCard } from './mobile/SwipeableCard';
 import { cn, getRegionColor, getSentimentColor, truncate } from '../lib/utils';
@@ -42,6 +44,10 @@ export function NewsCard({ article, priority = false, onTranslate }: NewsCardPro
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [propagandaAnalysis, setPropagandaAnalysis] = useState<PropagandaAnalysis | null>(null);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
+  const [shareUrls, setShareUrls] = useState<ShareUrls | null>(null);
+  const [shareCode, setShareCode] = useState<string | null>(null);
+  const [isCreatingShare, setIsCreatingShare] = useState(false);
+  const createShare = useCreateShare();
 
   const handleAnalyze = async () => {
     if (isAnalyzing) return;
@@ -70,6 +76,24 @@ export function NewsCard({ article, priority = false, onTranslate }: NewsCardPro
       setAnalysisError('Analysis failed. Please try again.');
     } finally {
       setIsAnalyzing(false);
+    }
+  };
+
+  const handleShare = async () => {
+    if (shareUrls) return; // Already created
+    if (isCreatingShare) return;
+
+    setIsCreatingShare(true);
+    try {
+      const urls = await createShare.mutateAsync(localArticle);
+      setShareUrls(urls);
+      // Extract share code from direct URL: /s/{code}
+      const code = urls.direct.split('/s/')[1];
+      setShareCode(code);
+    } catch (err) {
+      console.error('Failed to create share:', err);
+    } finally {
+      setIsCreatingShare(false);
     }
   };
 
@@ -292,6 +316,33 @@ export function NewsCard({ article, priority = false, onTranslate }: NewsCardPro
             <ExternalLink className="h-3 w-3" />
             Original
           </a>
+
+          {/* Share button per D-01 */}
+          {shareUrls && shareCode ? (
+            <ShareButtons
+              shareCode={shareCode}
+              title={localArticle.title}
+              urls={shareUrls}
+              className="ml-2"
+            />
+          ) : (
+            <button
+              onClick={handleShare}
+              disabled={isCreatingShare}
+              className={cn(
+                'flex items-center gap-1 rounded px-2 py-1 text-xs transition-all ml-2',
+                'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              )}
+              title="Create share link"
+            >
+              {isCreatingShare ? (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              ) : (
+                <Share2 className="h-3 w-3" />
+              )}
+              Share
+            </button>
+          )}
         </div>
       </div>
 
