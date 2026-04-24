@@ -1,12 +1,10 @@
 import { useState } from 'react';
-import { Bookmark, ExternalLink, Globe, Languages, Loader2, Shield, Search, AlertTriangle, X, CheckCircle, Info, ImageOff } from 'lucide-react';
+import { Bookmark, ExternalLink, Globe, Languages, Loader2, Shield, Search, AlertTriangle, X, CheckCircle, Info } from 'lucide-react';
+import { ResponsiveImage } from './ResponsiveImage';
 import { cn, getRegionColor, getSentimentColor, truncate } from '../lib/utils';
 import { formatDateTime } from '../lib/formatters';
 import { useAppStore } from '../store';
 import type { NewsArticle } from '../types';
-
-// Base64 SVG placeholder for failed images
-const PLACEHOLDER_IMAGE = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMjAwIDEyMCI+PHJlY3QgZmlsbD0iIzFmMjkzNyIgd2lkdGg9IjIwMCIgaGVpZ2h0PSIxMjAiLz48ZyBmaWxsPSIjNGI1NTYzIj48cmVjdCB4PSI4NSIgeT0iMzUiIHdpZHRoPSIzMCIgaGVpZ2h0PSIyNSIgcng9IjIiLz48Y2lyY2xlIGN4PSIxMDAiIGN5PSI3MCIgcj0iMTUiLz48cGF0aCBkPSJNNzUgODVoNTBsLTEwLTIwLTEwIDEwLTEwLTUtMjAgMTV6Ii8+PC9nPjwvc3ZnPg==';
 
 interface PropagandaIndicator {
   type: string;
@@ -24,10 +22,11 @@ interface PropagandaAnalysis {
 
 interface NewsCardProps {
   article: NewsArticle;
+  priority?: boolean; // For first 3 cards - uses eager loading (D-77)
   onTranslate?: (articleId: string, targetLang: 'de' | 'en') => Promise<NewsArticle | null>;
 }
 
-export function NewsCard({ article, onTranslate }: NewsCardProps) {
+export function NewsCard({ article, priority = false, onTranslate }: NewsCardProps) {
   const { language, toggleBookmark, isBookmarked, addToReadingHistory } = useAppStore();
   const bookmarked = isBookmarked(article.id);
 
@@ -40,15 +39,6 @@ export function NewsCard({ article, onTranslate }: NewsCardProps) {
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [propagandaAnalysis, setPropagandaAnalysis] = useState<PropagandaAnalysis | null>(null);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
-  const [imageError, setImageError] = useState(false);
-
-  // Handle image load error - swap to placeholder
-  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    const target = e.currentTarget;
-    target.onerror = null; // Prevent infinite loop if placeholder also fails
-    target.src = PLACEHOLDER_IMAGE;
-    setImageError(true);
-  };
 
   const handleAnalyze = async () => {
     if (isAnalyzing) return;
@@ -151,25 +141,15 @@ export function NewsCard({ article, onTranslate }: NewsCardProps) {
 
   return (
     <article className="rounded-lg border border-gray-700 bg-gray-800 p-4 transition-shadow hover:shadow-lg">
-      {/* Thumbnail image with fallback */}
+      {/* Thumbnail image with ResponsiveImage */}
       {localArticle.imageUrl && (
-        <div className="relative -mx-4 -mt-4 mb-4 h-40 overflow-hidden rounded-t-lg bg-gray-900">
-          <img
-            src={localArticle.imageUrl}
-            alt={localArticle.title}
-            loading="lazy"
-            className={cn(
-              'h-full w-full object-cover transition-opacity duration-300',
-              imageError ? 'opacity-60' : 'opacity-100'
-            )}
-            onError={handleImageError}
-          />
-          {imageError && (
-            <div className="absolute inset-0 flex items-center justify-center bg-gray-900/50">
-              <ImageOff className="h-8 w-8 text-gray-600" />
-            </div>
-          )}
-        </div>
+        <ResponsiveImage
+          src={localArticle.imageUrl}
+          alt={localArticle.title}
+          priority={priority}
+          aspectRatio="16:9"
+          className="-mx-4 -mt-4 mb-4 h-40 rounded-t-lg"
+        />
       )}
 
       <div className="mb-3 flex items-start justify-between">
