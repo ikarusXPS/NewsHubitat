@@ -1,5 +1,5 @@
-import { useRef, useState, useCallback, type ReactNode } from 'react';
-import { Toaster } from 'sonner';
+import { useRef, useState, useCallback, useEffect, type ReactNode } from 'react';
+import { Toaster, type ToasterProps } from 'sonner';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { CommandPalette } from './CommandPalette';
@@ -9,6 +9,8 @@ import { BreakingNewsTicker } from './BreakingNewsTicker';
 import { KeyboardShortcutsHelp } from './KeyboardShortcutsHelp';
 import { InstallPromptBanner } from './InstallPromptBanner';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
+import { BottomNav } from './mobile/BottomNav';
+import { MobileDrawer } from './mobile/MobileDrawer';
 
 interface LayoutProps {
   children: ReactNode;
@@ -29,6 +31,20 @@ export function Layout({ children }: LayoutProps) {
     onCloseModal: handleCloseModal,
   });
 
+  // Responsive toast position: top-center on mobile, bottom-right on desktop (D-29)
+  const [toastPosition, setToastPosition] = useState<ToasterProps['position']>(
+    typeof window !== 'undefined' && window.innerWidth < 768 ? 'top-center' : 'bottom-right'
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setToastPosition(window.innerWidth < 768 ? 'top-center' : 'bottom-right');
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Animated Background Layers */}
@@ -41,8 +57,15 @@ export function Layout({ children }: LayoutProps) {
       {/* Reading Progress */}
       <ReadingProgressBar containerRef={mainRef} />
 
-      {/* Sidebar */}
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      {/* Desktop Sidebar - hidden on mobile */}
+      <div className="hidden md:block">
+        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      </div>
+
+      {/* Mobile Drawer - visible on mobile only */}
+      <div className="md:hidden">
+        <MobileDrawer isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      </div>
 
       {/* Main Content Area */}
       <div className="flex flex-1 flex-col overflow-hidden relative z-10">
@@ -69,8 +92,13 @@ export function Layout({ children }: LayoutProps) {
         </main>
       </div>
 
-      {/* Command Palette */}
-      <CommandPalette />
+      {/* Command Palette - desktop only (D-22) */}
+      <div className="hidden md:block">
+        <CommandPalette />
+      </div>
+
+      {/* Bottom Nav - mobile only */}
+      <BottomNav />
 
       {/* Keyboard Shortcuts Help */}
       <KeyboardShortcutsHelp
@@ -80,7 +108,7 @@ export function Layout({ children }: LayoutProps) {
 
       {/* Toast Notifications - Cyber Style */}
       <Toaster
-        position="bottom-right"
+        position={toastPosition}
         theme="dark"
         toastOptions={{
           className: 'glass-panel font-mono',
