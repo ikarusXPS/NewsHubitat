@@ -52,7 +52,12 @@ export function Layout({ children }: LayoutProps) {
         <InstallPromptBanner />
         <main
           ref={mainRef}
-          className="flex-1 overflow-y-auto p-6 relative"
+          className="flex-1 overflow-y-auto p-4 md:p-6 relative"
+          style={{
+            paddingLeft: 'max(1rem, var(--safe-area-left))',
+            paddingRight: 'max(1rem, var(--safe-area-right))',
+            paddingBottom: 'max(1rem, var(--safe-area-bottom))',
+          }}
         >
           {/* Data Stream Effect (subtle) */}
           <div className="data-stream opacity-20" />
