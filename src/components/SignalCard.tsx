@@ -15,9 +15,12 @@ import {
   Target,
   Eye,
   EyeOff,
+  Loader2,
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useAppStore } from '../store';
+import { ShareButtons } from './sharing';
+import { useCreateShare, type ShareUrls } from '../hooks/useShare';
 import type { NewsArticle } from '../types';
 
 interface SignalCardProps {
@@ -66,7 +69,27 @@ export function SignalCard({ article, isBookmarked, onBookmark, index = 0, isRea
   const [isHovered, setIsHovered] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
+  const [shareUrls, setShareUrls] = useState<ShareUrls | null>(null);
+  const [shareCode, setShareCode] = useState<string | null>(null);
+  const [isCreatingShare, setIsCreatingShare] = useState(false);
   const { setSearchQuery, setActiveSourceFilter, feedState } = useAppStore();
+  const createShare = useCreateShare();
+
+  const handleShare = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (shareUrls || isCreatingShare) return;
+    setIsCreatingShare(true);
+    try {
+      const urls = await createShare.mutateAsync(article);
+      setShareUrls(urls);
+      setShareCode(urls.direct.split('/s/')[1]);
+    } catch (err) {
+      console.error('Failed to create share:', err);
+    } finally {
+      setIsCreatingShare(false);
+    }
+  };
 
   const handleSourceClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -396,9 +419,18 @@ export function SignalCard({ article, isBookmarked, onBookmark, index = 0, isRea
             </button>
 
             {/* Share */}
-            <button className="p-2 rounded-md text-gray-500 hover:text-[#bf00ff] hover:bg-[#bf00ff]/5 transition-colors" title="Share article">
-              <Share2 className="h-4 w-4" />
-            </button>
+            {shareUrls && shareCode ? (
+              <ShareButtons shareCode={shareCode} title={article.title} urls={shareUrls} />
+            ) : (
+              <button
+                onClick={handleShare}
+                disabled={isCreatingShare}
+                className="p-2 rounded-md text-gray-500 hover:text-[#bf00ff] hover:bg-[#bf00ff]/5 transition-colors"
+                title="Share article"
+              >
+                {isCreatingShare ? <Loader2 className="h-4 w-4 animate-spin" /> : <Share2 className="h-4 w-4" />}
+              </button>
+            )}
           </div>
 
           <a
