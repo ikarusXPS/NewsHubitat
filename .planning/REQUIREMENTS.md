@@ -9,9 +9,9 @@ Requirements for User & Community Features milestone. Each maps to roadmap phase
 
 ### OAuth Login
 
-- [ ] **OAUTH-01**: User kann sich mit Google OAuth anmelden
-- [ ] **OAUTH-02**: User kann sich mit GitHub OAuth anmelden
-- [ ] **OAUTH-03**: User kann OAuth-Account mit bestehendem Email-Account verknüpfen
+- [x] **OAUTH-01**: User kann sich mit Google OAuth anmelden
+- [x] **OAUTH-02**: User kann sich mit GitHub OAuth anmelden
+- [x] **OAUTH-03**: User kann OAuth-Account mit bestehendem Email-Account verknüpfen
 
 ### Internationalization (i18n)
 
@@ -58,9 +58,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SHARE-01 | Phase 25 | Pending |
 | SHARE-02 | Phase 25 | Pending |
 | SHARE-03 | Phase 25 | Pending |
-| OAUTH-01 | Phase 26 | Pending |
-| OAUTH-02 | Phase 26 | Pending |
-| OAUTH-03 | Phase 26 | Pending |
+| OAUTH-01 | Phase 26 | Complete |
+| OAUTH-02 | Phase 26 | Complete |
+| OAUTH-03 | Phase 26 | Complete |
 | COMM-01 | Phase 27 | Pending |
 | COMM-02 | Phase 27 | Pending |
 | COMM-03 | Phase 27 | Pending |
