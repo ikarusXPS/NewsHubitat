@@ -263,7 +263,7 @@ export function ReadingHistory() {
               <h2 className="text-sm font-mono text-gray-500 uppercase tracking-wider mb-4">
                 {language === 'de' ? group.labelDe : group.label}
               </h2>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-4 md:grid-cols-2 md:grid-cols-3">
                 {group.entries.map((entry) => {
                   const article = articlesMap?.get(entry.articleId);
                   if (!article) return null;

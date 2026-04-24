@@ -643,9 +643,9 @@ export function EventMap() {
       </div>
 
       {/* Map */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-4 min-h-0">
+      <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-4 min-h-0">
         {/* Event List */}
-        <div className="glass-panel rounded-xl p-4 overflow-y-auto max-h-[500px] lg:max-h-full">
+        <div className="glass-panel rounded-xl p-4 overflow-y-auto max-h-[500px] md:max-h-full">
           <div className="signal-label mb-3 flex items-center justify-between">
             <span>Recent Events</span>
             <span className="text-[#00f0ff]">{filteredEvents.length}</span>
@@ -709,7 +709,7 @@ export function EventMap() {
         </div>
 
         {/* Map Container */}
-        <div className="lg:col-span-3 glass-panel rounded-xl overflow-hidden relative h-[600px]">
+        <div className="md:col-span-3 glass-panel rounded-xl overflow-hidden relative h-[600px]">
           {isLoading ? (
             <div className="h-full flex items-center justify-center">
               <div className="text-center">

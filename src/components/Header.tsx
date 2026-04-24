@@ -45,7 +45,7 @@ export function Header({ onMenuClick }: HeaderProps) {
           {/* Hamburger Menu - Mobile Only */}
           <button
             onClick={onMenuClick}
-            className="lg:hidden p-2 hover:bg-white/5 rounded-md transition-colors"
+            className="md:hidden p-2 hover:bg-white/5 rounded-md transition-colors"
             aria-label="Open menu"
           >
             <Menu className="h-5 w-5 text-[#00f0ff]" />
@@ -58,7 +58,7 @@ export function Header({ onMenuClick }: HeaderProps) {
               // Search is already live-filtering via setSearchQuery
               // This ensures Enter doesn't reload the page
             }}
-            className="relative w-48 sm:w-64 lg:w-80"
+            className="relative w-48 sm:w-64 md:w-80"
           >
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#00f0ff]/50" />
             <input

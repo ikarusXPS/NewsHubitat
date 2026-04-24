@@ -105,7 +105,7 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
           />
         )}
       </AnimatePresence>
@@ -119,8 +119,8 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
         className={cn(
           'sidebar-cyber flex w-64 flex-col relative z-50',
-          'fixed lg:relative inset-y-0 left-0',
-          'lg:translate-x-0'
+          'fixed md:relative inset-y-0 left-0',
+          'md:translate-x-0'
         )}
       >
       {/* Logo - same height as header (h-14) */}
@@ -143,7 +143,7 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
         {/* Mobile Close Button */}
         <button
           onClick={onClose}
-          className="lg:hidden p-2 hover:bg-white/5 rounded-md transition-colors"
+          className="md:hidden p-2 hover:bg-white/5 rounded-md transition-colors"
           aria-label="Close sidebar"
         >
           <X className="h-5 w-5 text-gray-400 hover:text-white" />

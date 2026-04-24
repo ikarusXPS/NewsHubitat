@@ -144,7 +144,7 @@ export function BadgeGrid({ showFeatured = true, selectable = false, onSelect }:
       </div>
 
       {/* Badge Grid */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
         {Array.from(badgeGroups.entries()).map(([baseName, groupBadges]) => {
           // Show highest earned tier, or first unearned
           const earnedInGroup = groupBadges.filter((b) => earnedBadgeIds.has(b.id));
