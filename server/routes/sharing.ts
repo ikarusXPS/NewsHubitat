@@ -2,12 +2,48 @@
  * Social Sharing API Routes
  */
 
-import { Router } from 'express';
+import { Router, type Request } from 'express';
 import { SharingService, type Platform } from '../services/sharingService';
+import { authMiddleware } from '../services/authService';
 import logger from '../utils/logger';
+
+interface AuthenticatedRequest extends Request {
+  user?: { userId: string; email: string };
+}
 
 const router = Router();
 const sharingService = SharingService.getInstance();
+
+/**
+ * GET /api/share/my
+ * Get current user's shares (requires auth)
+ */
+router.get('/my', authMiddleware, async (req, res) => {
+  try {
+    const userId = (req as AuthenticatedRequest).user?.userId;
+    if (!userId) {
+      return res.status(401).json({ success: false, error: 'Not authenticated' });
+    }
+
+    const shares = await sharingService.getUserShares(userId);
+
+    // Include analytics for each share
+    const sharesWithAnalytics = await Promise.all(
+      shares.map(async (share) => {
+        const analytics = await sharingService.getAnalytics(share.shareCode);
+        return {
+          ...share,
+          analytics: analytics || { views: share.viewCount, clicks: [], topReferrers: [] },
+        };
+      })
+    );
+
+    res.json({ success: true, data: sharesWithAnalytics });
+  } catch (err) {
+    logger.error('Error fetching user shares:', err);
+    res.status(500).json({ success: false, error: 'Failed to fetch shares' });
+  }
+});
 
 /**
  * POST /api/share/article

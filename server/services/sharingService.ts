@@ -239,6 +239,19 @@ export class SharingService {
   }
 
   /**
+   * Get all shares created by a user
+   */
+  async getUserShares(userId: string): Promise<SharedContent[]> {
+    const userShares: SharedContent[] = [];
+    for (const shared of sharedContents.values()) {
+      if (shared.createdBy === userId && (!shared.expiresAt || shared.expiresAt > new Date())) {
+        userShares.push(shared);
+      }
+    }
+    return userShares.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  /**
    * Get share analytics
    */
   async getAnalytics(shareCode: string): Promise<{
