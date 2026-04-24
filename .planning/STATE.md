@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: User & Community Features
 status: executing
-last_updated: "2026-04-24T12:00:48Z"
+last_updated: "2026-04-24T12:10:15Z"
 last_activity: 2026-04-24
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 5
-  completed_plans: 5
-  percent: 20
+  completed_plans: 6
+  percent: 24
 ---
 
 # State: NewsHub
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-04-23)
 ## Current Position
 
 Phase: 24 (Mobile Responsive) - In progress
-Current Plan: 02 (Bottom Navigation)
-Status: Plan 01 complete, ready for Plan 02
-Last activity: 2026-04-24 — Plan 01 Mobile Foundation Layer complete
+Current Plan: 03 (Responsive Images)
+Status: Plan 02 complete, ready for Plan 03
+Last activity: 2026-04-24 — Plan 02 Bottom Navigation complete
 
 ```
-v1.4 Progress: [####                ] 20% (6 phases, 1 complete + 1 in progress)
+v1.4 Progress: [#####               ] 24% (6 phases, 1 complete + 1 in progress)
 ```
 
 ## Milestone Progress
@@ -45,7 +45,7 @@ v1.4 Progress: [####                ] 20% (6 phases, 1 complete + 1 in progress)
 | Phase | Name | Requirements | Status |
 |-------|------|--------------|--------|
 | 23 | i18n Foundation | I18N-01, I18N-02, I18N-03 | Complete (2026-04-24) |
-| 24 | Mobile Responsive | MOBILE-01, MOBILE-02, MOBILE-03 | In progress (1/5 plans) |
+| 24 | Mobile Responsive | MOBILE-01, MOBILE-02, MOBILE-03 | In progress (2/5 plans) |
 | 25 | Social Sharing | SHARE-01, SHARE-02, SHARE-03 | Not started |
 | 26 | OAuth Integration | OAUTH-01, OAUTH-02, OAUTH-03 | Not started |
 | 27 | Comments System | COMM-01, COMM-02, COMM-03 | Not started |
@@ -95,9 +95,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Completed 24-01 Mobile Foundation Layer (safe area CSS, breakpoint migration, useMediaQuery hook)
-**Next step:** Continue with Phase 24 Plan 02 (Bottom Navigation)
-**Resume file:** .planning/phases/24-mobile-responsive/24-01-SUMMARY.md
+**Last action:** Completed 24-02 Bottom Navigation (BottomNav, MobileDrawer, scroll/haptic hooks)
+**Next step:** Continue with Phase 24 Plan 03 (Responsive Images)
+**Resume file:** .planning/phases/24-mobile-responsive/24-02-SUMMARY.md
 **Checkpoint:** —
 
 ## Accumulated Context
@@ -161,6 +161,11 @@ v1.4 Stack Decisions (from research):
 | md: as primary mobile breakpoint | Tablet-first responsive design | Migrated lg: (1024px) to md: (768px) across all components |
 | CSS env() safe area variables | Notched device support | --safe-area-top/right/bottom/left from env(safe-area-inset-*) |
 | SSR-safe useMediaQuery hook | Server rendering compatibility | typeof window guard with legacy addListener fallback |
+| 5-item BottomNav | Mobile primary navigation | Dashboard, Monitor, Events, Bookmarks, Profile per D-01 |
+| MobileDrawer full navigation | All nav items in drawer | Full duplication from Sidebar per D-06 |
+| Controls in drawer | FocusSelector, FeedManager, LanguageSwitcher | Moved from header to drawer on mobile per D-20 |
+| No event stats in drawer | Navigation focus only | Removed stats panel per D-27 |
+| Responsive toast position | top-center mobile, bottom-right desktop | Per D-29 |
 
 ## Reports
 
@@ -170,4 +175,4 @@ v1.4 Stack Decisions (from research):
 
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-24 — Completed 24-01 Mobile Foundation Layer*
+*Last updated: 2026-04-24 — Completed 24-02 Bottom Navigation*
