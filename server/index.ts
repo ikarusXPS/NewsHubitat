@@ -15,7 +15,10 @@ import { newsRoutes } from './routes/news';
 import { translationRoutes } from './routes/translation';
 import { analysisRoutes } from './routes/analysis';
 import { eventsRoutes } from './routes/events';
+import passport from 'passport';
+import { configurePassport } from './config/passport';
 import { authRoutes } from './routes/auth';
+import { oauthRoutes } from './routes/oauth';
 import aiRoutes from './routes/ai';
 import marketsRoutes from './routes/markets.js';
 import { focusRoutes } from './routes/focus';
@@ -85,6 +88,10 @@ app.use(serverTimingMiddleware);
 // Prometheus metrics collection (D-05)
 app.use(metricsMiddleware);
 
+// Initialize Passport (no session - stateless JWT per D-05)
+app.use(passport.initialize());
+configurePassport();
+
 // JSON parser with raw body preservation for webhook signature verification (Phase 22)
 app.use(express.json({
   verify: (req: express.Request, _res, buf) => {
@@ -116,6 +123,9 @@ app.use('/api/auth/register', authLimiter);
 app.use('/api/auth/request-reset', authLimiter);
 app.use('/api/auth/reset-password', authLimiter);
 app.use('/api/auth', authRoutes);
+
+// OAuth routes (Google, GitHub) - uses same /api/auth prefix
+app.use('/api/auth', oauthRoutes);
 
 // AI endpoints - moderate (10 req/min per user) - D-05
 app.use('/api/ai', aiLimiter, aiRoutes);
