@@ -11,6 +11,8 @@ import { MediaBiasBar } from './MediaBiasBar';
 import { SourceFilterBanner } from './SourceFilterBanner';
 import { BulkReadActions } from './BulkReadActions';
 import { ForYouCarousel } from './ForYouCarousel';
+import { PullToRefresh } from './mobile/PullToRefresh';
+import { ScrollToTopFAB } from './mobile/ScrollToTopFAB';
 import { useAppStore } from '../store';
 import { useCachedQuery } from '../hooks/useCachedQuery';
 import { cn } from '../lib/utils';
@@ -126,6 +128,11 @@ export function NewsFeed() {
     }
   }, [isArticleRead, markAsRead, markAsUnread]);
 
+  // Handle pull-to-refresh action
+  const handleRefresh = async () => {
+    await refetch();
+  };
+
   // Memoize article processing to avoid recalculating on every render
   const articles = useMemo(() => data?.data || [], [data?.data]);
 
@@ -208,9 +215,10 @@ export function NewsFeed() {
   }
 
   return (
-    <div className="space-y-3">
-      {/* Hero Section */}
-      <HeroSection stats={heroStats} />
+    <PullToRefresh onRefresh={handleRefresh}>
+      <div className="space-y-3">
+        {/* Hero Section */}
+        <HeroSection stats={heroStats} />
 
       {/* For You Carousel per D-17 - after HeroSection */}
       <ForYouCarousel enabled={isPersonalizationEnabled} />
@@ -428,8 +436,12 @@ export function NewsFeed() {
         </motion.div>
       )}
 
-      {/* AI Chat Assistant */}
-      <AskAI articles={data?.data || []} />
-    </div>
+        {/* AI Chat Assistant */}
+        <AskAI articles={data?.data || []} />
+      </div>
+
+      {/* Scroll to top FAB - mobile only */}
+      <ScrollToTopFAB />
+    </PullToRefresh>
   );
 }
