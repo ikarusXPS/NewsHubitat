@@ -54,9 +54,11 @@ Exceptions:
 | Role | Size | Weight | Line Height | Font |
 |------|------|--------|-------------|------|
 | Body | 14px | 400 (regular) | 1.5 | Inter |
-| Label | 10-12px | 500 (medium) | 1.4 | JetBrains Mono |
+| Label | 10-12px | 400 (regular) | 1.4 | JetBrains Mono |
 | Heading | 18px | 600 (semibold) | 1.3 | JetBrains Mono |
-| Display | 24px | 700 (bold) | 1.2 | JetBrains Mono |
+| Display | 24px | 600 (semibold) | 1.2 | JetBrains Mono |
+
+**Weight rationale:** 2 weights only (regular + semibold) to prevent visual noise. Labels use regular weight with size differentiation. Display text uses semibold with size differentiation from headings.
 
 **Mobile-specific adjustments:**
 - Card titles: 18px (vs 20px on desktop) for single-column layout
