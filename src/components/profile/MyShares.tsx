@@ -41,9 +41,7 @@ export function MyShares() {
         <h4 className="text-sm font-medium text-gray-400 mb-1">
           {t('myShares.noShares')}
         </h4>
-        <p className="text-xs text-gray-500">
-          {t('myShares.noSharesBody')}
-        </p>
+        <p className="text-xs text-gray-500">{t('myShares.noSharesBody')}</p>
       </div>
     );
   }
@@ -51,7 +49,8 @@ export function MyShares() {
   return (
     <div className="space-y-3">
       {shares.map((share) => {
-        const totalClicks = share.analytics?.clicks.reduce((sum, c) => sum + c.count, 0) || 0;
+        const totalClicks =
+          share.analytics?.clicks.reduce((sum, c) => sum + c.count, 0) || 0;
 
         return (
           <div
@@ -61,7 +60,9 @@ export function MyShares() {
             {/* Title and date */}
             <div className="flex items-start justify-between gap-3 mb-3">
               <h4 className="text-sm font-medium text-white line-clamp-2 flex-1">
-                {share.title.length > 60 ? `${share.title.slice(0, 60)}...` : share.title}
+                {share.title.length > 60
+                  ? `${share.title.slice(0, 60)}...`
+                  : share.title}
               </h4>
               <a
                 href={`/s/${share.shareCode}`}
