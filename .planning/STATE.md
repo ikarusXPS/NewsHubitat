@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: User & Community Features
 status: executing
-last_updated: "2026-04-24T12:10:15Z"
+last_updated: "2026-04-24T12:30:00Z"
 last_activity: 2026-04-24
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 5
-  completed_plans: 6
-  percent: 24
+  completed_plans: 7
+  percent: 28
 ---
 
 # State: NewsHub
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-04-23)
 ## Current Position
 
 Phase: 24 (Mobile Responsive) - In progress
-Current Plan: 03 (Responsive Images)
-Status: Plan 02 complete, ready for Plan 03
-Last activity: 2026-04-24 — Plan 02 Bottom Navigation complete
+Current Plan: 04 (Settings Mobile Layout)
+Status: Plan 03 complete, ready for Plan 04
+Last activity: 2026-04-24 — Plan 03 Responsive Images complete
 
 ```
-v1.4 Progress: [#####               ] 24% (6 phases, 1 complete + 1 in progress)
+v1.4 Progress: [######              ] 28% (6 phases, 1 complete + 1 in progress)
 ```
 
 ## Milestone Progress
@@ -45,7 +45,7 @@ v1.4 Progress: [#####               ] 24% (6 phases, 1 complete + 1 in progress)
 | Phase | Name | Requirements | Status |
 |-------|------|--------------|--------|
 | 23 | i18n Foundation | I18N-01, I18N-02, I18N-03 | Complete (2026-04-24) |
-| 24 | Mobile Responsive | MOBILE-01, MOBILE-02, MOBILE-03 | In progress (2/5 plans) |
+| 24 | Mobile Responsive | MOBILE-01, MOBILE-02, MOBILE-03 | In progress (3/5 plans) |
 | 25 | Social Sharing | SHARE-01, SHARE-02, SHARE-03 | Not started |
 | 26 | OAuth Integration | OAUTH-01, OAUTH-02, OAUTH-03 | Not started |
 | 27 | Comments System | COMM-01, COMM-02, COMM-03 | Not started |
@@ -95,9 +95,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Completed 24-02 Bottom Navigation (BottomNav, MobileDrawer, scroll/haptic hooks)
-**Next step:** Continue with Phase 24 Plan 03 (Responsive Images)
-**Resume file:** .planning/phases/24-mobile-responsive/24-02-SUMMARY.md
+**Last action:** Completed 24-03 Responsive Images (Cloudinary URL builder, ResponsiveImage component, priority loading)
+**Next step:** Continue with Phase 24 Plan 04 (Settings Mobile Layout)
+**Resume file:** .planning/phases/24-mobile-responsive/24-03-SUMMARY.md
 **Checkpoint:** —
 
 ## Accumulated Context
@@ -166,6 +166,11 @@ v1.4 Stack Decisions (from research):
 | Controls in drawer | FocusSelector, FeedManager, LanguageSwitcher | Moved from header to drawer on mobile per D-20 |
 | No event stats in drawer | Navigation focus only | Removed stats panel per D-27 |
 | Responsive toast position | top-center mobile, bottom-right desktop | Per D-29 |
+| Cloudinary fetch mode | On-the-fly image transformation | No upload required, graceful fallback |
+| AVIF -> WebP -> JPEG fallback | Modern format support via picture element | D-75: best compression with universal compatibility |
+| srcSet 320w/640w/960w/1280w | Responsive image widths | D-73: cover common viewport sizes |
+| Priority loading first 3 cards | eager + fetchpriority=high | D-77, D-78: improve LCP |
+| URL encoding for Cloudinary | encodeURIComponent on original URL | T-24-05: prevent URL injection |
 
 ## Reports
 
@@ -175,4 +180,4 @@ v1.4 Stack Decisions (from research):
 
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-24 — Completed 24-02 Bottom Navigation*
+*Last updated: 2026-04-24 — Completed 24-03 Responsive Images*
