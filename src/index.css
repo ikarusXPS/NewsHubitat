@@ -944,3 +944,52 @@ body {
   margin: 0 !important;
   border-radius: 50%;
 }
+
+/* ============================================
+   MOBILE TOUCH TARGETS (WCAG 2.5.5 AAA: 44x44px)
+   Per phase 24 mobile responsive requirements
+   ============================================ */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Extended touch target with hit area expansion */
+.touch-target-extended {
+  position: relative;
+}
+
+.touch-target-extended::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  bottom: -8px;
+  left: -8px;
+}
+
+/* Touch feedback - subtle scale on tap */
+.touch-feedback {
+  transition: transform 0.1s ease;
+}
+
+.touch-feedback:active {
+  transform: scale(0.97);
+}
+
+/* Touch highlight - custom tap highlight color */
+.touch-highlight {
+  -webkit-tap-highlight-color: rgba(0, 240, 255, 0.2);
+}
+
+/* Disable default tap highlight */
+.touch-no-highlight {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Touch scroll container - smooth momentum scrolling */
+.touch-scroll {
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
