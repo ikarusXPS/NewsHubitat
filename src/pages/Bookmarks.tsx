@@ -128,10 +128,11 @@ export function Bookmarks() {
           </p>
 
           <div className="grid gap-4 md:grid-cols-2 md:grid-cols-3">
-            {articles?.map((article) => (
+            {articles?.map((article, index) => (
               <NewsCard
                 key={article.id}
                 article={article}
+                priority={index < 3}
                 onTranslate={handleTranslate}
               />
             ))}
