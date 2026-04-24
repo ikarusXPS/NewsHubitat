@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Share2, Twitter, Linkedin, Facebook, MessageCircle, Copy, Check } from 'lucide-react';
+import { Share2, MessageCircle, Copy, Check, Globe, Send, AtSign } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { cn } from '../../lib/utils';
@@ -13,15 +13,15 @@ interface ShareButtonsProps {
   className?: string;
 }
 
-// Platform colors per D-03
+// Platform colors per D-03 (using generic icons - social brand icons not in lucide-react)
 const PLATFORM_CONFIG = {
   twitter: {
-    icon: Twitter,
+    icon: AtSign, // X/Twitter
     color: '#1DA1F2',
     hoverClass: 'hover:bg-[#1DA1F2]/20 hover:text-[#1DA1F2]',
   },
   linkedin: {
-    icon: Linkedin,
+    icon: Send, // LinkedIn
     color: '#0A66C2',
     hoverClass: 'hover:bg-[#0A66C2]/20 hover:text-[#0A66C2]',
   },
@@ -31,7 +31,7 @@ const PLATFORM_CONFIG = {
     hoverClass: 'hover:bg-[#25D366]/20 hover:text-[#25D366]',
   },
   facebook: {
-    icon: Facebook,
+    icon: Globe, // Facebook
     color: '#1877F2',
     hoverClass: 'hover:bg-[#1877F2]/20 hover:text-[#1877F2]',
   },
