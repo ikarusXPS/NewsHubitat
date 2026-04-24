@@ -386,7 +386,7 @@ export function NewsFeed() {
             className={cn(
               'grid gap-6',
               viewMode === 'grid'
-                ? 'md:grid-cols-2 lg:grid-cols-3'
+                ? 'md:grid-cols-2 md:grid-cols-3'
                 : 'grid-cols-1 max-w-3xl'
             )}
           >

@@ -180,7 +180,7 @@ export function Monitor() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-4 min-h-0">
+      <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-4 min-h-0">
         {/* Left Panel - Stats & Filters */}
         <div className="glass-panel rounded-xl p-4 space-y-3 overflow-y-auto max-h-[calc(100vh-180px)]">
           {/* Live Status */}
@@ -356,7 +356,7 @@ export function Monitor() {
         </div>
 
         {/* Main View - Globe or Map */}
-        <div className="lg:col-span-3 glass-panel rounded-xl overflow-hidden relative min-h-[600px]">
+        <div className="md:col-span-3 glass-panel rounded-xl overflow-hidden relative min-h-[600px]">
           <AnimatePresence mode="wait">
             {viewMode === 'globe' ? (
               <motion.div

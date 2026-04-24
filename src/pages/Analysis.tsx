@@ -113,7 +113,7 @@ export function Analysis() {
           </motion.div>
 
           {/* Charts Row with explanations */}
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="grid gap-6 md:grid-cols-2">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -141,7 +141,7 @@ export function Analysis() {
           </div>
 
           {/* New Analytics Row with explanations */}
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="grid gap-6 md:grid-cols-2">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -187,7 +187,7 @@ export function Analysis() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="grid gap-6 lg:grid-cols-2"
+            className="grid gap-6 md:grid-cols-2"
           >
             {/* Political Alignment Chart */}
             <div className="glass-panel rounded-xl p-5 border border-[#00f0ff]/20">
