@@ -80,17 +80,13 @@ export function NewsCard({ article, priority = false, onTranslate }: NewsCardPro
   };
 
   const handleShare = async (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent SwipeableCard drag from intercepting
-    if (shareUrls) return; // Already created
-    if (isCreatingShare) return;
-
+    e.stopPropagation();
+    if (shareUrls || isCreatingShare) return;
     setIsCreatingShare(true);
     try {
       const urls = await createShare.mutateAsync(localArticle);
       setShareUrls(urls);
-      // Extract share code from direct URL: /s/{code}
-      const code = urls.direct.split('/s/')[1];
-      setShareCode(code);
+      setShareCode(urls.direct.split('/s/')[1]);
     } catch (err) {
       console.error('Failed to create share:', err);
     } finally {
