@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-04-23)
 
 ## Current Position
 
-Phase: 25 (Social Sharing) - Planned, ready to execute
-Current Plan: 01
-Status: 3 plans in 3 waves, verified
-Last activity: 2026-04-24 — Phase 25 planning complete
+Phase: 25 (Social Sharing) - Executing
+Current Plan: 02
+Status: 1/3 plans complete
+Last activity: 2026-04-24 — Completed 25-01 server infrastructure
 
 ```
 v1.4 Progress: [########            ] 36% (6 phases, 2 complete)
@@ -46,7 +46,7 @@ v1.4 Progress: [########            ] 36% (6 phases, 2 complete)
 |-------|------|--------------|--------|
 | 23 | i18n Foundation | I18N-01, I18N-02, I18N-03 | Complete (2026-04-24) |
 | 24 | Mobile Responsive | MOBILE-01, MOBILE-02, MOBILE-03 | Complete (2026-04-24) |
-| 25 | Social Sharing | SHARE-01, SHARE-02, SHARE-03 | Planned (3 plans) |
+| 25 | Social Sharing | SHARE-01, SHARE-02, SHARE-03 | Executing (1/3 plans) |
 | 26 | OAuth Integration | OAUTH-01, OAUTH-02, OAUTH-03 | Not started |
 | 27 | Comments System | COMM-01, COMM-02, COMM-03 | Not started |
 | 28 | Team Collaboration | COLLAB-01, COLLAB-02, COLLAB-03 | Not started |
@@ -95,9 +95,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Planned Phase 25 Social Sharing (3 plans in 3 waves)
-**Next step:** Execute Phase 25 Social Sharing
-**Resume file:** .planning/phases/25-social-sharing/25-01-PLAN.md
+**Last action:** Completed Phase 25-01 server infrastructure (bot detection, /s/:code, /api/share/my)
+**Next step:** Execute Phase 25-02 frontend components
+**Resume file:** .planning/phases/25-social-sharing/25-02-PLAN.md
 **Checkpoint:** —
 
 ## Accumulated Context
@@ -176,6 +176,9 @@ v1.4 Stack Decisions (from research):
 | Radio icon for PullToRefresh | Matches NewsHub logo | Per CONTEXT.md Specific Ideas |
 | ScrollToTopFAB 500px threshold | Appears after significant scroll | Per D-32 |
 | react-simple-pull-to-refresh | Pull-to-refresh library | Installed with --legacy-peer-deps for vite@8 |
+| Bot detection via user-agent substring | 10 social crawlers | Twitterbot, facebookexternalhit, LinkedInBot, WhatsApp, TelegramBot, Slackbot, Discordbot, Facebot, Pinterest, Embedly |
+| generateOGHtml meta refresh | Human fallback | Redirects humans via meta http-equiv refresh if they receive OG HTML |
+| /s/:code route placement | Before SPA fallback | Ensures share routes handled before {*path} catch-all |
 
 ## Reports
 
@@ -185,4 +188,4 @@ v1.4 Stack Decisions (from research):
 
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-24 — Completed Phase 24 Mobile Responsive*
+*Last updated: 2026-04-24 — Completed Phase 25-01 Server Infrastructure*

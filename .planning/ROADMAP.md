@@ -120,7 +120,7 @@ Plans:
   4. Mobile users can use native share sheet via Web Share API
 **Plans**: 3 plans
 Plans:
-- [ ] 25-01-PLAN.md — Server infrastructure (bot detection, /s/:code route, /api/share/my, OG meta tags)
+- [x] 25-01-PLAN.md — Server infrastructure (bot detection, /s/:code route, /api/share/my, OG meta tags)
 - [ ] 25-02-PLAN.md — Frontend components (ShareButtons, useShare hook, i18n translations)
 - [ ] 25-03-PLAN.md — Integration (NewsCard share button, MyShares in Profile, verification)
 **UI hint**: yes
@@ -192,7 +192,7 @@ Plans:
 | 22. SMTP Production | v1.3 | 3/3 | Complete | 2026-04-23 |
 | 23. i18n Foundation | v1.4 | 4/4 | Complete | 2026-04-24 |
 | 24. Mobile Responsive | v1.4 | 5/5 | Complete | 2026-04-24 |
-| 25. Social Sharing | v1.4 | 0/3 | Not started | - |
+| 25. Social Sharing | v1.4 | 1/3 | In Progress | - |
 | 26. OAuth Integration | v1.4 | 0/? | Not started | - |
 | 27. Comments System | v1.4 | 0/? | Not started | - |
 | 28. Team Collaboration | v1.4 | 0/? | Not started | - |
@@ -253,4 +253,4 @@ v1.7 Advanced          -> Bedarfsabhangig erweitern
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-24 — Phase 25 Social Sharing planned (3 plans)*
+*Last updated: 2026-04-24 — Phase 25-01 complete (server infrastructure)*
