@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Bookmark, ExternalLink, Globe, Languages, Loader2, Shield, Search, AlertTriangle, X, CheckCircle, Info } from 'lucide-react';
 import { ResponsiveImage } from './ResponsiveImage';
+import { SwipeableCard } from './mobile/SwipeableCard';
 import { cn, getRegionColor, getSentimentColor, truncate } from '../lib/utils';
 import { formatDateTime } from '../lib/formatters';
 import { useAppStore } from '../store';
+import { useIsMobile } from '../hooks/useMediaQuery';
 import type { NewsArticle } from '../types';
 
 interface PropagandaIndicator {
@@ -29,6 +31,7 @@ interface NewsCardProps {
 export function NewsCard({ article, priority = false, onTranslate }: NewsCardProps) {
   const { language, toggleBookmark, isBookmarked, addToReadingHistory } = useAppStore();
   const bookmarked = isBookmarked(article.id);
+  const isMobile = useIsMobile();
 
   // Track reading when article is clicked
   const trackReading = () => addToReadingHistory(article.id);
@@ -93,6 +96,11 @@ export function NewsCard({ article, priority = false, onTranslate }: NewsCardPro
     ? !!localArticle.titleTranslated?.de
     : !!localArticle.titleTranslated?.en;
 
+  // Handle bookmark action for swipe gesture
+  const handleBookmark = () => {
+    toggleBookmark(localArticle.id);
+  };
+
   const getDisplayTitle = () => {
     if (showOriginal || !hasTranslation) {
       return localArticle.title;
@@ -139,7 +147,7 @@ export function NewsCard({ article, priority = false, onTranslate }: NewsCardPro
     he: 'HE',
   }[localArticle.originalLanguage] || localArticle.originalLanguage.toUpperCase();
 
-  return (
+  const cardContent = (
     <article className="rounded-lg border border-gray-700 bg-gray-800 p-4 transition-shadow hover:shadow-lg">
       {/* Thumbnail image with ResponsiveImage */}
       {localArticle.imageUrl && (
@@ -403,4 +411,15 @@ export function NewsCard({ article, priority = false, onTranslate }: NewsCardPro
       )}
     </article>
   );
+
+  // Wrap with SwipeableCard on mobile for swipe-to-bookmark gesture
+  if (isMobile) {
+    return (
+      <SwipeableCard onBookmark={handleBookmark} isBookmarked={bookmarked}>
+        {cardContent}
+      </SwipeableCard>
+    );
+  }
+
+  return cardContent;
 }
