@@ -100,5 +100,12 @@
   },
   "toast": {
     "loggedOut": "Successfully logged out"
+  },
+  "connectedAccounts": {
+    "title": "Connected Accounts",
+    "description": "Link your Google or GitHub account for faster login",
+    "noPasswordHint": "You're using OAuth-only login. Set a password in Security settings before unlinking all providers.",
+    "unlinkTitle": "Unlink {{provider}}",
+    "unlinkMessage": "Are you sure you want to unlink {{provider}}? You can reconnect anytime."
   }
 }

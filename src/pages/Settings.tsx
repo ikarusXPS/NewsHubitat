@@ -14,6 +14,7 @@ import { ConfirmDialog } from '../components/ConfirmDialog';
 import { AvatarPicker } from '../components/profile/AvatarPicker';
 import { DataExportModal } from '../components/modals/DataExportModal';
 import { DeleteAccountModal } from '../components/modals/DeleteAccountModal';
+import { ConnectedAccounts } from '../components/settings/ConnectedAccounts';
 
 const ALL_REGIONS: PerspectiveRegion[] = [
   'afrika', 'alternative', 'asien', 'china', 'deutschland',
@@ -299,6 +300,9 @@ export function Settings() {
           </div>
         )}
       </div>
+
+      {/* Connected Accounts Section - only show when authenticated */}
+      {isAuthenticated && user && <ConnectedAccounts />}
 
       {/* Profile Editing per D-27 */}
       {isAuthenticated && user && (
