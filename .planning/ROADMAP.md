@@ -64,7 +64,7 @@
 **Milestone Goal:** Reduce onboarding friction, expand target audience, and increase user engagement through OAuth login, internationalization, mobile optimization, social sharing, comments, and team collaboration.
 
 - [x] **Phase 23: i18n Foundation** - Multi-language UI with react-i18next, string extraction, browser detection (completed 2026-04-24)
-- [ ] **Phase 24: Mobile Responsive** - Responsive layouts, touch navigation, optimized images
+- [x] **Phase 24: Mobile Responsive** - Responsive layouts, touch navigation, optimized images (completed 2026-04-24)
 - [ ] **Phase 25: Social Sharing** - Share buttons, Open Graph meta tags, share analytics
 - [ ] **Phase 26: OAuth Integration** - Google and GitHub OAuth with account linking
 - [ ] **Phase 27: Comments System** - Article comments with threaded replies and real-time updates
@@ -106,7 +106,7 @@ Plans:
 - [x] 24-02-PLAN.md — Mobile navigation (BottomNav + MobileDrawer with hooks)
 - [x] 24-03-PLAN.md — Responsive images (ResponsiveImage + Cloudinary + NewsCard integration)
 - [x] 24-04-PLAN.md — Touch interactions (SwipeableCard, PullToRefresh, ScrollToTopFAB)
-- [ ] 24-05-PLAN.md — Layout adaptations and verification
+- [x] 24-05-PLAN.md — Layout adaptations and verification
 **UI hint**: yes
 
 ### Phase 25: Social Sharing
@@ -187,7 +187,7 @@ Plans:
 | 21. Load Testing | v1.3 | 3/3 | Complete | 2026-04-23 |
 | 22. SMTP Production | v1.3 | 3/3 | Complete | 2026-04-23 |
 | 23. i18n Foundation | v1.4 | 4/4 | Complete | 2026-04-24 |
-| 24. Mobile Responsive | v1.4 | 4/5 | In progress | - |
+| 24. Mobile Responsive | v1.4 | 5/5 | Complete | 2026-04-24 |
 | 25. Social Sharing | v1.4 | 0/? | Not started | - |
 | 26. OAuth Integration | v1.4 | 0/? | Not started | - |
 | 27. Comments System | v1.4 | 0/? | Not started | - |
@@ -249,4 +249,4 @@ v1.7 Advanced          -> Bedarfsabhangig erweitern
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-24 — Phase 24 Plan 04 Touch Interactions complete*
+*Last updated: 2026-04-24 — Phase 24 Mobile Responsive complete*
