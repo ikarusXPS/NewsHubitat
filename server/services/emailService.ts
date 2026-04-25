@@ -680,6 +680,52 @@ export class EmailService {
   }
 
   /**
+   * Send team invite email (Phase 28, per D-01, D-02)
+   */
+  async sendTeamInvite(
+    email: string,
+    teamName: string,
+    inviterName: string,
+    inviteUrl: string
+  ): Promise<boolean> {
+    const subject = `You're invited to join ${teamName} on NewsHub`;
+    const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 20px; background-color: #0a0a0f; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <div style="max-width: 500px; margin: 0 auto; background: #111118; border-radius: 12px; padding: 32px; border: 1px solid #00f0ff;">
+    <h1 style="color: #00f0ff; margin: 0 0 16px; font-size: 24px;">Team Invitation</h1>
+    <p style="color: #e5e7eb; font-size: 16px; line-height: 1.6;">
+      <strong>${inviterName}</strong> has invited you to join <strong>${teamName}</strong> on NewsHub.
+    </p>
+    <p style="color: #9ca3af; font-size: 14px; line-height: 1.6;">
+      Share and discover news articles with your team. Click below to accept the invitation.
+    </p>
+    <a href="${inviteUrl}"
+       style="display: inline-block; background: #00f0ff; color: #0a0a0f; padding: 12px 24px;
+              border-radius: 8px; text-decoration: none; font-weight: 600; margin-top: 16px; font-size: 14px;">
+      Join Team
+    </a>
+    <p style="color: #6b7280; font-size: 12px; margin-top: 24px;">
+      This invitation expires in 7 days. If you don't have a NewsHub account, you'll be prompted to create one.
+    </p>
+  </div>
+</body>
+</html>
+    `;
+
+    const result = await this.send(email, subject, html);
+    if (result) {
+      logger.info(`team_invite:sent email=${email} team=${teamName}`);
+    }
+    return result;
+  }
+
+  /**
    * Strip HTML tags for plain text version
    */
   private stripHtml(html: string): string {

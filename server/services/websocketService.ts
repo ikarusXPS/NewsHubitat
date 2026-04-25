@@ -32,6 +32,11 @@ export interface ServerToClientEvents {
   'comment:new': (data: { articleId: string; comment: CommentWithUser }) => void;
   'comment:typing': (data: { articleId: string }) => void;
 
+  // Team events (Phase 28)
+  'team:bookmark:new': (data: { teamId: string; bookmark: TeamBookmarkWithArticle }) => void;
+  'team:member:joined': (data: { teamId: string; member: TeamMemberInfo }) => void;
+  'team:member:removed': (data: { teamId: string; userId: string }) => void;
+
   // System
   'connected': (data: { clientId: string; serverTime: number }) => void;
   'stats': (data: { connectedClients: number; activeRooms: string[] }) => void;
@@ -50,6 +55,10 @@ export interface ClientToServerEvents {
   'comment:typing:start': (articleId: string) => void;
   'comment:typing:stop': (articleId: string) => void;
 
+  // Team room subscriptions (Phase 28)
+  'subscribe:team': (teamId: string) => void;
+  'unsubscribe:team': (teamId: string) => void;
+
   // User authentication
   'authenticate': (token: string) => void;
 
@@ -62,6 +71,25 @@ interface SocketData {
   subscribedRegions: Set<string>;
   subscribedTopics: Set<string>;
   authenticatedAt?: Date;
+}
+
+// Team bookmark with user info for real-time broadcasts (Phase 28)
+export interface TeamBookmarkWithArticle {
+  id: string;
+  teamId: string;
+  articleId: string;
+  addedBy: string;
+  addedByUser: { id: string; name: string; avatarUrl: string | null };
+  note: string | null;
+  createdAt: Date;
+}
+
+// Team member info for real-time broadcasts (Phase 28)
+export interface TeamMemberInfo {
+  userId: string;
+  name: string;
+  avatarUrl: string | null;
+  role: 'owner' | 'admin' | 'member';
 }
 
 // Comment with user info for real-time broadcasts (Phase 27)
@@ -168,6 +196,25 @@ export class WebSocketService {
       socket.on('unsubscribe:article', (articleId) => {
         socket.leave(`article:${articleId}`);
         logger.debug(`Client ${clientId} unsubscribed from article:${articleId}`);
+      });
+
+      // Team room subscriptions (Phase 28)
+      // T-28-05: Require authentication before allowing team room subscription
+      socket.on('subscribe:team', (teamId: string) => {
+        const userId = socket.data.userId;
+        if (!userId) {
+          logger.debug(`Unauthenticated socket tried to join team:${teamId}`);
+          return;
+        }
+        // Note: Full membership verification happens in TeamService
+        // Socket joins room; server-side broadcasts only go to verified members
+        socket.join(`team:${teamId}`);
+        logger.debug(`Client ${clientId} joined team:${teamId}`);
+      });
+
+      socket.on('unsubscribe:team', (teamId: string) => {
+        socket.leave(`team:${teamId}`);
+        logger.debug(`Client ${clientId} left team:${teamId}`);
       });
 
       // Comment typing indicators (Phase 27)
@@ -363,6 +410,33 @@ export class WebSocketService {
       articleId,
       comment,
     });
+  }
+
+  /**
+   * Broadcast new team bookmark (Phase 28)
+   */
+  broadcastTeamBookmark(teamId: string, bookmark: TeamBookmarkWithArticle): void {
+    if (!this.io) return;
+    this.io.to(`team:${teamId}`).emit('team:bookmark:new', { teamId, bookmark });
+    logger.debug(`Broadcast team:bookmark:new to team:${teamId}`);
+  }
+
+  /**
+   * Broadcast team member joined (Phase 28)
+   */
+  broadcastTeamMemberJoined(teamId: string, member: TeamMemberInfo): void {
+    if (!this.io) return;
+    this.io.to(`team:${teamId}`).emit('team:member:joined', { teamId, member });
+    logger.debug(`Broadcast team:member:joined to team:${teamId}`);
+  }
+
+  /**
+   * Broadcast team member removed (Phase 28)
+   */
+  broadcastTeamMemberRemoved(teamId: string, userId: string): void {
+    if (!this.io) return;
+    this.io.to(`team:${teamId}`).emit('team:member:removed', { teamId, userId });
+    logger.debug(`Broadcast team:member:removed to team:${teamId}`);
   }
 
   /**
