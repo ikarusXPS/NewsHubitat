@@ -137,7 +137,7 @@ Plans:
 Plans:
 - [x] 31-01-PLAN.md — Install @tanstack/react-virtual, create VirtualizedGrid, VirtualizedList, PaginatedFeed, useAccessibilityFallback (2/2 tasks, commits: ca2c891, 4f6af13)
 - [x] 31-02-PLAN.md — SignalCard CSS animation, CSS fade-in keyframes, NewsFeed virtualization integration (3/3 tasks, commits: 029524a, af9e933, 6d5df7c)
-- [ ] 31-03-PLAN.md — Keyboard navigation, focus indicators, scroll reset on filter change, human verification
+- [x] 31-03-PLAN.md — Keyboard navigation, focus indicators, scroll reset on filter change (5/5 tasks, commits: e3a82b7, 85ecec4, 13dd460, 1c2a5d0)
 
 ### Phase 32: Image Pipeline
 **Goal**: Users experience faster image loading with modern formats and responsive delivery
@@ -209,7 +209,7 @@ Plans:
 | 28. Team Collaboration | v1.4 | 5/5 | Complete | 2026-04-25 |
 | 29. Measurement Foundation | v1.5 | 3/3 | Complete | 2026-04-25 |
 | 30. Frontend Code Splitting | v1.5 | 4/4 | Complete | 2026-04-25 |
-| 31. Virtual Scrolling | v1.5 | 2/3 | In progress | - |
+| 31. Virtual Scrolling | v1.5 | 3/3 | Complete | 2026-04-25 |
 | 32. Image Pipeline | v1.5 | 0/4 | Not started | - |
 | 33. Caching Improvements | v1.5 | 0/3 | Not started | - |
 | 34. Database Optimization | v1.5 | 0/4 | Not started | - |
@@ -274,4 +274,4 @@ v1.8 Advanced          -> Demand-driven expansion
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-25 — Phase 31 Plan 02 complete (CSS animation, NewsFeed integration)*
+*Last updated: 2026-04-25 — Phase 31 complete (Virtual Scrolling with keyboard navigation)*

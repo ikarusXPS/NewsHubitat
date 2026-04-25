@@ -15,10 +15,10 @@ Requirements for Performance Optimization milestone. Each maps to roadmap phases
 
 ### Frontend Optimization
 
-- [ ] **FRON-01**: Route-based code splitting implemented for Dashboard, Analysis, Monitor, Timeline, EventMap pages
-- [ ] **FRON-02**: Virtual scrolling implemented for NewsFeed with @tanstack/react-virtual
-- [ ] **FRON-03**: Lazy image loading enabled for article thumbnails (native loading="lazy")
-- [ ] **FRON-04**: Initial JS bundle reduced to < 250KB (from ~800KB estimated)
+- [x] **FRON-01**: Route-based code splitting implemented for Dashboard, Analysis, Monitor, Timeline, EventMap pages
+- [x] **FRON-02**: Virtual scrolling implemented for NewsFeed with @tanstack/react-virtual
+- [x] **FRON-03**: Lazy image loading enabled for article thumbnails (native loading="lazy")
+- [x] **FRON-04**: Initial JS bundle reduced to < 250KB (from ~800KB estimated)
 
 ### Image Pipeline
 
@@ -59,10 +59,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MEAS-01 | Phase 29 | Complete |
 | MEAS-02 | Phase 29 | Complete |
 | MEAS-03 | Phase 29 | Complete |
-| FRON-01 | Phase 30 | Pending |
-| FRON-02 | Phase 31 | Pending |
-| FRON-03 | Phase 30 | Pending |
-| FRON-04 | Phase 30 | Pending |
+| FRON-01 | Phase 30 | Complete |
+| FRON-02 | Phase 31 | Complete |
+| FRON-03 | Phase 30 | Complete |
+| FRON-04 | Phase 30 | Complete |
 | IMG-01 | Phase 32 | Pending |
 | IMG-02 | Phase 32 | Pending |
 | IMG-03 | Phase 32 | Pending |
