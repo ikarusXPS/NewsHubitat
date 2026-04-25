@@ -25,13 +25,13 @@ See: .planning/PROJECT.md (updated 2026-04-23)
 
 ## Current Position
 
-Phase: 27 (Comments System) - Complete
-Current Plan: —
-Status: Phase complete, ready for Phase 28
-Last activity: 2026-04-25 — Phase 27 Comments System complete
+Phase: 28 (Team Collaboration) - In Progress
+Current Plan: 01 complete
+Status: Plan 28-01 complete, ready for Plan 28-02
+Last activity: 2026-04-25 — Completed 28-01 database models and core services
 
 ```
-v1.4 Progress: [################    ] 83% (6 phases, 5 complete)
+v1.4 Progress: [#################   ] 88% (6 phases, 5 complete + 1 in progress)
 ```
 
 ## Milestone Progress
@@ -50,7 +50,7 @@ v1.4 Progress: [################    ] 83% (6 phases, 5 complete)
 | 25 | Social Sharing | SHARE-01, SHARE-02, SHARE-03 | Complete (2026-04-25) |
 | 26 | OAuth Integration | OAUTH-01, OAUTH-02, OAUTH-03 | Complete (2026-04-25) |
 | 27 | Comments System | COMM-01, COMM-02, COMM-03 | Complete (2026-04-25) |
-| 28 | Team Collaboration | COLLAB-01, COLLAB-02, COLLAB-03 | Not started |
+| 28 | Team Collaboration | COLLAB-01, COLLAB-02, COLLAB-03 | In progress (1/4 plans) |
 
 ### Phase Dependencies
 
@@ -97,8 +97,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Completed Phase 26-05 OAuth tests and documentation
-**Next step:** Execute Phase 27 Comments System
+**Last action:** Completed Phase 28-01 database models and core services
+**Next step:** Execute Phase 28-02 API routes
 **Resume file:** None
 **Checkpoint:** —
 
@@ -195,6 +195,12 @@ v1.4 Stack Decisions (from research):
 | Security notifications | Claude discretion | Email on OAuth link/unlink events |
 | OAuth routes at /api/auth | D-05 stateless | oauthRoutes registered after authRoutes, same prefix |
 | Passport no session | D-05 requirement | passport.initialize() with session:false on all strategies |
+| Team name 3-50 chars | Claude discretion | Balanced brevity and descriptiveness |
+| Max 10 teams per user | Claude discretion | Prevents abuse while allowing flexibility |
+| Soft limit 50 members | Claude discretion | Warning log only, no hard block |
+| 7-day invite expiry | D-02 requirement | Matches existing token patterns |
+| Soft delete teams | Claude discretion | deletedAt field, 7-day grace period |
+| Same error for member/invite | T-28-04 mitigation | Prevents user enumeration |
 
 ## Reports
 
@@ -204,4 +210,4 @@ v1.4 Stack Decisions (from research):
 
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2025-04-25 — Completed Phase 26-05 OAuth Tests and Documentation*
+*Last updated: 2026-04-25 — Completed Phase 28-01 Database Models and Core Services*
