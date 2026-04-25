@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Performance Optimization
-current_plan: 31-02
+current_plan: 31-03
 status: executing
-last_updated: "2026-04-25T20:23:02.000Z"
-last_activity: 2026-04-25 — Plan 31-01 complete (@tanstack/react-virtual + virtualization components)
+last_updated: "2026-04-25T20:33:05Z"
+last_activity: 2026-04-25 — Plan 31-02 complete (CSS fade-in, NewsFeed virtualization integration)
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 21
-  completed_plans: 7
-  percent: 33
+  completed_plans: 8
+  percent: 38
 ---
 
 # State: NewsHub
@@ -26,12 +26,12 @@ See: .planning/PROJECT.md (updated 2026-04-25)
 ## Current Position
 
 Phase: 31 - Virtual Scrolling
-Current Plan: 02 (pending)
-Status: Plan 31-01 complete
-Last activity: 2026-04-25 — Plan 31-01 complete (@tanstack/react-virtual + virtualization components)
+Current Plan: 03 (pending)
+Status: Plan 31-02 complete
+Last activity: 2026-04-25 — Plan 31-02 complete (CSS fade-in, NewsFeed virtualization integration)
 
 ```
-v1.5 Progress: [███████░░░░░░░░░░░░░] 33% (6 phases, 2 complete)
+v1.5 Progress: [████████░░░░░░░░░░░░] 38% (6 phases, 2 complete)
 ```
 
 ## Milestone Progress
@@ -70,9 +70,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Plan 31-01 complete (installed @tanstack/react-virtual, created VirtualizedGrid, VirtualizedList, PaginatedFeed, useAccessibilityFallback)
-**Next step:** Execute Plan 31-02 (SignalCard CSS animation, NewsFeed virtualization integration)
-**Resume file:** .planning/phases/31-virtual-scrolling/31-02-PLAN.md
+**Last action:** Plan 31-02 complete (CSS fade-in animation, SignalCard refactor, NewsFeed virtualization integration)
+**Next step:** Execute Plan 31-03 (keyboard navigation and scroll reset)
+**Resume file:** .planning/phases/31-virtual-scrolling/31-03-PLAN.md
 **Checkpoint:** —
 
 ## Accumulated Context
@@ -202,6 +202,9 @@ v1.4 Stack Decisions (from research):
 | 400px estimated row height | Phase 31 Plan 01 | Starting estimate with measureElement for dynamic adjustment |
 | 5-item overscan | Phase 31 Plan 01 | Balance between smoothness and DOM node count |
 | Responsive grid columns | Phase 31 Plan 01 | 3 desktop (1024px+), 2 tablet (768px+), 1 mobile |
+| CSS fade-in 200ms | Phase 31 Plan 02 | Replace framer-motion stagger with lightweight CSS |
+| prefers-reduced-motion fallback | Phase 31 Plan 02 | Disable animation for accessibility users |
+| Keep SignalCard index prop | Phase 31 Plan 02 | Backward compatibility with callers |
 
 ## Reports
 
@@ -211,4 +214,4 @@ v1.4 Stack Decisions (from research):
 
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-25 — Plan 31-01 complete (virtualization infrastructure)*
+*Last updated: 2026-04-25 — Plan 31-02 complete (CSS animation, NewsFeed integration)*
