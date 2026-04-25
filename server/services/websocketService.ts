@@ -28,6 +28,10 @@ export interface ServerToClientEvents {
   'notification': (data: { type: string; title: string; message: string; data?: unknown }) => void;
   'bookmark:synced': (data: { articleId: string; action: 'added' | 'removed' }) => void;
 
+  // Comment events (Phase 27)
+  'comment:new': (data: { articleId: string; comment: CommentWithUser }) => void;
+  'comment:typing': (data: { articleId: string }) => void;
+
   // System
   'connected': (data: { clientId: string; serverTime: number }) => void;
   'stats': (data: { connectedClients: number; activeRooms: string[] }) => void;
@@ -39,6 +43,12 @@ export interface ClientToServerEvents {
   'unsubscribe:region': (region: string) => void;
   'subscribe:topic': (topic: string) => void;
   'unsubscribe:topic': (topic: string) => void;
+
+  // Article room subscriptions (Phase 27)
+  'subscribe:article': (articleId: string) => void;
+  'unsubscribe:article': (articleId: string) => void;
+  'comment:typing:start': (articleId: string) => void;
+  'comment:typing:stop': (articleId: string) => void;
 
   // User authentication
   'authenticate': (token: string) => void;
@@ -52,6 +62,26 @@ interface SocketData {
   subscribedRegions: Set<string>;
   subscribedTopics: Set<string>;
   authenticatedAt?: Date;
+}
+
+// Comment with user info for real-time broadcasts (Phase 27)
+export interface CommentWithUser {
+  id: string;
+  text: string;
+  userId: string;
+  articleId: string;
+  parentId: string | null;
+  user: {
+    id: string;
+    name: string;
+    avatarUrl: string | null;
+  };
+  isDeleted: boolean;
+  isEdited: boolean;
+  isFlagged: boolean;
+  aiModerated: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export class WebSocketService {
@@ -127,6 +157,44 @@ export class WebSocketService {
       socket.on('unsubscribe:topic', (topic) => {
         socket.leave(`topic:${topic}`);
         socket.data.subscribedTopics.delete(topic);
+      });
+
+      // Article room subscriptions for comments (Phase 27)
+      socket.on('subscribe:article', (articleId) => {
+        socket.join(`article:${articleId}`);
+        logger.debug(`Client ${clientId} subscribed to article:${articleId}`);
+      });
+
+      socket.on('unsubscribe:article', (articleId) => {
+        socket.leave(`article:${articleId}`);
+        logger.debug(`Client ${clientId} unsubscribed from article:${articleId}`);
+      });
+
+      // Comment typing indicators (Phase 27)
+      let typingTimeout: NodeJS.Timeout | null = null;
+
+      socket.on('comment:typing:start', (articleId) => {
+        // Broadcast to other users in the article room (excludes sender)
+        socket.to(`article:${articleId}`).emit('comment:typing', { articleId });
+
+        // Clear existing timeout
+        if (typingTimeout) {
+          clearTimeout(typingTimeout);
+        }
+
+        // Auto-stop after 2s of inactivity
+        typingTimeout = setTimeout(() => {
+          // Typing stopped implicitly
+        }, 2000);
+      });
+
+      socket.on('comment:typing:stop', (articleId) => {
+        if (typingTimeout) {
+          clearTimeout(typingTimeout);
+          typingTimeout = null;
+        }
+        // Note: articleId is available if we need to track per-article typing state
+        void articleId;
       });
 
       // Handle authentication
@@ -282,6 +350,18 @@ export class WebSocketService {
     this.io.to('authenticated').emit('stats', {
       connectedClients: this.connectedClients.size,
       activeRooms: rooms,
+    });
+  }
+
+  /**
+   * Broadcast new comment to article room (Phase 27)
+   */
+  broadcastNewComment(articleId: string, comment: CommentWithUser): void {
+    if (!this.io) return;
+
+    this.io.to(`article:${articleId}`).emit('comment:new', {
+      articleId,
+      comment,
     });
   }
 
