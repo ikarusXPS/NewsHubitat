@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Performance Optimization
-current_plan: 30-04
+current_plan: 31-01
 status: executing
-last_updated: "2026-04-25T17:37:55.000Z"
-last_activity: 2026-04-25 — Plan 30-03 complete (nav integration with NavLinkPrefetch)
+last_updated: "2026-04-25T17:46:09.000Z"
+last_activity: 2026-04-25 — Plan 30-04 complete (Dashboard optimization, image lazy loading, CI bundle warning)
 progress:
   total_phases: 6
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 21
-  completed_plans: 6
-  percent: 29
+  completed_plans: 7
+  percent: 33
 ---
 
 # State: NewsHub
@@ -25,13 +25,13 @@ See: .planning/PROJECT.md (updated 2026-04-25)
 
 ## Current Position
 
-Phase: 30 - Frontend Code Splitting
-Current Plan: 04 (Dashboard Optimization)
-Status: Executing Phase 30
-Last activity: 2026-04-25 — Plan 30-03 complete (nav integration with NavLinkPrefetch)
+Phase: 31 - Virtual Scrolling
+Current Plan: 01 (pending)
+Status: Phase 30 complete
+Last activity: 2026-04-25 — Plan 30-04 complete (Dashboard optimization, image lazy loading, CI bundle warning)
 
 ```
-v1.5 Progress: [██████░░░░░░░░░░░░░░] 29% (6 phases, 1 complete)
+v1.5 Progress: [███████░░░░░░░░░░░░░] 33% (6 phases, 2 complete)
 ```
 
 ## Milestone Progress
@@ -46,7 +46,7 @@ v1.5 Progress: [██████░░░░░░░░░░░░░░] 29
 | Phase | Name | Requirements | Status |
 |-------|------|--------------|--------|
 | 29 | Measurement Foundation | MEAS-01, MEAS-02, MEAS-03 | Complete (3 plans) |
-| 30 | Frontend Code Splitting | FRON-01, FRON-03, FRON-04 | Pending |
+| 30 | Frontend Code Splitting | FRON-01, FRON-03, FRON-04 | Complete (4 plans) |
 | 31 | Virtual Scrolling | FRON-02 | Pending |
 | 32 | Image Pipeline | IMG-01, IMG-02, IMG-03 | Pending |
 | 33 | Caching Improvements | CACHE-01, CACHE-02, CACHE-03 | Pending |
@@ -70,9 +70,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Plan 30-03 complete (Sidebar and BottomNav NavLinkPrefetch integration)
-**Next step:** Execute Plan 30-04 (Dashboard optimization)
-**Resume file:** .planning/phases/30-frontend-code-splitting/30-03-SUMMARY.md
+**Last action:** Plan 30-04 complete (Dashboard shell + lazy content, image lazy loading, CI bundle warning)
+**Next step:** Execute Plan 31-01 (Virtual scrolling)
+**Resume file:** .planning/phases/30-frontend-code-splitting/30-04-SUMMARY.md
 **Checkpoint:** —
 
 ## Accumulated Context
@@ -193,6 +193,10 @@ v1.4 Stack Decisions (from research):
 | 150ms hover prefetch delay | Phase 30 Plan 02 | Filter accidental hovers per D-04 |
 | NavLinkPrefetch in nav components | Phase 30 Plan 03 | Sidebar main nav + profile, BottomNav all items |
 | Privacy link uses NavLink | Phase 30 Plan 03 | Low priority legal page, no prefetch benefit |
+| Dashboard shell + lazy NewsFeed | Phase 30 Plan 04 | Suspense with DashboardSkeleton for immediate visual feedback |
+| Skeleton over critical CSS | Phase 30 Plan 04 | animate-pulse skeleton achieves same effect without build complexity |
+| NewsCardPremium lazy images | Phase 30 Plan 04 | Added loading="lazy" decoding="async" to motion.img |
+| CI bundle-size warning step | Phase 30 Plan 04 | 250KB threshold, ::warning:: annotation, warn-only (no exit 1) |
 
 ## Reports
 
@@ -202,4 +206,4 @@ v1.4 Stack Decisions (from research):
 
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-25 — Plan 30-03 complete (nav integration with NavLinkPrefetch)*
+*Last updated: 2026-04-25 — Plan 30-04 complete (Dashboard optimization, Phase 30 complete)*
