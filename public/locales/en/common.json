@@ -64,5 +64,37 @@
     "ozeanien": "Oceania",
     "kanada": "Canada",
     "alternative": "Alternative"
+  },
+  "comments": {
+    "post": "Post Comment",
+    "reply": "Reply",
+    "edit": "Edit",
+    "delete": "Delete",
+    "flag": "Flag",
+    "showReplies": "Show {{count}} replies",
+    "hideReplies": "Hide replies",
+    "typing": "Someone is typing...",
+    "deleted": "[Comment deleted]",
+    "edited": "(edited)",
+    "flagged": "Flagged for review",
+    "characterCount": "{{current}} / {{max}}",
+    "characterLimitExceeded": "Comment too long",
+    "authRequired": "Sign in to join the discussion",
+    "emptyState": {
+      "heading": "No comments yet",
+      "body": "Be the first to share your thoughts on this article."
+    },
+    "errors": {
+      "postFailed": "Failed to post comment. Please try again.",
+      "rateLimit": "Too many comments. Please wait a moment.",
+      "flagged": "Your comment was flagged for review.",
+      "editExpired": "Edit time expired",
+      "deleteFailed": "Failed to delete comment."
+    },
+    "deleteConfirm": {
+      "heading": "Delete comment?",
+      "body": "This will remove your comment from the discussion. Replies will remain visible.",
+      "confirm": "Delete"
+    }
   }
 }
