@@ -60,6 +60,52 @@ function formatZodError(error: z.ZodError): string {
 }
 
 // ============================================================================
+// INVITE ACCEPTANCE (must be before /:teamId routes for proper specificity)
+// ============================================================================
+
+/**
+ * POST /api/teams/accept-invite/:token
+ * Accept team invite (auth required)
+ * Note: Route is at /api/teams level, not under /:teamId
+ */
+router.post('/accept-invite/:token', authMiddleware, async (req: AuthRequest, res: Response) => {
+  try {
+    const { token } = req.params;
+    const userId = req.user!.userId;
+
+    if (!token) {
+      res.status(400).json({ success: false, error: 'Invite token required' });
+      return;
+    }
+
+    const teamService = TeamService.getInstance();
+    const team = await teamService.acceptInvite(token, userId);
+
+    res.status(200).json({
+      success: true,
+      data: team,
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Failed to accept invite';
+
+    if (message.includes('Invalid') || message.includes('expired') || message.includes('already used')) {
+      res.status(400).json({ success: false, error: message });
+      return;
+    }
+
+    if (message.includes('no longer exists') || message.includes('Already a team member')) {
+      res.status(400).json({ success: false, error: message });
+      return;
+    }
+
+    res.status(500).json({
+      success: false,
+      error: message,
+    });
+  }
+});
+
+// ============================================================================
 // TEAM CRUD
 // ============================================================================
 
