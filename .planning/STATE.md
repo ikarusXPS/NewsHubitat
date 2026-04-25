@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Performance Optimization
-current_plan: —
-status: ready_to_execute
-last_updated: "2026-04-25T16:10:33.000Z"
-last_activity: 2026-04-25 — Plan 29-03 complete (Lighthouse CI integration)
+current_plan: 30-02
+status: executing
+last_updated: "2026-04-25T17:22:44.000Z"
+last_activity: 2026-04-25 — Plan 30-01 complete (core lazy loading infrastructure)
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 21
-  completed_plans: 3
-  percent: 14
+  completed_plans: 4
+  percent: 19
 ---
 
 # State: NewsHub
@@ -26,12 +26,12 @@ See: .planning/PROJECT.md (updated 2026-04-25)
 ## Current Position
 
 Phase: 30 - Frontend Code Splitting
-Current Plan: —
-Status: Context gathered, ready for planning
-Last activity: 2026-04-25 — Phase 30 context captured (code splitting decisions)
+Current Plan: 02 (Route Migration)
+Status: Executing Phase 30
+Last activity: 2026-04-25 — Plan 30-01 complete (core lazy loading infrastructure)
 
 ```
-v1.5 Progress: [███░░░░░░░░░░░░░░░░░] 14% (6 phases, 1 complete)
+v1.5 Progress: [████░░░░░░░░░░░░░░░░] 19% (6 phases, 1 complete)
 ```
 
 ## Milestone Progress
@@ -70,9 +70,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Phase 30 context gathered (code splitting decisions)
-**Next step:** Run /gsd-plan-phase 30 to create implementation plans
-**Resume file:** .planning/phases/30-frontend-code-splitting/30-CONTEXT.md
+**Last action:** Plan 30-01 complete (lazyWithRetry, criticalStrings, ChunkErrorBoundary)
+**Next step:** Execute Plan 30-02 (route migration)
+**Resume file:** .planning/phases/30-frontend-code-splitting/30-01-SUMMARY.md
 **Checkpoint:** —
 
 ## Accumulated Context
@@ -185,6 +185,9 @@ v1.4 Stack Decisions (from research):
 | 30-day Lighthouse artifact retention | Phase 29 Plan 03 | Balance historical analysis with storage costs |
 | Temporary public storage for reports | Phase 29 Plan 03 | Free 7-day retention with shareable report links |
 | Performance baseline TBD placeholders | Phase 29 Plan 03 | Populated after first CI run with actual metrics |
+| Exponential backoff 1s, 2s, 4s | Phase 30 Plan 01 | Balance retry speed vs server load for chunk loading |
+| Clear promise cache on retry | Phase 30 Plan 01 | Browser caches failed imports; must reset for fresh attempt |
+| French critical strings included | Phase 30 Plan 01 | Project supports DE/EN/FR per i18n foundation |
 
 ## Reports
 
@@ -194,4 +197,4 @@ v1.4 Stack Decisions (from research):
 
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-25 — Phase 29 complete (3 plans executed)*
+*Last updated: 2026-04-25 — Plan 30-01 complete (core lazy loading infrastructure)*
