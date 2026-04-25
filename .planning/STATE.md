@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Performance Optimization
-current_plan: 32-01
+current_plan: 33-03
 status: ready
-last_updated: "2026-04-25T20:51:40Z"
-last_activity: 2026-04-25 — Phase 31 complete (Virtual Scrolling with keyboard navigation, focus indicators, scroll reset)
+last_updated: "2026-04-25T22:53:45Z"
+last_activity: 2026-04-25 — Phase 33-02 complete (ETag middleware and immutable static headers)
 progress:
   total_phases: 6
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 21
-  completed_plans: 9
-  percent: 43
+  completed_plans: 13
+  percent: 62
 ---
 
 # State: NewsHub
@@ -25,13 +25,13 @@ See: .planning/PROJECT.md (updated 2026-04-25)
 
 ## Current Position
 
-Phase: 32 - Image Pipeline
-Current Plan: 01 (pending)
-Status: Phase 31 complete
-Last activity: 2026-04-25 — Phase 31 complete (Virtual Scrolling with keyboard navigation, focus indicators, scroll reset)
+Phase: 33 - Caching Improvements
+Current Plan: 03 (pending)
+Status: Phase 33-02 complete
+Last activity: 2026-04-25 — Phase 33-02 complete (ETag middleware and immutable static headers)
 
 ```
-v1.5 Progress: [█████████░░░░░░░░░░░] 43% (6 phases, 3 complete)
+v1.5 Progress: [████████████░░░░░░░░] 62% (6 phases, 4 complete)
 ```
 
 ## Milestone Progress
@@ -70,9 +70,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Phase 31 complete (keyboard navigation, focus indicators, scroll reset - human verified)
-**Next step:** Execute Phase 32 Plan 01 (Image Pipeline)
-**Resume file:** .planning/phases/32-image-pipeline/32-01-PLAN.md
+**Last action:** Phase 33-02 complete (ETag middleware and immutable static headers)
+**Next step:** Execute Phase 33 Plan 03 (Caching tests and validation)
+**Resume file:** .planning/phases/33-caching-improvements/33-03-PLAN.md
 **Checkpoint:** —
 
 ## Accumulated Context
@@ -209,6 +209,8 @@ v1.4 Stack Decisions (from research):
 | ArrowUp/Left from null = noop | Phase 31 CR-fix | No action when no selection exists |
 | Removed screen reader sniffing | Phase 31 CR-fix | Rely solely on prefers-reduced-motion, not UA detection |
 | DEV-only console.error | Phase 31 CR-fix | Wrap share errors in import.meta.env.DEV check |
+| MD5 16-char hash for ETags | Phase 33-02 | Fast generation, sufficient collision resistance for cache validation |
+| Cross-platform /assets/ path check | Phase 33-02 | Windows uses backslash, Unix uses forward slash |
 
 ## Reports
 
@@ -218,4 +220,4 @@ v1.4 Stack Decisions (from research):
 
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-25 — Phase 31 complete (Virtual Scrolling with keyboard navigation)*
+*Last updated: 2026-04-25 — Phase 33-02 complete (ETag middleware and immutable static headers)*

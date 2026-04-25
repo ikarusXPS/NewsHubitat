@@ -170,8 +170,8 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 33-01-PLAN.md — Cache invalidation on WebSocket broadcasts and jitter-based TTL
-- [ ] 33-02-PLAN.md — ETag middleware for API responses and immutable static asset headers
+- [x] 33-01-PLAN.md — Cache invalidation on WebSocket broadcasts and jitter-based TTL (commit: d62d1d0)
+- [x] 33-02-PLAN.md — ETag middleware for API responses and immutable static asset headers (commits: 9b6452e, 8107e70)
 - [ ] 33-03-PLAN.md — Unit tests for caching improvements and full validation
 
 ### Phase 34: Database Optimization
@@ -222,7 +222,7 @@ Plans:
 | 30. Frontend Code Splitting | v1.5 | 4/4 | Complete | 2026-04-25 |
 | 31. Virtual Scrolling | v1.5 | 3/3 | Complete | 2026-04-25 |
 | 32. Image Pipeline | v1.5 | 4/4 | Complete | 2026-04-26 |
-| 33. Caching Improvements | v1.5 | 0/3 | Not started | - |
+| 33. Caching Improvements | v1.5 | 2/3 | In progress | - |
 | 34. Database Optimization | v1.5 | 0/4 | Not started | - |
 
 ---
