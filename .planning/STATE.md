@@ -70,9 +70,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Phase 33-03 complete (Caching tests and validation)
-**Next step:** Execute Phase 34 Plan 01 (Database Optimization)
-**Resume file:** .planning/phases/34-database-optimization/34-01-PLAN.md
+**Last action:** Phase 34 context gathered
+**Next step:** Plan Phase 34 (Database Optimization)
+**Resume file:** .planning/phases/34-database-optimization/34-CONTEXT.md
 **Checkpoint:** —
 
 ## Accumulated Context
