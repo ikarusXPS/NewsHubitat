@@ -32,6 +32,7 @@ import { accountRoutes } from './routes/account';
 import bookmarksRoutes from './routes/bookmarks';
 import historyRoutes from './routes/history';
 import commentRoutes from './routes/comments';
+import teamsRoutes from './routes/teams';
 import { authLimiter, aiLimiter, newsLimiter } from './middleware/rateLimiter';
 import { isBot, generateOGHtml } from './middleware/botDetection';
 import { SharingService } from './services/sharingService';
@@ -152,6 +153,9 @@ app.use('/api/history', historyRoutes);
 
 // Comment routes (Phase 27)
 app.use('/api/comments', commentRoutes);
+
+// Team routes (Phase 28)
+app.use('/api/teams', teamsRoutes);
 
 // Make services available to routes
 app.locals.wsService = wsService;
