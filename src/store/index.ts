@@ -78,6 +78,10 @@ interface AppState {
   toggleHideReadArticles: () => void;
   isArticleRead: (articleId: string) => boolean;
   clearReadArticles: () => void;
+
+  // Team Collaboration
+  activeTeamId: string | null;
+  setActiveTeamId: (teamId: string | null) => void;
 }
 
 const defaultFilters: FilterState = {
@@ -368,6 +372,10 @@ export const useAppStore = create<AppState>()(
             readArticles: [],
           },
         })),
+
+      // Team Collaboration
+      activeTeamId: null,
+      setActiveTeamId: (teamId) => set({ activeTeamId: teamId }),
     }),
     {
       name: 'newshub-storage',
@@ -384,6 +392,7 @@ export const useAppStore = create<AppState>()(
         customPresets: state.customPresets,
         feedState: state.feedState,
         readState: state.readState,
+        activeTeamId: state.activeTeamId,
       }),
     }
   )
