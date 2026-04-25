@@ -24,6 +24,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { FocusSelector } from '../FocusSelector';
 import { FeedManagerButton } from '../FeedManagerButton';
 import { LanguageSwitcher } from '../LanguageSwitcher';
+import { TeamSwitcher } from '../teams/TeamSwitcher';
 
 interface MobileDrawerProps {
   isOpen: boolean;
@@ -214,6 +215,16 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
                 </NavLink>
               ))}
             </nav>
+
+            {/* Teams Section - authenticated users only */}
+            {isAuthenticated && (
+              <div className="border-t border-gray-700 pt-4 mt-4 px-4">
+                <h3 className="text-xs font-mono text-gray-500 uppercase tracking-wider mb-3">
+                  Teams
+                </h3>
+                <TeamSwitcher />
+              </div>
+            )}
 
             {/* Controls Section (D-20) - FocusSelector, FeedManager, LanguageSwitcher */}
             <div className="border-t border-[#00f0ff]/20 px-4 py-3 space-y-3">

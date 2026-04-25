@@ -8,6 +8,7 @@ import { AuthModal } from './AuthModal';
 import { FocusSelector } from './FocusSelector';
 import { FeedManagerButton } from './FeedManagerButton';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { TeamSwitcher } from './teams/TeamSwitcher';
 import { cn } from '../lib/utils';
 
 interface HeaderProps {
@@ -183,6 +184,9 @@ export function Header({ onMenuClick }: HeaderProps) {
 
             {/* Language Switcher */}
             <LanguageSwitcher />
+
+            {/* Team Switcher - authenticated users only */}
+            {isAuthenticated && <TeamSwitcher />}
           </div>
 
           {/* Auth */}
