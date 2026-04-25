@@ -70,9 +70,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Plan 30-04 complete (Dashboard shell + lazy content, image lazy loading, CI bundle warning)
-**Next step:** Execute Plan 31-01 (Virtual scrolling)
-**Resume file:** .planning/phases/30-frontend-code-splitting/30-04-SUMMARY.md
+**Last action:** Phase 31 context gathered (virtual scrolling decisions captured)
+**Next step:** Plan Phase 31 (virtual scrolling)
+**Resume file:** .planning/phases/31-virtual-scrolling/31-CONTEXT.md
 **Checkpoint:** —
 
 ## Accumulated Context
