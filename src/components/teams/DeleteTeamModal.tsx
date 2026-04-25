@@ -7,9 +7,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { X, AlertTriangle, Trash2, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { cn } from '../../lib/utils';
 import { useDeleteTeam } from '../../hooks/useTeams';
-import toast from 'react-hot-toast';
 
 interface DeleteTeamModalProps {
   isOpen: boolean;

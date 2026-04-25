@@ -6,11 +6,11 @@
 import { Mail, Clock, X, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'sonner';
 import { cn } from '../../lib/utils';
 import { useTeamInvites, useCancelInvite, type TeamInvite } from '../../hooks/useTeamMembers';
 import { TeamRoleBadge } from './TeamRoleBadge';
 import type { TeamRole } from '../../hooks/useTeams';
-import toast from 'react-hot-toast';
 
 interface PendingInviteListProps {
   teamId: string;
