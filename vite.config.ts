@@ -4,6 +4,8 @@ import tailwindcss from '@tailwindcss/vite'
 import viteCompression from 'vite-plugin-compression'
 import { VitePWA } from 'vite-plugin-pwa'
 import { sentryVitePlugin } from '@sentry/vite-plugin'
+import { visualizer } from 'rollup-plugin-visualizer'
+import { type PluginOption } from 'vite'
 
 export default defineConfig({
   plugins: [
@@ -116,6 +118,14 @@ export default defineConfig({
           }),
         ]
       : []),
+    // Bundle visualizer - generates dist/stats.html for CI artifact (per D-01)
+    visualizer({
+      filename: 'dist/stats.html',
+      template: 'treemap',
+      gzipSize: true,
+      brotliSize: true,
+      open: false,
+    }) as PluginOption,
   ],
   test: {
     globals: true,
