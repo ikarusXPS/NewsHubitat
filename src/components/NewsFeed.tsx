@@ -89,6 +89,19 @@ export function NewsFeed() {
   const [sources, setSources] = useState<NewsSource[]>([]);
   const { shouldUseFallback } = useAccessibilityFallback();
 
+  // D-24: Reset scroll position when filters or view mode change
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+    }
+  }, [
+    filters.regions,
+    filters.searchQuery,
+    viewMode,
+    trendFilter,
+    feedState.activeSourceFilter,
+  ]);
+
   // Fetch sources for filter banner
   useEffect(() => {
     fetch('/api/news/sources')
