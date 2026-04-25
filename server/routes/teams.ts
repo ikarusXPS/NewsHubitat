@@ -559,15 +559,6 @@ router.get(
 
       const bookmarks = await prisma.teamBookmark.findMany({
         where: { teamId },
-        include: {
-          article: {
-            select: {
-              id: true,
-              title: true,
-              url: true,
-            },
-          },
-        },
         orderBy: { createdAt: 'desc' },
       });
 
@@ -579,20 +570,31 @@ router.get(
       });
       const userMap = new Map(users.map((u) => [u.id, u]));
 
-      const enrichedBookmarks = bookmarks.map((b) => ({
-        id: b.id,
-        teamId: b.teamId,
-        articleId: b.articleId,
-        addedBy: b.addedBy,
-        addedByUser: userMap.get(b.addedBy) || { id: b.addedBy, name: 'Unknown', avatarUrl: null },
-        note: b.note,
-        createdAt: b.createdAt,
-        article: b.article ? {
-          id: b.article.id,
-          title: b.article.title,
-          url: b.article.url,
-        } : null,
-      }));
+      // Fetch article info (no Prisma relation, fetch separately)
+      const articleIds = [...new Set(bookmarks.map((b) => b.articleId))];
+      const articles = await prisma.newsArticle.findMany({
+        where: { id: { in: articleIds } },
+        select: { id: true, title: true, url: true },
+      });
+      const articleMap = new Map(articles.map((a) => [a.id, a]));
+
+      const enrichedBookmarks = bookmarks.map((b) => {
+        const article = articleMap.get(b.articleId);
+        return {
+          id: b.id,
+          teamId: b.teamId,
+          articleId: b.articleId,
+          addedBy: b.addedBy,
+          addedByUser: userMap.get(b.addedBy) || { id: b.addedBy, name: 'Unknown', avatarUrl: null },
+          note: b.note,
+          createdAt: b.createdAt,
+          article: article ? {
+            id: article.id,
+            title: article.title,
+            url: article.url,
+          } : null,
+        };
+      });
 
       res.status(200).json({
         success: true,

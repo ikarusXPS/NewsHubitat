@@ -4,6 +4,7 @@
  */
 
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Bookmark, BookmarkCheck, Users, ChevronDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
@@ -74,17 +75,41 @@ export function BookmarkButton({
   const { isAuthenticated } = useAuth();
   const { teams } = useTeams();
   const [showTeamDropdown, setShowTeamDropdown] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0 });
 
-  // Close dropdown on outside click
+  // Update dropdown position when shown
+  useEffect(() => {
+    if (showTeamDropdown && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setDropdownPos({
+        top: rect.bottom + 8,
+        left: rect.right - 192, // 192px = w-48
+      });
+    }
+  }, [showTeamDropdown]);
+
+  // Close dropdown on outside click or scroll
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(e.target as Node)
+      ) {
         setShowTeamDropdown(false);
       }
     };
+    const handleScroll = () => setShowTeamDropdown(false);
+
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    window.addEventListener('scroll', handleScroll, true); // capture phase for nested scrolls
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('scroll', handleScroll, true);
+    };
   }, []);
 
   const handleBookmarkClick = () => {
@@ -103,8 +128,9 @@ export function BookmarkButton({
   };
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative">
       <button
+        ref={buttonRef}
         onClick={handleBookmarkClick}
         className={cn(
           'p-2 rounded-md transition-colors flex items-center gap-1',
@@ -125,9 +151,13 @@ export function BookmarkButton({
         )}
       </button>
 
-      {/* Team Selection Dropdown */}
-      {showTeamDropdown && teams.length > 0 && (
-        <div className="absolute right-0 top-full mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50 py-2">
+      {/* Team Selection Dropdown - rendered via portal to escape overflow:hidden */}
+      {showTeamDropdown && teams.length > 0 && createPortal(
+        <div
+          ref={dropdownRef}
+          className="fixed w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-xl py-2"
+          style={{ top: dropdownPos.top, left: dropdownPos.left, zIndex: 9999 }}
+        >
           {/* Personal bookmark option */}
           <button
             onClick={handlePersonalBookmarkSelect}
@@ -154,7 +184,8 @@ export function BookmarkButton({
               onSuccess={() => setShowTeamDropdown(false)}
             />
           ))}
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
