@@ -127,6 +127,41 @@ jobs:
       - name: Build with visualizer
         run: npm run build
 
+      # Bundle size warning (per D-16 - warn but don't block)
+      - name: Check bundle size
+        id: bundle-size
+        run: |
+          # Extract main chunk sizes from build output
+          echo "## Bundle Size Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Find the main index chunk (not vendor chunks)
+          MAIN_CHUNK=$(find dist/assets -name "index-*.js" -type f | head -1)
+          if [ -n "$MAIN_CHUNK" ]; then
+            SIZE=$(stat --printf="%s" "$MAIN_CHUNK" 2>/dev/null || stat -f%z "$MAIN_CHUNK" 2>/dev/null)
+            SIZE_KB=$((SIZE / 1024))
+            echo "Main chunk: ${SIZE_KB}KB" >> $GITHUB_STEP_SUMMARY
+
+            # Warn if > 250KB (per D-16)
+            if [ "$SIZE_KB" -gt 250 ]; then
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "**Warning:** Main chunk exceeds 250KB target (${SIZE_KB}KB)" >> $GITHUB_STEP_SUMMARY
+              echo "::warning::Bundle size ${SIZE_KB}KB exceeds 250KB target"
+            else
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "Bundle size within target" >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+
+          # Also report total JS size
+          TOTAL_JS=$(find dist/assets -name "*.js" -type f -exec stat --printf="%s\n" {} + 2>/dev/null | awk '{s+=$1}END{print s}' || find dist/assets -name "*.js" -type f -exec stat -f%z {} + 2>/dev/null | awk '{s+=$1}END{print s}')
+          TOTAL_JS_KB=$((TOTAL_JS / 1024))
+          echo "Total JS: ${TOTAL_JS_KB}KB" >> $GITHUB_STEP_SUMMARY
+
+          # Link to bundle analysis
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "See [bundle analysis artifact](../artifacts) for details" >> $GITHUB_STEP_SUMMARY
+
       - name: Upload bundle stats
         uses: actions/upload-artifact@v4
         with:
