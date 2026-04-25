@@ -118,7 +118,7 @@ Plans:
 Plans:
 - [x] 30-01-PLAN.md — Core lazy infrastructure: lazyWithRetry utility, ChunkErrorBoundary, critical i18n strings (3/3 tasks, commits: fa04fff, 175d77d, 60200bf)
 - [x] 30-02-PLAN.md — Route migration: centralized routes.ts, NavLinkPrefetch component, App.tsx update (3/3 tasks, commits: b5ed50b, 28689a6, 1155a8f)
-- [ ] 30-03-PLAN.md — Navigation integration: Sidebar and BottomNav use NavLinkPrefetch
+- [x] 30-03-PLAN.md — Navigation integration: Sidebar and BottomNav use NavLinkPrefetch (2/2 tasks, commits: a86c955, 0f1e854)
 - [ ] 30-04-PLAN.md — Dashboard optimization: shell + lazy content, image lazy loading fix, CI bundle warning
 
 ### Phase 31: Virtual Scrolling
@@ -203,7 +203,7 @@ Plans:
 | 27. Comments System | v1.4 | 4/4 | Complete | 2026-04-25 |
 | 28. Team Collaboration | v1.4 | 5/5 | Complete | 2026-04-25 |
 | 29. Measurement Foundation | v1.5 | 3/3 | Complete | 2026-04-25 |
-| 30. Frontend Code Splitting | v1.5 | 2/4 | In Progress | - |
+| 30. Frontend Code Splitting | v1.5 | 3/4 | In Progress | - |
 | 31. Virtual Scrolling | v1.5 | 0/3 | Not started | - |
 | 32. Image Pipeline | v1.5 | 0/4 | Not started | - |
 | 33. Caching Improvements | v1.5 | 0/3 | Not started | - |
@@ -269,4 +269,4 @@ v1.8 Advanced          -> Demand-driven expansion
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-25 — Plan 30-02 complete (2/4 plans)*
+*Last updated: 2026-04-25 — Plan 30-03 complete (3/4 plans)*

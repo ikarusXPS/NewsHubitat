@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Performance Optimization
-current_plan: 30-03
+current_plan: 30-04
 status: executing
-last_updated: "2026-04-25T17:31:05.000Z"
-last_activity: 2026-04-25 — Plan 30-02 complete (route migration with lazyWithRetry)
+last_updated: "2026-04-25T17:37:55.000Z"
+last_activity: 2026-04-25 — Plan 30-03 complete (nav integration with NavLinkPrefetch)
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 21
-  completed_plans: 5
-  percent: 24
+  completed_plans: 6
+  percent: 29
 ---
 
 # State: NewsHub
@@ -26,12 +26,12 @@ See: .planning/PROJECT.md (updated 2026-04-25)
 ## Current Position
 
 Phase: 30 - Frontend Code Splitting
-Current Plan: 03 (Nav Integration)
+Current Plan: 04 (Dashboard Optimization)
 Status: Executing Phase 30
-Last activity: 2026-04-25 — Plan 30-02 complete (route migration with lazyWithRetry)
+Last activity: 2026-04-25 — Plan 30-03 complete (nav integration with NavLinkPrefetch)
 
 ```
-v1.5 Progress: [█████░░░░░░░░░░░░░░░] 24% (6 phases, 1 complete)
+v1.5 Progress: [██████░░░░░░░░░░░░░░] 29% (6 phases, 1 complete)
 ```
 
 ## Milestone Progress
@@ -70,9 +70,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Plan 30-02 complete (routes.ts, NavLinkPrefetch, App.tsx migration)
-**Next step:** Execute Plan 30-03 (nav integration)
-**Resume file:** .planning/phases/30-frontend-code-splitting/30-02-SUMMARY.md
+**Last action:** Plan 30-03 complete (Sidebar and BottomNav NavLinkPrefetch integration)
+**Next step:** Execute Plan 30-04 (Dashboard optimization)
+**Resume file:** .planning/phases/30-frontend-code-splitting/30-03-SUMMARY.md
 **Checkpoint:** —
 
 ## Accumulated Context
@@ -191,6 +191,8 @@ v1.4 Stack Decisions (from research):
 | Dashboard lazy-loaded | Phase 30 Plan 02 | Was sync import, now uses lazyWithRetry for bundle size |
 | routePreloaders map | Phase 30 Plan 02 | Centralized preload functions for hover prefetch |
 | 150ms hover prefetch delay | Phase 30 Plan 02 | Filter accidental hovers per D-04 |
+| NavLinkPrefetch in nav components | Phase 30 Plan 03 | Sidebar main nav + profile, BottomNav all items |
+| Privacy link uses NavLink | Phase 30 Plan 03 | Low priority legal page, no prefetch benefit |
 
 ## Reports
 
@@ -200,4 +202,4 @@ v1.4 Stack Decisions (from research):
 
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-25 — Plan 30-02 complete (route migration with lazyWithRetry)*
+*Last updated: 2026-04-25 — Plan 30-03 complete (nav integration with NavLinkPrefetch)*
