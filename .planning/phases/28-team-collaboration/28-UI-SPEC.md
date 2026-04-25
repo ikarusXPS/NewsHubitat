@@ -52,9 +52,11 @@ Exceptions:
 | Role | Size | Weight | Line Height |
 |------|------|--------|-------------|
 | Body | 14px | 400 (regular) | 1.5 |
-| Label | 12px | 500 (medium) | 1.4 |
+| Label | 12px | 400 (regular) | 1.4 |
 | Heading | 18px | 600 (semibold) | 1.2 |
-| Display | 24px | 700 (bold) | 1.2 |
+| Display | 24px | 600 (semibold) | 1.2 |
+
+**Weights used:** 2 total — 400 (regular) for body and labels, 600 (semibold) for headings and display.
 
 **Font family mapping:**
 - Body/Label: `var(--font-sans)` — Inter
@@ -87,6 +89,24 @@ Exceptions:
 - Info: `#bf00ff` (cyber-purple) — Team activity badges, new bookmark notification
 
 **Source:** Existing `--color-cyber-*` CSS variables from `src/index.css`.
+
+---
+
+## Visual Focal Point
+
+**Primary screen:** `/team/:id` (TeamDashboard)
+
+**Focal point:** Team bookmark list positioned in the main content area (center/left on desktop, full-width on mobile). The bookmark list is the primary visual anchor because:
+1. It displays the team's shared content — the core purpose of the feature
+2. It occupies the largest visual area (60%+ of viewport)
+3. Real-time bookmark updates draw attention here via slide-in animation
+
+**Secondary anchor:** Team header with team name, member count badge, and role indicator. Positioned at top of content area, provides team context before scrolling to bookmarks.
+
+**Visual hierarchy:**
+1. Team header (name + member count) — establishes context
+2. Bookmark list — primary interaction zone
+3. Member sidebar (desktop) or collapsible member section (mobile) — supporting information
 
 ---
 
