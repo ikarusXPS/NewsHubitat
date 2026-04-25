@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-04-25)
 
 ## Current Position
 
-Phase: 29 - Measurement Foundation
+Phase: 30 - Frontend Code Splitting
 Current Plan: —
-Status: Complete (3 of 3 plans)
-Last activity: 2026-04-25 — Plan 29-03 complete (Lighthouse CI integration)
+Status: Context gathered, ready for planning
+Last activity: 2026-04-25 — Phase 30 context captured (code splitting decisions)
 
 ```
 v1.5 Progress: [███░░░░░░░░░░░░░░░░░] 14% (6 phases, 1 complete)
@@ -70,9 +70,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Plan 29-03 complete (Lighthouse CI integration)
-**Next step:** Begin Phase 30 - Frontend Code Splitting
-**Resume file:** None
+**Last action:** Phase 30 context gathered (code splitting decisions)
+**Next step:** Run /gsd-plan-phase 30 to create implementation plans
+**Resume file:** .planning/phases/30-frontend-code-splitting/30-CONTEXT.md
 **Checkpoint:** —
 
 ## Accumulated Context
