@@ -1,83 +1,49 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.4
-milestone_name: User & Community Features
-current_plan: 05
-status: completed
-last_updated: "2025-04-25T00:01:00.000Z"
-last_activity: 2025-04-25 — Completed 26-05 OAuth tests and documentation
+milestone: v1.5
+milestone_name: Performance Optimization
+current_plan: —
+status: defining_requirements
+last_updated: "2026-04-25T12:00:00.000Z"
+last_activity: 2026-04-25 — Milestone v1.5 started
 progress:
-  total_phases: 6
-  completed_phases: 6
-  total_plans: 17
-  completed_plans: 17
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # State: NewsHub
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-23)
+See: .planning/PROJECT.md (updated 2026-04-25)
 
 **Core value:** Users can see how the same story is covered by different regional perspectives
-**Current focus:** v1.4 User & Community Features
+**Current focus:** v1.5 Performance Optimization
 
 ## Current Position
 
-Phase: 28 (Team Collaboration) - Complete
-Current Plan: 05 complete
-Status: Phase 28 complete, v1.4 milestone complete
-Last activity: 2026-04-25 — Completed 28-05 integration and testing
+Phase: Not started (defining requirements)
+Current Plan: —
+Status: Defining requirements
+Last activity: 2026-04-25 — Milestone v1.5 started
 
 ```
-v1.4 Progress: [####################] 100% (6 phases, 6 complete)
+v1.5 Progress: [░░░░░░░░░░░░░░░░░░░░] 0% (0 phases, 0 complete)
 ```
 
 ## Milestone Progress
 
-**Milestone:** v1.4 - User & Community Features
-**Goal:** Reduce onboarding friction, expand target audience, and increase user engagement
-**Status:** Roadmap complete
-**Previous:** v1.3 complete 2026-04-23
+**Milestone:** v1.5 - Performance Optimization
+**Goal:** Comprehensive performance improvements across API, database, frontend, and caching layers
+**Status:** Defining requirements
+**Previous:** v1.4 complete 2026-04-25
 
 ### Phase Summary
 
-| Phase | Name | Requirements | Status |
-|-------|------|--------------|--------|
-| 23 | i18n Foundation | I18N-01, I18N-02, I18N-03 | Complete (2026-04-24) |
-| 24 | Mobile Responsive | MOBILE-01, MOBILE-02, MOBILE-03 | Complete (2026-04-24) |
-| 25 | Social Sharing | SHARE-01, SHARE-02, SHARE-03 | Complete (2026-04-25) |
-| 26 | OAuth Integration | OAUTH-01, OAUTH-02, OAUTH-03 | Complete (2026-04-25) |
-| 27 | Comments System | COMM-01, COMM-02, COMM-03 | Complete (2026-04-25) |
-| 28 | Team Collaboration | COLLAB-01, COLLAB-02, COLLAB-03 | Complete (2026-04-25) |
-
-### Phase Dependencies
-
-```
-Phase 22 (v1.3 complete)
-    |
-Phase 23: i18n Foundation
-    |
-Phase 24: Mobile Responsive
-    |
-Phase 25: Social Sharing
-    |
-Phase 26: OAuth Integration
-    |
-Phase 27: Comments System
-    |
-Phase 28: Team Collaboration
-```
-
-### Research Flags
-
-From research SUMMARY.md:
-
-- Phase 25 (Sharing): Needs SSR investigation for SPA OG tag limitation
-- Phase 26 (OAuth): Account linking requires security review
-- Phase 27 (Comments): Moderation strategy needs finalization (AI vs manual vs hybrid)
-- Phase 28 (Teams): Enterprise features (SSO/SCIM) deferred to v1.5+
+_(Phases will be defined after requirements)_
 
 ## Deferred Items
 
@@ -97,8 +63,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Completed Phase 28-05 integration and testing
-**Next step:** v1.4 milestone complete, ready for v1.5 planning
+**Last action:** Started milestone v1.5
+**Next step:** Define requirements, create roadmap
 **Resume file:** None
 **Checkpoint:** —
 

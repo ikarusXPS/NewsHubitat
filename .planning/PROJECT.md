@@ -134,32 +134,45 @@ This document evolves at phase transitions and milestone boundaries.
 - Core Value confirmed: multi-perspective comparison is the differentiator
 - Gamification and personalization added as key engagement features
 
-## Current Milestone: v1.4 User & Community Features
+## Current Milestone: v1.5 Performance Optimization
 
-**Goal:** Reduce onboarding friction, expand target audience, and increase user engagement
+**Goal:** Comprehensive performance improvements across API, database, frontend, and caching layers
 
 **Target features:**
 
-**User Features:**
-- Google OAuth Login (reduce signup friction)
-- GitHub OAuth Login (developer audience)
-- Multi-Language UI / i18n (expand beyond DE/EN)
-- Mobile Responsive Layouts (optimize mobile UX)
+**Caching:**
+- API response caching in Redis with smart invalidation
+- Query result caching for expensive operations (clusters, analytics)
+- CDN integration for static assets (JS/CSS/images)
 
-**Community Features:**
-- Social Media Sharing (virality, reach)
-- Article Comments (discussion, engagement)
-- Team Collaboration (B2B use case)
+**Database:**
+- Query analysis with EXPLAIN ANALYZE
+- Add missing indexes for slow queries
+- Fix N+1 query patterns
 
-**Baseline (2026-04-23):**
-- Unit tests: 1051 passing, 91.65% coverage
-- E2E tests: 62 passing
+**Frontend:**
+- Route-based bundle splitting (reduce initial JS)
+- Image optimization (next-gen formats, lazy loading, srcset)
+- Virtual scrolling for long news lists
+
+**Baseline (2026-04-25):**
+- Unit tests: 1051+ passing, 91.65% coverage
+- E2E tests: 62+ passing
 - Database: PostgreSQL (Docker)
-- Caching: Redis
+- Caching: Redis (JWT blacklist, rate limits, AI cache)
 - Deployment: Docker Compose with CI/CD
 - Monitoring: Prometheus + Grafana + Sentry
+- 10k concurrent users validated (k6)
 
 ## Completed Milestones
+
+### v1.4 User & Community Features (2026-04-25)
+- i18n Foundation (DE/EN/FR/ES/IT)
+- Mobile Responsive layouts
+- Social Sharing with OG tags
+- Google & GitHub OAuth
+- Comments System
+- Team Collaboration
 
 ### v1.3 Production Ready (2026-04-23)
 - CI/CD Pipeline (GitHub Actions)
@@ -185,4 +198,4 @@ This document evolves at phase transitions and milestone boundaries.
 - Gamification and personalization
 
 ---
-*Last updated: 2026-04-23 after v1.4 milestone started*
+*Last updated: 2026-04-25 after v1.5 milestone started*
