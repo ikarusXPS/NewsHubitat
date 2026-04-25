@@ -279,8 +279,24 @@ export function NewsCardPremium({
 
                 {/* Share button */}
                 <button
-                  onClick={() => navigator.share?.({ url: article.url, title: article.title })}
+                  onClick={async () => {
+                    if (navigator.share) {
+                      try {
+                        await navigator.share({ url: article.url, title: article.title });
+                      } catch (err) {
+                        // User cancelled or share failed - ignore AbortError
+                        if ((err as Error).name !== 'AbortError') {
+                          // Fallback to clipboard on non-cancel errors
+                          await navigator.clipboard.writeText(article.url);
+                        }
+                      }
+                    } else {
+                      // Fallback: copy to clipboard for unsupported browsers
+                      await navigator.clipboard.writeText(article.url);
+                    }
+                  }}
                   className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-700/50 hover:text-white transition-all"
+                  title="Share"
                 >
                   <Share2 className="h-4 w-4" />
                 </button>
