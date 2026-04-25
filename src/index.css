@@ -557,6 +557,21 @@ body {
   opacity: 1;
 }
 
+/* D-22: Focus indicator visible on active card */
+.signal-card:focus-visible {
+  outline: 2px solid var(--color-cyber-blue);
+  outline-offset: 2px;
+  border-color: var(--color-cyber-blue);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+}
+
+/* Virtualized card wrapper focus state - for keyboard navigation */
+[role="listitem"]:focus-visible .signal-card {
+  outline: 2px solid var(--color-cyber-blue);
+  outline-offset: 2px;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+}
+
 .signal-card-critical {
   border-color: rgba(255, 0, 68, 0.3);
 }
