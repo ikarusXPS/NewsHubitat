@@ -1,9 +1,10 @@
 ---
-status: diagnosed
+status: planning
 phase: 28-team-collaboration
 source: 28-01-SUMMARY.md, 28-02-SUMMARY.md, 28-03-SUMMARY.md, 28-04-SUMMARY.md, 28-05-SUMMARY.md
 started: 2026-04-25T11:30:00Z
-updated: 2026-04-25T12:45:00Z
+updated: 2026-04-25T13:00:00Z
+gap_closure_plan: 28-06-PLAN.md
 ---
 
 ## Current Test
@@ -37,6 +38,7 @@ expected: As team admin+, invites tab or section shows pending invite with email
 result: issue
 reported: "no pending invites listed"
 severity: major
+fix_plan: 28-06-PLAN.md Task 1
 
 ### 7. Accept Team Invite
 expected: Receive invite email, click link. If logged in, goes to /team/invite/:token, accepts automatically, redirects to team. If not logged in, redirects to login first.
@@ -49,12 +51,14 @@ expected: On any article, click BookmarkButton. If user has teams, dropdown show
 result: issue
 reported: "no bookmarks not saved"
 severity: major
+fix_plan: 28-06-PLAN.md Task 2
 
 ### 9. View Team Bookmarks
 expected: On Team Dashboard, Bookmarks tab shows all shared bookmarks with article title, note, "Added by" attribution, and external link.
 result: issue
 reported: "team bookmarks empty and cant open in new tab"
 severity: major
+fix_plan: 28-06-PLAN.md Task 3
 
 ### 10. Remove Team Bookmark
 expected: On Team Dashboard, as bookmark adder or admin+, click remove on a bookmark. Bookmark disappears from list.
@@ -85,6 +89,7 @@ expected: As team owner, delete team. Team is soft-deleted, no longer visible in
 result: issue
 reported: "cant find delete team"
 severity: major
+fix_plan: 28-06-PLAN.md Task 4
 
 ### 16. Real-time Bookmark Updates
 expected: Have two browser windows open on same team. Add bookmark in window A. Bookmark appears in window B within seconds without refresh (WebSocket).
@@ -121,7 +126,7 @@ blocked: 1
 ## Gaps
 
 - truth: "Pending invites section shows invites with email, role, expiry date, and cancel option"
-  status: failed
+  status: planning
   reason: "User reported: no pending invites listed"
   severity: major
   test: 6
@@ -133,10 +138,10 @@ blocked: 1
     - "Add 'invites' tab option to TeamDashboard"
     - "Create PendingInviteList component"
     - "Import and use useTeamInvites hook"
-  debug_session: ".planning/debug/no-pending-invites-team-dashboard.md"
+  fix: "28-06-PLAN.md Task 1"
 
 - truth: "Bookmark saves to team with 'Added by' attribution when selecting team from dropdown"
-  status: failed
+  status: planning
   reason: "User reported: no bookmarks not saved"
   severity: major
   test: 8
@@ -151,10 +156,10 @@ blocked: 1
   missing:
     - "Replace inline bookmark buttons in SignalCard with BookmarkButton component"
     - "Replace inline bookmark buttons in NewsCard with BookmarkButton component"
-  debug_session: ".planning/debug/bookmarks-not-saved-to-team.md"
+  fix: "28-06-PLAN.md Task 2"
 
 - truth: "Team bookmarks tab shows shared bookmarks with external link that opens in new tab"
-  status: failed
+  status: planning
   reason: "User reported: team bookmarks empty and cant open in new tab"
   severity: major
   test: 9
@@ -170,10 +175,10 @@ blocked: 1
     - "Modify bookmarks API to join NewsArticle table"
     - "Update TeamBookmark TypeScript interface to include article data"
     - "Pass bookmark.article.url to TeamBookmarkCard"
-  debug_session: ".planning/debug/team-bookmarks-new-tab.md"
+  fix: "28-06-PLAN.md Task 3"
 
 - truth: "Delete Team option available for team owner"
-  status: failed
+  status: planning
   reason: "User reported: cant find delete team"
   severity: major
   test: 15
@@ -184,7 +189,7 @@ blocked: 1
     - path: "src/components/teams/DeleteTeamModal.tsx"
       issue: "Component does not exist (needs to be created)"
   missing:
-    - "Create DeleteTeamModal component with password confirmation"
-    - "Add settings icon to TeamDashboard header (owner only)"
-    - "Wire settings to open delete option in danger zone"
-  debug_session: ".planning/debug/28-team-delete-not-found.md"
+    - "Create DeleteTeamModal component with name confirmation"
+    - "Add delete icon to TeamDashboard header (owner only)"
+    - "Wire delete icon to open DeleteTeamModal"
+  fix: "28-06-PLAN.md Task 4"
