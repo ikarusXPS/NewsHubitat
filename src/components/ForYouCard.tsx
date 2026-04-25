@@ -2,6 +2,7 @@ import { ExternalLink, Sparkles } from 'lucide-react';
 import { formatTopicBadge } from '../lib/personalization';
 import type { NewsArticle } from '../types';
 import { useAppStore } from '../store';
+import { ResponsiveImage } from './ResponsiveImage';
 
 interface ForYouCardProps {
   article: NewsArticle;
@@ -56,12 +57,13 @@ export function ForYouCard({ article, matchedTopic }: ForYouCardProps) {
 
       {/* Image */}
       {article.imageUrl && (
-        <div className="relative aspect-video mb-3 rounded-lg overflow-hidden bg-gray-800">
-          <img
+        <div className="relative mb-3 rounded-lg overflow-hidden">
+          <ResponsiveImage
             src={article.imageUrl}
             alt=""
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            loading="lazy"
+            aspectRatio="16:9"
+            sizes="280px"
+            className="group-hover:scale-105 transition-transform duration-300"
           />
         </div>
       )}
