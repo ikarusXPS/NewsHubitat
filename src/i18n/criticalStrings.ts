@@ -11,18 +11,21 @@ export const CRITICAL_I18N = {
     retrying: 'Retrying...',
     failed: 'Failed to load. Tap to retry.',
     connectionIssue: 'Connection issue. Retrying...',
+    retry: 'Retry',
   },
   de: {
     loading: 'Laden...',
     retrying: 'Wird erneut versucht...',
     failed: 'Laden fehlgeschlagen. Tippen zum Wiederholen.',
     connectionIssue: 'Verbindungsproblem. Wird erneut versucht...',
+    retry: 'Erneut versuchen',
   },
   fr: {
     loading: 'Chargement...',
     retrying: 'Nouvelle tentative...',
     failed: 'Echec du chargement. Appuyez pour reessayer.',
     connectionIssue: 'Probleme de connexion. Nouvelle tentative...',
+    retry: 'Reessayer',
   },
 } as const;
 
