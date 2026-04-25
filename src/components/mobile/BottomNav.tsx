@@ -1,5 +1,5 @@
 import { useMemo, useState, useRef, useCallback } from 'react';
-import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -12,6 +12,7 @@ import {
   Cpu,
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { NavLinkPrefetch } from '../NavLinkPrefetch';
 import { useScrollDirection } from '../../hooks/useScrollDirection';
 import { useHapticFeedback } from '../../hooks/useHapticFeedback';
 
@@ -115,7 +116,7 @@ export function BottomNav() {
               (item.to !== '/' && location.pathname.startsWith(item.to));
 
             return (
-              <NavLink
+              <NavLinkPrefetch
                 key={item.to}
                 to={item.to}
                 onClick={(e) => handleNavClick(item.to, e)}
@@ -168,7 +169,7 @@ export function BottomNav() {
                     </motion.span>
                   )}
                 </AnimatePresence>
-              </NavLink>
+              </NavLinkPrefetch>
             );
           })}
         </div>
