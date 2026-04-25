@@ -4,14 +4,14 @@ milestone: v1.5
 milestone_name: Performance Optimization
 current_plan: 33-03
 status: ready
-last_updated: "2026-04-25T22:53:45Z"
-last_activity: 2026-04-25 — Phase 33-02 complete (ETag middleware and immutable static headers)
+last_updated: "2026-04-25T22:55:00Z"
+last_activity: 2026-04-25 — Phase 33-01 complete (Cache invalidation and TTL jitter)
 progress:
   total_phases: 6
   completed_phases: 4
   total_plans: 21
-  completed_plans: 13
-  percent: 62
+  completed_plans: 14
+  percent: 67
 ---
 
 # State: NewsHub
@@ -27,11 +27,11 @@ See: .planning/PROJECT.md (updated 2026-04-25)
 
 Phase: 33 - Caching Improvements
 Current Plan: 03 (pending)
-Status: Phase 33-02 complete
-Last activity: 2026-04-25 — Phase 33-02 complete (ETag middleware and immutable static headers)
+Status: Phase 33-01, 33-02 complete
+Last activity: 2026-04-25 — Phase 33-01 complete (Cache invalidation and TTL jitter)
 
 ```
-v1.5 Progress: [████████████░░░░░░░░] 62% (6 phases, 4 complete)
+v1.5 Progress: [█████████████░░░░░░░] 67% (6 phases, 4 complete)
 ```
 
 ## Milestone Progress
@@ -70,7 +70,7 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Phase 33-02 complete (ETag middleware and immutable static headers)
+**Last action:** Phase 33-01 complete (Cache invalidation and TTL jitter)
 **Next step:** Execute Phase 33 Plan 03 (Caching tests and validation)
 **Resume file:** .planning/phases/33-caching-improvements/33-03-PLAN.md
 **Checkpoint:** —
@@ -211,6 +211,8 @@ v1.4 Stack Decisions (from research):
 | DEV-only console.error | Phase 31 CR-fix | Wrap share errors in import.meta.env.DEV check |
 | MD5 16-char hash for ETags | Phase 33-02 | Fast generation, sufficient collision resistance for cache validation |
 | Cross-platform /assets/ path check | Phase 33-02 | Windows uses backslash, Unix uses forward slash |
+| 10% TTL jitter variance | Phase 33-01 | baseTTL * (0.9 + random * 0.2) prevents thundering herd |
+| Fire-and-forget cache invalidation | Phase 33-01 | void prefix on delPattern/del calls; don't block broadcasts |
 
 ## Reports
 
@@ -220,4 +222,4 @@ v1.4 Stack Decisions (from research):
 
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-25 — Phase 33-02 complete (ETag middleware and immutable static headers)*
+*Last updated: 2026-04-25 — Phase 33-01 complete (Cache invalidation and TTL jitter)*
