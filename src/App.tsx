@@ -66,6 +66,10 @@ const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 // Legal pages
 const Privacy = lazy(() => import('./pages/Privacy').then(m => ({ default: m.Privacy })));
 
+// Team pages
+const TeamDashboard = lazy(() => import('./pages/TeamDashboard').then(m => ({ default: m.TeamDashboard })));
+const TeamInviteAccept = lazy(() => import('./pages/TeamInviteAccept').then(m => ({ default: m.TeamInviteAccept })));
+
 // Loading fallback component - Cyber style
 function PageLoader() {
   return (
@@ -134,6 +138,9 @@ function AppRoutes() {
             <Route path="/settings" element={<Settings />} />
             {/* Legal pages */}
             <Route path="/privacy" element={<Privacy />} />
+            {/* Team pages - invite route must come before :teamId for specificity */}
+            <Route path="/team/invite/:token" element={<TeamInviteAccept />} />
+            <Route path="/team/:teamId" element={<TeamDashboard />} />
           </Routes>
         </Suspense>
       </ErrorBoundary>
