@@ -119,6 +119,7 @@ model User {
   emailDigests      EmailDigest[]
   userPersonas      UserPersona[]
   badges            UserBadge[]
+  comments          Comment[]
 
   // Indexes for token lookups (D-53)
   @@index([verificationTokenHash])
@@ -328,4 +329,35 @@ model LeaderboardSnapshot {
 
   @@index([date, timeframe])
   @@index([timeframe])
+}
+
+// ============================================================================
+// PHASE 27: COMMENTS SYSTEM
+// ============================================================================
+
+model Comment {
+  id              String    @id @default(cuid())
+  text            String    @db.VarChar(5000)
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String
+  articleId       String
+
+  // Self-referencing relation for threading
+  parentComment   Comment?  @relation("Replies", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  parentId        String?
+  replies         Comment[] @relation("Replies")
+
+  isDeleted       Boolean   @default(false)
+  isEdited        Boolean   @default(false)
+  isFlagged       Boolean   @default(false)
+  flagReasons     Json?
+  aiModerated     Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([articleId])
+  @@index([userId])
+  @@index([parentId])
+  @@index([isFlagged])
+  @@index([createdAt])
 }
