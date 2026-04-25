@@ -68,27 +68,39 @@ export function VirtualizedGrid({
       return;
     }
 
-    const current = focusedIndex ?? -1;
     let newIndex: number | null = null;
 
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
-        // Move down by columns (next row, same column)
-        newIndex = Math.min(current + columns, articles.length - 1);
+        // Start at first item when no selection exists
+        if (focusedIndex === null) {
+          newIndex = 0;
+        } else {
+          // Move down by columns (next row, same column)
+          newIndex = Math.min(focusedIndex + columns, articles.length - 1);
+        }
         break;
       case 'ArrowUp':
         e.preventDefault();
+        // Do nothing if no selection
+        if (focusedIndex === null) return;
         // Move up by columns (previous row, same column)
-        newIndex = Math.max(current - columns, 0);
+        newIndex = Math.max(focusedIndex - columns, 0);
         break;
       case 'ArrowRight':
         e.preventDefault();
-        newIndex = Math.min(current + 1, articles.length - 1);
+        if (focusedIndex === null) {
+          newIndex = 0;
+        } else {
+          newIndex = Math.min(focusedIndex + 1, articles.length - 1);
+        }
         break;
       case 'ArrowLeft':
         e.preventDefault();
-        newIndex = Math.max(current - 1, 0);
+        // Do nothing if no selection
+        if (focusedIndex === null) return;
+        newIndex = Math.max(focusedIndex - 1, 0);
         break;
       default:
         return;
