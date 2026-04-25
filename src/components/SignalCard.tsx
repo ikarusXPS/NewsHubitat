@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import {
   ExternalLink,
   Clock,
@@ -110,14 +109,11 @@ export function SignalCard({ article, isBookmarked, onBookmark, index = 0, isRea
   const timeAgo = formatTimeAgo(new Date(article.publishedAt));
 
   return (
-    <motion.article
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.1 + index * 0.05, duration: 0.3 }}
+    <article
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={cn(
-        'signal-card group',
+        'signal-card group animate-fade-in',
         severity === 'critical' && 'signal-card-critical',
         isRead && 'opacity-55 hover:opacity-80'
       )}
@@ -432,7 +428,7 @@ export function SignalCard({ article, isBookmarked, onBookmark, index = 0, isRea
           </a>
         </div>
       </div>
-    </motion.article>
+    </article>
   );
 }
 
