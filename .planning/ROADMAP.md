@@ -79,7 +79,7 @@
 - [x] **Phase 29: Measurement Foundation** - Bundle analyzer, query logging, Lighthouse baseline
 - [x] **Phase 30: Frontend Code Splitting** - Route-based splitting, lazy image loading, reduced initial bundle
 - [x] **Phase 31: Virtual Scrolling** - Virtualized rendering for long article lists (completed 2026-04-25)
-- [ ] **Phase 32: Image Pipeline** - WebP/AVIF conversion, responsive srcset, Cloudinary integration
+- [x] **Phase 32: Image Pipeline** - WebP/AVIF conversion, responsive srcset, Cloudinary integration (completed 2026-04-26)
 - [ ] **Phase 33: Caching Improvements** - Smart invalidation, HTTP cache headers, jitter-based TTL
 - [ ] **Phase 34: Database Optimization** - EXPLAIN ANALYZE audit, composite indexes, N+1 fixes, pool tuning
 
@@ -152,10 +152,10 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 32-01-PLAN.md — Migrate SignalCard to ResponsiveImage with priority={index < 6}
-- [ ] 32-02-PLAN.md — Migrate NewsCardPremium to ResponsiveImage with motion.div wrapper
-- [ ] 32-03-PLAN.md — Migrate ForYouCard to ResponsiveImage with fixed 280px sizes
-- [ ] 32-04-PLAN.md — Validation checkpoint: tests, build, and human verification
+- [x] 32-01-PLAN.md — Migrate SignalCard to ResponsiveImage with priority={index < 6} (commit: 7da8249)
+- [x] 32-02-PLAN.md — Migrate NewsCardPremium to ResponsiveImage with motion.div wrapper (commit: b402128)
+- [x] 32-03-PLAN.md — Migrate ForYouCard to ResponsiveImage with fixed 280px sizes (commit: fcb43a8)
+- [x] 32-04-PLAN.md — Validation checkpoint: tests, build, and human verification (commit: b2f57a2)
 
 ### Phase 33: Caching Improvements
 **Goal**: API responses served from cache with smart invalidation maintaining data freshness
@@ -216,7 +216,7 @@ Plans:
 | 29. Measurement Foundation | v1.5 | 3/3 | Complete | 2026-04-25 |
 | 30. Frontend Code Splitting | v1.5 | 4/4 | Complete | 2026-04-25 |
 | 31. Virtual Scrolling | v1.5 | 3/3 | Complete | 2026-04-25 |
-| 32. Image Pipeline | v1.5 | 0/4 | Not started | - |
+| 32. Image Pipeline | v1.5 | 4/4 | Complete | 2026-04-26 |
 | 33. Caching Improvements | v1.5 | 0/3 | Not started | - |
 | 34. Database Optimization | v1.5 | 0/4 | Not started | - |
 
