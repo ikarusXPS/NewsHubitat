@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Performance Optimization
-current_plan: 31-01
+current_plan: 31-02
 status: executing
-last_updated: "2026-04-25T17:46:09.000Z"
-last_activity: 2026-04-25 — Plan 30-04 complete (Dashboard optimization, image lazy loading, CI bundle warning)
+last_updated: "2026-04-25T20:23:02.000Z"
+last_activity: 2026-04-25 — Plan 31-01 complete (@tanstack/react-virtual + virtualization components)
 progress:
   total_phases: 6
   completed_phases: 2
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-04-25)
 ## Current Position
 
 Phase: 31 - Virtual Scrolling
-Current Plan: 01 (pending)
-Status: Phase 30 complete
-Last activity: 2026-04-25 — Plan 30-04 complete (Dashboard optimization, image lazy loading, CI bundle warning)
+Current Plan: 02 (pending)
+Status: Plan 31-01 complete
+Last activity: 2026-04-25 — Plan 31-01 complete (@tanstack/react-virtual + virtualization components)
 
 ```
 v1.5 Progress: [███████░░░░░░░░░░░░░] 33% (6 phases, 2 complete)
@@ -70,9 +70,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Phase 31 context gathered (virtual scrolling decisions captured)
-**Next step:** Plan Phase 31 (virtual scrolling)
-**Resume file:** .planning/phases/31-virtual-scrolling/31-CONTEXT.md
+**Last action:** Plan 31-01 complete (installed @tanstack/react-virtual, created VirtualizedGrid, VirtualizedList, PaginatedFeed, useAccessibilityFallback)
+**Next step:** Execute Plan 31-02 (SignalCard CSS animation, NewsFeed virtualization integration)
+**Resume file:** .planning/phases/31-virtual-scrolling/31-02-PLAN.md
 **Checkpoint:** —
 
 ## Accumulated Context
@@ -197,6 +197,11 @@ v1.4 Stack Decisions (from research):
 | Skeleton over critical CSS | Phase 30 Plan 04 | animate-pulse skeleton achieves same effect without build complexity |
 | NewsCardPremium lazy images | Phase 30 Plan 04 | Added loading="lazy" decoding="async" to motion.img |
 | CI bundle-size warning step | Phase 30 Plan 04 | 250KB threshold, ::warning:: annotation, warn-only (no exit 1) |
+| @tanstack/react-virtual@3.13.24 | Phase 31 Plan 01 | Headless virtualization, same TanStack family as react-query |
+| --legacy-peer-deps for install | Phase 31 Plan 01 | vite-plugin-pwa peer conflict with vite@8 |
+| 400px estimated row height | Phase 31 Plan 01 | Starting estimate with measureElement for dynamic adjustment |
+| 5-item overscan | Phase 31 Plan 01 | Balance between smoothness and DOM node count |
+| Responsive grid columns | Phase 31 Plan 01 | 3 desktop (1024px+), 2 tablet (768px+), 1 mobile |
 
 ## Reports
 
@@ -206,4 +211,4 @@ v1.4 Stack Decisions (from research):
 
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-25 — Plan 30-04 complete (Dashboard optimization, Phase 30 complete)*
+*Last updated: 2026-04-25 — Plan 31-01 complete (virtualization infrastructure)*
