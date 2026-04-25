@@ -4,17 +4,19 @@
 
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Users, Bookmark, UserPlus, Loader2, ArrowLeft } from 'lucide-react';
+import { Users, Bookmark, UserPlus, Loader2, ArrowLeft, Mail, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '../lib/utils';
 import { useAuth } from '../contexts/AuthContext';
 import { useTeam } from '../hooks/useTeams';
 import { useTeamBookmarks } from '../hooks/useTeamBookmarks';
-import { useTeamMembers } from '../hooks/useTeamMembers';
+import { useTeamMembers, useTeamInvites } from '../hooks/useTeamMembers';
 import { TeamBookmarkCard } from '../components/teams/TeamBookmarkCard';
 import { TeamMemberList } from '../components/teams/TeamMemberList';
 import { TeamRoleBadge } from '../components/teams/TeamRoleBadge';
 import { InviteModal } from '../components/teams/InviteModal';
+import { PendingInviteList } from '../components/teams/PendingInviteList';
+import { DeleteTeamModal } from '../components/teams/DeleteTeamModal';
 
 export function TeamDashboard() {
   const { teamId } = useParams();
@@ -22,11 +24,13 @@ export function TeamDashboard() {
   const { t } = useTranslation('teams');
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [showInviteModal, setShowInviteModal] = useState(false);
-  const [activeTab, setActiveTab] = useState<'bookmarks' | 'members'>('bookmarks');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [activeTab, setActiveTab] = useState<'bookmarks' | 'members' | 'invites'>('bookmarks');
 
   const { team, isLoading: teamLoading } = useTeam(teamId);
   const { bookmarks, isLoading: bookmarksLoading } = useTeamBookmarks(teamId);
   const { members, isLoading: membersLoading } = useTeamMembers(teamId);
+  const { invites } = useTeamInvites(teamId);
 
   const isLoading = teamLoading || authLoading;
   const canInvite = team?.role === 'owner' || team?.role === 'admin';
@@ -100,22 +104,33 @@ export function TeamDashboard() {
           </div>
         </div>
 
-        {canInvite && (
-          <button
-            onClick={() => setShowInviteModal(true)}
-            className={cn(
-              'flex items-center gap-2 px-4 py-2 rounded-lg transition-colors',
-              'bg-[#00f0ff] text-[#0a0a0f] hover:bg-[#00d4e0] font-medium'
-            )}
-          >
-            <UserPlus className="h-4 w-4" />
-            <span>{t('inviteMember', 'Invite Member')}</span>
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {canInvite && (
+            <button
+              onClick={() => setShowInviteModal(true)}
+              className={cn(
+                'flex items-center gap-2 px-4 py-2 rounded-lg transition-colors',
+                'bg-[#00f0ff] text-[#0a0a0f] hover:bg-[#00d4e0] font-medium'
+              )}
+            >
+              <UserPlus className="h-4 w-4" />
+              <span>{t('inviteMember', 'Invite Member')}</span>
+            </button>
+          )}
+          {team.role === 'owner' && (
+            <button
+              onClick={() => setShowDeleteModal(true)}
+              className="p-2 rounded-lg text-gray-400 hover:text-[#ff0044] hover:bg-[rgba(255,0,68,0.1)] transition-colors"
+              title={t('deleteTeam', 'Delete Team')}
+            >
+              <Trash2 className="h-5 w-5" />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className={cn('grid gap-4', canInvite ? 'grid-cols-3' : 'grid-cols-2')}>
         <div className="glass-panel rounded-xl p-4 hover:border-[#00f0ff]/30 transition-colors">
           <div className="flex items-center gap-3">
             <Users className="h-5 w-5 text-[#00f0ff]" />
@@ -134,6 +149,17 @@ export function TeamDashboard() {
             </div>
           </div>
         </div>
+        {canInvite && (
+          <div className="glass-panel rounded-xl p-4 hover:border-[#00f0ff]/30 transition-colors">
+            <div className="flex items-center gap-3">
+              <Mail className="h-5 w-5 text-[#ffee00]" />
+              <div>
+                <div className="text-2xl font-bold text-white">{invites.length}</div>
+                <div className="text-sm text-gray-400">{t('pendingInvites', 'Pending Invites')}</div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Tabs */}
@@ -162,6 +188,25 @@ export function TeamDashboard() {
             <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#00f0ff]" />
           )}
         </button>
+        {canInvite && (
+          <button
+            onClick={() => setActiveTab('invites')}
+            className={cn(
+              'pb-3 text-sm font-medium transition-colors relative',
+              activeTab === 'invites' ? 'text-[#00f0ff]' : 'text-gray-400 hover:text-white'
+            )}
+          >
+            {t('pendingInvites', 'Pending Invites')}
+            {invites.length > 0 && (
+              <span className="ml-2 px-1.5 py-0.5 text-xs bg-[#ffee00]/20 text-[#ffee00] rounded">
+                {invites.length}
+              </span>
+            )}
+            {activeTab === 'invites' && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#00f0ff]" />
+            )}
+          </button>
+        )}
       </div>
 
       {/* Content */}
@@ -186,6 +231,8 @@ export function TeamDashboard() {
                     bookmark={bookmark}
                     teamId={teamId!}
                     userRole={team.role}
+                    articleTitle={bookmark.article?.title}
+                    articleUrl={bookmark.article?.url}
                   />
                 ))}
               </div>
@@ -208,12 +255,24 @@ export function TeamDashboard() {
             )}
           </>
         )}
+
+        {activeTab === 'invites' && canInvite && (
+          <PendingInviteList teamId={teamId!} userRole={team.role} />
+        )}
       </div>
 
       {/* Invite Modal */}
       <InviteModal
         isOpen={showInviteModal}
         onClose={() => setShowInviteModal(false)}
+        teamId={teamId!}
+        teamName={team.name}
+      />
+
+      {/* Delete Team Modal */}
+      <DeleteTeamModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
         teamId={teamId!}
         teamName={team.name}
       />

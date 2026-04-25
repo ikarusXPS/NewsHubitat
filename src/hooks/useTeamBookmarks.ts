@@ -27,6 +27,11 @@ export interface TeamBookmark {
   };
   note: string | null;
   createdAt: string;
+  article: {
+    id: string;
+    title: string;
+    url: string;
+  } | null;
 }
 
 interface ApiResponse<T> {
@@ -172,6 +177,7 @@ export function useAddTeamBookmark(teamId: string) {
         },
         note: note || null,
         createdAt: new Date().toISOString(),
+        article: null, // Will be populated on refetch
       };
 
       queryClient.setQueryData(['team-bookmarks', teamId], (old: TeamBookmark[] | undefined) =>

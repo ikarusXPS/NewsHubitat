@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Bookmark, ExternalLink, Globe, Languages, Loader2, Shield, Search, AlertTriangle, X, CheckCircle, Info, Share2, MessageSquare } from 'lucide-react';
+import { ExternalLink, Globe, Languages, Loader2, Shield, Search, AlertTriangle, X, CheckCircle, Info, Share2, MessageSquare } from 'lucide-react';
 import { ShareButtons } from './sharing';
+import { BookmarkButton } from './BookmarkButton';
 import { useCreateShare, type ShareUrls } from '../hooks/useShare';
 import { ResponsiveImage } from './ResponsiveImage';
 import { SwipeableCard } from './mobile/SwipeableCard';
@@ -218,17 +219,11 @@ export function NewsCard({ article, priority = false, onTranslate }: NewsCardPro
           )}
         </div>
         <div className="flex items-center gap-1">
-          <button
-            onClick={() => toggleBookmark(localArticle.id)}
-            className={cn(
-              'rounded p-1 transition-colors',
-              bookmarked
-                ? 'text-yellow-500 hover:text-yellow-400'
-                : 'text-gray-500 hover:text-gray-400'
-            )}
-          >
-            <Bookmark className="h-4 w-4" fill={bookmarked ? 'currentColor' : 'none'} />
-          </button>
+          <BookmarkButton
+            articleId={localArticle.id}
+            isBookmarked={bookmarked}
+            onPersonalBookmark={() => toggleBookmark(localArticle.id)}
+          />
         </div>
       </div>
 

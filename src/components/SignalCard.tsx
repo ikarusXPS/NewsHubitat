@@ -2,8 +2,6 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   ExternalLink,
-  Bookmark,
-  BookmarkCheck,
   Clock,
   AlertTriangle,
   TrendingUp,
@@ -20,6 +18,7 @@ import {
 import { cn } from '../lib/utils';
 import { useAppStore } from '../store';
 import { ShareButtons } from './sharing';
+import { BookmarkButton } from './BookmarkButton';
 import { useCreateShare, type ShareUrls } from '../hooks/useShare';
 import type { NewsArticle } from '../types';
 
@@ -401,22 +400,11 @@ export function SignalCard({ article, isBookmarked, onBookmark, index = 0, isRea
             </button>
 
             {/* Bookmark */}
-            <button
-              onClick={() => onBookmark?.(article.id)}
-              className={cn(
-                'p-2 rounded-md transition-colors',
-                isBookmarked
-                  ? 'text-[#00f0ff] bg-[#00f0ff]/10'
-                  : 'text-gray-500 hover:text-[#00f0ff] hover:bg-[#00f0ff]/5'
-              )}
-              title={isBookmarked ? 'Remove bookmark' : 'Add bookmark'}
-            >
-              {isBookmarked ? (
-                <BookmarkCheck className="h-4 w-4" />
-              ) : (
-                <Bookmark className="h-4 w-4" />
-              )}
-            </button>
+            <BookmarkButton
+              articleId={article.id}
+              isBookmarked={isBookmarked ?? false}
+              onPersonalBookmark={() => onBookmark?.(article.id)}
+            />
 
             {/* Share */}
             {shareUrls && shareCode ? (
