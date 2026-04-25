@@ -7,6 +7,7 @@ import { Server as HttpServer } from 'http';
 import { Server, Socket } from 'socket.io';
 import logger from '../utils/logger';
 import type { NewsArticle, GeoEvent } from '../../src/types';
+import { CacheService, CacheKeys } from './cacheService';
 
 // Event types for type-safe communication
 export interface ServerToClientEvents {
@@ -302,6 +303,24 @@ export class WebSocketService {
     for (const topic of article.topics) {
       this.io.to(`topic:${topic}`).emit('news:new', article);
     }
+
+    // D-01, D-02: Invalidate cache synchronously after broadcast
+    const cache = CacheService.getInstance();
+    void cache.delPattern('news:list:*');  // D-02: Clear all list variants
+  }
+
+  /**
+   * Broadcast article update and invalidate cache (D-03)
+   */
+  broadcastArticleUpdated(article: Partial<NewsArticle> & { id: string }): void {
+    if (!this.io) return;
+
+    this.io.emit('news:updated', article);
+
+    // D-03: Invalidate specific article cache + all list caches
+    const cache = CacheService.getInstance();
+    void cache.del(CacheKeys.newsArticle(article.id));
+    void cache.delPattern('news:list:*');
   }
 
   /**
@@ -324,6 +343,25 @@ export class WebSocketService {
     if (event.location?.region) {
       this.io.to(`region:${event.location.region}`).emit('event:new', event);
     }
+
+    // D-03: Invalidate events caches
+    const cache = CacheService.getInstance();
+    void cache.del(CacheKeys.geoEvents());
+    void cache.del(CacheKeys.timeline());
+  }
+
+  /**
+   * Broadcast event update and invalidate cache (D-03)
+   */
+  broadcastEventUpdated(event: Partial<GeoEvent> & { id: string }): void {
+    if (!this.io) return;
+
+    this.io.emit('event:updated', event);
+
+    // D-03: Invalidate events caches
+    const cache = CacheService.getInstance();
+    void cache.del(CacheKeys.geoEvents());
+    void cache.del(CacheKeys.timeline());
   }
 
   /**
@@ -353,6 +391,10 @@ export class WebSocketService {
   broadcastClusterUpdate(topic: string, articleCount: number): void {
     if (!this.io) return;
     this.io.emit('analysis:cluster-updated', { topic, articleCount });
+
+    // D-03: Invalidate cluster caches
+    const cache = CacheService.getInstance();
+    void cache.delPattern('analysis:clusters:*');
   }
 
   /**

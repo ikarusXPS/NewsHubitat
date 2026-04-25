@@ -157,6 +157,57 @@ describe('CacheService', () => {
     });
   });
 
+  describe('setWithJitter', () => {
+    it('returns false when cache unavailable', async () => {
+      const service = CacheService.getInstance();
+      (service as any).isConnected = false;
+      const result = await service.setWithJitter('test-key', 'value');
+      expect(result).toBe(false);
+    });
+
+    it('stores value with jittered TTL (10% variance)', async () => {
+      const service = CacheService.getInstance();
+      (service as any).isConnected = true;
+      const mockClient = { setex: vi.fn().mockResolvedValue('OK') };
+      (service as any).client = mockClient;
+
+      const result = await service.setWithJitter('test-key', { data: 'test' }, CACHE_TTL.MEDIUM);
+      expect(result).toBe(true);
+      expect(mockClient.setex).toHaveBeenCalled();
+
+      const [key, ttl, value] = mockClient.setex.mock.calls[0];
+      expect(key).toBe('test-key');
+      expect(value).toBe('{"data":"test"}');
+      // TTL should be within 10% variance: 300 * 0.9 = 270, 300 * 1.1 = 330
+      expect(ttl).toBeGreaterThanOrEqual(Math.floor(CACHE_TTL.MEDIUM * 0.9));
+      expect(ttl).toBeLessThanOrEqual(Math.ceil(CACHE_TTL.MEDIUM * 1.1));
+    });
+
+    it('uses default MEDIUM TTL when not specified', async () => {
+      const service = CacheService.getInstance();
+      (service as any).isConnected = true;
+      const mockClient = { setex: vi.fn().mockResolvedValue('OK') };
+      (service as any).client = mockClient;
+
+      await service.setWithJitter('test-key', 'value');
+
+      const [, ttl] = mockClient.setex.mock.calls[0];
+      // Default is CACHE_TTL.MEDIUM (300), jitter range: 270-330
+      expect(ttl).toBeGreaterThanOrEqual(Math.floor(CACHE_TTL.MEDIUM * 0.9));
+      expect(ttl).toBeLessThanOrEqual(Math.ceil(CACHE_TTL.MEDIUM * 1.1));
+    });
+
+    it('returns false on error', async () => {
+      const service = CacheService.getInstance();
+      (service as any).isConnected = true;
+      const mockClient = { setex: vi.fn().mockRejectedValue(new Error('Redis error')) };
+      (service as any).client = mockClient;
+
+      const result = await service.setWithJitter('test-key', 'value');
+      expect(result).toBe(false);
+    });
+  });
+
   describe('del', () => {
     it('returns false when cache unavailable', async () => {
       const service = CacheService.getInstance();
@@ -276,11 +327,14 @@ describe('CacheService', () => {
 
       expect(result).toBe('computed-value');
       expect(computeFn).toHaveBeenCalledOnce();
-      expect(mockClient.setex).toHaveBeenCalledWith(
-        'test-key',
-        CACHE_TTL.SHORT,
-        '"computed-value"'
-      );
+      expect(mockClient.setex).toHaveBeenCalled();
+      // getOrSet uses setWithJitter which applies 10% variance (0.9-1.1 multiplier)
+      const [key, ttl, value] = mockClient.setex.mock.calls[0];
+      expect(key).toBe('test-key');
+      expect(value).toBe('"computed-value"');
+      // TTL should be within 10% variance: 60 * 0.9 = 54, 60 * 1.1 = 66
+      expect(ttl).toBeGreaterThanOrEqual(Math.floor(CACHE_TTL.SHORT * 0.9));
+      expect(ttl).toBeLessThanOrEqual(Math.ceil(CACHE_TTL.SHORT * 1.1));
     });
 
     it('calls computeFn when cache unavailable', async () => {
