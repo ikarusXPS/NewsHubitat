@@ -1,611 +1,585 @@
-# Technology Stack Additions for v1.4
+# Technology Stack — Performance Optimization
 
-**Project:** NewsHub v1.4 - User & Community Features
-**Researched:** 2026-04-23
-**Mode:** Incremental (additions to existing stack)
+**Project:** NewsHub v1.5 - Performance Optimization
+**Researched:** 2026-04-25
+**Confidence:** HIGH
 
 ## Executive Summary
 
-This document identifies the minimum libraries needed for OAuth, i18n, mobile responsive, social sharing, comments, and team collaboration features. The existing React 19, Express 5, PostgreSQL/Prisma 7, Zustand, TanStack Query, and Socket.io stack is validated and should NOT be changed.
+This research identifies the specific libraries and tools needed to add performance optimization features to the existing NewsHub application. The recommendations focus on **incremental additions** to the validated v1.4 stack (React 19, Vite 8, Express 5, PostgreSQL via Prisma 7, Redis) rather than replacing existing infrastructure.
 
-**Key decisions:**
-- OAuth: Passport.js 0.7 (mature, Express-compatible, 480+ strategies)
-- i18n: react-i18next 17 + i18next 26 (de-facto standard, React 19 compatible)
-- Mobile: NO new libraries (Tailwind v4 already provides responsive utilities)
-- Social Sharing: Native Web Share API + fallback (no library needed)
-- Comments: Custom build using existing Prisma + Socket.io (no library needed)
-- Team/RBAC: CASL 6.8 (isomorphic, Prisma-native, TypeScript-first)
+**Key principles:**
+- **Leverage existing infrastructure** — Redis already available for cache invalidation, PostgreSQL for query optimization
+- **Native-first approach** — Use built-in browser APIs (Intersection Observer, native lazy loading) before third-party libraries
+- **Zero breaking changes** — All additions are opt-in and backward compatible
 
-## Existing Stack (DO NOT MODIFY)
+## Recommended Stack Additions
 
-| Category | Technology | Version | Status |
-|----------|------------|---------|--------|
-| Frontend | React | 19.2.0 | Keep |
-| Build | Vite | 8.0.8 | Keep |
-| Language | TypeScript | 6.0.3 | Keep |
-| Styling | Tailwind CSS | 4.2.1 | Keep |
-| State | Zustand | 5.0.11 | Keep |
-| Server State | TanStack Query | 5.90.21 | Keep |
-| Backend | Express | 5.2.1 | Keep |
-| Database | PostgreSQL + Prisma | 7.7.0 | Keep |
-| Real-time | Socket.io | 4.8.3 | Keep |
-| Auth | JWT (jsonwebtoken) | 9.0.3 | Keep |
-| Validation | Zod | 4.3.6 | Keep |
+### Virtual Scrolling
 
----
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| **@tanstack/react-virtual** | 3.13.24 | Virtual scrolling for news feeds | Headless (10-15KB), supports variable sizing, infinite scroll, smooth scrolling. React 19 compatible. Actively maintained by TanStack. |
 
-## NEW: OAuth Authentication
+**Alternatives considered:**
+- `react-window` — Lighter (2-3KB) but lacks dynamic sizing and infinite scroll features needed for news feeds
+- `react-virtualized` — Deprecated, 30KB, not recommended for new projects in 2026
 
-### Recommended Stack
-
-| Library | Version | Purpose | Confidence |
-|---------|---------|---------|------------|
-| passport | ^0.7.0 | OAuth authentication middleware | HIGH |
-| passport-google-oauth20 | ^2.0.0 | Google OAuth 2.0 strategy | HIGH |
-| passport-github2 | ^0.1.12 | GitHub OAuth 2.0 strategy | HIGH |
-| @types/passport | ^1.0.16 | TypeScript definitions | HIGH |
-| @types/passport-google-oauth20 | ^2.0.14 | TypeScript definitions | HIGH |
-| @types/passport-github2 | ^1.2.9 | TypeScript definitions | HIGH |
-
-### Why Passport.js
-
-1. **Express-native**: Designed for Connect-style middleware, integrates cleanly with Express 5
-2. **Strategy ecosystem**: 480+ strategies for any OAuth provider needed in future
-3. **Session-optional**: Can work with existing JWT-based auth (no session dependency)
-4. **Proven at scale**: Used by major platforms, mature and stable
-
-### Integration Points
-
-```typescript
-// server/routes/auth.ts - Extend existing auth routes
-import passport from 'passport';
-import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import { Strategy as GitHubStrategy } from 'passport-github2';
-
-// OAuth strategies use existing User model
-// Add optional fields to schema:
-// - googleId: String? @unique
-// - githubId: String? @unique
-// - provider: String @default("local")
-```
-
-### Schema Changes Required
-
-```prisma
-model User {
-  // Existing fields...
-
-  // OAuth provider IDs (v1.4)
-  googleId    String?  @unique
-  githubId    String?  @unique
-  provider    String   @default("local")  // local, google, github
-  avatarUrl   String?  // Already exists, populated from OAuth profile
-}
-```
-
-### Environment Variables
-
+**Installation:**
 ```bash
-# Google OAuth
-GOOGLE_CLIENT_ID=
-GOOGLE_CLIENT_SECRET=
-GOOGLE_CALLBACK_URL=http://localhost:5173/auth/google/callback
-
-# GitHub OAuth
-GITHUB_CLIENT_ID=
-GITHUB_CLIENT_SECRET=
-GITHUB_CALLBACK_URL=http://localhost:5173/auth/github/callback
+npm install @tanstack/react-virtual
 ```
 
-### Sources
-
-- [Passport.js Official](https://www.passportjs.org/)
-- [passport-google-oauth20](https://www.passportjs.org/packages/passport-google-oauth20/)
-- [passport-github2 npm](https://www.npmjs.com/package/passport-github2)
+**Why @tanstack/react-virtual:**
+- Handles variable-height news cards (different content lengths)
+- Built-in infinite scroll support for pagination
+- Framework-agnostic core with React adapter
+- 60 FPS rendering for thousands of items
+- Active maintenance (latest release: 7 days ago as of April 2026)
 
 ---
 
-## NEW: Internationalization (i18n)
+### Image Optimization (Backend)
 
-### Recommended Stack
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| **sharp** | 0.34.5 | Server-side image processing | 4-5x faster than ImageMagick. Native AVIF/WebP support. Used by Next.js. Node 18+ compatible. |
 
-| Library | Version | Purpose | Confidence |
-|---------|---------|---------|------------|
-| i18next | ^26.0.6 | Core i18n framework | HIGH |
-| react-i18next | ^17.0.2 | React integration | HIGH |
-| i18next-browser-languagedetector | ^8.0.4 | Auto-detect user language | HIGH |
-| i18next-http-backend | ^3.0.3 | Load translations via HTTP | MEDIUM |
-
-### Why i18next + react-i18next
-
-1. **React 19 compatible**: Version 17 includes fixes for React 19 warnings (key prop, ref warnings)
-2. **Hook-based**: `useTranslation()` hook fits existing functional component patterns
-3. **Lazy loading**: Load translations on-demand to reduce bundle size
-4. **Proven ecosystem**: 6,173+ projects on npm, extensive documentation
-
-### Integration Architecture
-
-```
-src/
-  locales/
-    en/
-      common.json      # Shared UI strings
-      dashboard.json   # Dashboard-specific
-      analysis.json    # Analysis page strings
-    de/
-      common.json
-      dashboard.json
-      analysis.json
-    tr/                # Future: Turkish (significant user base)
-      ...
-  i18n/
-    config.ts          # i18n initialization
-    index.ts           # Export hook wrappers
+**Installation:**
+```bash
+npm install sharp
 ```
 
-### Configuration Pattern
+**Why sharp:**
+- **Performance:** Uses libvips (C library) for exceptional speed
+- **Formats:** JPEG, PNG, WebP, AVIF, GIF, SVG, TIFF support
+- **Quality:** AVIF at quality 60-70 = JPEG 85; WebP at 75-85 = JPEG 85
+- **Ecosystem:** Industry standard (Next.js default, 1M+ weekly downloads)
+- **Compression:** WebP 25-35% smaller than JPEG, AVIF 50% smaller
 
-```typescript
-// src/i18n/config.ts
-import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
-import LanguageDetector from 'i18next-browser-languagedetector';
-import HttpBackend from 'i18next-http-backend';
-
-i18n
-  .use(HttpBackend)
-  .use(LanguageDetector)
-  .use(initReactI18next)
-  .init({
-    fallbackLng: 'en',
-    supportedLngs: ['en', 'de'],
-    ns: ['common', 'dashboard', 'analysis'],
-    defaultNS: 'common',
-    backend: {
-      loadPath: '/locales/{{lng}}/{{ns}}.json',
-    },
-    detection: {
-      order: ['localStorage', 'navigator'],
-      caches: ['localStorage'],
-    },
-  });
-```
-
-### Zustand Integration
-
-```typescript
-// Extend existing store
-interface AppState {
-  language: 'en' | 'de' | 'tr';  // Expand from current 'de' | 'en'
-  setLanguage: (lang: 'en' | 'de' | 'tr') => void;
-}
-
-// Language change syncs with i18next
-setLanguage: (lang) => {
-  i18n.changeLanguage(lang);
-  set({ language: lang });
-},
-```
-
-### Sources
-
-- [react-i18next npm](https://www.npmjs.com/package/react-i18next) (v17.0.2)
-- [i18next npm](https://www.npmjs.com/package/i18next) (v26.0.6)
-- [react-i18next documentation](https://react.i18next.com/)
+**Use cases:**
+- Convert uploaded images to WebP/AVIF
+- Generate responsive image sets (srcset)
+- Optimize thumbnails for article cards
+- Resize images for different viewports
 
 ---
 
-## Mobile Responsive: NO NEW LIBRARIES NEEDED
+### Image Optimization (Frontend Build)
 
-### Rationale
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| **vite-imagetools** | 9.0.2 | Build-time image optimization | Generates srcset, converts formats, integrates with Vite import system. Works at build time (zero runtime overhead). |
 
-Tailwind CSS v4 (already installed at 4.2.1) provides complete mobile-first responsive utilities.
+**Installation:**
+```bash
+npm install -D vite-imagetools
+```
 
-### Existing Capabilities
+**Why vite-imagetools:**
+- **Zero runtime cost** — All transformations happen at build time
+- **Developer experience** — Import images with query parameters: `?w=200;400;800`
+- **Automatic srcset** — Generates responsive image sets automatically
+- **Format conversion** — WebP/AVIF conversion via import directives
+- **Vite integration** — First-class support for Vite's module system
 
-| Feature | Tailwind v4 Solution |
-|---------|---------------------|
-| Breakpoints | `sm:`, `md:`, `lg:`, `xl:`, `2xl:` prefixes |
-| Container queries | `@container`, `@sm:`, `@md:` (built-in, no plugin) |
-| Mobile navigation | Build with existing components + `md:hidden`/`md:flex` |
-| Touch targets | `min-h-12` (48px minimum), `p-4` padding |
-| Viewport units | `h-dvh` (dynamic viewport height) |
+**Example usage:**
+```typescript
+// Generates srcset with 200px, 400px, 800px versions
+import srcset from '../images/hero.jpg?w=200;400;800&format=webp'
+```
 
-### Default Breakpoints (Tailwind v4)
+---
 
-| Prefix | Width | Use Case |
-|--------|-------|----------|
-| (none) | 0px+ | Mobile-first base |
-| `sm:` | 640px+ | Large phones |
-| `md:` | 768px+ | Tablets |
-| `lg:` | 1024px+ | Laptops |
-| `xl:` | 1280px+ | Desktops |
-| `2xl:` | 1536px+ | Large screens |
+### Lazy Loading (Images)
 
-### Mobile Navigation Pattern
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| **react-intersection-observer** | 10.0.3 | Lazy load images on scroll | Lightweight wrapper for native IntersectionObserver API. Provides hooks and render props. React 19 compatible. |
 
+**Installation:**
+```bash
+npm install react-intersection-observer
+```
+
+**Why react-intersection-observer:**
+- **Native API wrapper** — Uses browser's IntersectionObserver (no polyfill needed for modern browsers)
+- **React 19 compatible** — Latest version supports React 19 hooks
+- **Reuses instances** — Optimizes performance by sharing observer instances
+- **Testing support** — Built-in utilities for Jest/Vitest
+- **Preloading** — Supports 50px margin for preloading before viewport
+
+**Hybrid approach (recommended):**
 ```tsx
-// Use existing @headlessui/react Dialog for mobile drawer
-// Already compatible with Tailwind v4
-import { Dialog, DialogPanel } from '@headlessui/react';
-
-// Mobile menu toggle
-<button className="md:hidden">
-  <Menu className="h-6 w-6" />
-</button>
-
-// Desktop nav visible on md+
-<nav className="hidden md:flex">
-  ...
-</nav>
+// Use native loading="lazy" with Intersection Observer fallback
+<img
+  src={src}
+  loading="lazy"  // Native lazy loading
+  ref={ref}       // Intersection Observer for older browsers
+  className={inView ? 'loaded' : 'loading'}
+/>
 ```
 
-### What to Add (Optional)
-
-| Library | Version | Purpose | When |
-|---------|---------|---------|------|
-| @headlessui/react | ^2.2.10 | Accessible dialogs/menus | IF mobile drawer needed |
-
-**Note**: Check if Radix Dialog (already installed: `@radix-ui/react-dialog ^1.1.15`) meets needs before adding Headless UI.
-
-### Sources
-
-- [Tailwind CSS Responsive Design](https://tailwindcss.com/docs/responsive-design)
-- [Tailwind CSS v4 Container Queries](https://bordermedia.org/blog/tailwind-css-4-breakpoint-override)
+**Note:** For critical above-the-fold images (LCP elements), use `loading="eager"` and `fetchPriority="high"` to avoid 35% slower LCP.
 
 ---
 
-## Social Sharing: MINIMAL LIBRARY APPROACH
+### Response Compression
 
-### Recommended Approach
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| **compression** | 1.7.5 | HTTP response compression | Standard Express middleware. Brotli + gzip support. Zero config for most use cases. |
 
-Use native **Web Share API** with fallback to direct share URLs. No library needed.
+**Installation:**
+```bash
+npm install compression
+```
 
-### Why No Library
+**Why compression (not shrink-ray-current):**
+- **Stability** — Standard Express.js middleware, battle-tested
+- **Brotli support** — Automatic Brotli compression (70-90% size reduction)
+- **Fallback chain** — Tries Brotli → gzip → deflate based on Accept-Encoding
+- **Zero config** — Works out-of-box with `app.use(compression())`
+- **Maintenance** — Actively maintained, unlike shrink-ray-current (last update 2021)
 
-1. **Web Share API**: Native on mobile, covers 85%+ of share use cases
-2. **Direct URLs**: Simple `window.open()` fallback for desktop
-3. **Bundle size**: Zero additional bytes vs 6KB+ for react-share
-4. **Already have SharedContent model**: Schema exists in Prisma
-
-### Implementation Pattern
-
+**Configuration (recommended):**
 ```typescript
-// src/lib/share.ts
-export async function shareContent(data: ShareData): Promise<boolean> {
-  // Native share on supported browsers (mobile)
-  if (navigator.canShare?.(data)) {
-    await navigator.share(data);
-    return true;
-  }
-
-  // Fallback: open share dialog
-  return false;
-}
-
-// Direct share URLs for fallback
-export const shareUrls = {
-  twitter: (text: string, url: string) =>
-    `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
-  facebook: (url: string) =>
-    `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
-  linkedin: (url: string) =>
-    `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
-  whatsapp: (text: string) =>
-    `https://wa.me/?text=${encodeURIComponent(text)}`,
-  telegram: (text: string, url: string) =>
-    `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`,
-};
+app.use(compression({
+  threshold: 1024,  // Only compress responses > 1KB
+  level: 6,         // Balance between speed and compression
+}));
 ```
 
-### Existing Schema Support
-
-```prisma
-// Already exists in schema.prisma
-model SharedContent {
-  id            String   @id
-  shareCode     String   @unique
-  contentType   String   // article, cluster, comparison, digest
-  contentId     String
-  // ... analytics fields
-}
-
-model ShareClick {
-  platform      String   // twitter, facebook, linkedin, whatsapp, telegram, copy, email
-  // ... tracking fields
-}
-```
-
-### Optional: If Library Preferred
-
-| Library | Version | Size | When to Use |
-|---------|---------|------|-------------|
-| react-share | ^5.1.2 | 6KB gzip | If custom button styling needed |
-
-### Sources
-
-- [Web Share API MDN](https://developer.mozilla.org/en-US/docs/Web/API/Web_Share_API)
-- [Using Web Share API in React](https://www.brannen.dev/posts/using-the-web-share-api-in-react)
-- [react-share npm](https://www.npmjs.com/package/react-share)
+**Performance:**
+- Reduces API response sizes by 70-90%
+- Brotli: 95ms encoding time (2.5x faster than gzip in 2026 benchmarks)
+- gzip: Universal browser support fallback
 
 ---
 
-## Comments System: CUSTOM BUILD
+### Cache Management (No New Library Needed)
 
-### Recommended Approach
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| **ioredis** | ✓ Existing | Redis client with cache patterns | Already in use for JWT blacklist and rate limiting. Supports clustering, pipelining, Sentinel. |
 
-Build custom using existing Prisma + Socket.io stack. No external library needed.
+**What's needed:** Implementation patterns, not new libraries.
 
-### Why Custom Build
+**Cache invalidation strategies:**
 
-1. **Socket.io already installed**: Real-time updates for new comments
-2. **Prisma models extensible**: Add Comment model with self-referencing for threads
-3. **No good React 19 libraries**: react-comments-section is 2+ years old
-4. **Control over moderation**: Custom allows AI-based spam detection integration
-
-### Schema Design
-
-```prisma
-model Comment {
-  id          String    @id @default(cuid())
-  content     String
-  articleId   String
-  author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId    String
-
-  // Threading
-  parent      Comment?  @relation("CommentThread", fields: [parentId], references: [id])
-  parentId    String?
-  replies     Comment[] @relation("CommentThread")
-
-  // Moderation
-  status      String    @default("published")  // published, hidden, flagged
-  reportCount Int       @default(0)
-
-  // Engagement
-  upvotes     Int       @default(0)
-  downvotes   Int       @default(0)
-
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  @@index([articleId])
-  @@index([authorId])
-  @@index([parentId])
-  @@index([status])
-}
-
-model CommentVote {
-  id          String   @id @default(cuid())
-  comment     Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
-  commentId   String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId      String
-  vote        Int      // 1 = upvote, -1 = downvote
-
-  @@unique([commentId, userId])
-}
-```
-
-### Real-time Integration
-
+1. **TTL-Based Expiration** (simplest)
 ```typescript
-// server/services/websocketService.ts
-// Extend existing WebSocket service
-
-socket.on('comment:new', (articleId) => {
-  io.to(`article:${articleId}`).emit('comment:added', comment);
-});
-
-socket.on('comment:reply', (parentId) => {
-  io.to(`comment:${parentId}`).emit('comment:replied', reply);
-});
+// Set cache with TTL
+await redis.setex(key, 300, JSON.stringify(data));  // 5 minutes
 ```
 
-### Sources
+2. **Event-Driven Invalidation** (for strong consistency)
+```typescript
+// Invalidate when data changes
+async function updateArticle(id: string, data: any) {
+  await db.article.update({ where: { id }, data });
+  await redis.del(`article:${id}`);  // Invalidate cache
+  await redis.del('article:list:*');  // Invalidate list caches
+}
+```
 
-- [react-comments-section npm](https://www.npmjs.com/package/react-comments-section) (outdated, avoid)
-- [Building Nested Comments in React](https://www.saikatsamanta.dev/blog/create-nested-comment-section-with-react)
+3. **Tag-Based Invalidation** (for complex dependencies)
+```typescript
+// Store tag-to-key mappings
+await redis.sadd(`tag:region:usa`, `article:${id}`);
+// Invalidate all articles in region
+const keys = await redis.smembers('tag:region:usa');
+await redis.del(...keys);
+```
+
+**Recommended pattern for NewsHub:**
+- **TTL for read-heavy data:** Article lists (5 min), sentiment stats (10 min)
+- **Event-driven for writes:** Article updates, user preferences
+- **Tag-based for regions:** Invalidate by region/source when new articles arrive
+
+**Connection pooling (already configured):**
+- ioredis uses single connection with multiplexing (no pooling library needed)
+- For high concurrency: Use `generic-pool` with ioredis (only if metrics show bottleneck)
 
 ---
 
-## Team Collaboration & RBAC
+### Database Query Optimization (No New Library Needed)
 
-### Recommended Stack
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| **Prisma** | 7.x (existing) | ORM with query optimization tools | Built-in `@@index` directive, Query Insights included with Prisma Postgres. |
+| **pg_stat_statements** | Built-in | PostgreSQL query statistics | Tracks every query's execution time, call count, resource usage. Essential for finding slow queries. |
 
-| Library | Version | Purpose | Confidence |
-|---------|---------|---------|------------|
-| @casl/ability | ^6.8.0 | Core permissions engine | HIGH |
-| @casl/react | ^5.0.1 | React integration (Can component) | HIGH |
-| @casl/prisma | ^1.6.1 | Prisma query filtering | HIGH |
+**What's needed:** Enable extensions and use built-in Prisma tools.
 
-### Why CASL
+**Setup steps:**
 
-1. **Isomorphic**: Same permission logic on frontend and backend
-2. **Prisma-native**: `accessibleBy()` generates WHERE clauses automatically
-3. **TypeScript-first**: Full type safety with ability definitions
-4. **Minimal size**: 6KB gzipped core
-5. **Action-based**: Matches REST patterns (create, read, update, delete)
-
-### Permission Architecture
-
-```typescript
-// shared/permissions.ts
-import { AbilityBuilder, PureAbility } from '@casl/ability';
-import { PrismaQuery, Subjects } from '@casl/prisma';
-
-type AppSubjects =
-  | Subjects<{ Article: Article; Comment: Comment; Team: Team }>
-  | 'all';
-
-type AppAbility = PureAbility<[string, AppSubjects], PrismaQuery>;
-
-export function defineAbilitiesFor(user: User, teamMembership?: TeamMember) {
-  const { can, cannot, build } = new AbilityBuilder<AppAbility>();
-
-  // Everyone can read public articles
-  can('read', 'Article', { isPublic: true });
-
-  if (user) {
-    // Logged-in users can comment
-    can('create', 'Comment');
-    can('update', 'Comment', { authorId: user.id });
-    can('delete', 'Comment', { authorId: user.id });
-  }
-
-  if (teamMembership?.role === 'admin') {
-    can('manage', 'Team', { id: teamMembership.teamId });
-    can('manage', 'Comment', { teamId: teamMembership.teamId });
-  }
-
-  return build();
-}
+1. **Enable pg_stat_statements** (PostgreSQL extension)
+```sql
+CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
 ```
 
-### Schema Design (Teams)
+2. **Find slow queries**
+```sql
+SELECT
+  query,
+  calls,
+  total_exec_time,
+  mean_exec_time,
+  max_exec_time
+FROM pg_stat_statements
+ORDER BY mean_exec_time DESC
+LIMIT 10;
+```
 
+3. **Add indexes in Prisma schema**
 ```prisma
-model Team {
-  id          String       @id @default(cuid())
-  name        String
-  slug        String       @unique
-  description String?
-  avatarUrl   String?
-
-  members     TeamMember[]
-  sharedFeeds TeamFeed[]
-
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-
-  @@index([slug])
-}
-
-model TeamMember {
+model NewsArticle {
   id        String   @id @default(cuid())
-  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  teamId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String
-  role      String   @default("member")  // owner, admin, member, viewer
-  joinedAt  DateTime @default(now())
+  region    String
+  sentiment String
+  createdAt DateTime @default(now())
 
-  @@unique([teamId, userId])
-  @@index([teamId])
-  @@index([userId])
-}
-
-model TeamFeed {
-  id          String   @id @default(cuid())
-  team        Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  teamId      String
-  name        String
-  filters     Json     // Saved source/region/topic filters
-  isDefault   Boolean  @default(false)
-  createdBy   String
-  createdAt   DateTime @default(now())
-
-  @@index([teamId])
+  @@index([region, createdAt])  // Composite index for region filtering + sorting
+  @@index([sentiment])           // Single-column index for sentiment filtering
 }
 ```
 
-### React Integration
-
-```tsx
-// src/components/Can.tsx
-import { Can as CaslCan } from '@casl/react';
-import { useAbility } from '../hooks/useAbility';
-
-export function Can({ children, ...props }) {
-  const ability = useAbility();
-  return <CaslCan ability={ability} {...props}>{children}</CaslCan>;
-}
-
-// Usage
-<Can I="delete" a="Comment" this={comment}>
-  <button onClick={handleDelete}>Delete</button>
-</Can>
+4. **Use Prisma Query Insights** (included with Prisma Postgres)
+```bash
+# Install SQL commenter for ORM attribution
+npm install @prisma/sqlcommenter-query-insights
 ```
 
-### Sources
+**Tools for analysis:**
+- **pganalyze** ($149/month) — Index Advisor with "What If?" analysis, tries hundreds of index combinations
+- **pgMustard** (€95/year) — EXPLAIN plan visualization, identifies index-only scan potential, late filters
+- **Built-in EXPLAIN ANALYZE** (free) — PostgreSQL's query planner output
 
-- [CASL Official](https://casl.js.org/)
-- [@casl/ability npm](https://www.npmjs.com/package/@casl/ability) (v6.8.0)
-- [@casl/prisma npm](https://www.npmjs.com/package/@casl/prisma) (v1.6.1)
-- [Building RBAC with CASL (2026)](https://benmukebo.medium.com/how-i-built-a-production-ready-rbac-system-in-react-with-casl-fd5b16354e3d)
+**For NewsHub:** Start with free tools (pg_stat_statements, EXPLAIN ANALYZE, Prisma Query Insights). Add paid tools only if complex queries justify cost.
 
 ---
 
-## Installation Summary
+### Code Splitting (No New Library Needed)
 
-### NPM Install Command
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| **Vite** | 8.x (existing) | Build tool with automatic code splitting | Built-in support for dynamic imports, route-based splitting via `React.lazy()`. |
+
+**What's needed:** Implementation patterns using existing Vite + React features.
+
+**Route-based code splitting (recommended):**
+```typescript
+// Before: Direct import (all routes in main bundle)
+import Dashboard from './pages/Dashboard';
+
+// After: Lazy import (Dashboard in separate chunk)
+const Dashboard = React.lazy(() => import('./pages/Dashboard'));
+
+// Wrap in Suspense
+<Suspense fallback={<LoadingSpinner />}>
+  <Dashboard />
+</Suspense>
+```
+
+**Manual chunk configuration (if needed):**
+```typescript
+// vite.config.ts
+export default defineConfig({
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor': ['react', 'react-dom'],
+          'charts': ['recharts', 'globe.gl'],
+          'ui': ['@headlessui/react', 'framer-motion'],
+        }
+      }
+    }
+  }
+});
+```
+
+**Best practices:**
+- **Route-level splitting** — Easiest win, split by page
+- **Avoid micro-chunks** — Too many small chunks hurts performance
+- **Preload critical chunks** — Vite adds `<link rel="modulepreload">` automatically
+
+---
+
+### CDN Integration (No New Library Needed)
+
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| **Vite `base` config** | Built-in | CDN URL prefix for static assets | Native Vite feature, no plugin needed. |
+
+**What's needed:** Configuration, not libraries.
+
+**For Cloudflare CDN (recommended for NewsHub):**
+
+1. **Update Vite config**
+```typescript
+// vite.config.ts
+export default defineConfig({
+  base: process.env.NODE_ENV === 'production'
+    ? 'https://cdn.newshub.example.com/'
+    : '/',
+});
+```
+
+2. **Deploy static assets to Cloudflare Workers**
+```json
+// wrangler.jsonc
+{
+  "name": "newshub-cdn",
+  "compatibility_date": "2026-04-25",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS"
+  }
+}
+```
+
+**Why Cloudflare:**
+- **Free tier** — No cost for moderate traffic
+- **Global network** — 330+ data centers
+- **Auto SSL** — Free SSL certificates
+- **DDoS protection** — Built-in
+- **Cache control** — 80% reduction in origin server load
+- **Brotli support** — Automatic compression
+
+**Alternative:** If already using another CDN (AWS CloudFront, Fastly), just update `base` config to point to CDN URL.
+
+---
+
+## What NOT to Add
+
+| Library | Why NOT |
+|---------|---------|
+| **Next.js Image component** | NewsHub uses Vite, not Next.js. Use sharp + vite-imagetools instead. |
+| **react-window** | Too limited — lacks variable sizing and infinite scroll needed for news feeds. |
+| **shrink-ray-current** | Unmaintained (last update 2021). Use standard `compression` middleware. |
+| **generic-pool** (for Redis) | ioredis uses single connection with multiplexing. Add pooling only if metrics show bottleneck. |
+| **pganalyze/pgMustard** (initially) | Start with free tools (pg_stat_statements, EXPLAIN ANALYZE). Add paid tools only if justified. |
+| **Separate bundler plugins** | Vite handles code splitting natively via React.lazy(). No plugin needed. |
+
+---
+
+## Integration Points
+
+### 1. Virtual Scrolling → NewsFeed Component
+```typescript
+// src/components/NewsFeed.tsx
+import { useVirtualizer } from '@tanstack/react-virtual';
+
+const virtualizer = useVirtualizer({
+  count: articles.length,
+  getScrollElement: () => parentRef.current,
+  estimateSize: () => 350,  // Estimated card height
+  overscan: 5,              // Render 5 extra items for smooth scrolling
+});
+```
+
+### 2. Image Optimization → Article Upload Flow
+```typescript
+// server/routes/articles.ts
+import sharp from 'sharp';
+
+// Convert uploaded image to WebP + AVIF
+await sharp(inputBuffer)
+  .resize(1200, 630, { fit: 'cover' })
+  .webp({ quality: 80 })
+  .toFile('output.webp');
+
+await sharp(inputBuffer)
+  .resize(1200, 630, { fit: 'cover' })
+  .avif({ quality: 65 })
+  .toFile('output.avif');
+```
+
+### 3. Lazy Loading → SignalCard Component
+```typescript
+// src/components/SignalCard.tsx
+import { useInView } from 'react-intersection-observer';
+
+const { ref, inView } = useInView({
+  triggerOnce: true,
+  rootMargin: '50px',  // Preload 50px before entering viewport
+});
+
+<img ref={ref} src={inView ? imageUrl : placeholder} loading="lazy" />
+```
+
+### 4. Cache Invalidation → News Aggregator Service
+```typescript
+// server/services/newsAggregator.ts
+async function fetchNewArticles() {
+  const articles = await fetchFromSources();
+  await db.article.createMany({ data: articles });
+
+  // Invalidate caches
+  await redis.del('articles:list');
+  await redis.del('articles:count:*');
+  articles.forEach(a => redis.sadd(`tag:region:${a.region}`, `article:${a.id}`));
+}
+```
+
+### 5. Response Compression → Express App Setup
+```typescript
+// server/index.ts
+import compression from 'compression';
+
+app.use(compression({
+  threshold: 1024,
+  level: 6,
+}));
+```
+
+### 6. Code Splitting → Router Configuration
+```typescript
+// src/App.tsx
+const Dashboard = React.lazy(() => import('./pages/Dashboard'));
+const Analysis = React.lazy(() => import('./pages/Analysis'));
+const Monitor = React.lazy(() => import('./pages/Monitor'));
+
+<Suspense fallback={<PageLoader />}>
+  <Routes>
+    <Route path="/" element={<Dashboard />} />
+    <Route path="/analysis" element={<Analysis />} />
+    <Route path="/monitor" element={<Monitor />} />
+  </Routes>
+</Suspense>
+```
+
+---
+
+## Dependencies Summary
+
+### Production Dependencies
+```json
+{
+  "dependencies": {
+    "@tanstack/react-virtual": "^3.13.24",
+    "compression": "^1.7.5",
+    "react-intersection-observer": "^10.0.3",
+    "sharp": "^0.34.5"
+  },
+  "devDependencies": {
+    "vite-imagetools": "^9.0.2"
+  }
+}
+```
+
+### PostgreSQL Extensions (enable via SQL)
+```sql
+CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
+```
+
+### Optional (add only if metrics justify)
+```json
+{
+  "dependencies": {
+    "@prisma/sqlcommenter-query-insights": "latest"  // ORM-level query attribution
+  }
+}
+```
+
+---
+
+## Installation Script
 
 ```bash
-# OAuth
-npm install passport passport-google-oauth20 passport-github2
-npm install -D @types/passport @types/passport-google-oauth20 @types/passport-github2
+# Install production dependencies
+npm install @tanstack/react-virtual compression react-intersection-observer sharp
 
-# i18n
-npm install i18next react-i18next i18next-browser-languagedetector i18next-http-backend
+# Install dev dependencies
+npm install -D vite-imagetools
 
-# RBAC (Team Collaboration)
-npm install @casl/ability @casl/react @casl/prisma
+# Enable PostgreSQL extension (run in database)
+psql -d newshub -c "CREATE EXTENSION IF NOT EXISTS pg_stat_statements;"
+
+# Optional: Prisma Query Insights
+# npm install @prisma/sqlcommenter-query-insights
 ```
 
-### What NOT to Install
-
-| Library | Reason |
-|---------|--------|
-| tailwindcss-responsive | Already have Tailwind v4 |
-| @headlessui/react | Already have Radix Dialog |
-| react-share | Native Web Share API sufficient |
-| react-comments-section | Outdated, build custom |
-| permit.io / cerbos | CASL is simpler for this scale |
-| express-session | Keep JWT-based auth (no session) |
-
 ---
 
-## Bundle Impact Analysis
+## Validation Checklist
 
-| Addition | Size (gzip) | Impact |
-|----------|-------------|--------|
-| passport + strategies | ~15KB | Server only |
-| i18next + react-i18next | ~25KB | Moderate |
-| @casl/* | ~10KB | Minimal |
-| **Total frontend** | ~35KB | Acceptable |
+Before marking research complete:
 
-### Mitigation
-
-- i18next: Lazy-load translations per route
-- CASL: Tree-shake unused features
-- Translations: Load on-demand via HTTP backend
-
----
-
-## Integration Priority
-
-| Feature | Priority | Dependencies | Est. Effort |
-|---------|----------|--------------|-------------|
-| OAuth (Google/GitHub) | HIGH | Schema migration | 2-3 days |
-| i18n | HIGH | Translation files | 3-4 days |
-| Mobile Responsive | MEDIUM | None | 2-3 days |
-| Social Sharing | MEDIUM | None (schema exists) | 1-2 days |
-| Comments | LOW | Schema migration | 3-4 days |
-| Team Collaboration | LOW | Schema + RBAC | 5-7 days |
+- [x] All libraries have current versions (verified via npm, official docs)
+- [x] Integration points identified for existing codebase
+- [x] Alternatives considered with rationale for rejection
+- [x] Zero breaking changes to existing stack
+- [x] Native browser APIs prioritized over third-party libraries
+- [x] Performance benefits quantified from official sources
+- [x] Installation and setup steps provided
+- [x] "What NOT to add" section prevents scope creep
 
 ---
 
 ## Confidence Assessment
 
-| Area | Confidence | Reasoning |
-|------|------------|-----------|
-| OAuth (Passport) | HIGH | Mature library, official docs verified, Express 5 compatible |
-| i18n (react-i18next) | HIGH | React 19 compatibility confirmed in v17, npm verified |
-| Mobile (Tailwind v4) | HIGH | Already installed, official docs confirm capabilities |
-| Social Sharing | HIGH | Native API + simple fallback, no dependencies |
-| Comments | MEDIUM | Custom build, patterns researched but not library-backed |
-| RBAC (CASL) | HIGH | Recent npm versions, Prisma integration documented |
+| Area | Confidence | Notes |
+|------|------------|-------|
+| Virtual Scrolling | HIGH | @tanstack/react-virtual is industry standard, React 19 compatible, actively maintained |
+| Image Optimization (Backend) | HIGH | sharp is Next.js default, 4-5x faster than alternatives, stable API |
+| Image Optimization (Frontend) | HIGH | vite-imagetools integrates with existing Vite setup, zero runtime cost |
+| Lazy Loading | HIGH | Native IntersectionObserver API + react-intersection-observer wrapper, proven pattern |
+| Compression | HIGH | Standard Express middleware, Brotli benchmarks from 2026 sources |
+| Cache Invalidation | MEDIUM | Patterns are well-established, but NewsHub-specific TTL values need tuning |
+| Database Optimization | HIGH | Prisma 7 + pg_stat_statements are standard tools, Query Insights included |
+| Code Splitting | HIGH | Vite 8 built-in feature, React.lazy() is React 19 standard |
+| CDN Integration | MEDIUM | Cloudflare configuration is straightforward, but NewsHub needs DNS setup |
+
+**Overall confidence:** HIGH — All recommendations use stable, well-documented libraries with active maintenance.
 
 ---
 
-*Research completed 2026-04-23. Sources include npm registry, official documentation, and verified 2026 blog posts.*
+## Sources
+
+**Virtual Scrolling:**
+- [TanStack Virtual Documentation](https://tanstack.com/virtual/latest)
+- [TanStack Virtual React Adapter](https://tanstack.com/virtual/v3/docs/framework/react/react-virtual)
+- [@tanstack/react-virtual npm](https://www.npmjs.com/package/@tanstack/react-virtual)
+
+**Image Optimization:**
+- [sharp npm package](https://www.npmjs.com/package/sharp)
+- [sharp Official Documentation](https://sharp.pixelplumbing.com/)
+- [Image Optimization in 2026: WebP/AVIF](https://tworowstudio.com/image-optimization-2026/)
+- [Optimise Images with Sharp in Node.js — 2026 Guide](https://meisteritsystems.com/news/optimise-images-with-sharp-in-node-js-full-2026-guide/)
+- [vite-imagetools npm](https://www.npmjs.com/package/vite-imagetools)
+- [vite-imagetools GitHub](https://github.com/JonasKruckenberg/imagetools)
+
+**Lazy Loading:**
+- [react-intersection-observer npm](https://www.npmjs.com/package/react-intersection-observer)
+- [react-intersection-observer GitHub](https://github.com/thebuilder/react-intersection-observer)
+- [Lazy Loading React Components using Intersection Observer](https://huzaima.io/blog/lazy-loading-react-components-intersection-observer)
+
+**Compression:**
+- [Express compression middleware](https://expressjs.com/en/resources/middleware/compression.html)
+- [How to Use Compression in Express.js](https://oneuptime.com/blog/post/2026-01-22-nodejs-express-compression/view)
+- [HTTP Compression in Node.js: Gzip, Deflate, and Brotli](https://www.ayrshare.com/http-compression-in-node-js-a-dive-into-gzip-deflate-and-brotli/)
+
+**Cache Management:**
+- [Redis Cache Invalidation](https://oneuptime.com/blog/post/2026-01-25-redis-cache-invalidation/view)
+- [Redis Caching Patterns](https://oneuptime.com/blog/post/2026-01-26-redis-caching-patterns/view)
+- [How to Configure Connection Pooling for Redis](https://oneuptime.com/blog/post/2026-01-25-redis-connection-pooling/view)
+- [Getting Started with Node.js and Redis](https://redis.io/tutorials/develop/node/gettingstarted/)
+
+**Database Optimization:**
+- [Prisma Query Optimization](https://www.prisma.io/docs/postgres/query-optimization)
+- [How to Use pg_stat_statements for Query Analysis](https://oneuptime.com/blog/post/2026-01-25-use-pg-stat-statements-query-analysis/view)
+- [pganalyze Index Advisor](https://pganalyze.com/index-advisor)
+- [Improving query performance with Prisma indexes](https://www.prisma.io/blog/improving-query-performance-using-indexes-1-zuLNZwBkuL)
+
+**Code Splitting:**
+- [Boost Your React App's Performance with Vite and Code Splitting](https://benmukebo.medium.com/boost-your-react-apps-performance-with-vite-lazy-loading-and-code-splitting-2fd093128682)
+- [Vite Code Splitting That Just Works](https://www.sambitsahoo.com/blog/vite-code-splitting-that-works.html)
+- [How to Implement Code Splitting in React](https://oneuptime.com/blog/post/2026-01-15-react-code-splitting-lazy-loading/view)
+
+**CDN Integration:**
+- [Cloudflare Workers Static Assets](https://developers.cloudflare.com/workers/static-assets/)
+- [CDN Configuration for Hugo Sites: Cloudflare](https://dasroot.net/posts/2026/01/cdn-configuration-hugo-cloudflare-beyond/)
+- [Adding CDN Caching to a Vite Build](https://css-tricks.com/adding-cdn-caching-to-a-vite-build/)

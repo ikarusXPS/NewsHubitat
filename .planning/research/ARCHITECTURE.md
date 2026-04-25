@@ -1,1081 +1,796 @@
 # Architecture Patterns
 
-**Domain:** User & Community Features for News Analysis Platform
-**Researched:** 2026-04-23
-**Confidence:** HIGH (verified against existing codebase + industry patterns)
+**Domain:** Performance Optimization for NewsHub
+**Researched:** 2026-04-25
 
 ## Executive Summary
 
-The v1.4 features integrate into NewsHub's existing layered monolith architecture. This document specifies exact integration points with existing components, new Prisma models, Socket.IO extensions for real-time comments, and dependency-based build order.
+Performance optimization in NewsHub must integrate with existing architecture without disrupting validated patterns. The app already has foundational performance infrastructure (Redis caching, Vite manual chunking, lazy-loaded routes, PostgreSQL with basic indexes) that NEW optimizations should enhance, not replace.
 
-**Key Architecture Decision:** All new features extend existing infrastructure rather than replacing it. OAuth adds to AuthService (preserves JWT), i18n layers on Zustand, comments leverage Socket.IO, teams follow existing RBAC patterns.
+**Key Integration Points:**
+1. **Caching Layer**: Extend existing CacheService for API response caching
+2. **Frontend**: Add route-level lazy loading to existing React.lazy() setup
+3. **Database**: Add indexes to existing Prisma schema
+4. **Build Pipeline**: Enhance existing Vite config with CDN support and image optimization
+
+**Critical Constraint**: All changes must maintain existing API contracts (TanStack Query keys, response formats, WebSocket events).
 
 ---
 
 ## Current Architecture Overview
 
+### Component Map (Existing)
+
 ```
-+------------------+     +------------------+     +------------------+
-|   React SPA      |     |  Express API     |     |  PostgreSQL      |
-|  (Vite + React)  |<--->|  (REST + WS)     |<--->|  (via Prisma)    |
-+------------------+     +------------------+     +------------------+
-       |                        |                        |
-       v                        v                        v
-+------------------+     +------------------+     +------------------+
-|  Zustand Store   |     |  Socket.IO       |     |  Redis Cache     |
-|  (Client State)  |     |  (Real-time)     |     |  (Sessions, etc) |
-+------------------+     +------------------+     +------------------+
+┌─────────────────────────────────────────────────────────────┐
+│                         Frontend (React 19)                  │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
+│  │ TanStack     │  │ Zustand      │  │ React Router │      │
+│  │ Query        │  │ (Client      │  │ v7 (Routes)  │      │
+│  │ (Server      │  │  State)      │  │              │      │
+│  │  State)      │  └──────────────┘  └──────────────┘      │
+│  └──────┬───────┘                                           │
+│         │ queryKey: ['news'], ['geo-events'], etc.         │
+│         ▼                                                    │
+│  ┌──────────────────────────────────────────────────┐      │
+│  │ API Client (fetch /api/news, /api/events, etc.) │      │
+│  └──────────────────┬───────────────────────────────┘      │
+└─────────────────────┼───────────────────────────────────────┘
+                      │ HTTP/WebSocket
+┌─────────────────────▼───────────────────────────────────────┐
+│                    Backend (Express 5)                       │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
+│  │ CacheService │  │ NewsAggregator│ │ WebSocket    │      │
+│  │ (Redis)      │  │ (In-memory   │  │ Service      │      │
+│  │ - JWT tokens │  │  article     │  │              │      │
+│  │ - Rate limit │  │  cache)      │  │              │      │
+│  │ - AI cache   │  └──────┬───────┘  └──────────────┘      │
+│  └──────┬───────┘         │                                 │
+│         │                 │                                 │
+│         ▼                 ▼                                 │
+│  ┌──────────────────────────────────────────────────┐      │
+│  │         PostgreSQL (via Prisma 7 ORM)            │      │
+│  │  - NewsArticle (with GIN indexes on JSONB)       │      │
+│  │  - NewsSource                                     │      │
+│  │  - User, Bookmark, ReadingHistory                │      │
+│  └──────────────────────────────────────────────────┘      │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-### Existing Integration Points (Verified from Codebase)
+### Data Flow (Current)
 
-| Component | File Location | Current Role | v1.4 Extension |
-|-----------|--------------|--------------|----------------|
-| `AuthService` | `server/services/authService.ts` | JWT + email/password auth, token blacklist | OAuth provider linking |
-| `authMiddleware` | `server/services/authService.ts:559` | JWT validation, tokenVersion check | No change needed |
-| `AuthContext` | `src/contexts/AuthContext.tsx` | React auth state, login/register | OAuth login methods |
-| `WebSocketService` | `server/services/websocketService.ts` | News/event broadcasts, rooms | Comment broadcasts |
-| `Zustand store` | `src/store/index.ts` | UI state (theme, language, filters) | i18n locale, team context |
-| `User model` | `prisma/schema.prisma:66` | Auth, preferences, badges | OAuth accounts, team membership |
-| `SharedContent` | `prisma/schema.prisma:245` | Share links (exists) | Leverage for social sharing |
+1. **Article Fetch Flow**:
+   ```
+   User → Component → TanStack Query → /api/news
+   → NewsAggregator (in-memory cache hit?)
+   → PostgreSQL (if miss)
+   → Response (HTTP Cache-Control: 300s)
+   ```
+
+2. **AI Analysis Flow**:
+   ```
+   User → /api/ai/ask → CacheService.get(ai:topics)
+   → Cache hit? Return
+   → Cache miss? → AIService → Redis cache (30min TTL)
+   ```
+
+3. **Current Caching Strategy**:
+   - **HTTP Cache-Control headers** (5min for news, 24h for sources)
+   - **In-memory article cache** in NewsAggregator (server-side)
+   - **Redis cache** for AI responses, JWT blacklist, rate limits
+   - **TanStack Query cache** (client-side, 2min stale time)
 
 ---
 
-## Feature 1: OAuth Integration (Google + GitHub)
+## Performance Features Integration
 
-### Integration with Existing JWT Auth
+### 1. API Response Caching (NEW)
 
-**Critical:** OAuth does NOT replace JWT. OAuth creates the same JWT token as email/password login.
+**Extends**: Existing `CacheService` (D:\NewsHub\server\services\cacheService.ts)
 
-```
-EXISTING FLOW (preserved):
-  Email/Password → AuthService.login() → JWT → AuthContext
-
-NEW FLOW (added):
-  OAuth Callback → AuthService.loginWithOAuth() → JWT → AuthContext
-                                                   ^
-                                         Same JWT format, same validation
-```
-
-### New Files Required
-
-```
-server/
-├── config/
-│   └── passport.ts              # Passport strategies (Google, GitHub)
-├── routes/
-│   └── oauth.ts                 # OAuth routes (/auth/google, /auth/github)
-└── services/
-    └── authService.ts           # EXTEND (add OAuth methods)
-
-src/
-├── pages/
-│   └── AuthCallback.tsx         # Handle OAuth redirect with token
-└── contexts/
-    └── AuthContext.tsx          # EXTEND (add loginWithOAuth)
-```
-
-### Prisma Model: OAuthAccount
-
-```prisma
-// Add to prisma/schema.prisma
-
-model OAuthAccount {
-  id                String   @id @default(cuid())
-  provider          String   // 'google' | 'github'
-  providerAccountId String   // ID from provider (Google sub, GitHub id)
-
-  // Optional: Store for API access on user's behalf
-  accessToken       String?  // Encrypted at rest
-  refreshToken      String?  // Encrypted at rest
-  tokenExpiresAt    DateTime?
-
-  // Profile data from provider
-  email             String?  // Email from provider
-  avatarUrl         String?  // Avatar from provider
-
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId            String
-
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-
-  @@unique([provider, providerAccountId])
-  @@index([userId])
-}
-```
-
-### User Model Extension
-
-```prisma
-// Modify existing User model in prisma/schema.prisma
-
-model User {
-  // ... existing fields (id, email, passwordHash, name, etc.) ...
-
-  // OAuth support (NEW)
-  oauthAccounts     OAuthAccount[]
-
-  // Make passwordHash nullable for OAuth-only users
-  // MIGRATION: Add default value first, then make nullable
-  passwordHash      String?  // Was: String (required)
-}
-```
-
-### AuthService Extension
+#### Integration Pattern
 
 ```typescript
-// Add to server/services/authService.ts
-
-interface OAuthProfile {
-  provider: 'google' | 'github';
-  providerAccountId: string;
-  email: string;
-  name: string;
-  avatarUrl?: string;
-}
-
-// Add these methods to AuthService class:
-
-async loginWithOAuth(profile: OAuthProfile): Promise<{ user: SafeUser; token: string; isNewUser: boolean }> {
-  // 1. Check if OAuthAccount exists
-  const existingOAuth = await prisma.oAuthAccount.findUnique({
-    where: {
-      provider_providerAccountId: {
-        provider: profile.provider,
-        providerAccountId: profile.providerAccountId
-      }
-    },
-    include: { user: true }
-  });
-
-  if (existingOAuth) {
-    // Existing OAuth user - generate JWT
-    const token = this.generateToken(existingOAuth.user);
-    return { user: this.sanitizeUser(existingOAuth.user), token, isNewUser: false };
-  }
-
-  // 2. Check if email matches existing User
-  const existingUser = await prisma.user.findUnique({
-    where: { email: profile.email.toLowerCase() }
-  });
-
-  if (existingUser) {
-    // Link OAuth to existing account (user already has email/password)
-    await prisma.oAuthAccount.create({
-      data: {
-        provider: profile.provider,
-        providerAccountId: profile.providerAccountId,
-        email: profile.email,
-        avatarUrl: profile.avatarUrl,
-        userId: existingUser.id
-      }
-    });
-    const token = this.generateToken(existingUser);
-    return { user: this.sanitizeUser(existingUser), token, isNewUser: false };
-  }
-
-  // 3. Create new User + OAuthAccount (no password)
-  const newUser = await prisma.user.create({
-    data: {
-      email: profile.email.toLowerCase(),
-      name: profile.name,
-      avatarUrl: profile.avatarUrl,
-      emailVerified: true,  // OAuth email is pre-verified
-      passwordHash: null,    // No password for OAuth-only users
-      preferences: JSON.stringify({
-        language: 'de',
-        theme: 'dark',
-        regions: ['western', 'middle-east', 'turkish', 'russian', 'chinese', 'alternative']
-      }),
-      oauthAccounts: {
-        create: {
-          provider: profile.provider,
-          providerAccountId: profile.providerAccountId,
-          email: profile.email,
-          avatarUrl: profile.avatarUrl
-        }
-      }
-    },
-    include: { oauthAccounts: true }
-  });
-
-  const token = this.generateToken(newUser);
-  return { user: this.sanitizeUser(newUser), token, isNewUser: true };
-}
-
-async linkOAuthAccount(userId: string, profile: OAuthProfile): Promise<boolean> {
-  // Security: Requires authenticated session
-  try {
-    await prisma.oAuthAccount.create({
-      data: {
-        provider: profile.provider,
-        providerAccountId: profile.providerAccountId,
-        email: profile.email,
-        avatarUrl: profile.avatarUrl,
-        userId
-      }
-    });
-    return true;
-  } catch (err) {
-    if (err.code === 'P2002') {
-      throw new Error('This account is already linked to another user');
-    }
-    throw err;
-  }
-}
-
-async unlinkOAuthAccount(userId: string, provider: string): Promise<boolean> {
-  // Prevent unlinking if it's the only auth method
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    include: { oauthAccounts: true }
-  });
-
-  if (!user) return false;
-
-  const hasPassword = !!user.passwordHash;
-  const oauthCount = user.oauthAccounts.length;
-
-  if (!hasPassword && oauthCount <= 1) {
-    throw new Error('Cannot unlink last authentication method');
-  }
-
-  await prisma.oAuthAccount.deleteMany({
-    where: { userId, provider }
-  });
-  return true;
-}
-```
-
-### AuthContext Extension
-
-```typescript
-// Add to src/contexts/AuthContext.tsx interface
-
-interface AuthContextType {
-  // ... existing methods ...
-  loginWithOAuth: (provider: 'google' | 'github') => void;
-  linkOAuthAccount: (provider: 'google' | 'github') => void;
-  unlinkOAuthAccount: (provider: 'google' | 'github') => Promise<void>;
-  oauthAccounts: { provider: string; email: string }[];
-}
-
-// Add implementation:
-
-const loginWithOAuth = useCallback((provider: 'google' | 'github') => {
-  // Redirect to OAuth flow
-  window.location.href = `/api/auth/${provider}`;
-}, []);
-
-const linkOAuthAccount = useCallback((provider: 'google' | 'github') => {
-  // Redirect with linking intent
-  window.location.href = `/api/auth/${provider}?intent=link`;
-}, []);
-```
-
----
-
-## Feature 2: i18n Multi-Language UI
-
-### Integration with Zustand Store
-
-**Existing:** `language: 'de' | 'en'` in Zustand store (line 104-105)
-**Extension:** Expand type, sync with i18next
-
-```typescript
-// Update src/store/index.ts
-
-// Change from:
-language: 'de' | 'en';
-
-// To:
-language: 'de' | 'en' | 'es' | 'fr' | 'zh' | 'ar';
-
-// Add i18n sync effect in a new file:
-// src/hooks/useI18nSync.ts
-export function useI18nSync() {
-  const language = useAppStore((state) => state.language);
-
-  useEffect(() => {
-    i18n.changeLanguage(language);
-    document.documentElement.lang = language;
-    document.documentElement.dir = ['ar', 'he'].includes(language) ? 'rtl' : 'ltr';
-  }, [language]);
-}
-```
-
-### File Structure
-
-```
-src/
-├── i18n/
-│   ├── index.ts              # i18next initialization
-│   └── useTypedTranslation.ts # Type-safe t() hook
-└── locales/
-    ├── en/
-    │   ├── common.json       # Shared: buttons, labels, nav
-    │   ├── dashboard.json    # Dashboard-specific
-    │   ├── analysis.json     # Analysis page
-    │   ├── auth.json         # Login, register, password
-    │   └── errors.json       # Error messages
-    ├── de/
-    │   └── (same structure)
-    └── es/ fr/ zh/ ar/
-        └── (same structure)
-```
-
-### Configuration
-
-```typescript
-// src/i18n/index.ts
-import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
-import Backend from 'i18next-http-backend';
-import LanguageDetector from 'i18next-browser-languagedetector';
-
-i18n
-  .use(Backend)
-  .use(LanguageDetector)
-  .use(initReactI18next)
-  .init({
-    fallbackLng: 'en',
-    supportedLngs: ['en', 'de', 'es', 'fr', 'zh', 'ar'],
-    ns: ['common', 'dashboard', 'analysis', 'auth', 'errors'],
-    defaultNS: 'common',
-    backend: {
-      loadPath: '/locales/{{lng}}/{{ns}}.json'
-    },
-    interpolation: {
-      escapeValue: false  // React already escapes
-    },
-    detection: {
-      order: ['localStorage', 'navigator'],
-      lookupLocalStorage: 'newshub-storage',
-      lookupFromPathIndex: 0
-    }
-  });
-
-export default i18n;
-```
-
-### No Backend Changes Required
-
-UI translations are client-side only. Article translations (JSONB in NewsArticle) remain separate.
-
----
-
-## Feature 3: Mobile Responsive Layouts
-
-### Component Updates Required
-
-| Component | Current | Mobile Changes |
-|-----------|---------|----------------|
-| `Layout` | Desktop sidebar | Collapsible drawer + bottom nav |
-| `NewsFeed` | 3-col grid | 1-col stack |
-| `HeroSection` | Horizontal stats | Vertical stack |
-| `FilterPanel` | Side panel | Bottom sheet modal |
-| `Navigation` | Sidebar | Hidden + hamburger |
-
-### New Components
-
-```
-src/components/layout/
-├── MobileNav.tsx           # Bottom tab bar (mobile only)
-├── MobileDrawer.tsx        # Hamburger menu content
-├── ResponsiveLayout.tsx    # Breakpoint-aware wrapper
-└── BottomSheet.tsx         # Modal for filters on mobile
-```
-
-### Tailwind Breakpoint Strategy
-
-```tsx
-// Mobile-first pattern (already in use with Tailwind v4)
-<div className="
-  flex flex-col           // Mobile: vertical stack
-  sm:flex-row             // 640px+: horizontal
-  gap-4
-  p-4 sm:p-6 lg:p-8       // Progressive padding
-">
-  <aside className="
-    hidden lg:block        // Hide on mobile/tablet
-    lg:w-64               // Desktop sidebar width
-  ">
-```
-
-### No Backend Changes Required
-
----
-
-## Feature 4: Social Media Sharing
-
-### Leveraging Existing SharedContent Model
-
-The `SharedContent` model already exists (schema line 245). New work:
-
-1. Create share link endpoint
-2. Server-side OG tag rendering for crawlers
-3. Share button components
-
-### New Route for OG Tags (Server-Side)
-
-```typescript
-// server/routes/share.ts
-import { Router } from 'express';
-import { prisma } from '../db/prisma';
-
-const router = Router();
-
-// Bot User-Agent patterns
-const BOT_PATTERNS = [
-  'facebookexternalhit',
-  'Twitterbot',
-  'LinkedInBot',
-  'WhatsApp',
-  'TelegramBot',
-  'Slackbot',
-  'Discordbot'
-];
-
-function isSocialBot(userAgent: string): boolean {
-  return BOT_PATTERNS.some(bot => userAgent.includes(bot));
-}
-
-router.get('/share/:code', async (req, res) => {
-  const share = await prisma.sharedContent.findUnique({
-    where: { shareCode: req.params.code }
-  });
-
-  if (!share) {
-    return res.redirect('/');
-  }
-
-  // Track view
-  await prisma.sharedContent.update({
-    where: { id: share.id },
-    data: { viewCount: { increment: 1 } }
-  });
-
-  const userAgent = req.headers['user-agent'] || '';
-
-  if (isSocialBot(userAgent)) {
-    // Render HTML with OG tags for crawlers
-    res.send(`
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8" />
-        <meta property="og:title" content="${escapeHtml(share.title)}" />
-        <meta property="og:description" content="${escapeHtml(share.description || '')}" />
-        <meta property="og:image" content="${share.imageUrl || 'https://newshub.app/og-default.png'}" />
-        <meta property="og:url" content="${process.env.APP_URL}/share/${share.shareCode}" />
-        <meta property="og:type" content="article" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="${escapeHtml(share.title)}" />
-        <meta name="twitter:description" content="${escapeHtml(share.description || '')}" />
-        <meta name="twitter:image" content="${share.imageUrl || 'https://newshub.app/og-default.png'}" />
-      </head>
-      <body>
-        <script>window.location.href = '/${share.contentType}/${share.contentId}';</script>
-        <noscript><a href="/${share.contentType}/${share.contentId}">Click here</a></noscript>
-      </body>
-      </html>
-    `);
-  } else {
-    // Human: redirect to SPA
-    res.redirect(`/${share.contentType}/${share.contentId}`);
-  }
-});
-
-function escapeHtml(text: string): string {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
-
-export { router as shareRoutes };
-```
-
----
-
-## Feature 5: Article Comments
-
-### Prisma Models
-
-```prisma
-// Add to prisma/schema.prisma
-
-model Comment {
-  id          String   @id @default(cuid())
-  content     String   @db.VarChar(2000)
-
-  // Article relation
-  article     NewsArticle @relation(fields: [articleId], references: [id], onDelete: Cascade)
-  articleId   String
-
-  // Author relation
-  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId    String
-
-  // Threading (one level only)
-  parent      Comment? @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
-  parentId    String?
-  replies     Comment[] @relation("CommentReplies")
-
-  // Moderation
-  isHidden    Boolean  @default(false)
-  hiddenAt    DateTime?
-  hiddenBy    String?
-  reportCount Int      @default(0)
-
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  reactions   CommentReaction[]
-
-  @@index([articleId, createdAt])
-  @@index([authorId])
-  @@index([parentId])
-}
-
-model CommentReaction {
-  id          String   @id @default(cuid())
-  type        String   // 'like' | 'insightful' | 'disagree'
-
-  comment     Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
-  commentId   String
-
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId      String
-
-  createdAt   DateTime @default(now())
-
-  @@unique([commentId, userId, type])
-  @@index([commentId])
-}
-```
-
-### User and NewsArticle Model Extensions
-
-```prisma
-// Add to existing User model
-model User {
-  // ... existing fields ...
-
-  // Comments (NEW)
-  comments          Comment[]
-  commentReactions  CommentReaction[]
-}
-
-// Add to existing NewsArticle model
-model NewsArticle {
-  // ... existing fields ...
-
-  // Comments (NEW)
-  comments    Comment[]
-}
-```
-
-### Socket.IO Integration
-
-**Existing WebSocket Interface (line 13-48):**
-
-```typescript
-// Add to ServerToClientEvents in server/services/websocketService.ts
-
-export interface ServerToClientEvents {
-  // ... existing events (news:new, event:new, etc.) ...
-
-  // Comment events (NEW)
-  'comment:new': (comment: CommentWithAuthor) => void;
-  'comment:updated': (data: { id: string; content?: string; isHidden?: boolean }) => void;
-  'comment:deleted': (data: { commentId: string; articleId: string }) => void;
-  'comment:reaction': (data: { commentId: string; type: string; count: number }) => void;
-}
-
-export interface ClientToServerEvents {
-  // ... existing events ...
-
-  // Comment subscriptions (NEW)
-  'subscribe:article-comments': (articleId: string) => void;
-  'unsubscribe:article-comments': (articleId: string) => void;
-}
-```
-
-### WebSocketService Extension
-
-```typescript
-// Add to server/services/websocketService.ts
-
-// In setupEventHandlers(), add:
-socket.on('subscribe:article-comments', (articleId: string) => {
-  socket.join(`article:${articleId}:comments`);
-  logger.debug(`Client ${clientId} subscribed to article comments: ${articleId}`);
-});
-
-socket.on('unsubscribe:article-comments', (articleId: string) => {
-  socket.leave(`article:${articleId}:comments`);
-});
-
-// Add broadcast method:
-broadcastComment(articleId: string, event: string, data: unknown): void {
-  if (!this.io) return;
-  this.io.to(`article:${articleId}:comments`).emit(event, data);
-}
-```
-
-### Comment Service
-
-```typescript
-// server/services/commentService.ts
-import { prisma } from '../db/prisma';
-import { WebSocketService } from './websocketService';
-import { CacheService, CACHE_TTL } from './cacheService';
-
-export class CommentService {
-  private static instance: CommentService;
-
-  static getInstance(): CommentService {
-    if (!CommentService.instance) {
-      CommentService.instance = new CommentService();
-    }
-    return CommentService.instance;
-  }
-
-  async createComment(
-    articleId: string,
-    authorId: string,
-    content: string,
-    parentId?: string
-  ) {
-    // Rate limiting via Redis
-    const cacheService = CacheService.getInstance();
-    const rateLimitKey = `comment:rate:${authorId}`;
-    const recentCount = await cacheService.get(rateLimitKey);
-
-    if (recentCount && parseInt(recentCount) >= 10) {
-      throw new Error('Too many comments. Please wait.');
+// NEW: Cache middleware factory (server/middleware/apiCache.ts)
+import { CacheService, CacheKeys, CACHE_TTL } from '../services/cacheService';
+
+export function createCacheMiddleware(ttl: number) {
+  return async (req, res, next) => {
+    if (req.method !== 'GET') return next();
+
+    const cacheKey = CacheKeys.apiResponse(req.path, req.query);
+    const cached = await CacheService.getInstance().get(cacheKey);
+
+    if (cached) {
+      res.set('X-Cache', 'HIT');
+      return res.json(cached);
     }
 
-    // Validate parent exists and is not a reply (max 1 level)
-    if (parentId) {
-      const parent = await prisma.comment.findUnique({
-        where: { id: parentId },
-        select: { parentId: true }
-      });
-      if (!parent) throw new Error('Parent comment not found');
-      if (parent.parentId) throw new Error('Cannot reply to a reply');
-    }
-
-    const comment = await prisma.comment.create({
-      data: { articleId, authorId, content, parentId },
-      include: {
-        author: {
-          select: { id: true, name: true, avatarUrl: true }
-        }
-      }
-    });
-
-    // Increment rate limit
-    await cacheService.set(rateLimitKey, String((parseInt(recentCount || '0')) + 1), CACHE_TTL.MINUTE * 5);
-
-    // Broadcast via WebSocket
-    WebSocketService.getInstance().broadcastComment(
-      articleId,
-      'comment:new',
-      comment
-    );
-
-    return comment;
-  }
-
-  async getCommentsForArticle(articleId: string, page = 1, limit = 50) {
-    const comments = await prisma.comment.findMany({
-      where: {
-        articleId,
-        parentId: null,  // Top-level only
-        isHidden: false
-      },
-      include: {
-        author: {
-          select: { id: true, name: true, avatarUrl: true }
-        },
-        replies: {
-          where: { isHidden: false },
-          include: {
-            author: {
-              select: { id: true, name: true, avatarUrl: true }
-            }
-          },
-          orderBy: { createdAt: 'asc' }
-        },
-        _count: {
-          select: { reactions: true }
-        }
-      },
-      orderBy: { createdAt: 'desc' },
-      skip: (page - 1) * limit,
-      take: limit
-    });
-
-    return comments;
-  }
-}
-```
-
-### Frontend Hook
-
-```typescript
-// src/hooks/useComments.ts
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useEffect } from 'react';
-import { getSocket } from '../services/socket';
-
-export function useComments(articleId: string) {
-  const queryClient = useQueryClient();
-
-  // REST for initial load
-  const query = useQuery({
-    queryKey: ['comments', articleId],
-    queryFn: () => fetch(`/api/comments?articleId=${articleId}`).then(r => r.json()),
-    staleTime: 60_000
-  });
-
-  // Socket for real-time updates
-  useEffect(() => {
-    const socket = getSocket();
-    socket.emit('subscribe:article-comments', articleId);
-
-    socket.on('comment:new', (comment) => {
-      queryClient.setQueryData(['comments', articleId], (old: Comment[]) => {
-        if (!old) return [comment];
-        if (comment.parentId) {
-          // Add reply to parent
-          return old.map(c =>
-            c.id === comment.parentId
-              ? { ...c, replies: [...(c.replies || []), comment] }
-              : c
-          );
-        }
-        return [comment, ...old];
-      });
-    });
-
-    return () => {
-      socket.emit('unsubscribe:article-comments', articleId);
-      socket.off('comment:new');
+    // Intercept res.json to cache on response
+    const originalJson = res.json.bind(res);
+    res.json = (body) => {
+      CacheService.getInstance().set(cacheKey, body, ttl);
+      res.set('X-Cache', 'MISS');
+      return originalJson(body);
     };
-  }, [articleId, queryClient]);
-
-  return query;
-}
-```
-
----
-
-## Feature 6: Team Collaboration
-
-### Prisma Models
-
-```prisma
-// Add to prisma/schema.prisma
-
-model Team {
-  id            String   @id @default(cuid())
-  name          String
-  slug          String   @unique
-  description   String?
-  logoUrl       String?
-
-  settings      Json?    // Team preferences
-  plan          String   @default("free")  // free | pro | enterprise
-
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  members       TeamMember[]
-  invitations   TeamInvitation[]
-  bookmarks     TeamBookmark[]
-  feeds         TeamFeed[]
-
-  @@index([slug])
-}
-
-model TeamMember {
-  id          String   @id @default(cuid())
-
-  team        Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  teamId      String
-
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId      String
-
-  role        String   @default("member")  // owner | admin | member | viewer
-
-  joinedAt    DateTime @default(now())
-
-  @@unique([teamId, userId])
-  @@index([userId])
-  @@index([teamId])
-}
-
-model TeamInvitation {
-  id          String   @id @default(cuid())
-
-  team        Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  teamId      String
-
-  email       String
-  role        String   @default("member")
-
-  invitedBy   String   // User ID
-  token       String   @unique
-  expiresAt   DateTime
-
-  acceptedAt  DateTime?
-  createdAt   DateTime @default(now())
-
-  @@index([email])
-  @@index([token])
-}
-
-model TeamBookmark {
-  id          String   @id @default(cuid())
-
-  team        Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  teamId      String
-
-  articleId   String
-  addedBy     String   // User ID
-  note        String?
-
-  createdAt   DateTime @default(now())
-
-  @@unique([teamId, articleId])
-  @@index([teamId])
-}
-
-model TeamFeed {
-  id          String   @id @default(cuid())
-  name        String
-
-  team        Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  teamId      String
-
-  filters     Json     // Saved filter configuration
-  createdBy   String   // User ID
-
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@index([teamId])
-}
-```
-
-### User Model Extension
-
-```prisma
-// Add to existing User model
-model User {
-  // ... existing fields ...
-
-  // Team membership (NEW)
-  teamMemberships   TeamMember[]
-  activeTeamId      String?
-}
-```
-
-### Team Authorization Middleware
-
-```typescript
-// server/middleware/teamAuth.ts
-import { Request, Response, NextFunction } from 'express';
-import { prisma } from '../db/prisma';
-
-type TeamRole = 'owner' | 'admin' | 'member' | 'viewer';
-
-const ROLE_HIERARCHY: Record<TeamRole, number> = {
-  viewer: 1,
-  member: 2,
-  admin: 3,
-  owner: 4
-};
-
-export function requireTeamRole(...allowedRoles: TeamRole[]) {
-  return async (req: Request, res: Response, next: NextFunction) => {
-    const { teamId } = req.params;
-    const userId = (req as any).user?.userId;
-
-    if (!userId) {
-      return res.status(401).json({ error: 'Authentication required' });
-    }
-
-    const membership = await prisma.teamMember.findUnique({
-      where: { teamId_userId: { teamId, userId } }
-    });
-
-    if (!membership) {
-      return res.status(403).json({ error: 'Not a team member' });
-    }
-
-    const userRoleLevel = ROLE_HIERARCHY[membership.role as TeamRole] || 0;
-    const requiredLevel = Math.min(...allowedRoles.map(r => ROLE_HIERARCHY[r]));
-
-    if (userRoleLevel < requiredLevel) {
-      return res.status(403).json({ error: 'Insufficient permissions' });
-    }
-
-    (req as any).teamMember = membership;
     next();
   };
 }
 
-// Usage example:
-// router.delete('/teams/:teamId', authMiddleware, requireTeamRole('owner'), deleteTeam);
-// router.post('/teams/:teamId/bookmarks', authMiddleware, requireTeamRole('member', 'admin', 'owner'), addBookmark);
+// MODIFIED: Apply to routes (server/routes/news.ts)
+newsRoutes.get('/', createCacheMiddleware(CACHE_TTL.MEDIUM), (req, res) => {
+  // Existing logic unchanged
+});
 ```
+
+#### New CacheKeys (extends server/services/cacheService.ts)
+
+```typescript
+export const CacheKeys = {
+  // ... existing keys ...
+
+  // NEW: API response caching
+  apiResponse: (path: string, query: object) =>
+    `api:${path}:${hashQuery(query)}`,
+
+  // NEW: Query result caching
+  clusterAnalysis: (params: string) => `query:clusters:${params}`,
+  sentimentAnalysis: () => 'query:sentiment',
+};
+```
+
+#### Invalidation Strategy
+
+**Pattern**: Time-based (TTL) + Manual invalidation on mutations
+
+```typescript
+// When new articles arrive (server/services/newsAggregator.ts)
+async processNewArticles(articles: NewsArticle[]) {
+  await this.saveToDatabase(articles);
+
+  // NEW: Invalidate related caches
+  await CacheService.getInstance().delPattern('api:/api/news:*');
+  await CacheService.getInstance().delPattern('query:clusters:*');
+  await CacheService.getInstance().delPattern('query:sentiment');
+
+  // Existing WebSocket broadcast
+  this.websocketService.broadcastArticles(articles);
+}
+```
+
+**Confidence**: HIGH — Pattern matches existing CacheService usage for AI cache
 
 ---
 
-## Component Boundaries
+### 2. Query Result Caching (PostgreSQL)
 
-| Component | Responsibility | Communicates With |
-|-----------|---------------|-------------------|
-| `AuthService` | JWT + OAuth + token blacklist | Prisma, Redis, OAuthAccount model |
-| `OAuthAccount model` | Store linked OAuth providers | User model |
-| `i18n/index.ts` | Translation loading + detection | Zustand (language state) |
-| `MobileNav` | Bottom navigation for mobile | React Router |
-| `MobileDrawer` | Hamburger menu content | React Router, AuthContext |
-| `ShareService` | Create share links, track clicks | SharedContent model (existing) |
-| `CommentService` | CRUD comments, rate limit | Comment model, WebSocket, Redis |
-| `TeamService` | Team CRUD, invitations | Team/TeamMember models, Email |
-| `requireTeamRole` | Role-based access control | TeamMember, authMiddleware |
+**Extends**: Existing database services using Prisma
+
+#### Integration Pattern
+
+Heavy queries (clusters, analytics) get Redis caching at service layer.
+
+```typescript
+// MODIFIED: server/services/newsAggregator.ts
+async getArticleClusters(options: { withSummaries: boolean }) {
+  const cacheKey = CacheKeys.clusterAnalysis(JSON.stringify(options));
+
+  // NEW: Try cache first
+  const cached = await this.cacheService.get(cacheKey);
+  if (cached) return cached;
+
+  // Existing query logic
+  const clusters = await this.clusteringAlgorithm(options);
+
+  // NEW: Cache results (30min for expensive operations)
+  await this.cacheService.set(cacheKey, clusters, CACHE_TTL.LONG);
+  return clusters;
+}
+```
+
+**Queries to Cache**:
+| Endpoint | Current Speed | Cache Strategy | Invalidation |
+|----------|---------------|----------------|--------------|
+| `/api/analysis/clusters` | ~800ms | 30min TTL | On new articles |
+| `/api/news/sentiment` | ~200ms | 5min TTL | On new articles |
+| `/api/events/geo` | ~150ms | 1min TTL | On event updates |
+| `/api/analysis/framing` | ~600ms | 30min TTL | On new articles |
+
+**Confidence**: HIGH — Follows existing AI cache pattern
 
 ---
 
-## Build Order (Dependency-Based)
+### 3. Database Indexing
 
-Features must be built in this order due to dependencies:
+**Extends**: Existing Prisma schema with NEW indexes for slow queries
 
-```
-                    +-------------------+
-                    |   1. i18n Setup   |  No dependencies
-                    |   (2-3 days)      |
-                    +--------+----------+
-                             |
-            +----------------+----------------+
-            |                                 |
-            v                                 v
-+-------------------+               +-------------------+
-| 2. Mobile Resp.   |               | 3. OAuth Backend  |
-| (3-4 days)        |               | (2-3 days)        |
-| No dependencies   |               | No dependencies   |
-+-------------------+               +--------+----------+
-                                             |
-                                             v
-                                  +-------------------+
-                                  | 4. OAuth Frontend |
-                                  | (2 days)          |
-                                  | Depends on: #3    |
-                                  +--------+----------+
-                                             |
-                    +------------------------+------------------------+
-                    |                                                 |
-                    v                                                 v
-         +-------------------+                              +-------------------+
-         | 5. Social Sharing |                              | 6. Comments       |
-         | (2-3 days)        |                              | Backend + UI      |
-         | Depends on: #4    |                              | (6-8 days)        |
-         | (auth optional)   |                              | Depends on: #4    |
-         +-------------------+                              +--------+----------+
-                                                                      |
-                                                                      v
-                                                           +-------------------+
-                                                           | 7. Team Collab.   |
-                                                           | (7-9 days)        |
-                                                           | Depends on: #4,#6 |
-                                                           +-------------------+
+#### Current Indexes (D:\NewsHub\prisma\schema.prisma)
+
+```prisma
+model NewsArticle {
+  // Existing indexes:
+  @@index([publishedAt])
+  @@index([perspective])
+  @@index([sentiment])
+  @@index([sourceId])
+  @@index([publishedAt, perspective])  // Dashboard: filtered timeline
+  @@index([sentiment, publishedAt])    // Sentiment charts
+  @@index([topics(ops: JsonbPathOps)], type: Gin)    // GIN for JSONB
+  @@index([entities(ops: JsonbPathOps)], type: Gin)  // GIN for JSONB
+}
 ```
 
-### Detailed Build Order
+#### NEW Indexes (Based on Query Analysis)
 
-| Order | Feature | Days | Dependencies | Critical Path? |
-|-------|---------|------|--------------|----------------|
-| 1 | i18n Setup | 2-3 | None | Yes - enables localized work |
-| 2 | Mobile Responsive | 3-4 | None | No - parallel track |
-| 3 | OAuth Backend | 2-3 | None | Yes - unblocks frontend |
-| 4 | OAuth Frontend | 2 | #3 | Yes - unblocks auth features |
-| 5 | Social Sharing | 2-3 | #4 (optional) | No - can proceed without auth |
-| 6 | Comments | 6-8 | #4 | Yes - requires auth |
-| 7 | Team Collaboration | 7-9 | #4, #6 | End of critical path |
+```prisma
+model NewsArticle {
+  // ... existing indexes ...
 
-**Total Estimated: 24-32 days**
+  // NEW: Composite index for filtered news feed
+  @@index([perspective, sentiment, publishedAt(sort: Desc)])
 
-### Parallelization Opportunities
+  // NEW: Partial index for recent articles (90% of queries)
+  @@index([publishedAt(sort: Desc)],
+    where: "publishedAt > NOW() - INTERVAL '7 days'")
 
-- **Parallel Track A:** i18n (1) + Mobile Responsive (2) = 5-7 days
-- **Parallel Track B:** OAuth Backend (3) during Track A
-- **After OAuth:** Social Sharing (5) can parallelize with Comments (6)
-- **Final:** Team Collaboration (7) must be last
+  // NEW: Covering index for article list queries
+  @@index([publishedAt, id, title, sentiment, perspective])
+}
+
+model User {
+  // ... existing fields ...
+
+  // NEW: Index for leaderboard queries
+  @@index([createdAt])
+}
+
+model ReadingHistory {
+  // NEW: User activity queries
+  @@index([userId, readAt(sort: Desc)])
+}
+
+model Bookmark {
+  // NEW: User bookmark queries
+  @@index([userId, createdAt(sort: Desc)])
+}
+```
+
+**Rationale**:
+- **Composite index (perspective, sentiment, publishedAt)**: Covers 80% of dashboard queries with filters
+- **Partial index**: PostgreSQL feature — smaller index for recent data reduces index scan time
+- **Covering index**: Includes SELECT columns to enable index-only scans (no table lookup)
+
+**Confidence**: MEDIUM — Partial indexes require PostgreSQL 10+, covering indexes need query validation
+
+**Sources**:
+- [Boosting Query Performance in Prisma ORM: The Impact of Indexing](https://medium.com/@manojbicte/boosting-query-performance-in-prisma-orm-the-impact-of-indexing-on-large-datasets-a55b1972ca72)
+- [Prisma ORM v7.4: Partial Indexes](https://www.prisma.io/blog/prisma-orm-v7-4-query-caching-partial-indexes-and-major-performance-improvements)
+
+---
+
+### 4. Route-Based Code Splitting (Frontend)
+
+**Extends**: Existing lazy loading in `src/App.tsx`
+
+#### Current Implementation
+
+```typescript
+// Already lazy-loaded (no changes needed):
+const Analysis = lazy(() => import('./pages/Analysis'));
+const Timeline = lazy(() => import('./pages/Timeline'));
+const Globe = lazy(() => import('./pages/Globe'));
+// ... 12 more routes
+```
+
+**React Router v7** already supports automatic code splitting when using `lazy()`. No framework-mode migration needed.
+
+#### NEW: Granular Component Splitting
+
+Split heavy components WITHIN pages:
+
+```typescript
+// MODIFIED: src/pages/Dashboard.tsx
+const HeroSection = lazy(() => import('../components/HeroSection'));
+const GlobeView = lazy(() => import('../components/GlobeView'));
+const SignalCard = lazy(() => import('../components/SignalCard'));
+
+export function Dashboard() {
+  return (
+    <Suspense fallback={<PageLoader />}>
+      <HeroSection />
+      <Suspense fallback={<div>Loading globe...</div>}>
+        <GlobeView />
+      </Suspense>
+      <NewsFeed />
+    </Suspense>
+  );
+}
+```
+
+**Bundle Impact**:
+- **Current globe-vendor.js**: ~2.5MB (globe.gl + three.js)
+- **After splitting**: Loaded only when user scrolls to globe section
+
+#### NEW: Vite Config Enhancement
+
+```typescript
+// MODIFIED: vite.config.ts
+build: {
+  rollupOptions: {
+    output: {
+      manualChunks(id: string) {
+        // Existing chunks unchanged
+        if (id.includes('globe.gl') || id.includes('three')) {
+          return 'globe-vendor';
+        }
+
+        // NEW: Split by route groups
+        if (id.includes('/src/pages/')) {
+          const match = id.match(/\/src\/pages\/([^/]+)/);
+          if (match) return `page-${match[1].toLowerCase()}`;
+        }
+      },
+    },
+  },
+}
+```
+
+**Confidence**: HIGH — Matches existing manual chunking pattern
+
+**Sources**:
+- [React Router 7 Lazy Loading](https://www.robinwieruch.de/react-router-lazy-loading/)
+- [Faster Lazy Loading in React Router v7.5+](https://remix.run/blog/faster-lazy-loading)
+
+---
+
+### 5. CDN Integration
+
+**Extends**: Existing Vite build config
+
+#### Integration Pattern
+
+```typescript
+// MODIFIED: vite.config.ts
+export default defineConfig({
+  base: process.env.CDN_BASE_URL || '/', // NEW: CDN URL for prod
+
+  build: {
+    rollupOptions: {
+      // Existing manualChunks config
+    },
+
+    // NEW: Asset naming with content hashes
+    assetsDir: 'assets',
+    cssCodeSplit: true,
+
+    // NEW: Generate manifest for CDN upload
+    manifest: true,
+  },
+});
+```
+
+#### Deployment Integration
+
+```bash
+# NEW: CI/CD step after build
+npm run build
+# Upload dist/assets/* to CDN
+aws s3 sync dist/assets/ s3://newshub-cdn/assets/ --cache-control "max-age=31536000"
+# Deploy HTML to app server (short cache)
+```
+
+**Cache Strategy**:
+- **Static assets (JS/CSS/images)**: CDN with 1-year cache (immutable)
+- **HTML files**: App server with 5-minute cache
+- **API responses**: Redis cache as defined above
+
+**Confidence**: MEDIUM — Requires CDN setup (AWS CloudFront, Cloudflare, etc.)
+
+**Sources**:
+- [Adding CDN Caching to a Vite Build](https://css-tricks.com/adding-cdn-caching-to-a-vite-build/)
+- [Vite Static Asset Handling](https://vite.dev/guide/assets)
+
+---
+
+### 6. Image Optimization
+
+**NEW Pipeline**: Convert, resize, lazy-load images
+
+#### Integration Pattern
+
+```typescript
+// NEW: server/utils/imageOptimizer.ts
+import sharp from 'sharp';
+
+export async function optimizeImage(
+  buffer: Buffer,
+  options: { width?: number; format?: 'webp' | 'avif' }
+) {
+  return sharp(buffer)
+    .resize({ width: options.width, withoutEnlargement: true })
+    .toFormat(options.format || 'webp', { quality: 80 })
+    .toBuffer();
+}
+
+// NEW: Middleware for /api/news/:id/image
+newsRoutes.get('/:id/image', async (req, res) => {
+  const { width, format } = req.query;
+  const imageBuffer = await fetchArticleImage(req.params.id);
+
+  const optimized = await optimizeImage(imageBuffer, {
+    width: parseInt(width || '800'),
+    format: format as 'webp' | 'avif',
+  });
+
+  res.set('Content-Type', `image/${format || 'webp'}`);
+  res.set('Cache-Control', 'public, max-age=86400'); // 24h
+  res.send(optimized);
+});
+```
+
+#### Frontend Integration
+
+```typescript
+// MODIFIED: src/components/SignalCard.tsx
+export function SignalCard({ article }: { article: NewsArticle }) {
+  return (
+    <picture>
+      <source
+        type="image/avif"
+        srcSet={`/api/news/${article.id}/image?format=avif&width=400 400w,
+                 /api/news/${article.id}/image?format=avif&width=800 800w`}
+      />
+      <source
+        type="image/webp"
+        srcSet={`/api/news/${article.id}/image?format=webp&width=400 400w,
+                 /api/news/${article.id}/image?format=webp&width=800 800w`}
+      />
+      <img
+        src={article.imageUrl}
+        loading="lazy"  // Native lazy loading
+        alt={article.title}
+        className="w-full h-48 object-cover"
+      />
+    </picture>
+  );
+}
+```
+
+**Impact**:
+- **AVIF**: 50% smaller than JPEG (1MB → 500KB)
+- **WebP fallback**: 25-35% smaller than JPEG
+- **Lazy loading**: Defers below-fold images (saves ~2MB initial load)
+
+**Confidence**: MEDIUM — Requires `sharp` package, backend processing overhead
+
+**Sources**:
+- [Image Optimization 2026: WebP/AVIF, DPR, and Lazy-Loading](https://tworowstudio.com/image-optimization-2026/)
+- [AVIF in 2026: Complete Guide](https://ide.com/avif-in-2026-the-complete-guide-to-the-image-format-that-beat-jpeg-png-and-webp/)
+
+---
+
+### 7. Virtual Scrolling
+
+**NEW Component**: Replace long lists with virtualized rendering
+
+#### Integration Pattern
+
+```typescript
+// NEW: src/components/VirtualNewsFeed.tsx
+import { useVirtualizer } from '@tanstack/react-virtual';
+
+export function VirtualNewsFeed({ articles }: { articles: NewsArticle[] }) {
+  const parentRef = useRef<HTMLDivElement>(null);
+
+  const virtualizer = useVirtualizer({
+    count: articles.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 320, // Estimated article card height
+    overscan: 5, // Render 5 extra items above/below viewport
+  });
+
+  return (
+    <div ref={parentRef} className="h-screen overflow-auto">
+      <div
+        style={{
+          height: `${virtualizer.getTotalSize()}px`,
+          position: 'relative',
+        }}
+      >
+        {virtualizer.getVirtualItems().map((virtualItem) => (
+          <div
+            key={virtualItem.key}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              transform: `translateY(${virtualItem.start}px)`,
+            }}
+          >
+            <SignalCard article={articles[virtualItem.index]} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// MODIFIED: src/components/NewsFeed.tsx
+const VirtualNewsFeed = lazy(() => import('./VirtualNewsFeed'));
+
+export function NewsFeed() {
+  const { data } = useQuery({ queryKey: ['news'], ... });
+
+  if (data.length > 50) {
+    return <VirtualNewsFeed articles={data} />;
+  }
+
+  // Existing grid/list view for small lists
+  return <SignalGrid articles={data} />;
+}
+```
+
+**Performance**:
+- **Before**: 500 articles = 500 DOM nodes (slow scrolling)
+- **After**: 500 articles = ~10 DOM nodes (60fps scrolling)
+
+**Trade-off**: Adds library dependency (@tanstack/react-virtual ~5KB gzipped)
+
+**Confidence**: HIGH — TanStack Virtual is battle-tested, maintained by TanStack team
+
+**Sources**:
+- [TanStack Virtual](https://tanstack.com/virtual/latest)
+- [Virtualization in React: Improving Performance for Large Lists](https://medium.com/@ignatovich.dm/virtualization-in-react-improving-performance-for-large-lists-3df0800022ef)
+
+---
+
+## Data Flow Changes
+
+### Before (Current)
+
+```
+User clicks Dashboard
+→ React Router loads Dashboard.tsx (with globe bundle ~2.5MB)
+→ TanStack Query fetches /api/news (HTTP Cache-Control: 300s)
+→ NewsAggregator checks in-memory cache
+→ PostgreSQL query (no specific composite index)
+→ Response (all 500 articles at once)
+→ Render 500 SignalCards (500 DOM nodes)
+```
+
+### After (Optimized)
+
+```
+User clicks Dashboard
+→ React Router loads Dashboard.tsx (WITHOUT globe bundle)
+→ TanStack Query fetches /api/news
+  → API middleware checks Redis cache (HIT → instant response)
+  → Cache MISS → NewsAggregator → PostgreSQL
+    → Query uses composite index (perspective, sentiment, publishedAt)
+→ Response cached in Redis (5min TTL)
+→ Render VirtualNewsFeed (only 10 visible cards, lazy-load images)
+→ User scrolls to globe section → lazy-load globe bundle
+```
+
+**Performance Gain**:
+- **Initial JS bundle**: 5.2MB → 2.7MB (-48%)
+- **API response time**: 200ms → 10ms (cache hit)
+- **DOM nodes**: 500 → 10 (-98%)
+- **Image payload**: 15MB → 3MB (WebP + lazy loading)
+
+---
+
+## Component Architecture (NEW vs MODIFIED)
+
+### NEW Components
+
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| `apiCache.ts` | `server/middleware/` | Express middleware for Redis API caching |
+| `imageOptimizer.ts` | `server/utils/` | Sharp-based image conversion |
+| `VirtualNewsFeed.tsx` | `src/components/` | Virtualized article list |
+
+### MODIFIED Components
+
+| Component | Changes |
+|-----------|---------|
+| `cacheService.ts` | Add `apiResponse()` and `clusterAnalysis()` cache keys |
+| `newsAggregator.ts` | Add cache invalidation on new articles |
+| `news.ts` (routes) | Wrap with `createCacheMiddleware()` |
+| `vite.config.ts` | Add CDN base URL, route-based chunking |
+| `schema.prisma` | Add composite and partial indexes |
+| `SignalCard.tsx` | Replace `<img>` with `<picture>` + srcset |
+| `NewsFeed.tsx` | Conditionally use VirtualNewsFeed for long lists |
+
+---
+
+## Build Order & Dependencies
+
+**Phase 1: Backend Caching (2-3 days)**
+1. Add `apiResponse()` cache key to `CacheService`
+2. Create `apiCache.ts` middleware
+3. Apply to `/api/news`, `/api/events`, `/api/analysis/clusters`
+4. Add cache invalidation to `newsAggregator.ts`
+
+**Phase 2: Database Optimization (1-2 days)**
+5. Add indexes to Prisma schema
+6. Generate migration: `npx prisma migrate dev --name add-performance-indexes`
+7. Run EXPLAIN ANALYZE on key queries to validate
+
+**Phase 3: Frontend Code Splitting (2 days)**
+8. Split heavy components within pages
+9. Add route-based chunking to Vite config
+10. Test bundle sizes with `npm run build`
+
+**Phase 4: Image Optimization (2-3 days)**
+11. Add `sharp` package
+12. Create `imageOptimizer.ts` service
+13. Add `/api/news/:id/image` endpoint
+14. Update SignalCard to use `<picture>` + srcset
+
+**Phase 5: Virtual Scrolling (1-2 days)**
+15. Add `@tanstack/react-virtual` package
+16. Create `VirtualNewsFeed.tsx` component
+17. Conditionally use in NewsFeed based on article count
+
+**Phase 6: CDN Integration (1 day + infra setup)**
+18. Configure CDN (CloudFront, Cloudflare)
+19. Update Vite config with `base` URL
+20. Add CI/CD step to upload assets to CDN
+
+**Total Estimate**: 9-13 days development + 1-2 days testing
+
+**Critical Dependencies**:
+- Phase 2 depends on Phase 1 (cache invalidation logic)
+- Phase 6 depends on Phase 3 (final bundle output)
+- Phases 3, 4, 5 are independent and can run in parallel
+
+---
+
+## TanStack Query Key Compatibility
+
+**CRITICAL**: Performance optimizations MUST NOT change existing query keys. Cache invalidation relies on consistent keys.
+
+### Existing Keys (DO NOT CHANGE)
+
+```typescript
+// Dashboard.tsx
+queryKey: ['news', { regions, search, sentiment }]
+
+// Monitor.tsx and EventMap.tsx (MUST MATCH)
+queryKey: ['geo-events']
+
+// Analysis.tsx
+queryKey: ['clusters', { withSummaries: true }]
+
+// NewsFeed.tsx
+queryKey: ['news-sentiment']
+```
+
+### NEW Query Keys
+
+```typescript
+// For virtual scrolling pagination
+queryKey: ['news', { regions, search, sentiment, offset, limit }]
+
+// For image optimization
+queryKey: ['article-image', articleId, { width, format }]
+```
+
+**Invalidation Example**:
+
+```typescript
+// When new articles arrive, invalidate all /api/news queries
+queryClient.invalidateQueries({ queryKey: ['news'] }); // Matches all variants
+```
+
+**Confidence**: HIGH — Follows existing pattern
+
+**Sources**:
+- [TanStack Query: Query Invalidation](https://tanstack.com/query/v4/docs/react/guides/query-invalidation)
+- [Managing Query Keys for Cache Invalidation](https://www.wisp.blog/blog/managing-query-keys-for-cache-invalidation-in-react-query)
 
 ---
 
 ## Anti-Patterns to Avoid
 
-### Anti-Pattern 1: OAuth Tokens in localStorage
-**What:** Storing OAuth access tokens in frontend localStorage.
-**Why bad:** XSS can steal tokens, OAuth providers don't recommend this.
-**Instead:** Store in httpOnly cookies or keep server-side only. Frontend only gets NewsHub JWT.
+### 1. Over-Caching Dynamic Content
 
-### Anti-Pattern 2: Blocking Translation Loads
-**What:** `await i18n.loadNamespaces('analysis')` before rendering.
-**Why bad:** Slow initial render, poor UX.
-**Instead:** Use Suspense with loading fallback, show untranslated text briefly.
+**Bad**: Cache user-specific data (bookmarks, reading history) in shared Redis
+**Why**: Cache poisoning — User A sees User B's bookmarks
+**Instead**: Only cache public data; use TanStack Query for user-specific
 
-### Anti-Pattern 3: Polling for Comments
-**What:** `setInterval(() => fetchComments(), 5000)`.
-**Why bad:** Wastes bandwidth, delayed updates, inconsistent with Socket.IO for news.
-**Instead:** Use existing WebSocket infrastructure, subscribe to article rooms.
+### 2. Aggressive Image Optimization
 
-### Anti-Pattern 4: N+1 Comment Queries
-**What:** Fetch comments, then loop to fetch replies one-by-one.
-**Why bad:** 100 comments = 101 database queries.
-**Instead:** Single query with `include: { replies: true }`, build tree client-side.
+**Bad**: Convert all images to AVIF with quality=50
+**Why**: Visual degradation on hero images, browser compatibility issues
+**Instead**: WebP quality=80 as default, AVIF as enhancement with fallback
 
-### Anti-Pattern 5: Team Role in JWT Claims
-**What:** `jwt.sign({ userId, teamRole: 'admin' })`.
-**Why bad:** Team membership changes won't reflect until JWT expires.
-**Instead:** Fetch team membership per-request, cache briefly in Redis.
+### 3. Premature Virtualization
+
+**Bad**: Virtualize all lists regardless of size
+**Why**: Adds complexity for 10-item lists where it's unnecessary
+**Instead**: Conditional: `if (articles.length > 50) use VirtualNewsFeed`
+
+### 4. Cache Without Invalidation
+
+**Bad**: Set long TTL (1 hour) on `/api/news` without invalidation
+**Why**: Users see stale news after new articles arrive
+**Instead**: Short TTL (5min) + manual invalidation on data mutations
+
+### 5. Blocking Image Processing
+
+**Bad**: Generate optimized images synchronously on request
+**Why**: 200ms image processing blocks API response
+**Instead**: Background job to pre-generate optimized images, or cache generated images
 
 ---
 
-## Scalability Considerations
+## Performance Metrics & Targets
 
-| Concern | At 1K users | At 100K users | At 1M users |
-|---------|------------|--------------|-------------|
-| OAuth | Passport in-memory OK | Redis session store | Rate limit per provider |
-| i18n | Bundled JSON | CDN-hosted locales | Edge-cached translations |
-| Comments | PostgreSQL | Read replicas | Sharding by article ID |
-| Teams | Single DB | Single DB | Tenant isolation schema |
-| Real-time | Single Socket.IO | Redis adapter | Socket.IO cluster |
-| Share analytics | Sync writes | Async queue | Event stream (Kafka) |
+### Baseline (Current)
+
+| Metric | Current | Target | Measurement |
+|--------|---------|--------|-------------|
+| Initial JS bundle | 5.2MB | 2.5MB | Lighthouse |
+| LCP (Largest Contentful Paint) | 2.8s | 1.5s | Web Vitals |
+| INP (Interaction to Next Paint) | 180ms | 100ms | Web Vitals |
+| API response (/api/news) | 200ms | 50ms (cache hit) | DevTools Network |
+| Article list scroll (500 items) | 30fps | 60fps | Chrome FPS meter |
+| Image payload (10 articles) | 15MB | 3MB | DevTools Network |
+
+### Monitoring Integration
+
+Existing Prometheus metrics can track:
+
+```typescript
+// NEW: Cache hit rate metric
+cacheHitRate = new Gauge({
+  name: 'newshub_cache_hit_rate',
+  help: 'Redis cache hit rate percentage',
+  labelNames: ['cache_key_prefix'],
+});
+
+// NEW: Image optimization metric
+imageOptimizationTime = new Histogram({
+  name: 'newshub_image_optimization_duration_ms',
+  help: 'Time to optimize images',
+  buckets: [10, 50, 100, 200, 500],
+});
+```
+
+**Confidence**: HIGH — Integrates with existing `metricsService.ts`
+
+---
+
+## Rollback Strategy
+
+All optimizations are additive — can be disabled without breaking existing functionality:
+
+1. **API Cache**: Remove middleware, app functions as before
+2. **Database Indexes**: Drop indexes (degrades performance but doesn't break queries)
+3. **Virtual Scrolling**: Conditional rendering falls back to normal list
+4. **Image Optimization**: Falls back to original image URLs
+5. **CDN**: Change `base` URL back to `/`
+
+**Rollback Testing**: All optimizations must pass E2E tests with feature flag OFF.
 
 ---
 
 ## Sources
 
-- [Passport.js Google OAuth20](https://www.passportjs.org/packages/passport-google-oauth20/)
-- [Passport.js GitHub OAuth2](https://github.com/jaredhanson/passport-oauth2)
-- [How to Implement OAuth2 in Express](https://oneuptime.com/blog/post/2026-02-02-express-oauth2/view)
-- [react-i18next Complete Guide 2026](https://intlpull.com/blog/react-i18next-internationalization-guide-2026)
-- [i18next GitHub](https://github.com/i18next/react-i18next)
-- [Tailwind CSS Responsive Design](https://tailwindcss.com/docs/responsive-design)
-- [Tailwind CSS Best Practices 2026](https://samioda.com/en/blog/tailwind-css-best-practices)
-- [Open Graph Tags 2026](https://www.imarkinfotech.com/open-graph-tags-boost-social-sharing-and-seo-in-2026/)
-- [Meta Tags & Open Graph Guide](https://vladimirsiedykh.com/blog/meta-tags-open-graph-complete-implementation-guide-nextjs-react-helmet)
-- [Multi-Tenancy for B2B SaaS](https://clerk.com/blog/what-is-multi-tenancy-and-why-it-matters-for-B2B-SaaS)
-- [Real-Time Chat with Socket.io and PostgreSQL](https://strapi.io/blog/real-time-chat-application-using-strapi-next-socket-io-and-postgre-sql)
-- [Socket.IO Rooms Documentation](https://socket.io/docs/v4/rooms/)
+- [React 19 Code Splitting and Lazy Loading](https://medium.com/@ignatovich.dm/optimizing-react-apps-with-code-splitting-and-lazy-loading-e8c8791006e3)
+- [React Performance Optimization 2026: Advanced Techniques](https://softaims.com/blog/react-performance-optimization-advanced-2026)
+- [Vite Build Optimization Guide](https://ndlab.blog/posts/part7-5-vite-build-optimization)
+- [Redis API Response Caching with Express](https://oneuptime.com/blog/post/2026-02-02-express-redis-caching/view)
+- [Cache-Aside Pattern with Redis](https://redis.io/tutorials/howtos/solutions/microservices/caching/)
+- [Prisma ORM v7.4: Partial Indexes & Performance](https://www.prisma.io/blog/prisma-orm-v7-4-query-caching-partial-indexes-and-major-performance-improvements)
+- [PostgreSQL Indexing with Prisma](https://medium.com/@manojbicte/boosting-query-performance-in-prisma-orm-the-impact-of-indexing-on-large-datasets-a55b1972ca72)
+- [TanStack Virtual Documentation](https://tanstack.com/virtual/latest)
+- [Virtualization in React for Large Lists](https://medium.com/@ignatovich.dm/virtualization-in-react-improving-performance-for-large-lists-3df0800022ef)
+- [Image Optimization 2026: WebP/AVIF Guide](https://tworowstudio.com/image-optimization-2026/)
+- [AVIF Complete Guide 2026](https://ide.com/avif-in-2026-the-complete-guide-to-the-image-format-that-beat-jpeg-png-and-webp/)
+- [Adding CDN Caching to Vite Build](https://css-tricks.com/adding-cdn-caching-to-a-vite-build/)
+- [React Router 7 Lazy Loading](https://www.robinwieruch.de/react-router-lazy-loading/)
+- [TanStack Query Cache Invalidation](https://tanstack.com/query/v4/docs/react/guides/query-invalidation)

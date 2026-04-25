@@ -7,9 +7,10 @@
 - [x] **v1.2 Performance & Scale** - Phases 13-17 (completed 2026-04-23)
 - [x] **v1.3 Production Ready** - Phases 18-22 (completed 2026-04-23)
 - [x] **v1.4 User & Community Features** - Phases 23-28 (completed 2026-04-25)
-- [ ] **v1.5 Scale & Infrastructure** - Kubernetes, Multi-Region, Log Aggregation (planned)
-- [ ] **v1.6 Growth & Monetization** - A/B Testing, Subscriptions (planned)
-- [ ] **v1.7 Advanced Features** - Native App, Video, Chat (demand-driven)
+- [ ] **v1.5 Performance Optimization** - Phases 29-34 (current)
+- [ ] **v1.6 Infrastructure & Scale** - Kubernetes, Multi-Region, CDN (planned)
+- [ ] **v1.7 Growth & Monetization** - A/B Testing, Subscriptions (planned)
+- [ ] **v1.8 Advanced Features** - Native App, Video, Chat (demand-driven)
 
 ## Phases
 
@@ -59,127 +60,104 @@
 
 </details>
 
-### v1.4 User & Community Features (Complete)
+<details>
+<summary>v1.4 User & Community Features (Phases 23-28) - COMPLETED 2026-04-25</summary>
 
-**Milestone Goal:** Reduce onboarding friction, expand target audience, and increase user engagement through OAuth login, internationalization, mobile optimization, social sharing, comments, and team collaboration.
+- [x] **Phase 23: i18n Foundation** - Multi-language UI with react-i18next, string extraction, browser detection (4/4 complete)
+- [x] **Phase 24: Mobile Responsive** - Responsive layouts, touch navigation, optimized images (5/5 complete)
+- [x] **Phase 25: Social Sharing** - Share buttons, Open Graph meta tags, share analytics (3/3 complete)
+- [x] **Phase 26: OAuth Integration** - Google and GitHub OAuth with account linking (5/5 complete)
+- [x] **Phase 27: Comments System** - Article comments with threaded replies and real-time updates (4/4 complete)
+- [x] **Phase 28: Team Collaboration** - Team workspaces, shared bookmarks, role-based permissions (5/5 complete)
 
-- [x] **Phase 23: i18n Foundation** - Multi-language UI with react-i18next, string extraction, browser detection (completed 2026-04-24)
-- [x] **Phase 24: Mobile Responsive** - Responsive layouts, touch navigation, optimized images (completed 2026-04-24)
-- [x] **Phase 25: Social Sharing** - Share buttons, Open Graph meta tags, share analytics (completed)
-- [x] **Phase 26: OAuth Integration** - Google and GitHub OAuth with account linking (completed)
-- [x] **Phase 27: Comments System** - Article comments with threaded replies and real-time updates (completed)
-- [x] **Phase 28: Team Collaboration** - Team workspaces, shared bookmarks, role-based permissions (completed 2026-04-25)
+</details>
+
+### v1.5 Performance Optimization (Current)
+
+**Milestone Goal:** Comprehensive performance optimization using measurement-first approach. Reduce bundle size, optimize database queries, improve image delivery, and enhance caching for faster page loads and API responses.
+
+- [ ] **Phase 29: Measurement Foundation** - Bundle analyzer, query logging, Lighthouse baseline
+- [ ] **Phase 30: Frontend Code Splitting** - Route-based splitting, lazy image loading, reduced initial bundle
+- [ ] **Phase 31: Virtual Scrolling** - Virtualized rendering for long article lists
+- [ ] **Phase 32: Image Pipeline** - WebP/AVIF conversion, responsive srcset, Cloudinary integration
+- [ ] **Phase 33: Caching Improvements** - Smart invalidation, HTTP cache headers, jitter-based TTL
+- [ ] **Phase 34: Database Optimization** - EXPLAIN ANALYZE audit, composite indexes, N+1 fixes, pool tuning
 
 ## Phase Details
 
-### Phase 23: i18n Foundation
-**Goal**: Users can switch UI language and experience fully localized interface
-**Depends on**: Phase 22 (v1.3 complete)
-**Requirements**: I18N-01, I18N-02, I18N-03
+### Phase 29: Measurement Foundation
+**Goal**: Establish performance baselines and tooling before any optimization work
+**Depends on**: Phase 28 (v1.4 complete)
+**Requirements**: MEAS-01, MEAS-02, MEAS-03
 **Success Criteria** (what must be TRUE):
-  1. User can change UI language via language switcher in navigation
-  2. All user-facing text displays in selected language (DE, EN initially)
-  3. Browser language is automatically detected and applied on first visit
-  4. Date formats, number formats adapt to selected locale
-  5. Adding new languages requires only translation JSON files (no code changes)
-**Plans**: 4 plans
-Plans:
-- [x] 23-01-PLAN.md - Install i18n dependencies and create core infrastructure
-- [x] 23-02-PLAN.md - Create translation JSON files (namespaces for EN/DE)
-- [x] 23-03-PLAN.md - Create locale-aware formatters and Zustand sync
-- [x] 23-04-PLAN.md - Refactor components to use i18n translations
-**UI hint**: yes
-
-### Phase 24: Mobile Responsive
-**Goal**: Users have optimized experience on mobile devices with touch-friendly navigation
-**Depends on**: Phase 23 (i18n Foundation)
-**Requirements**: MOBILE-01, MOBILE-02, MOBILE-03
-**Success Criteria** (what must be TRUE):
-  1. All pages display correctly on mobile screens (320px-768px viewport)
-  2. Touch navigation works via bottom nav bar, hamburger menu, and swipe gestures
-  3. Images load responsively with appropriate sizes and lazy loading
-  4. No horizontal scrolling required on any page
-  5. Interactive elements have touch-friendly tap targets (min 44px)
-**Plans**: 5 plans
-Plans:
-- [x] 24-01-PLAN.md — Breakpoint migration (lg: → md:) and safe area CSS infrastructure
-- [x] 24-02-PLAN.md — Mobile navigation (BottomNav + MobileDrawer with hooks)
-- [x] 24-03-PLAN.md — Responsive images (ResponsiveImage + Cloudinary + NewsCard integration)
-- [x] 24-04-PLAN.md — Touch interactions (SwipeableCard, PullToRefresh, ScrollToTopFAB)
-- [x] 24-05-PLAN.md — Layout adaptations and verification
-**UI hint**: yes
-
-### Phase 25: Social Sharing
-**Goal**: Users can share articles to social platforms with rich previews
-**Depends on**: Phase 24 (Mobile Responsive)
-**Requirements**: SHARE-01, SHARE-02, SHARE-03
-**Success Criteria** (what must be TRUE):
-  1. Share buttons (Twitter, LinkedIn, WhatsApp, Facebook) appear on article views
-  2. Shared links display rich previews with title, description, and image on social platforms
-  3. Share click events are tracked and visible in analytics
-  4. Mobile users can use native share sheet via Web Share API
+  1. Bundle analysis report shows exact sizes of all chunks with rollup-plugin-visualizer
+  2. Prisma query logs capture all database queries with timing information
+  3. Lighthouse CI baseline captures LCP, INP, CLS metrics for Dashboard, NewsFeed, Analysis pages
+  4. Performance baseline document records current metrics for before/after comparison
+  5. All optimization decisions can reference actual profiling data
 **Plans**: 3 plans
-Plans:
-- [x] 25-01-PLAN.md — Server infrastructure (bot detection, /s/:code route, /api/share/my, OG meta tags)
-- [x] 25-02-PLAN.md — Frontend components (ShareButtons, useShare hook, i18n translations)
-- [x] 25-03-PLAN.md — Integration (NewsCard share button, MyShares in Profile, verification)
-**UI hint**: yes
 
-### Phase 26: OAuth Integration
-**Goal**: Users can sign up and log in with Google or GitHub accounts
-**Depends on**: Phase 25 (Social Sharing)
-**Requirements**: OAUTH-01, OAUTH-02, OAUTH-03
+### Phase 30: Frontend Code Splitting
+**Goal**: Users experience faster initial page loads through reduced JavaScript bundle
+**Depends on**: Phase 29 (Measurement Foundation)
+**Requirements**: FRON-01, FRON-03, FRON-04
 **Success Criteria** (what must be TRUE):
-  1. User can create account by clicking "Sign in with Google" button
-  2. User can create account by clicking "Sign in with GitHub" button
-  3. Existing email account user can link Google or GitHub after re-authentication
-  4. OAuth login preserves existing user data (bookmarks, reading history, badges)
-  5. User can unlink OAuth provider and still log in with email/password
-**Plans**: 5 plans
-Plans:
-- [x] 26-01-PLAN.md — Database schema and OAuth service (Prisma, oauthService.ts, passport.ts)
-- [x] 26-02-PLAN.md — OAuth routes and server configuration (oauth.ts routes, server integration)
-- [x] 26-03-PLAN.md — Frontend OAuth components (useOAuthPopup, OAuthButton, ReAuthModal, AuthContext)
-- [x] 26-04-PLAN.md — UI integration (AuthModal OAuth buttons, ConnectedAccounts in Settings)
-- [x] 26-05-PLAN.md — Testing and documentation (oauthService tests, hook tests, .env.example)
-**UI hint**: yes
-
-### Phase 27: Comments System
-**Goal**: Users can engage in article discussions with threaded comments
-**Depends on**: Phase 26 (OAuth Integration)
-**Requirements**: COMM-01, COMM-02, COMM-03
-**Success Criteria** (what must be TRUE):
-  1. Authenticated user can post a comment on any article
-  2. User can reply to existing comments creating threaded discussions
-  3. New comments and replies appear in real-time without page refresh
-  4. Comments show author name, avatar, and timestamp
-  5. Comment author can delete their own comments
+  1. Dashboard, Analysis, Monitor, Timeline, EventMap pages load as separate chunks
+  2. Article thumbnails use native lazy loading (loading="lazy" attribute)
+  3. Initial JavaScript bundle is under 250KB (measured by Lighthouse)
+  4. Heavy dependencies (globe.gl, Recharts) load only when route is accessed
+  5. Lighthouse Performance score improves by at least 10 points
 **Plans**: 4 plans
-Plans:
-- [x] 27-01-PLAN.md — Database schema, WebSocket events, rate limits, i18n translations
-- [x] 27-02-PLAN.md — Backend API (CommentService + routes with AI moderation)
-- [x] 27-03-PLAN.md — Frontend components (hooks, CommentSection, CommentInput, CommentCard)
-- [x] 27-04-PLAN.md — Integration (Article page), unit tests, E2E tests, verification
 **UI hint**: yes
 
-### Phase 28: Team Collaboration
-**Goal**: Users can collaborate in team workspaces with shared resources
-**Depends on**: Phase 27 (Comments System)
-**Requirements**: COLLAB-01, COLLAB-02, COLLAB-03
+### Phase 31: Virtual Scrolling
+**Goal**: Users can scroll through hundreds of articles without performance degradation
+**Depends on**: Phase 30 (Frontend Code Splitting)
+**Requirements**: FRON-02
 **Success Criteria** (what must be TRUE):
-  1. User can create a team and invite members via email
-  2. Team has shared bookmark collection visible to all members
-  3. Team roles (Owner, Admin, Member) control who can invite, remove, or manage settings
-  4. Team members can see each other's activity in team context
-  5. User can be a member of multiple teams
-**Plans**: 5 plans
-Plans:
-- [x] 28-01-PLAN.md — Database models, TeamService, teamAuth middleware, WebSocket, email, i18n
-- [x] 28-02-PLAN.md — API routes (team CRUD, invites, bookmarks, rate limiting)
-- [x] 28-03-PLAN.md — Frontend hooks (useTeams, useTeamBookmarks, useTeamMembers, Zustand)
-- [x] 28-04-PLAN.md — UI components (TeamSwitcher, TeamCard, modals, pages)
-- [x] 28-05-PLAN.md — Integration and testing (Header/Drawer wiring, BookmarkButton, tests)
+  1. NewsFeed with 500+ articles renders only visible items (10-15 DOM nodes)
+  2. Scrolling maintains 60fps with 1000+ articles loaded
+  3. Keyboard navigation and screen reader accessibility preserved
+  4. "Load More" button available as accessible fallback
+  5. Memory usage remains stable over extended scrolling sessions
+**Plans**: 3 plans
 **UI hint**: yes
+
+### Phase 32: Image Pipeline
+**Goal**: Users experience faster image loading with modern formats and responsive delivery
+**Depends on**: Phase 30 (Frontend Code Splitting)
+**Requirements**: IMG-01, IMG-02, IMG-03
+**Success Criteria** (what must be TRUE):
+  1. Article thumbnails served as WebP with JPEG fallback via picture element
+  2. Responsive srcset provides 320w, 640w, 960w, 1280w variants
+  3. Cloudinary fetch mode handles format conversion and resizing
+  4. Above-fold images load eagerly, below-fold images lazy load
+  5. Total image payload per page reduced by at least 50%
+**Plans**: 4 plans
+
+### Phase 33: Caching Improvements
+**Goal**: API responses served from cache with smart invalidation maintaining data freshness
+**Depends on**: Phase 29 (Measurement Foundation)
+**Requirements**: CACHE-01, CACHE-02, CACHE-03
+**Success Criteria** (what must be TRUE):
+  1. WebSocket events trigger cache invalidation for affected API responses
+  2. Static assets have immutable cache headers (max-age=31536000)
+  3. API responses include appropriate Cache-Control and ETag headers
+  4. Jitter-based TTL prevents thundering herd on cache expiration
+  5. Redis cache hit ratio exceeds 90% for news list endpoints
+**Plans**: 3 plans
+
+### Phase 34: Database Optimization
+**Goal**: Database queries execute efficiently with proper indexing and connection management
+**Depends on**: Phase 29 (Measurement Foundation)
+**Requirements**: DB-01, DB-02, DB-03, DB-04
+**Success Criteria** (what must be TRUE):
+  1. EXPLAIN ANALYZE audit documents all major query patterns and their costs
+  2. Composite indexes added for identified slow queries (perspective, sentiment, publishedAt)
+  3. N+1 query patterns identified in Prisma logs are fixed with proper includes
+  4. Connection pool size tuned based on workload analysis
+  5. 95th percentile database query time under 50ms
+**Plans**: 4 plans
 
 ## Progress
 
@@ -213,26 +191,34 @@ Plans:
 | 26. OAuth Integration | v1.4 | 5/5 | Complete | 2026-04-24 |
 | 27. Comments System | v1.4 | 4/4 | Complete | 2026-04-25 |
 | 28. Team Collaboration | v1.4 | 5/5 | Complete | 2026-04-25 |
+| 29. Measurement Foundation | v1.5 | 0/3 | Not started | - |
+| 30. Frontend Code Splitting | v1.5 | 0/4 | Not started | - |
+| 31. Virtual Scrolling | v1.5 | 0/3 | Not started | - |
+| 32. Image Pipeline | v1.5 | 0/4 | Not started | - |
+| 33. Caching Improvements | v1.5 | 0/3 | Not started | - |
+| 34. Database Optimization | v1.5 | 0/4 | Not started | - |
 
 ---
 
 ## Future Milestones
 
-### v1.5 Scale & Infrastructure (Planned)
+### v1.6 Infrastructure & Scale (Planned)
 
-**Goal:** Prepare for growth and ensure reliability at scale
+**Goal:** CDN integration and infrastructure scaling for global reach
 
 | Requirement | Feature | Rationale |
 |-------------|---------|-----------|
+| INFRA-01 | CDN for Static Assets | Global performance via edge caching |
+| INFRA-02 | Predictive Prefetch | Preload likely-next routes |
+| INFRA-03 | PgBouncer Pooling | Connection pooling if metrics warrant |
 | SCALE-01 | Kubernetes Deployment | Horizontal scaling, auto-healing |
 | SCALE-02 | Horizontal Pod Autoscaling | Dynamic resource management |
 | SCALE-03 | Multi-Region Deployment | Latency optimization, redundancy |
 | SCALE-04 | Database Read Replicas | Geo-routing for read performance |
 | LOG-01 | Log Aggregation (Loki/ELK) | Debugging at scale |
 | LOG-02 | Structured Logging | Correlation IDs for tracing |
-| CDN-01 | CDN for Static Assets | Global performance |
 
-### v1.6 Growth & Monetization (Planned)
+### v1.7 Growth & Monetization (Planned)
 
 **Goal:** Enable data-driven decisions and generate revenue
 
@@ -245,7 +231,7 @@ Plans:
 | PAID-02 | Stripe Integration | Payment processing |
 | PAID-03 | Premium Export Features | Paid user value |
 
-### v1.7 Advanced Features (Demand-Driven)
+### v1.8 Advanced Features (Demand-Driven)
 
 **Goal:** Expand capabilities based on validated user demand
 
@@ -259,15 +245,17 @@ Plans:
 ### Milestone Sequence Logic
 
 ```
-v1.4 User & Community  -> Nutzer gewinnen + engagieren (OAuth, i18n, Mobile, Share, Comments, Teams)
+v1.4 User & Community  -> User acquisition + engagement (OAuth, i18n, Mobile, Share, Comments, Teams)
          |
-v1.5 Scale             -> Infrastruktur skalieren (K8s, Multi-Region)
+v1.5 Performance       -> Optimize speed + efficiency (Measurement, Bundle, Images, Cache, DB)
          |
-v1.6 Monetization      -> Revenue generieren (Subscriptions, A/B)
+v1.6 Infrastructure    -> Scale globally (K8s, Multi-Region, CDN)
          |
-v1.7 Advanced          -> Bedarfsabhangig erweitern
+v1.7 Monetization      -> Generate revenue (Subscriptions, A/B)
+         |
+v1.8 Advanced          -> Demand-driven expansion
 ```
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-25 — Phase 28 complete, v1.4 milestone complete*
+*Last updated: 2026-04-25 — v1.5 Performance Optimization phases added (29-34)*
