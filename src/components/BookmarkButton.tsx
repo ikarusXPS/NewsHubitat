@@ -6,11 +6,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { Bookmark, BookmarkCheck, Users, ChevronDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import { cn } from '../lib/utils';
 import { useAuth } from '../contexts/AuthContext';
 import { useTeams } from '../hooks/useTeams';
 import { useAddTeamBookmark } from '../hooks/useTeamBookmarks';
-import toast from 'react-hot-toast';
 
 interface BookmarkButtonProps {
   articleId: string;
