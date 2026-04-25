@@ -197,6 +197,31 @@ export class CacheService {
   }
 
   /**
+   * Set a cached value with jitter-based TTL to prevent thundering herd (D-07, D-08, D-09)
+   * Applies 10% variance: baseTTL * (0.9 + random * 0.2)
+   * Example: 300s base -> 270-330s actual
+   */
+  async setWithJitter<T>(
+    key: string,
+    value: T,
+    baseTtlSeconds: number = CACHE_TTL.MEDIUM
+  ): Promise<boolean> {
+    if (!this.isAvailable()) return false;
+
+    try {
+      // D-09: baseTTL * (0.9 + random * 0.2) - 10% below to 10% above
+      const jitterMultiplier = 0.9 + Math.random() * 0.2;
+      const actualTtl = Math.floor(baseTtlSeconds * jitterMultiplier);
+
+      await this.client!.setex(key, actualTtl, JSON.stringify(value));
+      return true;
+    } catch (err) {
+      logger.debug(`Cache setWithJitter error for key ${key}: ${err}`);
+      return false;
+    }
+  }
+
+  /**
    * Delete a cached value
    */
   async del(key: string): Promise<boolean> {
@@ -229,6 +254,7 @@ export class CacheService {
 
   /**
    * Get or set: Return cached value or compute and cache it
+   * Uses setWithJitter for consistent thundering herd prevention
    */
   async getOrSet<T>(
     key: string,
@@ -241,7 +267,7 @@ export class CacheService {
     }
 
     const value = await computeFn();
-    await this.set(key, value, ttlSeconds);
+    await this.setWithJitter(key, value, ttlSeconds);
     return value;
   }
 
