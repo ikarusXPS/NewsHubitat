@@ -169,6 +169,11 @@ Plans:
   5. Redis cache hit ratio exceeds 90% for news list endpoints
 **Plans**: 3 plans
 
+Plans:
+- [ ] 33-01-PLAN.md — Cache invalidation on WebSocket broadcasts and jitter-based TTL
+- [ ] 33-02-PLAN.md — ETag middleware for API responses and immutable static asset headers
+- [ ] 33-03-PLAN.md — Unit tests for caching improvements and full validation
+
 ### Phase 34: Database Optimization
 **Goal**: Database queries execute efficiently with proper indexing and connection management
 **Depends on**: Phase 29 (Measurement Foundation)
@@ -280,4 +285,4 @@ v1.8 Advanced          -> Demand-driven expansion
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-25 — Phase 32 planned (Image Pipeline, 4 plans)*
+*Last updated: 2026-04-26 — Phase 33 planned (Caching Improvements, 3 plans)*
