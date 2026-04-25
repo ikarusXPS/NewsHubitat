@@ -1,0 +1,15 @@
+# Grafana dashboard provisioning
+# Automatically loads dashboards from /etc/grafana/provisioning/dashboards
+# See: .planning/phases/20-monitoring-alerting/20-CONTEXT.md
+
+apiVersion: 1
+
+providers:
+  - name: 'NewsHub'
+    orgId: 1
+    folder: ''
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /etc/grafana/provisioning/dashboards

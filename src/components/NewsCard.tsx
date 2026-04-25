@@ -1,11 +1,16 @@
 import { useState } from 'react';
-import { Bookmark, ExternalLink, Globe, Languages, Loader2, Shield, Search, AlertTriangle, X, CheckCircle, Info, ImageOff } from 'lucide-react';
-import { cn, timeAgo, getRegionColor, getSentimentColor, truncate } from '../lib/utils';
+import { Link } from 'react-router-dom';
+import { ExternalLink, Globe, Languages, Loader2, Shield, Search, AlertTriangle, X, CheckCircle, Info, Share2, MessageSquare } from 'lucide-react';
+import { ShareButtons } from './sharing';
+import { BookmarkButton } from './BookmarkButton';
+import { useCreateShare, type ShareUrls } from '../hooks/useShare';
+import { ResponsiveImage } from './ResponsiveImage';
+import { SwipeableCard } from './mobile/SwipeableCard';
+import { cn, getRegionColor, getSentimentColor, truncate } from '../lib/utils';
+import { formatDateTime } from '../lib/formatters';
 import { useAppStore } from '../store';
+import { useIsMobile } from '../hooks/useMediaQuery';
 import type { NewsArticle } from '../types';
-
-// Base64 SVG placeholder for failed images
-const PLACEHOLDER_IMAGE = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMjAwIDEyMCI+PHJlY3QgZmlsbD0iIzFmMjkzNyIgd2lkdGg9IjIwMCIgaGVpZ2h0PSIxMjAiLz48ZyBmaWxsPSIjNGI1NTYzIj48cmVjdCB4PSI4NSIgeT0iMzUiIHdpZHRoPSIzMCIgaGVpZ2h0PSIyNSIgcng9IjIiLz48Y2lyY2xlIGN4PSIxMDAiIGN5PSI3MCIgcj0iMTUiLz48cGF0aCBkPSJNNzUgODVoNTBsLTEwLTIwLTEwIDEwLTEwLTUtMjAgMTV6Ii8+PC9nPjwvc3ZnPg==';
 
 interface PropagandaIndicator {
   type: string;
@@ -23,12 +28,14 @@ interface PropagandaAnalysis {
 
 interface NewsCardProps {
   article: NewsArticle;
+  priority?: boolean; // For first 3 cards - uses eager loading (D-77)
   onTranslate?: (articleId: string, targetLang: 'de' | 'en') => Promise<NewsArticle | null>;
 }
 
-export function NewsCard({ article, onTranslate }: NewsCardProps) {
+export function NewsCard({ article, priority = false, onTranslate }: NewsCardProps) {
   const { language, toggleBookmark, isBookmarked, addToReadingHistory } = useAppStore();
   const bookmarked = isBookmarked(article.id);
+  const isMobile = useIsMobile();
 
   // Track reading when article is clicked
   const trackReading = () => addToReadingHistory(article.id);
@@ -39,15 +46,10 @@ export function NewsCard({ article, onTranslate }: NewsCardProps) {
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [propagandaAnalysis, setPropagandaAnalysis] = useState<PropagandaAnalysis | null>(null);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
-  const [imageError, setImageError] = useState(false);
-
-  // Handle image load error - swap to placeholder
-  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    const target = e.currentTarget;
-    target.onerror = null; // Prevent infinite loop if placeholder also fails
-    target.src = PLACEHOLDER_IMAGE;
-    setImageError(true);
-  };
+  const [shareUrls, setShareUrls] = useState<ShareUrls | null>(null);
+  const [shareCode, setShareCode] = useState<string | null>(null);
+  const [isCreatingShare, setIsCreatingShare] = useState(false);
+  const createShare = useCreateShare();
 
   const handleAnalyze = async () => {
     if (isAnalyzing) return;
@@ -79,6 +81,21 @@ export function NewsCard({ article, onTranslate }: NewsCardProps) {
     }
   };
 
+  const handleShare = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (shareUrls || isCreatingShare) return;
+    setIsCreatingShare(true);
+    try {
+      const urls = await createShare.mutateAsync(localArticle);
+      setShareUrls(urls);
+      setShareCode(urls.direct.split('/s/')[1]);
+    } catch (err) {
+      console.error('Failed to create share:', err);
+    } finally {
+      setIsCreatingShare(false);
+    }
+  };
+
   const getScoreColor = (score: number) => {
     if (score <= 30) return '#00ff88';
     if (score <= 60) return '#ffee00';
@@ -101,6 +118,11 @@ export function NewsCard({ article, onTranslate }: NewsCardProps) {
   const hasTranslation = language === 'de'
     ? !!localArticle.titleTranslated?.de
     : !!localArticle.titleTranslated?.en;
+
+  // Handle bookmark action for swipe gesture
+  const handleBookmark = () => {
+    toggleBookmark(localArticle.id);
+  };
 
   const getDisplayTitle = () => {
     if (showOriginal || !hasTranslation) {
@@ -148,27 +170,17 @@ export function NewsCard({ article, onTranslate }: NewsCardProps) {
     he: 'HE',
   }[localArticle.originalLanguage] || localArticle.originalLanguage.toUpperCase();
 
-  return (
+  const cardContent = (
     <article className="rounded-lg border border-gray-700 bg-gray-800 p-4 transition-shadow hover:shadow-lg">
-      {/* Thumbnail image with fallback */}
+      {/* Thumbnail image with ResponsiveImage */}
       {localArticle.imageUrl && (
-        <div className="relative -mx-4 -mt-4 mb-4 h-40 overflow-hidden rounded-t-lg bg-gray-900">
-          <img
-            src={localArticle.imageUrl}
-            alt={localArticle.title}
-            loading="lazy"
-            className={cn(
-              'h-full w-full object-cover transition-opacity duration-300',
-              imageError ? 'opacity-60' : 'opacity-100'
-            )}
-            onError={handleImageError}
-          />
-          {imageError && (
-            <div className="absolute inset-0 flex items-center justify-center bg-gray-900/50">
-              <ImageOff className="h-8 w-8 text-gray-600" />
-            </div>
-          )}
-        </div>
+        <ResponsiveImage
+          src={localArticle.imageUrl}
+          alt={localArticle.title}
+          priority={priority}
+          aspectRatio="16:9"
+          className="-mx-4 -mt-4 mb-4 h-40 rounded-t-lg"
+        />
       )}
 
       <div className="mb-3 flex items-start justify-between">
@@ -207,23 +219,23 @@ export function NewsCard({ article, onTranslate }: NewsCardProps) {
           )}
         </div>
         <div className="flex items-center gap-1">
-          <button
-            onClick={() => toggleBookmark(localArticle.id)}
-            className={cn(
-              'rounded p-1 transition-colors',
-              bookmarked
-                ? 'text-yellow-500 hover:text-yellow-400'
-                : 'text-gray-500 hover:text-gray-400'
-            )}
-          >
-            <Bookmark className="h-4 w-4" fill={bookmarked ? 'currentColor' : 'none'} />
-          </button>
+          <BookmarkButton
+            articleId={localArticle.id}
+            isBookmarked={bookmarked}
+            onPersonalBookmark={() => toggleBookmark(localArticle.id)}
+          />
         </div>
       </div>
 
-      <h3 className="mb-2 text-lg font-semibold text-white leading-tight">
-        {getDisplayTitle()}
-      </h3>
+      <Link
+        to={`/article/${localArticle.id}`}
+        onClick={trackReading}
+        className="block mb-2"
+      >
+        <h3 className="text-lg font-semibold text-white leading-tight hover:text-[#00f0ff] transition-colors">
+          {getDisplayTitle()}
+        </h3>
+      </Link>
 
       <p className="mb-3 text-sm text-gray-400 line-clamp-3">
         {getDisplayContent()}
@@ -232,7 +244,7 @@ export function NewsCard({ article, onTranslate }: NewsCardProps) {
       <div className="flex items-center justify-between text-xs">
         <div className="flex items-center gap-3">
           <span className="text-gray-500">
-            {timeAgo(localArticle.publishedAt, language)}
+            {formatDateTime(localArticle.publishedAt)}
           </span>
           <span className={cn('font-medium', getSentimentColor(localArticle.sentiment))}>
             {localArticle.sentiment === 'positive' && '+ Positiv'}
@@ -293,6 +305,14 @@ export function NewsCard({ article, onTranslate }: NewsCardProps) {
               )}
             </>
           )}
+          <Link
+            to={`/article/${localArticle.id}`}
+            onClick={trackReading}
+            className="flex items-center gap-1 text-[#00f0ff] hover:text-[#00f0ff]/80"
+          >
+            <MessageSquare className="h-3 w-3" />
+            Comments
+          </Link>
           <a
             href={localArticle.url}
             target="_blank"
@@ -303,6 +323,33 @@ export function NewsCard({ article, onTranslate }: NewsCardProps) {
             <ExternalLink className="h-3 w-3" />
             Original
           </a>
+
+          {/* Share button per D-01 */}
+          {shareUrls && shareCode ? (
+            <ShareButtons
+              shareCode={shareCode}
+              title={localArticle.title}
+              urls={shareUrls}
+              className="ml-2"
+            />
+          ) : (
+            <button
+              onClick={(e) => handleShare(e)}
+              disabled={isCreatingShare}
+              className={cn(
+                'flex items-center gap-1 rounded px-2 py-1 text-xs transition-all ml-2',
+                'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              )}
+              title="Create share link"
+            >
+              {isCreatingShare ? (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              ) : (
+                <Share2 className="h-3 w-3" />
+              )}
+              Share
+            </button>
+          )}
         </div>
       </div>
 
@@ -422,4 +469,15 @@ export function NewsCard({ article, onTranslate }: NewsCardProps) {
       )}
     </article>
   );
+
+  // Wrap with SwipeableCard on mobile for swipe-to-bookmark gesture
+  if (isMobile) {
+    return (
+      <SwipeableCard onBookmark={handleBookmark} isBookmarked={bookmarked}>
+        {cardContent}
+      </SwipeableCard>
+    );
+  }
+
+  return cardContent;
 }

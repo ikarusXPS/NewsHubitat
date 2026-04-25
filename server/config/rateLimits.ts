@@ -49,6 +49,21 @@ export const RATE_LIMITS = {
       '/api/markets',
     ],
   },
+
+  /**
+   * Comment endpoints (moderate) - 5 req/min per user (Phase 27)
+   * Prevents spam while allowing rapid-fire discussions
+   */
+  comment: {
+    windowMs: 60_000,
+    max: 5,
+    keyBy: 'user' as const,
+    paths: [
+      '/api/comments',
+      '/api/comments/:id/edit',
+      '/api/comments/:id/flag',
+    ],
+  },
 } as const;
 
 export type RateLimitTier = keyof typeof RATE_LIMITS;

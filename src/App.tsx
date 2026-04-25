@@ -1,4 +1,5 @@
 import { Suspense, lazy, useEffect } from 'react';
+import './i18n/i18n'; // Initialize i18n before App renders
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Radio } from 'lucide-react';
@@ -6,7 +7,9 @@ import { onCLS, onINP, onLCP, onFCP, onTTFB } from 'web-vitals';
 import { Layout } from './components/Layout';
 import { Dashboard } from './pages/Dashboard';
 import { AuthProvider } from './contexts/AuthContext';
+import { ConsentProvider } from './contexts/ConsentContext';
 import { VerificationBanner } from './components/VerificationBanner';
+import { ConsentBanner } from './components/ConsentBanner';
 import { cacheService } from './services/cacheService';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { FocusSuggestions } from './components/FocusSuggestions';
@@ -53,11 +56,19 @@ const Settings = lazy(() => import('./pages/Settings').then(m => ({ default: m.S
 const EventMap = lazy(() => import('./pages/EventMap').then(m => ({ default: m.EventMap })));
 const Community = lazy(() => import('./pages/Community').then(m => ({ default: m.Community })));
 const Profile = lazy(() => import('./pages/Profile').then(m => ({ default: m.Profile })));
+const Article = lazy(() => import('./pages/Article').then(m => ({ default: m.Article })));
 
 // Auth pages (public - no auth required)
 const VerifyEmail = lazy(() => import('./pages/VerifyEmail'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword'));
+
+// Legal pages
+const Privacy = lazy(() => import('./pages/Privacy').then(m => ({ default: m.Privacy })));
+
+// Team pages
+const TeamDashboard = lazy(() => import('./pages/TeamDashboard').then(m => ({ default: m.TeamDashboard })));
+const TeamInviteAccept = lazy(() => import('./pages/TeamInviteAccept').then(m => ({ default: m.TeamInviteAccept })));
 
 // Loading fallback component - Cyber style
 function PageLoader() {
@@ -117,12 +128,19 @@ function AppRoutes() {
             <Route path="/bookmarks" element={<Bookmarks />} />
             <Route path="/history" element={<ReadingHistory />} />
             <Route path="/profile" element={<Profile />} />
+            {/* Article detail page with comments */}
+            <Route path="/article/:id" element={<Article />} />
             {/* Auth pages (public - no auth required) */}
             <Route path="/verify-email" element={<VerifyEmail />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             {/* Settings as full page when accessed directly */}
             <Route path="/settings" element={<Settings />} />
+            {/* Legal pages */}
+            <Route path="/privacy" element={<Privacy />} />
+            {/* Team pages - invite route must come before :teamId for specificity */}
+            <Route path="/team/invite/:token" element={<TeamInviteAccept />} />
+            <Route path="/team/:teamId" element={<TeamDashboard />} />
           </Routes>
         </Suspense>
       </ErrorBoundary>
@@ -150,21 +168,26 @@ export default function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <BrowserRouter>
-          {/* Show onboarding for first-time users */}
-          {!hasCompletedOnboarding && <FocusOnboarding />}
+      <ConsentProvider>
+        <AuthProvider>
+          <BrowserRouter>
+            {/* Show onboarding for first-time users */}
+            {!hasCompletedOnboarding && <FocusOnboarding />}
 
-          {/* Verification banner for unverified users */}
-          <VerificationBanner />
+            {/* Verification banner for unverified users */}
+            <VerificationBanner />
 
-          <Layout>
-            <AppRoutes />
-          </Layout>
-          {/* Global Focus Suggestions - overlays on all pages */}
-          <FocusSuggestions />
-        </BrowserRouter>
-      </AuthProvider>
+            <Layout>
+              <AppRoutes />
+            </Layout>
+            {/* Global Focus Suggestions - overlays on all pages */}
+            <FocusSuggestions />
+
+            {/* GDPR Consent Banner */}
+            <ConsentBanner />
+          </BrowserRouter>
+        </AuthProvider>
+      </ConsentProvider>
     </QueryClientProvider>
   );
 }

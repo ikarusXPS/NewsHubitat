@@ -1,7 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X, Loader2, Mail, Lock, User } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { cn } from '../lib/utils';
+import { OAuthButton } from './oauth/OAuthButton';
+import { ReAuthModal } from './oauth/ReAuthModal';
+import { useOAuthPopup } from '../hooks/useOAuthPopup';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -11,6 +15,7 @@ interface AuthModalProps {
 type AuthMode = 'login' | 'register';
 
 export function AuthModal({ isOpen, onClose }: AuthModalProps) {
+  const { t } = useTranslation('auth');
   const [mode, setMode] = useState<AuthMode>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -18,7 +23,97 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { login, register } = useAuth();
+  const { login, register, loginWithOAuth } = useAuth();
+
+  // OAuth state
+  const [linkingProvider, setLinkingProvider] = useState<'google' | 'github' | null>(null);
+  const [linkingEmail, setLinkingEmail] = useState<string>('');
+  const [oauthLoading, setOauthLoading] = useState<'google' | 'github' | null>(null);
+
+  const { openOAuthPopup } = useOAuthPopup({
+    onSuccess: async (result) => {
+      setOauthLoading(null);
+      if (result.token) {
+        try {
+          await loginWithOAuth(result.token);
+          onClose();
+          // Reset form
+          setEmail('');
+          setPassword('');
+          setName('');
+        } catch (err) {
+          setError(err instanceof Error ? err.message : 'OAuth login failed');
+        }
+      }
+    },
+    onError: (errorMsg) => {
+      setOauthLoading(null);
+      setError(errorMsg);
+    },
+    onNeedsLinking: (linkEmail) => {
+      const currentProvider = oauthLoading;
+      setOauthLoading(null);
+      setLinkingEmail(linkEmail);
+      setLinkingProvider(currentProvider);
+    },
+  });
+
+  const handleGoogleAuth = () => {
+    setError(null);
+    setOauthLoading('google');
+    openOAuthPopup('google');
+  };
+
+  const handleGitHubAuth = () => {
+    setError(null);
+    setOauthLoading('github');
+    openOAuthPopup('github');
+  };
+
+  const handleLinkAccount = async (linkPassword: string) => {
+    if (!linkingProvider) return { success: false, error: 'No provider selected' };
+
+    try {
+      const response = await fetch('/api/auth/oauth/link', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          provider: linkingProvider,
+          email: linkingEmail,
+          password: linkPassword,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!data.success) {
+        return { success: false, error: data.error };
+      }
+
+      // Login with the returned token
+      await loginWithOAuth(data.data.token);
+      setLinkingProvider(null);
+      setLinkingEmail('');
+      onClose();
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: err instanceof Error ? err.message : 'Link failed' };
+    }
+  };
+
+  // Handle Escape key to close modal
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -51,18 +146,33 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center" data-testid="auth-modal">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
+        data-testid="auth-modal-backdrop"
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-md rounded-lg border border-gray-700 bg-gray-800 p-6 shadow-xl">
+      <div
+        className={cn(
+          "relative w-full shadow-xl",
+          "max-w-none md:max-w-md", // Full-width mobile, constrained desktop (D-56)
+          "h-full md:h-auto", // Full-height mobile, auto desktop
+          "rounded-none md:rounded-lg", // No radius mobile, rounded desktop
+          "p-6",
+          "pt-[calc(var(--safe-area-top)+1.5rem)] md:pt-6", // Safe area top mobile (D-28)
+          "pb-[calc(var(--safe-area-bottom)+1.5rem)] md:pb-6", // Safe area bottom mobile
+          "border-0 md:border md:border-gray-700",
+          "bg-gray-800"
+        )}
+        data-testid="auth-modal-content"
+      >
         <button
           onClick={onClose}
           className="absolute right-4 top-4 text-gray-400 hover:text-white"
+          data-testid="auth-modal-close"
         >
           <X className="h-5 w-5" />
         </button>
@@ -70,6 +180,32 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
         <h2 className="mb-6 text-2xl font-bold text-white">
           {mode === 'login' ? 'Anmelden' : 'Registrieren'}
         </h2>
+
+        {/* OAuth Buttons per D-06, D-07 - above email/password form */}
+        <div className="space-y-3 mb-6">
+          <OAuthButton
+            provider="google"
+            onClick={handleGoogleAuth}
+            isLoading={oauthLoading === 'google'}
+            disabled={oauthLoading !== null}
+          />
+          <OAuthButton
+            provider="github"
+            onClick={handleGitHubAuth}
+            isLoading={oauthLoading === 'github'}
+            disabled={oauthLoading !== null}
+          />
+        </div>
+
+        {/* Divider */}
+        <div className="relative my-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-600" />
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="bg-gray-800 px-3 text-gray-400">{t('oauth.or')}</span>
+          </div>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {mode === 'register' && (
@@ -170,6 +306,18 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
             </>
           )}
         </div>
+
+        {/* Re-auth modal for account linking */}
+        <ReAuthModal
+          isOpen={linkingProvider !== null}
+          provider={linkingProvider || 'google'}
+          email={linkingEmail}
+          onLink={handleLinkAccount}
+          onCancel={() => {
+            setLinkingProvider(null);
+            setLinkingEmail('');
+          }}
+        />
       </div>
     </div>
   );

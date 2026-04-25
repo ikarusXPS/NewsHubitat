@@ -7,6 +7,8 @@ import nodemailer from 'nodemailer';
 import type { Transporter } from 'nodemailer';
 import logger from '../utils/logger';
 import type { NewsArticle } from '../../src/types';
+import { prisma } from '../db/prisma';
+import { MetricsService } from './metricsService';
 
 export interface EmailConfig {
   host: string;
@@ -29,12 +31,12 @@ export interface DigestOptions {
 }
 
 const DEFAULT_CONFIG: EmailConfig = {
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: parseInt(process.env.SMTP_PORT || '587', 10),
-  secure: process.env.SMTP_SECURE === 'true',
+  host: 'smtp.sendgrid.net',
+  port: 587,
+  secure: false,
   auth: {
-    user: process.env.SMTP_USER || '',
-    pass: process.env.SMTP_PASS || '',
+    user: 'apikey',  // Literal string 'apikey' per SendGrid SMTP spec
+    pass: process.env.SENDGRID_API_KEY || '',
   },
   from: process.env.SMTP_FROM || 'NewsHub <noreply@newshub.app>',
 };
@@ -58,8 +60,8 @@ export class EmailService {
   }
 
   private initialize(): void {
-    if (!this.config.auth.user || !this.config.auth.pass) {
-      logger.warn('⚠ Email service not configured (SMTP_USER/SMTP_PASS missing)');
+    if (!this.config.auth.pass) {
+      logger.warn('⚠ Email service not configured (SENDGRID_API_KEY missing)');
       return;
     }
 
@@ -109,6 +111,27 @@ export class EmailService {
       return false;
     }
 
+    const metricsService = MetricsService.getInstance();
+
+    // D-05: Check if email is bounced
+    try {
+      const user = await prisma.user.findUnique({ where: { email: to } });
+      if (user?.emailBounced) {
+        logger.warn(`Email blocked - address bounced: ${to}`);
+        metricsService.incrementEmailBounced(this.getEmailType(subject), 'blocked');
+        return false;
+      }
+
+      // D-07: Check if user opted out
+      if (user?.emailOptOut) {
+        logger.warn(`Email blocked - user opted out: ${to}`);
+        return false;
+      }
+    } catch (_err) {
+      // Non-user emails (e.g., external addresses) can still be sent
+      logger.debug(`Bounce check skipped for ${to}: not a registered user`);
+    }
+
     try {
       await this.transporter.sendMail({
         from: this.config.from,
@@ -119,11 +142,25 @@ export class EmailService {
       });
 
       logger.debug(`Email sent to ${to}: ${subject}`);
+
+      // D-11: Increment sent counter
+      metricsService.incrementEmailSent(this.getEmailType(subject));
+
       return true;
     } catch (err) {
       logger.error(`Failed to send email to ${to}:`, err);
       return false;
     }
+  }
+
+  /**
+   * Extract email type from subject for metrics labeling
+   */
+  private getEmailType(subject: string): string {
+    if (subject.includes('Verify') || subject.includes('Bestaetige')) return 'verification';
+    if (subject.includes('Reset') || subject.includes('zuruecksetzen')) return 'password_reset';
+    if (subject.includes('changed') || subject.includes('geaendert')) return 'password_change';
+    return 'other';
   }
 
   /**
@@ -640,6 +677,52 @@ export class EmailService {
     `;
 
     return this.send(email, subject, html);
+  }
+
+  /**
+   * Send team invite email (Phase 28, per D-01, D-02)
+   */
+  async sendTeamInvite(
+    email: string,
+    teamName: string,
+    inviterName: string,
+    inviteUrl: string
+  ): Promise<boolean> {
+    const subject = `You're invited to join ${teamName} on NewsHub`;
+    const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 20px; background-color: #0a0a0f; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <div style="max-width: 500px; margin: 0 auto; background: #111118; border-radius: 12px; padding: 32px; border: 1px solid #00f0ff;">
+    <h1 style="color: #00f0ff; margin: 0 0 16px; font-size: 24px;">Team Invitation</h1>
+    <p style="color: #e5e7eb; font-size: 16px; line-height: 1.6;">
+      <strong>${inviterName}</strong> has invited you to join <strong>${teamName}</strong> on NewsHub.
+    </p>
+    <p style="color: #9ca3af; font-size: 14px; line-height: 1.6;">
+      Share and discover news articles with your team. Click below to accept the invitation.
+    </p>
+    <a href="${inviteUrl}"
+       style="display: inline-block; background: #00f0ff; color: #0a0a0f; padding: 12px 24px;
+              border-radius: 8px; text-decoration: none; font-weight: 600; margin-top: 16px; font-size: 14px;">
+      Join Team
+    </a>
+    <p style="color: #6b7280; font-size: 12px; margin-top: 24px;">
+      This invitation expires in 7 days. If you don't have a NewsHub account, you'll be prompted to create one.
+    </p>
+  </div>
+</body>
+</html>
+    `;
+
+    const result = await this.send(email, subject, html);
+    if (result) {
+      logger.info(`team_invite:sent email=${email} team=${teamName}`);
+    }
+    return result;
   }
 
   /**

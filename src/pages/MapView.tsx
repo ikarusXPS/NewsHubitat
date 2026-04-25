@@ -295,7 +295,7 @@ export function MapView() {
       </div>
 
       {/* Stats Summary */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
         {[
           { region: 'usa' as PerspectiveRegion, label: 'USA' },
           { region: 'europa' as PerspectiveRegion, label: 'Europa' },

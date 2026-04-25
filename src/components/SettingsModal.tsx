@@ -2,6 +2,7 @@ import { useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
+import { cn } from '../lib/utils';
 
 interface SettingsModalProps {
   children: React.ReactNode;
@@ -69,7 +70,13 @@ export function SettingsModal({ children, isOpen }: SettingsModalProps) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="fixed inset-4 z-50 flex items-start justify-center overflow-y-auto pt-8 pb-8"
+            className={cn(
+              "fixed z-50 overflow-y-auto",
+              "inset-0 md:inset-4", // Full-screen mobile, overlay desktop (D-56)
+              "flex items-start justify-center",
+              "pt-[var(--safe-area-top)] pb-[var(--safe-area-bottom)]", // Safe areas mobile (D-28)
+              "md:pt-8 md:pb-8" // Regular padding desktop
+            )}
           >
             <div className="relative w-full max-w-2xl">
               {/* Close button - fixed at top right */}

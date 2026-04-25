@@ -9,7 +9,7 @@ interface TopicSelectorProps {
 
 export function TopicSelector({ selectedTopics, onToggle }: TopicSelectorProps) {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
       {AVAILABLE_TOPICS.map((topic, index) => {
         const isSelected = selectedTopics.includes(topic.id);
 

@@ -32,7 +32,7 @@ interface RegionSelectorProps {
 
 export function RegionSelector({ selectedRegions, onToggle }: RegionSelectorProps) {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
       {REGION_OPTIONS.map((region, index) => {
         const isSelected = selectedRegions.includes(region.id);
 

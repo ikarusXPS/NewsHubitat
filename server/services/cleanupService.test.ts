@@ -15,6 +15,14 @@ vi.mock('../db/prisma', () => ({
       deleteMany: vi.fn(),
       count: vi.fn(),
     },
+    shareClick: {
+      count: vi.fn(),
+      deleteMany: vi.fn(),
+    },
+    sharedContent: {
+      count: vi.fn(),
+      deleteMany: vi.fn(),
+    },
   },
 }));
 
@@ -51,6 +59,14 @@ describe('CleanupService', () => {
 
   afterAll(() => {
     vi.useRealTimers();
+  });
+
+  beforeEach(() => {
+    // Set up default mock values for all prisma calls to prevent undefined errors
+    vi.mocked(prisma.shareClick.count).mockResolvedValue(0);
+    vi.mocked(prisma.shareClick.deleteMany).mockResolvedValue({ count: 0 });
+    vi.mocked(prisma.sharedContent.count).mockResolvedValue(0);
+    vi.mocked(prisma.sharedContent.deleteMany).mockResolvedValue({ count: 0 });
   });
 
   afterEach(() => {
@@ -324,12 +340,17 @@ describe('CleanupService', () => {
   });
 
   describe('getStats', () => {
-    it('returns correct counts for unverified accounts', async () => {
+    it('returns correct counts for unverified accounts and analytics', async () => {
       vi.mocked(prisma.user.count)
         .mockResolvedValueOnce(10)  // unverifiedTotal
         .mockResolvedValueOnce(3)   // expiringIn7Days
         .mockResolvedValueOnce(1)   // expiringIn1Day
         .mockResolvedValueOnce(2);  // expiredCount
+      vi.mocked(prisma.shareClick.count)
+        .mockResolvedValueOnce(100)  // analyticsTotal
+        .mockResolvedValueOnce(5);   // analyticsExpiring
+      vi.mocked(prisma.sharedContent.count)
+        .mockResolvedValueOnce(3);   // expiredShares
 
       const service = CleanupService.getInstance();
       const stats = await service.getStats();
@@ -339,6 +360,9 @@ describe('CleanupService', () => {
         expiringIn7Days: 3,
         expiringIn1Day: 1,
         expiredCount: 2,
+        analyticsTotal: 100,
+        analyticsExpiring: 5,
+        expiredShares: 3,
       });
     });
 

@@ -186,7 +186,7 @@ export function MarketsPanel() {
       <div className="glass-panel rounded-xl p-5 border border-[#00f0ff]/20">
         <div className="animate-pulse space-y-3">
           <div className="h-6 w-32 bg-gray-700 rounded" />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-4 gap-3">
             {[...Array(4)].map((_, i) => (
               <div key={i} className="h-24 bg-gray-700 rounded" />
             ))}

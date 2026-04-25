@@ -242,7 +242,7 @@ export class AIService {
    * Try all available providers in priority order until one succeeds
    * Priority: OpenRouter → Gemini (gemma-4) → Gemini (gemma-3) → Anthropic
    */
-  private async callWithFallback(prompt: string): Promise<string | null> {
+  async callWithFallback(prompt: string): Promise<string | null> {
     // Define provider order: OpenRouter → Gemini primary → Gemini fallback → Anthropic
     const providers: Array<{ name: string; call: () => Promise<string | null> }> = [
       { name: 'openrouter', call: () => this.callOpenRouter(prompt) },

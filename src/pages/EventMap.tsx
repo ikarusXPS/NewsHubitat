@@ -25,6 +25,7 @@ import {
   Clock,
   MapPin,
   ChevronDown,
+  ChevronUp,
   BarChart3,
   PieChart,
   Calendar,
@@ -164,6 +165,7 @@ export function EventMap() {
   const [showTimeline, setShowTimeline] = useState(true);
   const [timeFilter, setTimeFilter] = useState<TimeFilter>('7d');
   const [showEventDetails, setShowEventDetails] = useState(false);
+  const [mobileSheetExpanded, setMobileSheetExpanded] = useState(false);
 
   const queryClient = useQueryClient();
 
@@ -643,9 +645,9 @@ export function EventMap() {
       </div>
 
       {/* Map */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-4 min-h-0">
-        {/* Event List */}
-        <div className="glass-panel rounded-xl p-4 overflow-y-auto max-h-[500px] lg:max-h-full">
+      <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-4 min-h-0">
+        {/* Event List - Desktop only (D-45: mobile uses bottom sheet) */}
+        <div className="hidden md:block glass-panel rounded-xl p-4 overflow-y-auto max-h-full">
           <div className="signal-label mb-3 flex items-center justify-between">
             <span>Recent Events</span>
             <span className="text-[#00f0ff]">{filteredEvents.length}</span>
@@ -709,7 +711,7 @@ export function EventMap() {
         </div>
 
         {/* Map Container */}
-        <div className="lg:col-span-3 glass-panel rounded-xl overflow-hidden relative h-[600px]">
+        <div className="md:col-span-3 glass-panel rounded-xl overflow-hidden relative h-[600px]">
           {isLoading ? (
             <div className="h-full flex items-center justify-center">
               <div className="text-center">
@@ -1054,6 +1056,122 @@ export function EventMap() {
           </>
         )}
       </AnimatePresence>
+
+      {/* Mobile Event List Bottom Sheet (D-45) */}
+      <motion.div
+        drag="y"
+        dragConstraints={{ top: 0, bottom: 0 }}
+        dragElastic={0.2}
+        onDragEnd={(_, info) => {
+          // D-69: Swipe down to dismiss/collapse
+          if (info.offset.y > 100) {
+            setMobileSheetExpanded(false);
+          } else if (info.offset.y < -100) {
+            setMobileSheetExpanded(true);
+          }
+        }}
+        initial={false}
+        animate={{ y: mobileSheetExpanded ? 0 : '60%' }}
+        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+        className={cn(
+          "fixed left-0 right-0 bg-gray-900/95 backdrop-blur-sm rounded-t-2xl border-t border-[#00f0ff]/30 md:hidden z-40",
+          "touch-none" // Prevent scroll interference during drag
+        )}
+        style={{
+          bottom: 'var(--bottom-nav-height)',
+          height: '70vh',
+        }}
+      >
+        {/* Drag handle */}
+        <div
+          className="flex justify-center py-3 cursor-grab active:cursor-grabbing"
+          onClick={() => setMobileSheetExpanded(!mobileSheetExpanded)}
+        >
+          <div className="w-12 h-1.5 bg-gray-600 rounded-full" />
+        </div>
+
+        {/* Sheet header */}
+        <div className="px-4 pb-2 flex items-center justify-between border-b border-gray-800">
+          <div className="signal-label flex items-center gap-2">
+            <MapPin className="h-3 w-3 text-[#00f0ff]" />
+            Recent Events
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-[#00f0ff] text-xs font-mono">{filteredEvents.length}</span>
+            <button
+              onClick={() => setMobileSheetExpanded(!mobileSheetExpanded)}
+              className="p-1 text-gray-400 hover:text-white transition-colors"
+            >
+              {mobileSheetExpanded ? (
+                <ChevronDown className="h-4 w-4" />
+              ) : (
+                <ChevronUp className="h-4 w-4" />
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Event list */}
+        <div className="px-4 py-2 overflow-y-auto touch-auto" style={{ maxHeight: 'calc(70vh - 80px)' }}>
+          <div className="space-y-2 pb-4">
+            {filteredEvents.length === 0 ? (
+              <div className="text-center py-8">
+                <Filter className="h-8 w-8 text-gray-600 mx-auto mb-3" />
+                <p className="text-xs text-gray-500 font-mono">
+                  {selectedSeverities.length === 0 && selectedCategories.length === 0
+                    ? 'Select filters to view events'
+                    : 'No events match selected filters'}
+                </p>
+              </div>
+            ) : (
+              filteredEvents.map((event) => {
+                const severityConfig = SEVERITY_CONFIG[event.severity];
+                return (
+                  <button
+                    key={event.id}
+                    onClick={() => {
+                      setSelectedEvent(event);
+                      setShowEventDetails(true);
+                      setMobileSheetExpanded(false);
+                    }}
+                    className={cn(
+                      'w-full text-left p-3 rounded-lg border transition-all',
+                      selectedEvent?.id === event.id
+                        ? 'bg-[rgba(0,240,255,0.1)] border-[#00f0ff]/50'
+                        : 'bg-black/20 border-gray-700/50 hover:border-gray-600'
+                    )}
+                  >
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <span
+                        className="badge-severity text-[9px]"
+                        style={{
+                          backgroundColor: `${severityConfig.color}20`,
+                          color: severityConfig.color,
+                          borderColor: `${severityConfig.color}50`,
+                        }}
+                      >
+                        {severityConfig.icon}
+                        {severityConfig.label}
+                      </span>
+                      <span className="text-[9px] font-mono text-gray-500 flex items-center gap-1">
+                        <Clock className="h-2.5 w-2.5" />
+                        {formatTimeAgo(event.timestamp)}
+                      </span>
+                    </div>
+                    <h4 className="text-xs font-medium text-white line-clamp-2 mb-1">
+                      {event.title}
+                    </h4>
+                    <div className="flex items-center gap-2 text-[9px] text-gray-500">
+                      <MapPin className="h-2.5 w-2.5" />
+                      {event.location.name}
+                    </div>
+                  </button>
+                );
+              })
+            )}
+          </div>
+        </div>
+      </motion.div>
     </div>
   );
 }

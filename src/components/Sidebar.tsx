@@ -1,5 +1,7 @@
+import { useMemo } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Activity,
@@ -60,16 +62,7 @@ async function fetchEventStats(): Promise<EventStats> {
   }
 }
 
-const navItems = [
-  { to: '/', icon: Activity, label: 'Live Feed', badge: 'live' },
-  { to: '/monitor', icon: Globe2, label: 'The Monitor', badge: null },
-  { to: '/events', icon: MapPin, label: 'Event Map', badge: 'events' }, // Dynamic event count
-  { to: '/community', icon: Users, label: 'Community', badge: 'new' },
-  { to: '/analysis', icon: BarChart3, label: 'Analytics' },
-  { to: '/timeline', icon: Clock, label: 'Timeline' },
-  { to: '/history', icon: History, label: 'History' },
-  { to: '/bookmarks', icon: Bookmark, label: 'Saved' },
-];
+// navItems moved inside component to use useTranslation
 
 interface SidebarProps {
   isOpen?: boolean;
@@ -77,9 +70,22 @@ interface SidebarProps {
 }
 
 export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
+  const { t } = useTranslation('common');
   const { user, isAuthenticated } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+
+  const navItems = useMemo(() => [
+    { to: '/', icon: Activity, label: t('navigation.dashboard'), badge: 'live' as const },
+    { to: '/monitor', icon: Globe2, label: t('navigation.monitor'), badge: null },
+    { to: '/events', icon: MapPin, label: t('navigation.events'), badge: 'events' as const },
+    { to: '/community', icon: Users, label: t('navigation.community'), badge: 'new' as const },
+    { to: '/analysis', icon: BarChart3, label: t('navigation.analysis') },
+    { to: '/timeline', icon: Clock, label: t('navigation.timeline') },
+    { to: '/history', icon: History, label: t('navigation.history') },
+    { to: '/bookmarks', icon: Bookmark, label: t('navigation.bookmarks') },
+  ], [t]);
+
   const { data: eventStats, dataUpdatedAt } = useQuery({
     queryKey: ['geo-events-stats'], // Separate stats query but same source
     queryFn: fetchEventStats,
@@ -99,7 +105,7 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
           />
         )}
       </AnimatePresence>
@@ -113,8 +119,8 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
         className={cn(
           'sidebar-cyber flex w-64 flex-col relative z-50',
-          'fixed lg:relative inset-y-0 left-0',
-          'lg:translate-x-0'
+          'fixed md:relative inset-y-0 left-0',
+          'md:translate-x-0'
         )}
       >
       {/* Logo - same height as header (h-14) */}
@@ -137,7 +143,7 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
         {/* Mobile Close Button */}
         <button
           onClick={onClose}
-          className="lg:hidden p-2 hover:bg-white/5 rounded-md transition-colors"
+          className="md:hidden p-2 hover:bg-white/5 rounded-md transition-colors"
           aria-label="Close sidebar"
         >
           <X className="h-5 w-5 text-gray-400 hover:text-white" />
@@ -259,7 +265,7 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
           ) : (
             <>
               <User className="h-4 w-4" />
-              <span>Profile</span>
+              <span>{t('navigation.profile')}</span>
             </>
           )}
         </NavLink>
@@ -277,17 +283,25 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
           )}
         >
           <Settings className="h-4 w-4" />
-          <span>Settings</span>
+          <span>{t('navigation.settings')}</span>
         </button>
 
-        {/* Version */}
-        <div className="mt-3 px-3 flex items-center justify-between">
-          <span className="text-[10px] font-mono text-gray-600 uppercase tracking-wider">
-            v2.0.0
-          </span>
-          <span className="text-[10px] font-mono text-[#00f0ff]/50 uppercase tracking-wider">
-            Premium
-          </span>
+        {/* Version & Legal */}
+        <div className="mt-3 px-3 space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-mono text-gray-600 uppercase tracking-wider">
+              v2.0.0
+            </span>
+            <span className="text-[10px] font-mono text-[#00f0ff]/50 uppercase tracking-wider">
+              Premium
+            </span>
+          </div>
+          <NavLink
+            to="/privacy"
+            className="text-[10px] font-mono text-gray-600 hover:text-[#00f0ff] transition-colors"
+          >
+            Datenschutz / Privacy
+          </NavLink>
         </div>
       </div>
     </motion.aside>

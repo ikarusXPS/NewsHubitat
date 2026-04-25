@@ -1,0 +1,15 @@
+# Grafana datasource provisioning for Prometheus
+# Auto-provisioned on container startup
+# See: .planning/phases/20-monitoring-alerting/20-CONTEXT.md
+
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: false
+    jsonData:
+      timeInterval: "15s"    # Match Prometheus scrape interval

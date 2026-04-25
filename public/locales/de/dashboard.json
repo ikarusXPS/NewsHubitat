@@ -1,0 +1,47 @@
+{
+  "hero": {
+    "title": "Globale Nachrichtenperspektiven",
+    "subtitle": "Multi-Perspektiven-Nachrichtenanalyse von {sourceCount} Quellen aus {regionCount} Regionen",
+    "stats": {
+      "articles": "Artikel",
+      "sources": "Quellen",
+      "regions": "Regionen",
+      "lastUpdate": "Letzte Aktualisierung"
+    }
+  },
+  "feed": {
+    "title": "Newsfeed",
+    "empty": "Keine Artikel entsprechen Ihren aktuellen Filtern",
+    "loadMore": "Mehr Artikel laden",
+    "refresh": "Aktualisieren",
+    "filters": {
+      "allRegions": "Alle Regionen",
+      "allSentiments": "Alle Stimmungen"
+    }
+  },
+  "sentiment": {
+    "positive": "Positiv",
+    "negative": "Negativ",
+    "neutral": "Neutral"
+  },
+  "article": {
+    "readMore": "Weiterlesen",
+    "translate": "Ubersetzen",
+    "translating": "Ubersetze...",
+    "bookmark": "Merken",
+    "bookmarked": "Gemerkt",
+    "share": "Teilen",
+    "source": "Quelle",
+    "region": "Region"
+  },
+  "clusters": {
+    "title": "Themen-Cluster",
+    "perspectives": "{count, plural, one {# Perspektive} other {# Perspektiven}}",
+    "articles": "{count, plural, one {# Artikel} other {# Artikel}}"
+  },
+  "focusSuggestions": {
+    "title": "Focus-Vorschlage",
+    "apply": "Anwenden",
+    "dismiss": "Verwerfen"
+  }
+}

@@ -21,10 +21,10 @@ npm run typecheck && npm run test:run && npm run build
 npm run typecheck        # TypeScript validation
 npm run lint             # ESLint validation
 
-# Unit Testing (Vitest)
+# Unit Testing (Vitest) - 80% coverage enforced
 npm run test             # Run unit tests
 npm run test:run         # Run tests once (CI mode)
-npm run test:coverage    # Coverage report (80% threshold)
+npm run test:coverage    # Coverage report (fails below 80%)
 
 # E2E Testing (Playwright)
 npm run test:e2e         # Playwright headless
@@ -44,11 +44,24 @@ npm run seed:personas    # Seed AI personas only
 
 # Docker (Production)
 docker compose build app          # Build app container
-docker compose up -d              # Start all services (app, postgres, redis)
+docker compose up -d              # Start all services (app, postgres, redis, prometheus, grafana)
 docker compose ps                 # Check container health
 docker compose logs -f app        # Watch app logs
 
-# Run Single Tests
+# Monitoring Stack (included in docker compose)
+# Prometheus: localhost:9090 - metrics scraping from /api/metrics
+# Grafana:    localhost:3000 - dashboards (admin/admin)
+# Alertmanager: localhost:9093 - alert routing
+
+# CI
+npm run validate:ci               # Validate GitHub Actions workflow syntax
+
+# Load Testing (k6)
+npm run load:smoke                # Quick smoke test
+npm run load:full                 # Full load test
+npm run seed:load-test            # Seed test users for load testing
+
+# Run Single Tests (unit: src/**/*.test.ts, server/**/*.test.ts | e2e: e2e/*.spec.ts)
 npm run test -- src/lib/utils.test.ts           # Single unit test file
 npm run test -- -t "mapCentering"               # Tests matching pattern
 npx playwright test e2e/auth.spec.ts            # Single E2E test file
@@ -56,15 +69,17 @@ npx playwright test e2e/auth.spec.ts            # Single E2E test file
 
 ## Tech Stack
 
-- **Frontend**: React 19.2 + Vite 8 + TypeScript 6 + Tailwind CSS v4
+- **Frontend**: React 19 + Vite 8 + TypeScript 6 + Tailwind CSS v4
 - **State**: Zustand v5 (persisted to localStorage under `newshub-storage`)
 - **Server State**: TanStack Query v5 (5-min refetch, 2-min stale time)
 - **Visualization**: Recharts 3, globe.gl 2, Leaflet 1.9
 - **Backend**: Express 5 (TypeScript, ES modules)
 - **Database**: PostgreSQL via Prisma 7 (adapter: @prisma/adapter-pg)
 - **Real-time**: Socket.io for WebSocket updates
-- **AI**: Multi-provider fallback (Gemini → OpenRouter → Anthropic)
+- **AI**: Multi-provider fallback (OpenRouter → Gemini → Anthropic)
 - **Translation**: Multi-provider chain (DeepL → Google → LibreTranslate → Claude)
+- **Testing**: Vitest (unit, 80% coverage threshold) + Playwright (E2E)
+- **Monitoring**: Prometheus + Grafana + Alertmanager; Sentry for error tracking
 
 ## Architecture
 
@@ -73,6 +88,7 @@ npx playwright test e2e/auth.spec.ts            # Single E2E test file
 - **State**: Zustand store for UI (theme, language, filters, bookmarks, feed settings, reading history)
 - **Data Fetching**: TanStack Query with error/loading states
 - **Auth**: Context API with JWT in localStorage
+- **Offline Sync**: `src/services/syncService.ts` queues actions in IndexedDB when offline
 
 ### Backend (`server/`)
 - **Singleton Services**: All services use `getInstance()` pattern
@@ -95,8 +111,8 @@ npx playwright test e2e/auth.spec.ts            # Single E2E test file
 | `stealthScraper.ts` | Puppeteer-based scraping with stealth plugins |
 | `personaService.ts` | AI persona management |
 | `emailService.ts` | Email digest and notifications |
-| `syncService.ts` | Background sync with IndexedDB queue for offline actions |
 | `cacheService.ts` | Redis wrapper with JWT blacklist and graceful degradation |
+| `cleanupService.ts` | Daily cleanup: unverified accounts (30d), analytics (90d), expired shares |
 
 ### Key Directories
 | Directory | Purpose |
@@ -182,8 +198,8 @@ refetchInterval: 2 * 60_000
 
 ### Multi-Provider AI Fallback
 The AI service (`server/services/aiService.ts`) uses a fallback chain:
-1. **Gemini** (free tier, 1500 req/day) - Primary
-2. **OpenRouter** (multi-model, paid) - Secondary
+1. **OpenRouter** (multiple free models) - Primary
+2. **Gemini** (free tier, 1500 req/day) - Secondary
 3. **Anthropic** (premium) - Fallback
 
 If all providers fail, keyword-based analysis is used as final fallback.
@@ -248,6 +264,7 @@ interface ApiResponse<T> {
 | `/api/health/redis` | GET | Redis connectivity and stats |
 | `/api/bookmarks` | POST | Create bookmark (auth required, idempotent) |
 | `/api/history` | POST | Create reading history entry (auth required) |
+| `/api/metrics` | GET | Prometheus metrics (prom-client format) |
 
 ## E2E Testing Structure
 
@@ -268,6 +285,13 @@ projects: [
 
 Auth-required tests (`profile.spec.ts`, `settings.spec.ts`, `history.spec.ts`) run in `chromium-auth` project.
 
+Debug E2E tests:
+```bash
+npx playwright test --debug                    # Step-through debugger
+npx playwright test --ui                       # Interactive UI mode
+npx playwright show-report                     # View last test report
+```
+
 ## UI Design System
 
 - **Theme**: Dark cyber aesthetic with cyan accent (`#00f0ff`)
@@ -282,10 +306,11 @@ Auth-required tests (`profile.spec.ts`, `settings.spec.ts`, `history.spec.ts`) r
 PORT=3001
 DATABASE_URL="postgresql://newshub:newshub_dev@localhost:5433/newshub?schema=public"
 REDIS_URL=redis://localhost:6379
+JWT_SECRET=               # Required, minimum 32 characters
 
-# AI (ONE required, priority: Gemini → OpenRouter → Anthropic)
-GEMINI_API_KEY=           # FREE tier - 1500 req/day (recommended)
-OPENROUTER_API_KEY=       # Paid - multi-model access
+# AI (ONE required, priority: OpenRouter → Gemini → Anthropic)
+OPENROUTER_API_KEY=       # FREE tier - multiple free models (recommended)
+GEMINI_API_KEY=           # FREE tier - 1500 req/day
 ANTHROPIC_API_KEY=        # Premium fallback
 
 # Translation (at least one recommended)
@@ -332,3 +357,29 @@ Edit `server/config/sources.ts`:
 ### Email Verification Not Working
 **Problem**: Users can't verify email.
 **Solution**: Configure SMTP environment variables. Check `cleanupService.ts` for token expiration handling.
+
+## GDPR Compliance
+
+### Consent Management
+- `ConsentContext` manages 3 categories: essential (required), preferences, analytics
+- `ConsentBanner` shows on first visit, stores consent in `newshub-consent` localStorage key
+- Non-essential localStorage is cleared when consent is revoked
+
+### Data Retention (automated via cleanupService)
+| Data | Retention | Trigger |
+|------|-----------|---------|
+| Unverified accounts | 30 days | Daily cleanup |
+| ShareClick analytics | 90 days | Daily cleanup |
+| Expired SharedContent | On expiry | Daily cleanup |
+| JWT tokens | 7 days | Blacklist in Redis |
+
+### User Rights Implementation
+| Right | Endpoint |
+|-------|----------|
+| Data Export (Art. 20) | `GET /api/account/export?format=json\|csv` |
+| Account Deletion (Art. 17) | `POST /api/account/delete-request` (7-day grace) |
+| History Pause (Art. 18) | `isHistoryPaused` store toggle |
+
+### Legal Documentation
+- `docs/legal/README.md` - DPA checklist for third-party providers
+- `docs/legal/PROCESSING-RECORDS.md` - Art. 30 processing activities register

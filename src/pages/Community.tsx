@@ -509,7 +509,7 @@ export function Community() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"
+            className="grid sm:grid-cols-2 md:grid-cols-3 gap-4"
           >
             {BADGES.map((badge) => {
               const rarityColor = RARITY_COLORS[badge.rarity];

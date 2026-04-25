@@ -18,11 +18,14 @@ export function InstallPromptBanner() {
         exit={{ y: 100, opacity: 0 }}
         transition={{ duration: 0.3 }}
         className={cn(
-          'fixed bottom-0 left-0 right-0 z-50',
+          'fixed left-0 right-0 z-30', // z-30 below bottom nav (z-40) per D-30
           'border-t border-cyan-500/30',
           'bg-gradient-to-r from-[#00f0ff]/20 via-[#00f0ff]/10 to-[#00f0ff]/20',
           'backdrop-blur-sm'
         )}
+        style={{
+          bottom: 'calc(var(--bottom-nav-height) + 8px)', // Position above bottom nav (D-30)
+        }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3">
           <div className="flex items-center justify-between gap-4 flex-wrap sm:flex-nowrap">

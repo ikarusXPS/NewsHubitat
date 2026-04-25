@@ -1,5 +1,6 @@
 /* eslint-disable react-refresh/only-export-components -- Context exports both provider and hook */
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import * as Sentry from '@sentry/react';
 import type { ReactNode } from 'react';
 
 interface User {
@@ -14,6 +15,9 @@ interface User {
     regions: string[];
   };
   emailVerified: boolean;
+  hasPassword?: boolean;
+  googleLinked?: boolean;
+  githubLinked?: boolean;
 }
 
 interface AuthContextType {
@@ -29,6 +33,7 @@ interface AuthContextType {
   addBookmark: (articleId: string) => Promise<void>;
   removeBookmark: (articleId: string) => Promise<void>;
   resendVerification: () => Promise<{ success: boolean; rateLimited?: boolean; minutesRemaining?: number }>;
+  loginWithOAuth: (token: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -63,6 +68,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (response.ok) {
           const data = await response.json();
           setUser(data.data);
+          // Restore Sentry user context on page load
+          Sentry.setUser({
+            id: data.data.id,
+            email: data.data.email,
+            username: data.data.name,
+          });
         } else {
           // Token invalid, clear it
           localStorage.removeItem(TOKEN_KEY);
@@ -94,6 +105,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(TOKEN_KEY, data.data.token);
     setToken(data.data.token);
     setUser(data.data.user);
+    // Set Sentry user context on login
+    Sentry.setUser({
+      id: data.data.user.id,
+      email: data.data.user.email,
+      username: data.data.user.name,
+    });
   }, []);
 
   const register = useCallback(async (email: string, password: string, name: string) => {
@@ -112,12 +129,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(TOKEN_KEY, data.data.token);
     setToken(data.data.token);
     setUser(data.data.user);
+    // Set Sentry user context on register
+    Sentry.setUser({
+      id: data.data.user.id,
+      email: data.data.user.email,
+      username: data.data.user.name,
+    });
   }, []);
 
   const logout = useCallback(() => {
     localStorage.removeItem(TOKEN_KEY);
     setToken(null);
     setUser(null);
+    // Clear Sentry user context on logout
+    Sentry.setUser(null);
   }, []);
 
   const updatePreferences = useCallback(async (preferences: Partial<User['preferences']>) => {
@@ -212,6 +237,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { success: data.success };
   }, [token]);
 
+  const loginWithOAuth = useCallback(async (oauthToken: string) => {
+    // Store token and fetch user data
+    localStorage.setItem(TOKEN_KEY, oauthToken);
+    setToken(oauthToken);
+
+    try {
+      const response = await fetch('/api/auth/me', {
+        headers: {
+          Authorization: `Bearer ${oauthToken}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setUser(data.data);
+        Sentry.setUser({
+          id: data.data.id,
+          email: data.data.email,
+          username: data.data.name,
+        });
+      } else {
+        // Token invalid, clear it
+        localStorage.removeItem(TOKEN_KEY);
+        setToken(null);
+        throw new Error('Invalid token');
+      }
+    } catch (err) {
+      localStorage.removeItem(TOKEN_KEY);
+      setToken(null);
+      throw err;
+    }
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
@@ -227,6 +285,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         addBookmark,
         removeBookmark,
         resendVerification,
+        loginWithOAuth,
       }}
     >
       {children}

@@ -76,7 +76,7 @@ export function HeroSection({ stats }: HeroSectionProps) {
 
       {/* Content */}
       <div className="relative z-10 px-4 py-4">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           {/* Left: Title & Description */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}

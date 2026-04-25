@@ -5,7 +5,11 @@
 - [x] **v1.0 AI Analysis & User Features** - Phases 1-6 (shipped 2026-04-20)
 - [x] **v1.1 Quality & Testing** - Phases 7-12 (completed 2026-04-22)
 - [x] **v1.2 Performance & Scale** - Phases 13-17 (completed 2026-04-23)
-- [ ] **v1.3 Production Ready** - Phases 18-22 (in progress)
+- [x] **v1.3 Production Ready** - Phases 18-22 (completed 2026-04-23)
+- [x] **v1.4 User & Community Features** - Phases 23-28 (completed 2026-04-25)
+- [ ] **v1.5 Scale & Infrastructure** - Kubernetes, Multi-Region, Log Aggregation (planned)
+- [ ] **v1.6 Growth & Monetization** - A/B Testing, Subscriptions (planned)
+- [ ] **v1.7 Advanced Features** - Native App, Video, Chat (demand-driven)
 
 ## Phases
 
@@ -44,81 +48,138 @@
 
 </details>
 
-### v1.3 Production Ready (In Progress)
+<details>
+<summary>v1.3 Production Ready (Phases 18-22) - COMPLETED 2026-04-23</summary>
 
-**Milestone Goal:** Production-grade deployment infrastructure with CI/CD, error tracking, monitoring, and performance validation
+- [x] **Phase 18: CI/CD Pipeline** - GitHub Actions for build, test, deploy with staging and production environments (3/3 complete)
+- [x] **Phase 19: Sentry Error Tracking** - Frontend and backend error capture with source maps and performance monitoring (3/3 complete)
+- [x] **Phase 20: Monitoring & Alerting** - Health endpoints, Prometheus metrics, uptime checks, Grafana dashboards (3/3 complete)
+- [x] **Phase 21: Load Testing** - k6 scripts, 10k user validation, CI integration, performance baselines (3/3 complete)
+- [x] **Phase 22: SMTP Production** - Production email provider, delivery verification, bounce handling (3/3 complete)
 
-- [ ] **Phase 18: CI/CD Pipeline** - GitHub Actions for build, test, deploy with staging and production environments
-- [ ] **Phase 19: Sentry Error Tracking** - Frontend and backend error capture with source maps and performance monitoring
-- [ ] **Phase 20: Monitoring & Alerting** - Health endpoints, Prometheus metrics, uptime checks, Grafana dashboards
-- [ ] **Phase 21: Load Testing** - k6 scripts, 10k user validation, CI integration, performance baselines
-- [ ] **Phase 22: SMTP Production** - Production email provider, delivery verification, bounce handling
+</details>
+
+### v1.4 User & Community Features (Complete)
+
+**Milestone Goal:** Reduce onboarding friction, expand target audience, and increase user engagement through OAuth login, internationalization, mobile optimization, social sharing, comments, and team collaboration.
+
+- [x] **Phase 23: i18n Foundation** - Multi-language UI with react-i18next, string extraction, browser detection (completed 2026-04-24)
+- [x] **Phase 24: Mobile Responsive** - Responsive layouts, touch navigation, optimized images (completed 2026-04-24)
+- [x] **Phase 25: Social Sharing** - Share buttons, Open Graph meta tags, share analytics (completed)
+- [x] **Phase 26: OAuth Integration** - Google and GitHub OAuth with account linking (completed)
+- [x] **Phase 27: Comments System** - Article comments with threaded replies and real-time updates (completed)
+- [x] **Phase 28: Team Collaboration** - Team workspaces, shared bookmarks, role-based permissions (completed 2026-04-25)
 
 ## Phase Details
 
-### Phase 18: CI/CD Pipeline
-**Goal**: Automated build, test, and deployment pipeline with staging and production environments
-**Depends on**: Phase 17 (Docker Deployment)
-**Requirements**: CICD-01, CICD-02, CICD-03, CICD-04
+### Phase 23: i18n Foundation
+**Goal**: Users can switch UI language and experience fully localized interface
+**Depends on**: Phase 22 (v1.3 complete)
+**Requirements**: I18N-01, I18N-02, I18N-03
 **Success Criteria** (what must be TRUE):
-  1. Pull requests trigger automated build and test runs with pass/fail status checks
-  2. Successful builds push Docker images to container registry with semantic version tags
-  3. Merges to main branch automatically deploy to staging environment
-  4. Production deployments require manual approval before execution
-  5. Deployment status visible in GitHub PR/commit interface
-**Plans**: 3 plans
-
+  1. User can change UI language via language switcher in navigation
+  2. All user-facing text displays in selected language (DE, EN initially)
+  3. Browser language is automatically detected and applied on first visit
+  4. Date formats, number formats adapt to selected locale
+  5. Adding new languages requires only translation JSON files (no code changes)
+**Plans**: 4 plans
 Plans:
-- [ ] 18-01-PLAN.md — GitHub Actions workflow with quality gates and Docker build
-- [ ] 18-02-PLAN.md — SSH deployment to staging (auto) and production (approval)
-- [ ] 18-03-PLAN.md — End-to-end pipeline verification
+- [x] 23-01-PLAN.md - Install i18n dependencies and create core infrastructure
+- [x] 23-02-PLAN.md - Create translation JSON files (namespaces for EN/DE)
+- [x] 23-03-PLAN.md - Create locale-aware formatters and Zustand sync
+- [x] 23-04-PLAN.md - Refactor components to use i18n translations
+**UI hint**: yes
 
-### Phase 19: Sentry Error Tracking
-**Goal**: Comprehensive error capture and performance monitoring across frontend and backend
-**Depends on**: Phase 18 (CI/CD Pipeline)
-**Requirements**: SNTR-01, SNTR-02, SNTR-03, SNTR-04
+### Phase 24: Mobile Responsive
+**Goal**: Users have optimized experience on mobile devices with touch-friendly navigation
+**Depends on**: Phase 23 (i18n Foundation)
+**Requirements**: MOBILE-01, MOBILE-02, MOBILE-03
 **Success Criteria** (what must be TRUE):
-  1. Frontend runtime errors are captured via React Error Boundary with Sentry SDK integration
-  2. Backend Express errors are captured via error handler middleware with Sentry SDK
-  3. Source maps are uploaded to Sentry enabling readable stack traces in production
-  4. Transaction traces show API latency and frontend performance metrics
-  5. Error alerts notify team when new issues occur
-**Plans**: TBD
+  1. All pages display correctly on mobile screens (320px-768px viewport)
+  2. Touch navigation works via bottom nav bar, hamburger menu, and swipe gestures
+  3. Images load responsively with appropriate sizes and lazy loading
+  4. No horizontal scrolling required on any page
+  5. Interactive elements have touch-friendly tap targets (min 44px)
+**Plans**: 5 plans
+Plans:
+- [x] 24-01-PLAN.md — Breakpoint migration (lg: → md:) and safe area CSS infrastructure
+- [x] 24-02-PLAN.md — Mobile navigation (BottomNav + MobileDrawer with hooks)
+- [x] 24-03-PLAN.md — Responsive images (ResponsiveImage + Cloudinary + NewsCard integration)
+- [x] 24-04-PLAN.md — Touch interactions (SwipeableCard, PullToRefresh, ScrollToTopFAB)
+- [x] 24-05-PLAN.md — Layout adaptations and verification
+**UI hint**: yes
 
-### Phase 20: Monitoring & Alerting
-**Goal**: Production observability with health checks, metrics, and alerting
-**Depends on**: Phase 19 (Sentry Error Tracking)
-**Requirements**: MNTR-01, MNTR-02, MNTR-03, MNTR-04
+### Phase 25: Social Sharing
+**Goal**: Users can share articles to social platforms with rich previews
+**Depends on**: Phase 24 (Mobile Responsive)
+**Requirements**: SHARE-01, SHARE-02, SHARE-03
 **Success Criteria** (what must be TRUE):
-  1. Health endpoints respond with service status (/health, /health/db, /health/redis, /readiness)
-  2. Prometheus-format metrics endpoint exposes request counts, latencies, and system stats
-  3. External uptime monitoring alerts team when services are down or degraded
-  4. Grafana dashboard visualizes all key metrics with historical trends
-  5. Alert rules trigger notifications for error spikes and latency anomalies
-**Plans**: TBD
+  1. Share buttons (Twitter, LinkedIn, WhatsApp, Facebook) appear on article views
+  2. Shared links display rich previews with title, description, and image on social platforms
+  3. Share click events are tracked and visible in analytics
+  4. Mobile users can use native share sheet via Web Share API
+**Plans**: 3 plans
+Plans:
+- [x] 25-01-PLAN.md — Server infrastructure (bot detection, /s/:code route, /api/share/my, OG meta tags)
+- [x] 25-02-PLAN.md — Frontend components (ShareButtons, useShare hook, i18n translations)
+- [x] 25-03-PLAN.md — Integration (NewsCard share button, MyShares in Profile, verification)
+**UI hint**: yes
 
-### Phase 21: Load Testing
-**Goal**: Validate system handles 10,000 concurrent users with documented performance baselines
-**Depends on**: Phase 20 (Monitoring & Alerting)
-**Requirements**: LOAD-01, LOAD-02, LOAD-03, LOAD-04
+### Phase 26: OAuth Integration
+**Goal**: Users can sign up and log in with Google or GitHub accounts
+**Depends on**: Phase 25 (Social Sharing)
+**Requirements**: OAUTH-01, OAUTH-02, OAUTH-03
 **Success Criteria** (what must be TRUE):
-  1. k6 test scripts exist for critical endpoints (news, auth, AI, bookmarks)
-  2. System maintains stability under 10,000 concurrent virtual users
-  3. Load tests run automatically as part of CI pipeline on demand
-  4. Performance baselines documented with p95 and p99 latency thresholds
-  5. Bottlenecks identified and addressed or documented for future optimization
-**Plans**: TBD
+  1. User can create account by clicking "Sign in with Google" button
+  2. User can create account by clicking "Sign in with GitHub" button
+  3. Existing email account user can link Google or GitHub after re-authentication
+  4. OAuth login preserves existing user data (bookmarks, reading history, badges)
+  5. User can unlink OAuth provider and still log in with email/password
+**Plans**: 5 plans
+Plans:
+- [x] 26-01-PLAN.md — Database schema and OAuth service (Prisma, oauthService.ts, passport.ts)
+- [x] 26-02-PLAN.md — OAuth routes and server configuration (oauth.ts routes, server integration)
+- [x] 26-03-PLAN.md — Frontend OAuth components (useOAuthPopup, OAuthButton, ReAuthModal, AuthContext)
+- [x] 26-04-PLAN.md — UI integration (AuthModal OAuth buttons, ConnectedAccounts in Settings)
+- [x] 26-05-PLAN.md — Testing and documentation (oauthService tests, hook tests, .env.example)
+**UI hint**: yes
 
-### Phase 22: SMTP Production
-**Goal**: Production email delivery with verified flows and bounce handling
-**Depends on**: Phase 21 (Load Testing)
-**Requirements**: SMTP-01, SMTP-02, SMTP-03
+### Phase 27: Comments System
+**Goal**: Users can engage in article discussions with threaded comments
+**Depends on**: Phase 26 (OAuth Integration)
+**Requirements**: COMM-01, COMM-02, COMM-03
 **Success Criteria** (what must be TRUE):
-  1. Production SMTP provider configured (SendGrid, SES, or equivalent)
-  2. Email verification flow delivers emails and tokens work in production
-  3. Password reset flow delivers emails and reset links work in production
-  4. Bounce handling marks undeliverable addresses and prevents retry spam
-**Plans**: TBD
+  1. Authenticated user can post a comment on any article
+  2. User can reply to existing comments creating threaded discussions
+  3. New comments and replies appear in real-time without page refresh
+  4. Comments show author name, avatar, and timestamp
+  5. Comment author can delete their own comments
+**Plans**: 4 plans
+Plans:
+- [x] 27-01-PLAN.md — Database schema, WebSocket events, rate limits, i18n translations
+- [x] 27-02-PLAN.md — Backend API (CommentService + routes with AI moderation)
+- [x] 27-03-PLAN.md — Frontend components (hooks, CommentSection, CommentInput, CommentCard)
+- [x] 27-04-PLAN.md — Integration (Article page), unit tests, E2E tests, verification
+**UI hint**: yes
+
+### Phase 28: Team Collaboration
+**Goal**: Users can collaborate in team workspaces with shared resources
+**Depends on**: Phase 27 (Comments System)
+**Requirements**: COLLAB-01, COLLAB-02, COLLAB-03
+**Success Criteria** (what must be TRUE):
+  1. User can create a team and invite members via email
+  2. Team has shared bookmark collection visible to all members
+  3. Team roles (Owner, Admin, Member) control who can invite, remove, or manage settings
+  4. Team members can see each other's activity in team context
+  5. User can be a member of multiple teams
+**Plans**: 5 plans
+Plans:
+- [x] 28-01-PLAN.md — Database models, TeamService, teamAuth middleware, WebSocket, email, i18n
+- [x] 28-02-PLAN.md — API routes (team CRUD, invites, bookmarks, rate limiting)
+- [x] 28-03-PLAN.md — Frontend hooks (useTeams, useTeamBookmarks, useTeamMembers, Zustand)
+- [x] 28-04-PLAN.md — UI components (TeamSwitcher, TeamCard, modals, pages)
+- [x] 28-05-PLAN.md — Integration and testing (Header/Drawer wiring, BookmarkButton, tests)
+**UI hint**: yes
 
 ## Progress
 
@@ -141,12 +202,72 @@ Plans:
 | 15. Query Optimization | v1.2 | 4/4 | Complete | 2026-04-22 |
 | 16. PWA / Service Worker | v1.2 | 6/6 | Complete | 2026-04-22 |
 | 17. Docker Deployment | v1.2 | 3/3 | Complete | 2026-04-23 |
-| 18. CI/CD Pipeline | v1.3 | 0/3 | Planned | - |
-| 19. Sentry Error Tracking | v1.3 | 0/? | Not started | - |
-| 20. Monitoring & Alerting | v1.3 | 0/? | Not started | - |
-| 21. Load Testing | v1.3 | 0/? | Not started | - |
-| 22. SMTP Production | v1.3 | 0/? | Not started | - |
+| 18. CI/CD Pipeline | v1.3 | 3/3 | Complete | 2026-04-23 |
+| 19. Sentry Error Tracking | v1.3 | 3/3 | Complete | 2026-04-23 |
+| 20. Monitoring & Alerting | v1.3 | 3/3 | Complete | 2026-04-23 |
+| 21. Load Testing | v1.3 | 3/3 | Complete | 2026-04-23 |
+| 22. SMTP Production | v1.3 | 3/3 | Complete | 2026-04-23 |
+| 23. i18n Foundation | v1.4 | 4/4 | Complete | 2026-04-24 |
+| 24. Mobile Responsive | v1.4 | 5/5 | Complete | 2026-04-24 |
+| 25. Social Sharing | v1.4 | 3/3 | Complete | 2026-04-24 |
+| 26. OAuth Integration | v1.4 | 5/5 | Complete | 2026-04-24 |
+| 27. Comments System | v1.4 | 4/4 | Complete | 2026-04-25 |
+| 28. Team Collaboration | v1.4 | 5/5 | Complete | 2026-04-25 |
+
+---
+
+## Future Milestones
+
+### v1.5 Scale & Infrastructure (Planned)
+
+**Goal:** Prepare for growth and ensure reliability at scale
+
+| Requirement | Feature | Rationale |
+|-------------|---------|-----------|
+| SCALE-01 | Kubernetes Deployment | Horizontal scaling, auto-healing |
+| SCALE-02 | Horizontal Pod Autoscaling | Dynamic resource management |
+| SCALE-03 | Multi-Region Deployment | Latency optimization, redundancy |
+| SCALE-04 | Database Read Replicas | Geo-routing for read performance |
+| LOG-01 | Log Aggregation (Loki/ELK) | Debugging at scale |
+| LOG-02 | Structured Logging | Correlation IDs for tracing |
+| CDN-01 | CDN for Static Assets | Global performance |
+
+### v1.6 Growth & Monetization (Planned)
+
+**Goal:** Enable data-driven decisions and generate revenue
+
+| Requirement | Feature | Rationale |
+|-------------|---------|-----------|
+| AB-01 | A/B Testing Framework | Data-driven decisions |
+| AB-02 | Feature Flags | Gradual rollouts |
+| ANALYTICS-01 | Analytics Dashboard | User behavior insights |
+| PAID-01 | Subscription Tiers | Revenue stream |
+| PAID-02 | Stripe Integration | Payment processing |
+| PAID-03 | Premium Export Features | Paid user value |
+
+### v1.7 Advanced Features (Demand-Driven)
+
+**Goal:** Expand capabilities based on validated user demand
+
+| Requirement | Feature | Rationale |
+|-------------|---------|-----------|
+| NATIVE-01 | iOS/Android App | Only if PWA insufficient |
+| NATIVE-02 | Push Notifications | Breaking news alerts |
+| VIDEO-01 | Video Content | Only if validated |
+| CHAT-01 | Real-time Chat | Only if community demands |
+
+### Milestone Sequence Logic
+
+```
+v1.4 User & Community  -> Nutzer gewinnen + engagieren (OAuth, i18n, Mobile, Share, Comments, Teams)
+         |
+v1.5 Scale             -> Infrastruktur skalieren (K8s, Multi-Region)
+         |
+v1.6 Monetization      -> Revenue generieren (Subscriptions, A/B)
+         |
+v1.7 Advanced          -> Bedarfsabhangig erweitern
+```
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-23 — Phase 18 planned (3 plans)*
+*Last updated: 2026-04-25 — Phase 28 complete, v1.4 milestone complete*

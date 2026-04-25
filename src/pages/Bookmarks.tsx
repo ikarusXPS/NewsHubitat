@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { Bookmark, Loader2, AlertCircle, Trash2 } from 'lucide-react';
 import { useAppStore } from '../store';
 import { NewsCard } from '../components/NewsCard';
@@ -36,6 +37,7 @@ async function translateArticle(
 }
 
 export function Bookmarks() {
+  const { t } = useTranslation(['bookmarks', 'common']);
   const { bookmarkedArticles, toggleBookmark } = useAppStore();
   const queryClient = useQueryClient();
 
@@ -65,15 +67,15 @@ export function Bookmarks() {
   if (bookmarkedArticles.length === 0) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold text-white">Gespeicherte Artikel</h1>
+        <h1 className="text-2xl font-bold text-white">{t('bookmarks:title')}</h1>
         <p className="text-gray-400">
-          Deine markierten Artikel zum spateren Lesen.
+          {t('bookmarks:description')}
         </p>
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <Bookmark className="mb-4 h-16 w-16 text-gray-500" />
-          <p className="text-gray-400">Keine gespeicherten Artikel</p>
+          <p className="text-gray-400">{t('bookmarks:empty.title')}</p>
           <p className="mt-2 text-sm text-gray-500">
-            Klicke auf das Lesezeichen-Symbol bei einem Artikel, um ihn zu speichern.
+            {t('bookmarks:empty.description')}
           </p>
         </div>
       </div>
@@ -83,10 +85,10 @@ export function Bookmarks() {
   if (error) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold text-white">Gespeicherte Artikel</h1>
+        <h1 className="text-2xl font-bold text-white">{t('bookmarks:title')}</h1>
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <AlertCircle className="mb-4 h-12 w-12 text-red-500" />
-          <p className="text-gray-400">Fehler beim Laden der Artikel</p>
+          <p className="text-gray-400">{t('bookmarks:error.loadFailed')}</p>
         </div>
       </div>
     );
@@ -96,9 +98,9 @@ export function Bookmarks() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Gespeicherte Artikel</h1>
+          <h1 className="text-2xl font-bold text-white">{t('bookmarks:title')}</h1>
           <p className="text-gray-400">
-            Deine markierten Artikel zum spateren Lesen.
+            {t('bookmarks:description')}
           </p>
         </div>
         {bookmarkedArticles.length > 0 && (
@@ -107,7 +109,7 @@ export function Bookmarks() {
             className="flex items-center gap-2 rounded-lg bg-red-600/20 px-3 py-2 text-sm text-red-400 hover:bg-red-600/30"
           >
             <Trash2 className="h-4 w-4" />
-            Alle entfernen
+            {t('bookmarks:actions.clearAll')}
           </button>
         )}
       </div>
@@ -119,14 +121,18 @@ export function Bookmarks() {
       ) : (
         <>
           <p className="text-sm text-gray-500">
-            {articles?.length || 0} von {bookmarkedArticles.length} Artikel verfugbar
+            {t('bookmarks:status.available', {
+              count: articles?.length || 0,
+              total: bookmarkedArticles.length
+            })}
           </p>
 
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {articles?.map((article) => (
+          <div className="grid gap-4 md:grid-cols-2 md:grid-cols-3">
+            {articles?.map((article, index) => (
               <NewsCard
                 key={article.id}
                 article={article}
+                priority={index < 3}
                 onTranslate={handleTranslate}
               />
             ))}
@@ -134,7 +140,7 @@ export function Bookmarks() {
 
           {articles && articles.length < bookmarkedArticles.length && (
             <p className="text-sm text-gray-500">
-              Einige Artikel sind nicht mehr verfugbar und wurden aus dem Server entfernt.
+              {t('bookmarks:status.someUnavailable')}
             </p>
           )}
         </>
