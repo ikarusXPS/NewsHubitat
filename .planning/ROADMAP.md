@@ -6,7 +6,7 @@
 - [x] **v1.1 Quality & Testing** - Phases 7-12 (completed 2026-04-22)
 - [x] **v1.2 Performance & Scale** - Phases 13-17 (completed 2026-04-23)
 - [x] **v1.3 Production Ready** - Phases 18-22 (completed 2026-04-23)
-- [ ] **v1.4 User & Community Features** - Phases 23-28 (in progress)
+- [x] **v1.4 User & Community Features** - Phases 23-28 (completed 2026-04-25)
 - [ ] **v1.5 Scale & Infrastructure** - Kubernetes, Multi-Region, Log Aggregation (planned)
 - [ ] **v1.6 Growth & Monetization** - A/B Testing, Subscriptions (planned)
 - [ ] **v1.7 Advanced Features** - Native App, Video, Chat (demand-driven)
@@ -59,7 +59,7 @@
 
 </details>
 
-### v1.4 User & Community Features (In Progress)
+### v1.4 User & Community Features (Complete)
 
 **Milestone Goal:** Reduce onboarding friction, expand target audience, and increase user engagement through OAuth login, internationalization, mobile optimization, social sharing, comments, and team collaboration.
 
@@ -68,7 +68,7 @@
 - [x] **Phase 25: Social Sharing** - Share buttons, Open Graph meta tags, share analytics (completed)
 - [x] **Phase 26: OAuth Integration** - Google and GitHub OAuth with account linking (completed)
 - [x] **Phase 27: Comments System** - Article comments with threaded replies and real-time updates (completed)
-- [ ] **Phase 28: Team Collaboration** - Team workspaces, shared bookmarks, role-based permissions
+- [x] **Phase 28: Team Collaboration** - Team workspaces, shared bookmarks, role-based permissions (completed 2026-04-25)
 
 ## Phase Details
 
@@ -174,11 +174,10 @@ Plans:
   5. User can be a member of multiple teams
 **Plans**: 5 plans
 Plans:
-- [ ] 28-01-PLAN.md — Database models, TeamService, teamAuth middleware, WebSocket, email, i18n
-- [ ] 28-02-PLAN.md — API routes (team CRUD, invites, bookmarks, rate limiting)
-- [ ] 28-03-PLAN.md — Frontend hooks (useTeams, useTeamBookmarks, useTeamMembers, Zustand)
-- [ ] 28-04-PLAN.md — UI components (TeamSwitcher, TeamCard, modals, pages)
-- [ ] 28-05-PLAN.md — Integration (Header, BookmarkButton), tests, verification
+- [x] 28-01-PLAN.md — Database models, TeamService, teamAuth middleware, WebSocket, email, i18n
+- [x] 28-02-PLAN.md — API routes (team CRUD, invites, bookmarks, rate limiting)
+- [x] 28-03-PLAN.md — Frontend hooks (useTeams, useTeamBookmarks, useTeamMembers, Zustand)
+- [x] 28-04-PLAN.md — UI components (TeamSwitcher, TeamCard, modals, pages)
 **UI hint**: yes
 
 ## Progress
@@ -212,7 +211,7 @@ Plans:
 | 25. Social Sharing | v1.4 | 3/3 | Complete | 2026-04-24 |
 | 26. OAuth Integration | v1.4 | 5/5 | Complete | 2026-04-24 |
 | 27. Comments System | v1.4 | 4/4 | Complete | 2026-04-25 |
-| 28. Team Collaboration | v1.4 | 0/5 | Not started | - |
+| 28. Team Collaboration | v1.4 | 4/4 | Complete | 2026-04-25 |
 
 ---
 
@@ -270,4 +269,4 @@ v1.7 Advanced          -> Bedarfsabhangig erweitern
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-25 — Phase 28 plans created (Team Collaboration)*
+*Last updated: 2026-04-25 — Phase 28 complete, v1.4 milestone complete*
