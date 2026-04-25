@@ -205,6 +205,10 @@ v1.4 Stack Decisions (from research):
 | CSS fade-in 200ms | Phase 31 Plan 02 | Replace framer-motion stagger with lightweight CSS |
 | prefers-reduced-motion fallback | Phase 31 Plan 02 | Disable animation for accessibility users |
 | Keep SignalCard index prop | Phase 31 Plan 02 | Backward compatibility with callers |
+| Arrow key null start at 0 | Phase 31 CR-fix | ArrowDown/Right from null focusedIndex starts at index 0 |
+| ArrowUp/Left from null = noop | Phase 31 CR-fix | No action when no selection exists |
+| Removed screen reader sniffing | Phase 31 CR-fix | Rely solely on prefers-reduced-motion, not UA detection |
+| DEV-only console.error | Phase 31 CR-fix | Wrap share errors in import.meta.env.DEV check |
 
 ## Reports
 

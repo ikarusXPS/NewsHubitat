@@ -78,7 +78,7 @@
 
 - [x] **Phase 29: Measurement Foundation** - Bundle analyzer, query logging, Lighthouse baseline
 - [x] **Phase 30: Frontend Code Splitting** - Route-based splitting, lazy image loading, reduced initial bundle
-- [ ] **Phase 31: Virtual Scrolling** - Virtualized rendering for long article lists
+- [x] **Phase 31: Virtual Scrolling** - Virtualized rendering for long article lists (completed 2026-04-25)
 - [ ] **Phase 32: Image Pipeline** - WebP/AVIF conversion, responsive srcset, Cloudinary integration
 - [ ] **Phase 33: Caching Improvements** - Smart invalidation, HTTP cache headers, jitter-based TTL
 - [ ] **Phase 34: Database Optimization** - EXPLAIN ANALYZE audit, composite indexes, N+1 fixes, pool tuning
