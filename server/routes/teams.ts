@@ -559,6 +559,15 @@ router.get(
 
       const bookmarks = await prisma.teamBookmark.findMany({
         where: { teamId },
+        include: {
+          article: {
+            select: {
+              id: true,
+              title: true,
+              url: true,
+            },
+          },
+        },
         orderBy: { createdAt: 'desc' },
       });
 
@@ -578,6 +587,11 @@ router.get(
         addedByUser: userMap.get(b.addedBy) || { id: b.addedBy, name: 'Unknown', avatarUrl: null },
         note: b.note,
         createdAt: b.createdAt,
+        article: b.article ? {
+          id: b.article.id,
+          title: b.article.title,
+          url: b.article.url,
+        } : null,
       }));
 
       res.status(200).json({
