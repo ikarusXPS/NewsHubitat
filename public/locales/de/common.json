@@ -64,5 +64,37 @@
     "ozeanien": "Ozeanien",
     "kanada": "Kanada",
     "alternative": "Alternative"
+  },
+  "comments": {
+    "post": "Kommentar posten",
+    "reply": "Antworten",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "flag": "Melden",
+    "showReplies": "{{count}} Antworten anzeigen",
+    "hideReplies": "Antworten ausblenden",
+    "typing": "Jemand schreibt...",
+    "deleted": "[Kommentar gelöscht]",
+    "edited": "(bearbeitet)",
+    "flagged": "Zur Überprüfung gemeldet",
+    "characterCount": "{{current}} / {{max}}",
+    "characterLimitExceeded": "Kommentar zu lang",
+    "authRequired": "Melde dich an, um mitzudiskutieren",
+    "emptyState": {
+      "heading": "Noch keine Kommentare",
+      "body": "Sei der Erste, der seine Gedanken zu diesem Artikel teilt."
+    },
+    "errors": {
+      "postFailed": "Kommentar konnte nicht gepostet werden. Bitte erneut versuchen.",
+      "rateLimit": "Zu viele Kommentare. Bitte warte einen Moment.",
+      "flagged": "Dein Kommentar wurde zur Überprüfung markiert.",
+      "editExpired": "Bearbeitungszeit abgelaufen",
+      "deleteFailed": "Kommentar konnte nicht gelöscht werden."
+    },
+    "deleteConfirm": {
+      "heading": "Kommentar löschen?",
+      "body": "Dies entfernt deinen Kommentar aus der Diskussion. Antworten bleiben sichtbar.",
+      "confirm": "Löschen"
+    }
   }
 }
