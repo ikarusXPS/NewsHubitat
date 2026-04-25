@@ -104,3 +104,4 @@ export function createLimiter(
 export const authLimiter = createLimiter('auth');
 export const aiLimiter = createLimiter('ai');
 export const newsLimiter = createLimiter('news');
+export const commentLimiter = createLimiter('comment');
