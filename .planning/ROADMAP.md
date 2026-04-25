@@ -151,6 +151,12 @@ Plans:
   5. Total image payload per page reduced by at least 50%
 **Plans**: 4 plans
 
+Plans:
+- [ ] 32-01-PLAN.md — Migrate SignalCard to ResponsiveImage with priority={index < 6}
+- [ ] 32-02-PLAN.md — Migrate NewsCardPremium to ResponsiveImage with motion.div wrapper
+- [ ] 32-03-PLAN.md — Migrate ForYouCard to ResponsiveImage with fixed 280px sizes
+- [ ] 32-04-PLAN.md — Validation checkpoint: tests, build, and human verification
+
 ### Phase 33: Caching Improvements
 **Goal**: API responses served from cache with smart invalidation maintaining data freshness
 **Depends on**: Phase 29 (Measurement Foundation)
@@ -274,4 +280,4 @@ v1.8 Advanced          -> Demand-driven expansion
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-25 — Phase 31 complete (Virtual Scrolling with keyboard navigation)*
+*Last updated: 2026-04-25 — Phase 32 planned (Image Pipeline, 4 plans)*
