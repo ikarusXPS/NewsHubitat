@@ -37,6 +37,7 @@ import { authLimiter, aiLimiter, newsLimiter } from './middleware/rateLimiter';
 import { isBot, generateOGHtml } from './middleware/botDetection';
 import { SharingService } from './services/sharingService';
 import { serverTimingMiddleware } from './middleware/serverTiming';
+import { etagMiddleware } from './middleware/etagMiddleware';
 import { metricsMiddleware } from './middleware/metricsMiddleware';
 import { NewsAggregator } from './services/newsAggregator';
 import { MetricsService } from './services/metricsService';
@@ -86,6 +87,9 @@ app.use(compression({ threshold: 1024 }));
 
 // Server-Timing header for p95 latency monitoring (D-05, D-06)
 app.use(serverTimingMiddleware);
+
+// ETag header for conditional caching (Phase 33 D-04, D-05, D-06)
+app.use(etagMiddleware);
 
 // Prometheus metrics collection (D-05)
 app.use(metricsMiddleware);
@@ -390,6 +394,12 @@ if (process.env.NODE_ENV === 'production') {
     maxAge: '7d',
     etag: true,
     index: false,  // Don't serve index.html for directory requests (SPA handles this)
+    setHeaders: (res, filePath) => {
+      // D-10, D-11, D-12: Immutable for hashed assets in /assets/
+      if (filePath.includes('/assets/') || filePath.includes('\\assets\\')) {
+        res.set('Cache-Control', 'public, max-age=31536000, immutable');
+      }
+    },
   }));
 
   // SPA fallback - serve index.html for all non-API routes
