@@ -76,7 +76,7 @@
 
 **Milestone Goal:** Comprehensive performance optimization using measurement-first approach. Reduce bundle size, optimize database queries, improve image delivery, and enhance caching for faster page loads and API responses.
 
-- [ ] **Phase 29: Measurement Foundation** - Bundle analyzer, query logging, Lighthouse baseline
+- [x] **Phase 29: Measurement Foundation** - Bundle analyzer, query logging, Lighthouse baseline
 - [ ] **Phase 30: Frontend Code Splitting** - Route-based splitting, lazy image loading, reduced initial bundle
 - [ ] **Phase 31: Virtual Scrolling** - Virtualized rendering for long article lists
 - [ ] **Phase 32: Image Pipeline** - WebP/AVIF conversion, responsive srcset, Cloudinary integration
@@ -100,7 +100,7 @@
 Plans:
 - [x] 29-01-PLAN.md — Bundle analysis tooling with rollup-plugin-visualizer and CI integration (2/2 tasks, commits: 3391263, 7436c6e)
 - [x] 29-02-PLAN.md — Prisma query logging with duration timing for development (2/2 tasks, commit: 387b8d2)
-- [ ] 29-03-PLAN.md — Lighthouse CI integration and performance baseline documentation
+- [x] 29-03-PLAN.md — Lighthouse CI integration and performance baseline documentation (3/3 tasks, commits: 4397296, deb6df4, 68b806b)
 
 ### Phase 30: Frontend Code Splitting
 **Goal**: Users experience faster initial page loads through reduced JavaScript bundle
@@ -196,7 +196,7 @@ Plans:
 | 26. OAuth Integration | v1.4 | 5/5 | Complete | 2026-04-24 |
 | 27. Comments System | v1.4 | 4/4 | Complete | 2026-04-25 |
 | 28. Team Collaboration | v1.4 | 5/5 | Complete | 2026-04-25 |
-| 29. Measurement Foundation | v1.5 | 0/3 | Not started | - |
+| 29. Measurement Foundation | v1.5 | 3/3 | Complete | 2026-04-25 |
 | 30. Frontend Code Splitting | v1.5 | 0/4 | Not started | - |
 | 31. Virtual Scrolling | v1.5 | 0/3 | Not started | - |
 | 32. Image Pipeline | v1.5 | 0/4 | Not started | - |
@@ -263,4 +263,4 @@ v1.8 Advanced          -> Demand-driven expansion
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-25 — Phase 29 plans created (3 plans in 2 waves)*
+*Last updated: 2026-04-25 — Phase 29 complete (3/3 plans executed)*

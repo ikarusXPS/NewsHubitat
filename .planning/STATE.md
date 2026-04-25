@@ -4,14 +4,14 @@ milestone: v1.5
 milestone_name: Performance Optimization
 current_plan: —
 status: ready_to_execute
-last_updated: "2026-04-25T15:55:58.000Z"
-last_activity: 2026-04-25 — Plan 29-02 complete (Prisma query logging)
+last_updated: "2026-04-25T16:10:33.000Z"
+last_activity: 2026-04-25 — Plan 29-03 complete (Lighthouse CI integration)
 progress:
   total_phases: 6
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 21
-  completed_plans: 2
-  percent: 10
+  completed_plans: 3
+  percent: 14
 ---
 
 # State: NewsHub
@@ -27,11 +27,11 @@ See: .planning/PROJECT.md (updated 2026-04-25)
 
 Phase: 29 - Measurement Foundation
 Current Plan: —
-Status: 2 of 3 plans complete
-Last activity: 2026-04-25 — Plan 29-02 complete (Prisma query logging)
+Status: Complete (3 of 3 plans)
+Last activity: 2026-04-25 — Plan 29-03 complete (Lighthouse CI integration)
 
 ```
-v1.5 Progress: [██░░░░░░░░░░░░░░░░░░] 10% (6 phases, 0 complete)
+v1.5 Progress: [███░░░░░░░░░░░░░░░░░] 14% (6 phases, 1 complete)
 ```
 
 ## Milestone Progress
@@ -45,7 +45,7 @@ v1.5 Progress: [██░░░░░░░░░░░░░░░░░░] 10
 
 | Phase | Name | Requirements | Status |
 |-------|------|--------------|--------|
-| 29 | Measurement Foundation | MEAS-01, MEAS-02, MEAS-03 | Planned (3 plans) |
+| 29 | Measurement Foundation | MEAS-01, MEAS-02, MEAS-03 | Complete (3 plans) |
 | 30 | Frontend Code Splitting | FRON-01, FRON-03, FRON-04 | Pending |
 | 31 | Virtual Scrolling | FRON-02 | Pending |
 | 32 | Image Pipeline | IMG-01, IMG-02, IMG-03 | Pending |
@@ -70,8 +70,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Plan 29-02 complete (Prisma query logging)
-**Next step:** Execute Plan 29-03 (baseline performance metrics)
+**Last action:** Plan 29-03 complete (Lighthouse CI integration)
+**Next step:** Begin Phase 30 - Frontend Code Splitting
 **Resume file:** None
 **Checkpoint:** —
 
@@ -178,6 +178,13 @@ v1.4 Stack Decisions (from research):
 | Query logging disabled in production | Performance and security | NODE_ENV !== 'production' gate |
 | 100ms slow query threshold | Balance visibility and noise | console.warn for >100ms queries |
 | 200-char param truncation | Log readability | Prevents massive param dumps in console |
+| Lighthouse CI master-only execution | Phase 29 Plan 03 | Runs after deploy-staging on master branch only |
+| 90+ category score thresholds | Phase 29 Plan 03 | Performance, accessibility, best-practices, SEO all require 90+ |
+| Core Web Vitals warn-level | Phase 29 Plan 03 | LCP < 2s, CLS < 0.05, INP < 150ms, FCP < 1.5s tracked without blocking |
+| Staging health check 5min timeout | Phase 29 Plan 03 | 30 attempts x 10s before running Lighthouse |
+| 30-day Lighthouse artifact retention | Phase 29 Plan 03 | Balance historical analysis with storage costs |
+| Temporary public storage for reports | Phase 29 Plan 03 | Free 7-day retention with shareable report links |
+| Performance baseline TBD placeholders | Phase 29 Plan 03 | Populated after first CI run with actual metrics |
 
 ## Reports
 
@@ -187,4 +194,4 @@ v1.4 Stack Decisions (from research):
 
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-25 — Phase 29 planned (3 plans, 2 waves)*
+*Last updated: 2026-04-25 — Phase 29 complete (3 plans executed)*

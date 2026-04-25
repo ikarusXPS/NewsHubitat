@@ -10,8 +10,8 @@ Requirements for Performance Optimization milestone. Each maps to roadmap phases
 ### Measurement Foundation
 
 - [x] **MEAS-01**: Bundle analysis tooling configured with rollup-plugin-visualizer
-- [ ] **MEAS-02**: Prisma query logging enabled to expose N+1 patterns and slow queries
-- [ ] **MEAS-03**: Lighthouse CI baseline established with LCP, INP, CLS metrics
+- [x] **MEAS-02**: Prisma query logging enabled to expose N+1 patterns and slow queries
+- [x] **MEAS-03**: Lighthouse CI baseline established with LCP, INP, CLS metrics
 
 ### Frontend Optimization
 
@@ -57,8 +57,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | MEAS-01 | Phase 29 | Complete |
-| MEAS-02 | Phase 29 | Pending |
-| MEAS-03 | Phase 29 | Pending |
+| MEAS-02 | Phase 29 | Complete |
+| MEAS-03 | Phase 29 | Complete |
 | FRON-01 | Phase 30 | Pending |
 | FRON-02 | Phase 31 | Pending |
 | FRON-03 | Phase 30 | Pending |
