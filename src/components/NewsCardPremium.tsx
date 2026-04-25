@@ -13,6 +13,7 @@ import {
   Eye,
 } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { ResponsiveImage } from './ResponsiveImage';
 import type { NewsArticle } from '../types';
 
 interface NewsCardPremiumProps {
@@ -140,7 +141,6 @@ export function NewsCardPremium({
   showTranslation = false,
 }: NewsCardPremiumProps) {
   const [isHovered, setIsHovered] = useState(false);
-  const [imageError, setImageError] = useState(false);
 
   const perspectiveStyle = PERSPECTIVE_COLORS[article.perspective] || PERSPECTIVE_COLORS.western;
   const perspectiveLabel = PERSPECTIVE_LABELS[article.perspective] || article.perspective;
@@ -185,18 +185,20 @@ export function NewsCardPremium({
 
       <div className="relative z-10">
         {/* Image */}
-        {article.imageUrl && !imageError && (
+        {article.imageUrl && (
           <div className="relative h-48 overflow-hidden">
-            <motion.img
-              src={article.imageUrl}
-              alt=""
-              loading="lazy"
-              decoding="async"
-              onError={() => setImageError(true)}
-              className="h-full w-full object-cover"
+            <motion.div
               animate={{ scale: isHovered ? 1.05 : 1 }}
               transition={{ duration: 0.5 }}
-            />
+              className="h-full w-full"
+            >
+              <ResponsiveImage
+                src={article.imageUrl}
+                alt=""
+                aspectRatio="16:9"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              />
+            </motion.div>
             <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/20 to-transparent" />
 
             {/* Floating badges on image */}
