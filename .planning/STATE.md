@@ -25,13 +25,13 @@ See: .planning/PROJECT.md (updated 2026-04-23)
 
 ## Current Position
 
-Phase: 26 (OAuth Integration) - Complete
+Phase: 27 (Comments System) - Complete
 Current Plan: —
-Status: Ready for Phase 27
-Last activity: 2026-04-25 — Completed Phase 26 OAuth Integration
+Status: Phase complete, ready for Phase 28
+Last activity: 2026-04-25 — Phase 27 Comments System complete
 
 ```
-v1.4 Progress: [#############       ] 67% (6 phases, 4 complete)
+v1.4 Progress: [################    ] 83% (6 phases, 5 complete)
 ```
 
 ## Milestone Progress
@@ -49,7 +49,7 @@ v1.4 Progress: [#############       ] 67% (6 phases, 4 complete)
 | 24 | Mobile Responsive | MOBILE-01, MOBILE-02, MOBILE-03 | Complete (2026-04-24) |
 | 25 | Social Sharing | SHARE-01, SHARE-02, SHARE-03 | Complete (2026-04-25) |
 | 26 | OAuth Integration | OAUTH-01, OAUTH-02, OAUTH-03 | Complete (2026-04-25) |
-| 27 | Comments System | COMM-01, COMM-02, COMM-03 | Not started |
+| 27 | Comments System | COMM-01, COMM-02, COMM-03 | Complete (2026-04-25) |
 | 28 | Team Collaboration | COLLAB-01, COLLAB-02, COLLAB-03 | Not started |
 
 ### Phase Dependencies
