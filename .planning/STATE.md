@@ -174,6 +174,10 @@ v1.4 Stack Decisions (from research):
 | 7-day invite expiry | D-02 requirement | Matches existing token patterns |
 | Soft delete teams | Claude discretion | deletedAt field, 7-day grace period |
 | Same error for member/invite | T-28-04 mitigation | Prevents user enumeration |
+| Prisma event-based query logging | Phase 29 Plan 02 | emit: 'event' for programmatic access to QueryEvent |
+| Query logging disabled in production | Performance and security | NODE_ENV !== 'production' gate |
+| 100ms slow query threshold | Balance visibility and noise | console.warn for >100ms queries |
+| 200-char param truncation | Log readability | Prevents massive param dumps in console |
 
 ## Reports
 
