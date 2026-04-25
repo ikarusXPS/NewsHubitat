@@ -65,9 +65,9 @@
 
 - [x] **Phase 23: i18n Foundation** - Multi-language UI with react-i18next, string extraction, browser detection (completed 2026-04-24)
 - [x] **Phase 24: Mobile Responsive** - Responsive layouts, touch navigation, optimized images (completed 2026-04-24)
-- [ ] **Phase 25: Social Sharing** - Share buttons, Open Graph meta tags, share analytics
-- [ ] **Phase 26: OAuth Integration** - Google and GitHub OAuth with account linking
-- [ ] **Phase 27: Comments System** - Article comments with threaded replies and real-time updates
+- [x] **Phase 25: Social Sharing** - Share buttons, Open Graph meta tags, share analytics (completed)
+- [x] **Phase 26: OAuth Integration** - Google and GitHub OAuth with account linking (completed)
+- [x] **Phase 27: Comments System** - Article comments with threaded replies and real-time updates (completed)
 - [ ] **Phase 28: Team Collaboration** - Team workspaces, shared bookmarks, role-based permissions
 
 ## Phase Details
@@ -122,7 +122,7 @@ Plans:
 Plans:
 - [x] 25-01-PLAN.md — Server infrastructure (bot detection, /s/:code route, /api/share/my, OG meta tags)
 - [x] 25-02-PLAN.md — Frontend components (ShareButtons, useShare hook, i18n translations)
-- [ ] 25-03-PLAN.md — Integration (NewsCard share button, MyShares in Profile, verification)
+- [x] 25-03-PLAN.md — Integration (NewsCard share button, MyShares in Profile, verification)
 **UI hint**: yes
 
 ### Phase 26: OAuth Integration
@@ -139,9 +139,9 @@ Plans:
 Plans:
 - [x] 26-01-PLAN.md — Database schema and OAuth service (Prisma, oauthService.ts, passport.ts)
 - [x] 26-02-PLAN.md — OAuth routes and server configuration (oauth.ts routes, server integration)
-- [ ] 26-03-PLAN.md — Frontend OAuth components (useOAuthPopup, OAuthButton, ReAuthModal, AuthContext)
-- [ ] 26-04-PLAN.md — UI integration (AuthModal OAuth buttons, ConnectedAccounts in Settings)
-- [ ] 26-05-PLAN.md — Testing and documentation (oauthService tests, hook tests, .env.example)
+- [x] 26-03-PLAN.md — Frontend OAuth components (useOAuthPopup, OAuthButton, ReAuthModal, AuthContext)
+- [x] 26-04-PLAN.md — UI integration (AuthModal OAuth buttons, ConnectedAccounts in Settings)
+- [x] 26-05-PLAN.md — Testing and documentation (oauthService tests, hook tests, .env.example)
 **UI hint**: yes
 
 ### Phase 27: Comments System
@@ -156,10 +156,10 @@ Plans:
   5. Comment author can delete their own comments
 **Plans**: 4 plans
 Plans:
-- [ ] 27-01-PLAN.md — Database schema, WebSocket events, rate limits, i18n translations
-- [ ] 27-02-PLAN.md — Backend API (CommentService + routes with AI moderation)
-- [ ] 27-03-PLAN.md — Frontend components (hooks, CommentSection, CommentInput, CommentCard)
-- [ ] 27-04-PLAN.md — Integration (Article page), unit tests, E2E tests, verification
+- [x] 27-01-PLAN.md — Database schema, WebSocket events, rate limits, i18n translations
+- [x] 27-02-PLAN.md — Backend API (CommentService + routes with AI moderation)
+- [x] 27-03-PLAN.md — Frontend components (hooks, CommentSection, CommentInput, CommentCard)
+- [x] 27-04-PLAN.md — Integration (Article page), unit tests, E2E tests, verification
 **UI hint**: yes
 
 ### Phase 28: Team Collaboration
@@ -172,7 +172,13 @@ Plans:
   3. Team roles (Owner, Admin, Member) control who can invite, remove, or manage settings
   4. Team members can see each other's activity in team context
   5. User can be a member of multiple teams
-**Plans**: TBD
+**Plans**: 5 plans
+Plans:
+- [ ] 28-01-PLAN.md — Database models, TeamService, teamAuth middleware, WebSocket, email, i18n
+- [ ] 28-02-PLAN.md — API routes (team CRUD, invites, bookmarks, rate limiting)
+- [ ] 28-03-PLAN.md — Frontend hooks (useTeams, useTeamBookmarks, useTeamMembers, Zustand)
+- [ ] 28-04-PLAN.md — UI components (TeamSwitcher, TeamCard, modals, pages)
+- [ ] 28-05-PLAN.md — Integration (Header, BookmarkButton), tests, verification
 **UI hint**: yes
 
 ## Progress
@@ -203,10 +209,10 @@ Plans:
 | 22. SMTP Production | v1.3 | 3/3 | Complete | 2026-04-23 |
 | 23. i18n Foundation | v1.4 | 4/4 | Complete | 2026-04-24 |
 | 24. Mobile Responsive | v1.4 | 5/5 | Complete | 2026-04-24 |
-| 25. Social Sharing | v1.4 | 2/3 | In Progress | - |
-| 26. OAuth Integration | v1.4 | 2/5 | In Progress | - |
-| 27. Comments System | v1.4 | 0/? | Not started | - |
-| 28. Team Collaboration | v1.4 | 0/? | Not started | - |
+| 25. Social Sharing | v1.4 | 3/3 | Complete | 2026-04-24 |
+| 26. OAuth Integration | v1.4 | 5/5 | Complete | 2026-04-24 |
+| 27. Comments System | v1.4 | 4/4 | Complete | 2026-04-25 |
+| 28. Team Collaboration | v1.4 | 0/5 | Not started | - |
 
 ---
 
@@ -264,4 +270,4 @@ v1.7 Advanced          -> Bedarfsabhangig erweitern
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-24 — Phase 26-02 complete (OAuth routes + server configuration)*
+*Last updated: 2026-04-25 — Phase 28 plans created (Team Collaboration)*
