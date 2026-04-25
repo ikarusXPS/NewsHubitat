@@ -347,6 +347,28 @@ describe('CacheService', () => {
       expect(result).toBe('computed-value');
       expect(computeFn).toHaveBeenCalledOnce();
     });
+
+    it('uses setWithJitter internally for consistent thundering herd prevention', async () => {
+      const service = CacheService.getInstance();
+      (service as any).isConnected = true;
+      const mockClient = {
+        get: vi.fn().mockResolvedValue(null),
+        setex: vi.fn().mockResolvedValue('OK')
+      };
+      (service as any).client = mockClient;
+
+      const setWithJitterSpy = vi.spyOn(service, 'setWithJitter');
+      const computeFn = vi.fn().mockResolvedValue({ computed: true });
+
+      // First call should compute and cache via setWithJitter
+      const result = await service.getOrSet('test:getOrSet:jitter', computeFn, 300);
+
+      expect(result).toEqual({ computed: true });
+      expect(computeFn).toHaveBeenCalledOnce();
+      expect(setWithJitterSpy).toHaveBeenCalledWith('test:getOrSet:jitter', { computed: true }, 300);
+
+      setWithJitterSpy.mockRestore();
+    });
   });
 
   describe('incr', () => {
