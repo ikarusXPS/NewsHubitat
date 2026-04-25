@@ -105,3 +105,45 @@ export const authLimiter = createLimiter('auth');
 export const aiLimiter = createLimiter('ai');
 export const newsLimiter = createLimiter('news');
 export const commentLimiter = createLimiter('comment');
+
+/**
+ * Team invite rate limiter - 10 invites per hour per team per user
+ * Prevents invite spam (T-28-DoS mitigation)
+ */
+export const teamInviteLimiter = (() => {
+  const cacheService = CacheService.getInstance();
+  const redisClient = cacheService.getClient();
+
+  let store: RedisStore | undefined;
+  if (redisClient) {
+    store = new RedisStore({
+      sendCommand: (command: string, ...args: string[]) =>
+        redisClient.call(command, ...args) as Promise<RedisReply>,
+      prefix: 'rl:team-invite:',
+    });
+  }
+
+  return rateLimit({
+    windowMs: 60 * 60 * 1000, // 1 hour
+    max: 10, // 10 invites per hour
+    keyGenerator: (req: AuthenticatedRequest) => {
+      const userId = req.user?.userId || 'anonymous';
+      const teamId = req.params.teamId || 'unknown';
+      return `${teamId}:${userId}`;
+    },
+    message: {
+      success: false,
+      error: 'Too many invites sent. Please try again later.',
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+    store,
+    skip: () => {
+      if (!cacheService.isAvailable()) {
+        logger.debug('Team invite rate limiting skipped: Redis unavailable');
+        return true;
+      }
+      return false;
+    },
+  });
+})();
