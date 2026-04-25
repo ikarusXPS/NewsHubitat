@@ -80,7 +80,7 @@
 - [x] **Phase 30: Frontend Code Splitting** - Route-based splitting, lazy image loading, reduced initial bundle
 - [x] **Phase 31: Virtual Scrolling** - Virtualized rendering for long article lists (completed 2026-04-25)
 - [x] **Phase 32: Image Pipeline** - WebP/AVIF conversion, responsive srcset, Cloudinary integration (completed 2026-04-26)
-- [ ] **Phase 33: Caching Improvements** - Smart invalidation, HTTP cache headers, jitter-based TTL
+- [x] **Phase 33: Caching Improvements** - Smart invalidation, HTTP cache headers, jitter-based TTL (completed 2026-04-25)
 - [ ] **Phase 34: Database Optimization** - EXPLAIN ANALYZE audit, composite indexes, N+1 fixes, pool tuning
 
 ## Phase Details
@@ -172,7 +172,7 @@ Plans:
 Plans:
 - [x] 33-01-PLAN.md — Cache invalidation on WebSocket broadcasts and jitter-based TTL (commit: d62d1d0)
 - [x] 33-02-PLAN.md — ETag middleware for API responses and immutable static asset headers (commits: 9b6452e, 8107e70)
-- [ ] 33-03-PLAN.md — Unit tests for caching improvements and full validation
+- [x] 33-03-PLAN.md — Unit tests for caching improvements and full validation (commits: 1f4bbaa, 1b8537a)
 
 ### Phase 34: Database Optimization
 **Goal**: Database queries execute efficiently with proper indexing and connection management
@@ -222,7 +222,7 @@ Plans:
 | 30. Frontend Code Splitting | v1.5 | 4/4 | Complete | 2026-04-25 |
 | 31. Virtual Scrolling | v1.5 | 3/3 | Complete | 2026-04-25 |
 | 32. Image Pipeline | v1.5 | 4/4 | Complete | 2026-04-26 |
-| 33. Caching Improvements | v1.5 | 2/3 | In progress | - |
+| 33. Caching Improvements | v1.5 | 3/3 | Complete | 2026-04-25 |
 | 34. Database Optimization | v1.5 | 0/4 | Not started | - |
 
 ---
