@@ -120,6 +120,7 @@ model User {
   userPersonas      UserPersona[]
   badges            UserBadge[]
   comments          Comment[]
+  teamMemberships   TeamMember[]
 
   // Indexes for token lookups (D-53)
   @@index([verificationTokenHash])
@@ -360,4 +361,68 @@ model Comment {
   @@index([parentId])
   @@index([isFlagged])
   @@index([createdAt])
+}
+
+// ============================================================================
+// PHASE 28: TEAM COLLABORATION
+// ============================================================================
+
+model Team {
+  id          String       @id @default(cuid())
+  name        String       @db.VarChar(50)
+  description String?      @db.VarChar(500)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  deletedAt   DateTime?    // Soft delete per Claude's discretion
+
+  members     TeamMember[]
+  bookmarks   TeamBookmark[]
+  invites     TeamInvite[]
+
+  @@index([deletedAt])
+}
+
+model TeamMember {
+  id        String   @id @default(cuid())
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  teamId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  role      String   @default("member") // owner, admin, member per D-07
+  joinedAt  DateTime @default(now())
+
+  @@unique([teamId, userId])
+  @@index([teamId])
+  @@index([userId])
+}
+
+model TeamBookmark {
+  id        String   @id @default(cuid())
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  teamId    String
+  articleId String
+  addedBy   String   // userId of person who added per D-06
+  note      String?  @db.VarChar(500)
+  createdAt DateTime @default(now())
+
+  @@unique([teamId, articleId])
+  @@index([teamId])
+  @@index([addedBy])
+}
+
+model TeamInvite {
+  id           String    @id @default(cuid())
+  team         Team      @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  teamId       String
+  email        String
+  tokenHash    String    @unique
+  invitedBy    String    // userId
+  role         String    @default("member") // role to assign on accept
+  expiresAt    DateTime  // 7 days per D-02
+  acceptedAt   DateTime?
+  createdAt    DateTime  @default(now())
+
+  @@index([teamId])
+  @@index([tokenHash])
+  @@index([email])
 }
