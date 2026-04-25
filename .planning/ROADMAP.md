@@ -178,6 +178,7 @@ Plans:
 - [x] 28-02-PLAN.md — API routes (team CRUD, invites, bookmarks, rate limiting)
 - [x] 28-03-PLAN.md — Frontend hooks (useTeams, useTeamBookmarks, useTeamMembers, Zustand)
 - [x] 28-04-PLAN.md — UI components (TeamSwitcher, TeamCard, modals, pages)
+- [x] 28-05-PLAN.md — Integration and testing (Header/Drawer wiring, BookmarkButton, tests)
 **UI hint**: yes
 
 ## Progress
@@ -211,7 +212,7 @@ Plans:
 | 25. Social Sharing | v1.4 | 3/3 | Complete | 2026-04-24 |
 | 26. OAuth Integration | v1.4 | 5/5 | Complete | 2026-04-24 |
 | 27. Comments System | v1.4 | 4/4 | Complete | 2026-04-25 |
-| 28. Team Collaboration | v1.4 | 4/4 | Complete | 2026-04-25 |
+| 28. Team Collaboration | v1.4 | 5/5 | Complete | 2026-04-25 |
 
 ---
 
