@@ -52,10 +52,12 @@ Exceptions:
 | Role | Size | Weight | Line Height | Font |
 |------|------|--------|-------------|------|
 | Body | 14px | 400 | 1.5 | Inter |
-| Label | 12px | 500 | 1.4 | JetBrains Mono |
+| Label | 12px | 400 | 1.4 | JetBrains Mono |
 | Comment text | 14px | 400 | 1.5 | Inter |
 | Username | 14px | 600 | 1.2 | Inter |
-| Timestamp | 11px | 500 | 1.0 | JetBrains Mono |
+| Timestamp | 11px | 400 | 1.0 | JetBrains Mono |
+
+**Weights:** 400 (regular) for body/secondary text, 600 (semibold) for emphasis only.
 
 **Source:** Existing patterns in Leaderboard, Toast components
 
