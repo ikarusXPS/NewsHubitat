@@ -115,6 +115,12 @@ Plans:
 **Plans**: 4 plans
 **UI hint**: yes
 
+Plans:
+- [ ] 30-01-PLAN.md — Core lazy infrastructure: lazyWithRetry utility, ChunkErrorBoundary, critical i18n strings
+- [ ] 30-02-PLAN.md — Route migration: centralized routes.ts, NavLinkPrefetch component, App.tsx update
+- [ ] 30-03-PLAN.md — Navigation integration: Sidebar and BottomNav use NavLinkPrefetch
+- [ ] 30-04-PLAN.md — Dashboard optimization: shell + lazy content, image lazy loading fix, CI bundle warning
+
 ### Phase 31: Virtual Scrolling
 **Goal**: Users can scroll through hundreds of articles without performance degradation
 **Depends on**: Phase 30 (Frontend Code Splitting)
@@ -263,4 +269,4 @@ v1.8 Advanced          -> Demand-driven expansion
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-25 — Phase 29 complete (3/3 plans executed)*
+*Last updated: 2026-04-25 — Phase 30 plans created (4 plans)*
