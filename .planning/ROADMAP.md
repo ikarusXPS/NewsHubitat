@@ -97,6 +97,11 @@
   5. All optimization decisions can reference actual profiling data
 **Plans**: 3 plans
 
+Plans:
+- [ ] 29-01-PLAN.md — Bundle analysis tooling with rollup-plugin-visualizer and CI integration
+- [ ] 29-02-PLAN.md — Prisma query logging with duration timing for development
+- [ ] 29-03-PLAN.md — Lighthouse CI integration and performance baseline documentation
+
 ### Phase 30: Frontend Code Splitting
 **Goal**: Users experience faster initial page loads through reduced JavaScript bundle
 **Depends on**: Phase 29 (Measurement Foundation)
@@ -258,4 +263,4 @@ v1.8 Advanced          -> Demand-driven expansion
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-25 — v1.5 Performance Optimization phases added (29-34)*
+*Last updated: 2026-04-25 — Phase 29 plans created (3 plans in 2 waves)*
