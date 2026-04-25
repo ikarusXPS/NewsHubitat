@@ -87,7 +87,7 @@ export class ChunkErrorBoundary extends Component<
               className="btn-cyber inline-flex items-center gap-2 px-6 py-3 rounded-lg font-mono"
             >
               <RefreshCw className="h-4 w-4" />
-              Retry
+              {getCriticalString(this.props.lang || 'en', 'retry')}
             </button>
           </div>
         </div>
