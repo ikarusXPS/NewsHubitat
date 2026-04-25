@@ -19,6 +19,7 @@ import { useAppStore } from '../store';
 import { ShareButtons } from './sharing';
 import { BookmarkButton } from './BookmarkButton';
 import { useCreateShare, type ShareUrls } from '../hooks/useShare';
+import { ResponsiveImage } from './ResponsiveImage';
 import type { NewsArticle } from '../types';
 
 interface SignalCardProps {
@@ -65,8 +66,6 @@ function getCountryFlag(countryCode: string): string {
 
 export function SignalCard({ article, isBookmarked, onBookmark, index = 0, isRead = false, onToggleRead }: SignalCardProps) {
   const [isHovered, setIsHovered] = useState(false);
-  const [imageError, setImageError] = useState(false);
-  const [imageLoading, setImageLoading] = useState(true);
   const [shareUrls, setShareUrls] = useState<ShareUrls | null>(null);
   const [shareCode, setShareCode] = useState<string | null>(null);
   const [isCreatingShare, setIsCreatingShare] = useState(false);
@@ -106,7 +105,7 @@ export function SignalCard({ article, isBookmarked, onBookmark, index = 0, isRea
   const isFilteredByThisSource = feedState.activeSourceFilter === article.source.id;
   const perspective = PERSPECTIVE_STYLES[article.perspective] || PERSPECTIVE_STYLES.usa;
   const severity = getSeverity(article);
-  const hasValidImage = article.imageUrl && article.imageUrl.trim() !== '' && !imageError;
+  const hasValidImage = article.imageUrl && article.imageUrl.trim() !== '';
 
   const timeAgo = formatTimeAgo(new Date(article.publishedAt));
 
@@ -133,32 +132,14 @@ export function SignalCard({ article, isBookmarked, onBookmark, index = 0, isRea
       {/* Image */}
       <div className="relative h-40 overflow-hidden">
         {hasValidImage ? (
-          <>
-            {/* Loading skeleton */}
-            {imageLoading && (
-              <div
-                className="absolute inset-0 animate-pulse"
-                style={{
-                  background: `linear-gradient(135deg, ${perspective.color}10 0%, #0a0e1a 50%, ${perspective.color}05 100%)`,
-                }}
-              />
-            )}
-            <img
-              src={article.imageUrl}
-              alt={article.title}
-              loading="lazy"
-              decoding="async"
-              className={cn(
-                'h-full w-full object-cover transition-all duration-500 group-hover:scale-105',
-                imageLoading ? 'opacity-0' : 'opacity-100'
-              )}
-              onLoad={() => setImageLoading(false)}
-              onError={() => {
-                setImageError(true);
-                setImageLoading(false);
-              }}
-            />
-          </>
+          <ResponsiveImage
+            src={article.imageUrl}
+            alt={article.title}
+            priority={index < 6}
+            aspectRatio="16:9"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className="group-hover:scale-105 transition-transform duration-500"
+          />
         ) : (
           /* Enhanced fallback placeholder with perspective-colored gradient + pattern */
           <div
