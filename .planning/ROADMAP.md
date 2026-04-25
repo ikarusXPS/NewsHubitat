@@ -77,7 +77,7 @@
 **Milestone Goal:** Comprehensive performance optimization using measurement-first approach. Reduce bundle size, optimize database queries, improve image delivery, and enhance caching for faster page loads and API responses.
 
 - [x] **Phase 29: Measurement Foundation** - Bundle analyzer, query logging, Lighthouse baseline
-- [ ] **Phase 30: Frontend Code Splitting** - Route-based splitting, lazy image loading, reduced initial bundle
+- [x] **Phase 30: Frontend Code Splitting** - Route-based splitting, lazy image loading, reduced initial bundle
 - [ ] **Phase 31: Virtual Scrolling** - Virtualized rendering for long article lists
 - [ ] **Phase 32: Image Pipeline** - WebP/AVIF conversion, responsive srcset, Cloudinary integration
 - [ ] **Phase 33: Caching Improvements** - Smart invalidation, HTTP cache headers, jitter-based TTL
@@ -133,6 +133,11 @@ Plans:
   5. Memory usage remains stable over extended scrolling sessions
 **Plans**: 3 plans
 **UI hint**: yes
+
+Plans:
+- [ ] 31-01-PLAN.md — Install @tanstack/react-virtual, create VirtualizedGrid, VirtualizedList, PaginatedFeed, useAccessibilityFallback
+- [ ] 31-02-PLAN.md — SignalCard CSS animation, CSS fade-in keyframes, NewsFeed virtualization integration
+- [ ] 31-03-PLAN.md — Keyboard navigation, focus indicators, scroll reset on filter change, human verification
 
 ### Phase 32: Image Pipeline
 **Goal**: Users experience faster image loading with modern formats and responsive delivery
@@ -269,4 +274,4 @@ v1.8 Advanced          -> Demand-driven expansion
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-25 — Phase 30 complete (4/4 plans)*
+*Last updated: 2026-04-25 — Phase 31 planned (3 plans)*
