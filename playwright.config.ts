@@ -35,7 +35,7 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         storageState: 'playwright/.auth/user.json',
       },
-      testMatch: ['**/profile.spec.ts', '**/settings.spec.ts', '**/history.spec.ts'],
+      testMatch: ['**/profile.spec.ts', '**/settings.spec.ts', '**/history.spec.ts', '**/comments.spec.ts'],
       dependencies: ['setup'],
     },
   ],
