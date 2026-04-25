@@ -1,4 +1,4 @@
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useState, useEffect } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { SignalCard } from '../SignalCard';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
@@ -26,6 +26,7 @@ export function VirtualizedGrid({
   onToggleRead,
 }: VirtualizedGridProps) {
   const parentRef = useRef<HTMLDivElement>(null);
+  const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
 
   // Responsive column count matching Tailwind breakpoints
   const isDesktop = useMediaQuery('(min-width: 1024px)');
@@ -55,8 +56,60 @@ export function VirtualizedGrid({
     [articles, columns]
   );
 
+  // Reset focus when articles change
+  useEffect(() => {
+    setFocusedIndex(null);
+  }, [articles]);
+
+  // D-19: Arrow key navigation (4-directional for grid)
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    const target = e.target as HTMLElement;
+    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+      return;
+    }
+
+    const current = focusedIndex ?? -1;
+    let newIndex: number | null = null;
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        // Move down by columns (next row, same column)
+        newIndex = Math.min(current + columns, articles.length - 1);
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        // Move up by columns (previous row, same column)
+        newIndex = Math.max(current - columns, 0);
+        break;
+      case 'ArrowRight':
+        e.preventDefault();
+        newIndex = Math.min(current + 1, articles.length - 1);
+        break;
+      case 'ArrowLeft':
+        e.preventDefault();
+        newIndex = Math.max(current - 1, 0);
+        break;
+      default:
+        return;
+    }
+
+    if (newIndex !== null && newIndex >= 0) {
+      setFocusedIndex(newIndex);
+      // Scroll to the row containing this index
+      const rowIndex = Math.floor(newIndex / columns);
+      virtualizer.scrollToIndex(rowIndex, { align: 'auto' });
+    }
+  }, [focusedIndex, articles.length, columns, virtualizer]);
+
   return (
-    <div ref={parentRef} role="list" aria-label="News articles">
+    <div
+      ref={parentRef}
+      role="list"
+      aria-label="News articles"
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+    >
       <div
         style={{
           height: `${virtualizer.getTotalSize()}px`,
@@ -84,7 +137,16 @@ export function VirtualizedGrid({
                 {rowArticles.map((article, colIndex) => {
                   const globalIndex = virtualRow.index * columns + colIndex;
                   return (
-                    <div key={article.id} role="listitem">
+                    <div
+                      key={article.id}
+                      role="listitem"
+                      tabIndex={focusedIndex === globalIndex ? 0 : -1}
+                      ref={(el) => {
+                        if (el && focusedIndex === globalIndex) {
+                          el.focus({ preventScroll: true });
+                        }
+                      }}
+                    >
                       <SignalCard
                         article={article}
                         isBookmarked={isBookmarked(article.id)}
