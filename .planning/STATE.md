@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Performance Optimization
-current_plan: 30-02
+current_plan: 30-03
 status: executing
-last_updated: "2026-04-25T17:22:44.000Z"
-last_activity: 2026-04-25 — Plan 30-01 complete (core lazy loading infrastructure)
+last_updated: "2026-04-25T17:31:05.000Z"
+last_activity: 2026-04-25 — Plan 30-02 complete (route migration with lazyWithRetry)
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 21
-  completed_plans: 4
-  percent: 19
+  completed_plans: 5
+  percent: 24
 ---
 
 # State: NewsHub
@@ -26,12 +26,12 @@ See: .planning/PROJECT.md (updated 2026-04-25)
 ## Current Position
 
 Phase: 30 - Frontend Code Splitting
-Current Plan: 02 (Route Migration)
+Current Plan: 03 (Nav Integration)
 Status: Executing Phase 30
-Last activity: 2026-04-25 — Plan 30-01 complete (core lazy loading infrastructure)
+Last activity: 2026-04-25 — Plan 30-02 complete (route migration with lazyWithRetry)
 
 ```
-v1.5 Progress: [████░░░░░░░░░░░░░░░░] 19% (6 phases, 1 complete)
+v1.5 Progress: [█████░░░░░░░░░░░░░░░] 24% (6 phases, 1 complete)
 ```
 
 ## Milestone Progress
@@ -70,9 +70,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Plan 30-01 complete (lazyWithRetry, criticalStrings, ChunkErrorBoundary)
-**Next step:** Execute Plan 30-02 (route migration)
-**Resume file:** .planning/phases/30-frontend-code-splitting/30-01-SUMMARY.md
+**Last action:** Plan 30-02 complete (routes.ts, NavLinkPrefetch, App.tsx migration)
+**Next step:** Execute Plan 30-03 (nav integration)
+**Resume file:** .planning/phases/30-frontend-code-splitting/30-02-SUMMARY.md
 **Checkpoint:** —
 
 ## Accumulated Context
@@ -188,6 +188,9 @@ v1.4 Stack Decisions (from research):
 | Exponential backoff 1s, 2s, 4s | Phase 30 Plan 01 | Balance retry speed vs server load for chunk loading |
 | Clear promise cache on retry | Phase 30 Plan 01 | Browser caches failed imports; must reset for fresh attempt |
 | French critical strings included | Phase 30 Plan 01 | Project supports DE/EN/FR per i18n foundation |
+| Dashboard lazy-loaded | Phase 30 Plan 02 | Was sync import, now uses lazyWithRetry for bundle size |
+| routePreloaders map | Phase 30 Plan 02 | Centralized preload functions for hover prefetch |
+| 150ms hover prefetch delay | Phase 30 Plan 02 | Filter accidental hovers per D-04 |
 
 ## Reports
 
@@ -197,4 +200,4 @@ v1.4 Stack Decisions (from research):
 
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-25 — Plan 30-01 complete (core lazy loading infrastructure)*
+*Last updated: 2026-04-25 — Plan 30-02 complete (route migration with lazyWithRetry)*
