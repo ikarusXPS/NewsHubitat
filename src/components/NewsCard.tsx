@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Bookmark, ExternalLink, Globe, Languages, Loader2, Shield, Search, AlertTriangle, X, CheckCircle, Info, Share2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Bookmark, ExternalLink, Globe, Languages, Loader2, Shield, Search, AlertTriangle, X, CheckCircle, Info, Share2, MessageSquare } from 'lucide-react';
 import { ShareButtons } from './sharing';
 import { useCreateShare, type ShareUrls } from '../hooks/useShare';
 import { ResponsiveImage } from './ResponsiveImage';
@@ -231,9 +232,15 @@ export function NewsCard({ article, priority = false, onTranslate }: NewsCardPro
         </div>
       </div>
 
-      <h3 className="mb-2 text-lg font-semibold text-white leading-tight">
-        {getDisplayTitle()}
-      </h3>
+      <Link
+        to={`/article/${localArticle.id}`}
+        onClick={trackReading}
+        className="block mb-2"
+      >
+        <h3 className="text-lg font-semibold text-white leading-tight hover:text-[#00f0ff] transition-colors">
+          {getDisplayTitle()}
+        </h3>
+      </Link>
 
       <p className="mb-3 text-sm text-gray-400 line-clamp-3">
         {getDisplayContent()}
@@ -303,6 +310,14 @@ export function NewsCard({ article, priority = false, onTranslate }: NewsCardPro
               )}
             </>
           )}
+          <Link
+            to={`/article/${localArticle.id}`}
+            onClick={trackReading}
+            className="flex items-center gap-1 text-[#00f0ff] hover:text-[#00f0ff]/80"
+          >
+            <MessageSquare className="h-3 w-3" />
+            Comments
+          </Link>
           <a
             href={localArticle.url}
             target="_blank"

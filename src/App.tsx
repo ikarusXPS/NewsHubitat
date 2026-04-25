@@ -56,6 +56,7 @@ const Settings = lazy(() => import('./pages/Settings').then(m => ({ default: m.S
 const EventMap = lazy(() => import('./pages/EventMap').then(m => ({ default: m.EventMap })));
 const Community = lazy(() => import('./pages/Community').then(m => ({ default: m.Community })));
 const Profile = lazy(() => import('./pages/Profile').then(m => ({ default: m.Profile })));
+const Article = lazy(() => import('./pages/Article').then(m => ({ default: m.Article })));
 
 // Auth pages (public - no auth required)
 const VerifyEmail = lazy(() => import('./pages/VerifyEmail'));
@@ -123,6 +124,8 @@ function AppRoutes() {
             <Route path="/bookmarks" element={<Bookmarks />} />
             <Route path="/history" element={<ReadingHistory />} />
             <Route path="/profile" element={<Profile />} />
+            {/* Article detail page with comments */}
+            <Route path="/article/:id" element={<Article />} />
             {/* Auth pages (public - no auth required) */}
             <Route path="/verify-email" element={<VerifyEmail />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
