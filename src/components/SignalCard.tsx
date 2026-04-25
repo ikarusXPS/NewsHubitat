@@ -83,7 +83,9 @@ export function SignalCard({ article, isBookmarked, onBookmark, index = 0, isRea
       setShareUrls(urls);
       setShareCode(urls.direct.split('/s/')[1]);
     } catch (err) {
-      console.error('Failed to create share:', err);
+      if (import.meta.env.DEV) {
+        console.error('Failed to create share:', err);
+      }
     } finally {
       setIsCreatingShare(false);
     }
