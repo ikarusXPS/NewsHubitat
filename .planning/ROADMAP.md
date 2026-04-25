@@ -154,7 +154,12 @@ Plans:
   3. New comments and replies appear in real-time without page refresh
   4. Comments show author name, avatar, and timestamp
   5. Comment author can delete their own comments
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [ ] 27-01-PLAN.md — Database schema, WebSocket events, rate limits, i18n translations
+- [ ] 27-02-PLAN.md — Backend API (CommentService + routes with AI moderation)
+- [ ] 27-03-PLAN.md — Frontend components (hooks, CommentSection, CommentInput, CommentCard)
+- [ ] 27-04-PLAN.md — Integration (Article page), unit tests, E2E tests, verification
 **UI hint**: yes
 
 ### Phase 28: Team Collaboration
