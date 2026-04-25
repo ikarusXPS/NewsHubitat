@@ -88,7 +88,7 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
   ], [t]);
 
   const { data: eventStats, dataUpdatedAt } = useQuery({
-    queryKey: ['geo-events-stats'], // Separate stats query but same source
+    queryKey: ['geo-events'], // Same key as EventMap/BottomNav for shared cache
     queryFn: fetchEventStats,
     staleTime: 60_000, // 1 minute (same as EventMap)
     refetchInterval: 2 * 60_000, // Refresh every 2 minutes (same as EventMap)
