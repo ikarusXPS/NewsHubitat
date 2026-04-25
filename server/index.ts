@@ -31,6 +31,7 @@ import { leaderboardRoutes } from './routes/leaderboard';
 import { accountRoutes } from './routes/account';
 import bookmarksRoutes from './routes/bookmarks';
 import historyRoutes from './routes/history';
+import commentRoutes from './routes/comments';
 import { authLimiter, aiLimiter, newsLimiter } from './middleware/rateLimiter';
 import { isBot, generateOGHtml } from './middleware/botDetection';
 import { SharingService } from './services/sharingService';
@@ -148,6 +149,9 @@ app.use('/api/leaderboard', leaderboardRoutes);
 app.use('/api/account', accountRoutes);
 app.use('/api/bookmarks', bookmarksRoutes);
 app.use('/api/history', historyRoutes);
+
+// Comment routes (Phase 27)
+app.use('/api/comments', commentRoutes);
 
 // Make services available to routes
 app.locals.wsService = wsService;
