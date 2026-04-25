@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useAuth } from '../contexts/AuthContext';
+import { NavLinkPrefetch } from './NavLinkPrefetch';
 
 function formatTimeAgo(timestamp: number): string {
   const diffMs = Date.now() - timestamp;
@@ -111,16 +112,13 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
       </AnimatePresence>
 
       {/* Sidebar */}
-      <motion.aside
-        initial={false}
-        animate={{
-          x: isOpen ? 0 : -280,
-        }}
-        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+      <aside
         className={cn(
           'sidebar-cyber flex w-64 flex-col relative z-50',
           'fixed md:relative inset-y-0 left-0',
-          'md:translate-x-0'
+          'transition-transform duration-200 ease-out',
+          // Mobile: slide based on isOpen. Desktop: always visible
+          isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         )}
       >
       {/* Logo - same height as header (h-14) */}
@@ -209,7 +207,7 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
       <nav className="flex-1 py-4 px-3 space-y-1">
         <div className="signal-label px-3 mb-3">Navigation</div>
         {navItems.map((item) => (
-          <NavLink
+          <NavLinkPrefetch
             key={item.to}
             to={item.to}
             className={({ isActive }) =>
@@ -238,7 +236,7 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
                 {eventStats.total}
               </span>
             )}
-          </NavLink>
+          </NavLinkPrefetch>
         ))}
 
       </nav>
@@ -246,7 +244,7 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
       {/* Footer */}
       <div className="border-t border-[rgba(0,240,255,0.1)] p-3 space-y-1">
         {/* Profile Link */}
-        <NavLink
+        <NavLinkPrefetch
           to="/profile"
           className={({ isActive }) =>
             cn(
@@ -268,7 +266,7 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
               <span>{t('navigation.profile')}</span>
             </>
           )}
-        </NavLink>
+        </NavLinkPrefetch>
 
         <button
           onClick={() => {
@@ -304,7 +302,7 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
           </NavLink>
         </div>
       </div>
-    </motion.aside>
+    </aside>
     </>
   );
 }
