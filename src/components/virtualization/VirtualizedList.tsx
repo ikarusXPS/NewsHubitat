@@ -52,17 +52,19 @@ export function VirtualizedList({
       return;
     }
 
-    const current = focusedIndex ?? -1;
     let newIndex: number | null = null;
 
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
-        newIndex = Math.min(current + 1, articles.length - 1);
+        // Start at first item when no selection exists
+        newIndex = focusedIndex === null ? 0 : Math.min(focusedIndex + 1, articles.length - 1);
         break;
       case 'ArrowUp':
         e.preventDefault();
-        newIndex = Math.max(current - 1, 0);
+        // Do nothing if no selection
+        if (focusedIndex === null) return;
+        newIndex = Math.max(focusedIndex - 1, 0);
         break;
       default:
         return;
