@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { AlertCircle, RefreshCw, LayoutGrid, List, Radio, Zap, TrendingUp, TrendingDown } from 'lucide-react';
 import { SignalCard } from './SignalCard';
 import { HeroSection } from './HeroSection';
@@ -13,6 +13,12 @@ import { BulkReadActions } from './BulkReadActions';
 import { ForYouCarousel } from './ForYouCarousel';
 import { PullToRefresh } from './mobile/PullToRefresh';
 import { ScrollToTopFAB } from './mobile/ScrollToTopFAB';
+import {
+  VirtualizedGrid,
+  VirtualizedList,
+  PaginatedFeed,
+  useAccessibilityFallback,
+} from './virtualization';
 import { useAppStore } from '../store';
 import { useCachedQuery } from '../hooks/useCachedQuery';
 import { cn } from '../lib/utils';
@@ -81,6 +87,7 @@ export function NewsFeed() {
   const [trendFilter, setTrendFilter] = useState<TrendFilter>('all');
   const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
   const [sources, setSources] = useState<NewsSource[]>([]);
+  const { shouldUseFallback } = useAccessibilityFallback();
 
   // Fetch sources for filter banner
   useEffect(() => {
@@ -383,34 +390,30 @@ export function NewsFeed() {
             </p>
           </div>
         </div>
+      ) : shouldUseFallback ? (
+        <PaginatedFeed
+          articles={filteredArticles}
+          isBookmarked={(id) => bookmarkedIds.has(id)}
+          onBookmark={handleBookmark}
+          isRead={isArticleRead}
+          onToggleRead={handleToggleRead}
+        />
+      ) : viewMode === 'grid' ? (
+        <VirtualizedGrid
+          articles={filteredArticles}
+          isBookmarked={(id) => bookmarkedIds.has(id)}
+          onBookmark={handleBookmark}
+          isRead={isArticleRead}
+          onToggleRead={handleToggleRead}
+        />
       ) : (
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={viewMode}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.2 }}
-            className={cn(
-              'grid gap-6',
-              viewMode === 'grid'
-                ? 'md:grid-cols-2 md:grid-cols-3'
-                : 'grid-cols-1 max-w-3xl'
-            )}
-          >
-            {filteredArticles.map((article: NewsArticle, index: number) => (
-              <SignalCard
-                key={article.id}
-                article={article}
-                isBookmarked={bookmarkedIds.has(article.id)}
-                onBookmark={handleBookmark}
-                isRead={isArticleRead(article.id)}
-                onToggleRead={handleToggleRead}
-                index={index}
-              />
-            ))}
-          </motion.div>
-        </AnimatePresence>
+        <VirtualizedList
+          articles={filteredArticles}
+          isBookmarked={(id) => bookmarkedIds.has(id)}
+          onBookmark={handleBookmark}
+          isRead={isArticleRead}
+          onToggleRead={handleToggleRead}
+        />
       )}
 
       {/* Empty state */}
