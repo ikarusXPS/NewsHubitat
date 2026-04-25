@@ -190,6 +190,8 @@ export function NewsCardPremium({
             <motion.img
               src={article.imageUrl}
               alt=""
+              loading="lazy"
+              decoding="async"
               onError={() => setImageError(true)}
               className="h-full w-full object-cover"
               animate={{ scale: isHovered ? 1.05 : 1 }}
