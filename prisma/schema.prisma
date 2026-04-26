@@ -114,6 +114,27 @@ model User {
   deletionRequestedAt  DateTime?
   deletionConfirmToken String?
 
+  // Phase 36: Subscription
+  subscriptionTier      SubscriptionTier   @default(FREE)
+  subscriptionStatus    SubscriptionStatus @default(ACTIVE)
+  stripeCustomerId      String?            @unique
+  stripeSubscriptionId  String?            @unique
+  subscriptionEndsAt    DateTime?
+  pausedUntil           DateTime?
+
+  // Premium perks
+  showPremiumBadge      Boolean            @default(true)
+  customAccentColor     String?
+
+  // Referrals
+  referralCode          String?            @unique
+  referredBy            String?
+  freeMonthsEarned      Int                @default(0)
+
+  // Student discount
+  isStudent             Boolean            @default(false)
+  studentVerifiedUntil  DateTime?
+
   // Relations for features
   emailSubscription EmailSubscription?
   emailDigests      EmailDigest[]
@@ -429,4 +450,68 @@ model TeamInvite {
   @@index([teamId])
   @@index([tokenHash])
   @@index([email])
+}
+
+// ============================================================================
+// PHASE 36: SUBSCRIPTION & WEBHOOK PROCESSING
+// ============================================================================
+
+enum SubscriptionTier {
+  FREE
+  PREMIUM
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  PAUSED
+}
+
+model ProcessedWebhookEvent {
+  id        String   @id
+  eventType String
+  processed DateTime @default(now())
+
+  @@index([processed])
+}
+
+model ReferralReward {
+  id           String   @id @default(cuid())
+  referrerId   String
+  referredId   String
+  rewardType   String   // free_month, discount
+  rewardValue  Int      // months or percentage
+  appliedAt    DateTime?
+  createdAt    DateTime @default(now())
+
+  @@index([referrerId])
+}
+
+model Campaign {
+  id           String    @id @default(cuid())
+  name         String
+  discountPct  Int
+  maxUses      Int?
+  usedCount    Int       @default(0)
+  startsAt     DateTime
+  endsAt       DateTime
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+
+  @@index([isActive, startsAt, endsAt])
+}
+
+model StudentVerification {
+  id          String   @id @default(cuid())
+  userId      String
+  documentUrl String?
+  status      String   // pending, approved, rejected
+  reviewedBy  String?
+  reviewedAt  DateTime?
+  createdAt   DateTime @default(now())
+
+  @@index([status])
+  @@index([userId])
 }
