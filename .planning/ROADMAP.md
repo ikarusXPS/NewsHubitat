@@ -111,7 +111,7 @@ n**Plans:**
 - [x] 35-02-PLAN.md — API key service with generation, validation, and storage
 - [x] 35-03-PLAN.md — Public API endpoints with OpenAPI docs and rate limiting
 - [x] 35-04-PLAN.md — Developer portal UI with Scalar docs and key management
-- [ ] 35-05-PLAN.md — Integration tests for public API and developer workflows
+- [x] 35-05-PLAN.md — Integration tests for public API and developer workflows (awaiting human verification)
 
 ### Phase 36: Monetization Core
 **Goal**: Users can subscribe to Premium tier and access gated features with Stripe billing
@@ -221,7 +221,7 @@ n**Plans:**
 | 32. Image Pipeline | v1.5 | 4/4 | Complete | 2026-04-26 |
 | 33. Caching Improvements | v1.5 | 3/3 | Complete | 2026-04-25 |
 | 34. Database Optimization | v1.5 | 4/4 | Complete | 2026-04-26 |
-| 35. Infrastructure Foundation | v1.6 | 4/5 | In Progress | - |
+| 35. Infrastructure Foundation | v1.6 | 5/5 | Awaiting Verification | - |
 | 36. Monetization Core | v1.6 | 0/? | Not started | - |
 | 37. Horizontal Scaling | v1.6 | 0/? | Not started | - |
 | 38. Advanced AI Features | v1.6 | 0/? | Not started | - |
@@ -231,4 +231,4 @@ n**Plans:**
 ---
 
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-26 — Plan 35-04 complete (Developer Portal UI)*
+*Last updated: 2026-04-26 — Plan 35-05 complete (E2E tests, awaiting human verification)*
