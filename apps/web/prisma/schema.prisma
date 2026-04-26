@@ -122,6 +122,9 @@ model User {
   comments          Comment[]
   teamMemberships   TeamMember[]
 
+  // API Keys (Phase 35)
+  apiKeys           ApiKey[]
+
   // Indexes for token lookups (D-53)
   @@index([verificationTokenHash])
   @@index([resetTokenHash])
@@ -429,4 +432,47 @@ model TeamInvite {
   @@index([teamId])
   @@index([tokenHash])
   @@index([email])
+}
+
+// ============================================================================
+// PHASE 35: DEVELOPER API KEYS
+// ============================================================================
+
+// API Key for developer access (Phase 35)
+// Stores hashed keys with tier-based rate limits
+model ApiKey {
+  id          String     @id @default(cuid())
+  keyHash     String     @unique  // bcrypt hash of full key (never store plaintext)
+  name        String               // User-defined name (e.g., "Production", "Staging")
+  tier        ApiKeyTier @default(free)
+  environment ApiKeyEnv  @default(live)
+
+  // Ownership and limits
+  userId      String
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Usage tracking
+  createdAt   DateTime   @default(now())
+  lastUsedAt  DateTime?
+  requestCount Int       @default(0)  // Monthly request counter (reset by cleanup job)
+
+  // Revocation
+  revokedAt   DateTime?
+  revokedReason String?
+
+  // Indexes for lookup and cleanup
+  @@index([userId])
+  @@index([revokedAt])
+  @@index([lastUsedAt])
+  @@index([createdAt])
+}
+
+enum ApiKeyTier {
+  free  // 10 req/min per D-15
+  pro   // 100 req/min per D-15
+}
+
+enum ApiKeyEnv {
+  live  // Production keys (nh_live_)
+  test  // Test/sandbox keys (nh_test_)
 }

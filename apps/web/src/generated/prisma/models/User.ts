@@ -436,6 +436,7 @@ export type UserWhereInput = {
   badges?: Prisma.UserBadgeListRelationFilter
   comments?: Prisma.CommentListRelationFilter
   teamMemberships?: Prisma.TeamMemberListRelationFilter
+  apiKeys?: Prisma.ApiKeyListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -478,6 +479,7 @@ export type UserOrderByWithRelationInput = {
   badges?: Prisma.UserBadgeOrderByRelationAggregateInput
   comments?: Prisma.CommentOrderByRelationAggregateInput
   teamMemberships?: Prisma.TeamMemberOrderByRelationAggregateInput
+  apiKeys?: Prisma.ApiKeyOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -523,6 +525,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   badges?: Prisma.UserBadgeListRelationFilter
   comments?: Prisma.CommentListRelationFilter
   teamMemberships?: Prisma.TeamMemberListRelationFilter
+  apiKeys?: Prisma.ApiKeyListRelationFilter
 }, "id" | "email" | "googleIdHash" | "githubIdHash">
 
 export type UserOrderByWithAggregationInput = {
@@ -641,6 +644,7 @@ export type UserCreateInput = {
   badges?: Prisma.UserBadgeCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentCreateNestedManyWithoutUserInput
   teamMemberships?: Prisma.TeamMemberCreateNestedManyWithoutUserInput
+  apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -683,6 +687,7 @@ export type UserUncheckedCreateInput = {
   badges?: Prisma.UserBadgeUncheckedCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
   teamMemberships?: Prisma.TeamMemberUncheckedCreateNestedManyWithoutUserInput
+  apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -725,6 +730,7 @@ export type UserUpdateInput = {
   badges?: Prisma.UserBadgeUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
   teamMemberships?: Prisma.TeamMemberUpdateManyWithoutUserNestedInput
+  apiKeys?: Prisma.ApiKeyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -767,6 +773,7 @@ export type UserUncheckedUpdateInput = {
   badges?: Prisma.UserBadgeUncheckedUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
   teamMemberships?: Prisma.TeamMemberUncheckedUpdateManyWithoutUserNestedInput
+  apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -1100,6 +1107,20 @@ export type UserUpdateOneRequiredWithoutTeamMembershipsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutTeamMembershipsInput, Prisma.UserUpdateWithoutTeamMembershipsInput>, Prisma.UserUncheckedUpdateWithoutTeamMembershipsInput>
 }
 
+export type UserCreateNestedOneWithoutApiKeysInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutApiKeysInput, Prisma.UserUncheckedCreateWithoutApiKeysInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutApiKeysInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutApiKeysNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutApiKeysInput, Prisma.UserUncheckedCreateWithoutApiKeysInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutApiKeysInput
+  upsert?: Prisma.UserUpsertWithoutApiKeysInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutApiKeysInput, Prisma.UserUpdateWithoutApiKeysInput>, Prisma.UserUncheckedUpdateWithoutApiKeysInput>
+}
+
 export type UserCreateWithoutBookmarksInput = {
   id?: string
   email: string
@@ -1139,6 +1160,7 @@ export type UserCreateWithoutBookmarksInput = {
   badges?: Prisma.UserBadgeCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentCreateNestedManyWithoutUserInput
   teamMemberships?: Prisma.TeamMemberCreateNestedManyWithoutUserInput
+  apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBookmarksInput = {
@@ -1180,6 +1202,7 @@ export type UserUncheckedCreateWithoutBookmarksInput = {
   badges?: Prisma.UserBadgeUncheckedCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
   teamMemberships?: Prisma.TeamMemberUncheckedCreateNestedManyWithoutUserInput
+  apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBookmarksInput = {
@@ -1237,6 +1260,7 @@ export type UserUpdateWithoutBookmarksInput = {
   badges?: Prisma.UserBadgeUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
   teamMemberships?: Prisma.TeamMemberUpdateManyWithoutUserNestedInput
+  apiKeys?: Prisma.ApiKeyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBookmarksInput = {
@@ -1278,6 +1302,7 @@ export type UserUncheckedUpdateWithoutBookmarksInput = {
   badges?: Prisma.UserBadgeUncheckedUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
   teamMemberships?: Prisma.TeamMemberUncheckedUpdateManyWithoutUserNestedInput
+  apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutReadingHistoryInput = {
@@ -1319,6 +1344,7 @@ export type UserCreateWithoutReadingHistoryInput = {
   badges?: Prisma.UserBadgeCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentCreateNestedManyWithoutUserInput
   teamMemberships?: Prisma.TeamMemberCreateNestedManyWithoutUserInput
+  apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReadingHistoryInput = {
@@ -1360,6 +1386,7 @@ export type UserUncheckedCreateWithoutReadingHistoryInput = {
   badges?: Prisma.UserBadgeUncheckedCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
   teamMemberships?: Prisma.TeamMemberUncheckedCreateNestedManyWithoutUserInput
+  apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReadingHistoryInput = {
@@ -1417,6 +1444,7 @@ export type UserUpdateWithoutReadingHistoryInput = {
   badges?: Prisma.UserBadgeUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
   teamMemberships?: Prisma.TeamMemberUpdateManyWithoutUserNestedInput
+  apiKeys?: Prisma.ApiKeyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReadingHistoryInput = {
@@ -1458,6 +1486,7 @@ export type UserUncheckedUpdateWithoutReadingHistoryInput = {
   badges?: Prisma.UserBadgeUncheckedUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
   teamMemberships?: Prisma.TeamMemberUncheckedUpdateManyWithoutUserNestedInput
+  apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutEmailSubscriptionInput = {
@@ -1499,6 +1528,7 @@ export type UserCreateWithoutEmailSubscriptionInput = {
   badges?: Prisma.UserBadgeCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentCreateNestedManyWithoutUserInput
   teamMemberships?: Prisma.TeamMemberCreateNestedManyWithoutUserInput
+  apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutEmailSubscriptionInput = {
@@ -1540,6 +1570,7 @@ export type UserUncheckedCreateWithoutEmailSubscriptionInput = {
   badges?: Prisma.UserBadgeUncheckedCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
   teamMemberships?: Prisma.TeamMemberUncheckedCreateNestedManyWithoutUserInput
+  apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutEmailSubscriptionInput = {
@@ -1597,6 +1628,7 @@ export type UserUpdateWithoutEmailSubscriptionInput = {
   badges?: Prisma.UserBadgeUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
   teamMemberships?: Prisma.TeamMemberUpdateManyWithoutUserNestedInput
+  apiKeys?: Prisma.ApiKeyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEmailSubscriptionInput = {
@@ -1638,6 +1670,7 @@ export type UserUncheckedUpdateWithoutEmailSubscriptionInput = {
   badges?: Prisma.UserBadgeUncheckedUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
   teamMemberships?: Prisma.TeamMemberUncheckedUpdateManyWithoutUserNestedInput
+  apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutEmailDigestsInput = {
@@ -1679,6 +1712,7 @@ export type UserCreateWithoutEmailDigestsInput = {
   badges?: Prisma.UserBadgeCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentCreateNestedManyWithoutUserInput
   teamMemberships?: Prisma.TeamMemberCreateNestedManyWithoutUserInput
+  apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutEmailDigestsInput = {
@@ -1720,6 +1754,7 @@ export type UserUncheckedCreateWithoutEmailDigestsInput = {
   badges?: Prisma.UserBadgeUncheckedCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
   teamMemberships?: Prisma.TeamMemberUncheckedCreateNestedManyWithoutUserInput
+  apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutEmailDigestsInput = {
@@ -1777,6 +1812,7 @@ export type UserUpdateWithoutEmailDigestsInput = {
   badges?: Prisma.UserBadgeUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
   teamMemberships?: Prisma.TeamMemberUpdateManyWithoutUserNestedInput
+  apiKeys?: Prisma.ApiKeyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEmailDigestsInput = {
@@ -1818,6 +1854,7 @@ export type UserUncheckedUpdateWithoutEmailDigestsInput = {
   badges?: Prisma.UserBadgeUncheckedUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
   teamMemberships?: Prisma.TeamMemberUncheckedUpdateManyWithoutUserNestedInput
+  apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutUserPersonasInput = {
@@ -1859,6 +1896,7 @@ export type UserCreateWithoutUserPersonasInput = {
   badges?: Prisma.UserBadgeCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentCreateNestedManyWithoutUserInput
   teamMemberships?: Prisma.TeamMemberCreateNestedManyWithoutUserInput
+  apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutUserPersonasInput = {
@@ -1900,6 +1938,7 @@ export type UserUncheckedCreateWithoutUserPersonasInput = {
   badges?: Prisma.UserBadgeUncheckedCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
   teamMemberships?: Prisma.TeamMemberUncheckedCreateNestedManyWithoutUserInput
+  apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutUserPersonasInput = {
@@ -1957,6 +1996,7 @@ export type UserUpdateWithoutUserPersonasInput = {
   badges?: Prisma.UserBadgeUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
   teamMemberships?: Prisma.TeamMemberUpdateManyWithoutUserNestedInput
+  apiKeys?: Prisma.ApiKeyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUserPersonasInput = {
@@ -1998,6 +2038,7 @@ export type UserUncheckedUpdateWithoutUserPersonasInput = {
   badges?: Prisma.UserBadgeUncheckedUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
   teamMemberships?: Prisma.TeamMemberUncheckedUpdateManyWithoutUserNestedInput
+  apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutBadgesInput = {
@@ -2039,6 +2080,7 @@ export type UserCreateWithoutBadgesInput = {
   userPersonas?: Prisma.UserPersonaCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentCreateNestedManyWithoutUserInput
   teamMemberships?: Prisma.TeamMemberCreateNestedManyWithoutUserInput
+  apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBadgesInput = {
@@ -2080,6 +2122,7 @@ export type UserUncheckedCreateWithoutBadgesInput = {
   userPersonas?: Prisma.UserPersonaUncheckedCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
   teamMemberships?: Prisma.TeamMemberUncheckedCreateNestedManyWithoutUserInput
+  apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBadgesInput = {
@@ -2137,6 +2180,7 @@ export type UserUpdateWithoutBadgesInput = {
   userPersonas?: Prisma.UserPersonaUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
   teamMemberships?: Prisma.TeamMemberUpdateManyWithoutUserNestedInput
+  apiKeys?: Prisma.ApiKeyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBadgesInput = {
@@ -2178,6 +2222,7 @@ export type UserUncheckedUpdateWithoutBadgesInput = {
   userPersonas?: Prisma.UserPersonaUncheckedUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
   teamMemberships?: Prisma.TeamMemberUncheckedUpdateManyWithoutUserNestedInput
+  apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCommentsInput = {
@@ -2219,6 +2264,7 @@ export type UserCreateWithoutCommentsInput = {
   userPersonas?: Prisma.UserPersonaCreateNestedManyWithoutUserInput
   badges?: Prisma.UserBadgeCreateNestedManyWithoutUserInput
   teamMemberships?: Prisma.TeamMemberCreateNestedManyWithoutUserInput
+  apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCommentsInput = {
@@ -2260,6 +2306,7 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   userPersonas?: Prisma.UserPersonaUncheckedCreateNestedManyWithoutUserInput
   badges?: Prisma.UserBadgeUncheckedCreateNestedManyWithoutUserInput
   teamMemberships?: Prisma.TeamMemberUncheckedCreateNestedManyWithoutUserInput
+  apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCommentsInput = {
@@ -2317,6 +2364,7 @@ export type UserUpdateWithoutCommentsInput = {
   userPersonas?: Prisma.UserPersonaUpdateManyWithoutUserNestedInput
   badges?: Prisma.UserBadgeUpdateManyWithoutUserNestedInput
   teamMemberships?: Prisma.TeamMemberUpdateManyWithoutUserNestedInput
+  apiKeys?: Prisma.ApiKeyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCommentsInput = {
@@ -2358,6 +2406,7 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   userPersonas?: Prisma.UserPersonaUncheckedUpdateManyWithoutUserNestedInput
   badges?: Prisma.UserBadgeUncheckedUpdateManyWithoutUserNestedInput
   teamMemberships?: Prisma.TeamMemberUncheckedUpdateManyWithoutUserNestedInput
+  apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutTeamMembershipsInput = {
@@ -2399,6 +2448,7 @@ export type UserCreateWithoutTeamMembershipsInput = {
   userPersonas?: Prisma.UserPersonaCreateNestedManyWithoutUserInput
   badges?: Prisma.UserBadgeCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentCreateNestedManyWithoutUserInput
+  apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutTeamMembershipsInput = {
@@ -2440,6 +2490,7 @@ export type UserUncheckedCreateWithoutTeamMembershipsInput = {
   userPersonas?: Prisma.UserPersonaUncheckedCreateNestedManyWithoutUserInput
   badges?: Prisma.UserBadgeUncheckedCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
+  apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutTeamMembershipsInput = {
@@ -2497,6 +2548,7 @@ export type UserUpdateWithoutTeamMembershipsInput = {
   userPersonas?: Prisma.UserPersonaUpdateManyWithoutUserNestedInput
   badges?: Prisma.UserBadgeUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
+  apiKeys?: Prisma.ApiKeyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTeamMembershipsInput = {
@@ -2538,6 +2590,191 @@ export type UserUncheckedUpdateWithoutTeamMembershipsInput = {
   userPersonas?: Prisma.UserPersonaUncheckedUpdateManyWithoutUserNestedInput
   badges?: Prisma.UserBadgeUncheckedUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
+  apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutApiKeysInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  name: string
+  createdAt?: Date | string
+  preferences?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  emailVerified?: boolean
+  verificationTokenHash?: string | null
+  verificationTokenExpiry?: Date | string | null
+  verificationSendCount?: number
+  lastVerificationSentAt?: Date | string | null
+  resetTokenHash?: string | null
+  resetTokenExpiry?: Date | string | null
+  resetSendCount?: number
+  lastResetSentAt?: Date | string | null
+  tokenVersion?: number
+  googleIdHash?: string | null
+  githubIdHash?: string | null
+  hasPassword?: boolean
+  emailBounced?: boolean
+  emailBouncedAt?: Date | string | null
+  emailOptOut?: boolean
+  emailOptOutAt?: Date | string | null
+  updatedAt?: Date | string
+  avatarUrl?: string | null
+  selectedPresetAvatar?: string | null
+  featuredBadgeId?: string | null
+  showOnLeaderboard?: boolean
+  isHistoryPaused?: boolean
+  deletionRequestedAt?: Date | string | null
+  deletionConfirmToken?: string | null
+  bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
+  readingHistory?: Prisma.ReadingHistoryCreateNestedManyWithoutUserInput
+  emailSubscription?: Prisma.EmailSubscriptionCreateNestedOneWithoutUserInput
+  emailDigests?: Prisma.EmailDigestCreateNestedManyWithoutUserInput
+  userPersonas?: Prisma.UserPersonaCreateNestedManyWithoutUserInput
+  badges?: Prisma.UserBadgeCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutUserInput
+  teamMemberships?: Prisma.TeamMemberCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutApiKeysInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  name: string
+  createdAt?: Date | string
+  preferences?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  emailVerified?: boolean
+  verificationTokenHash?: string | null
+  verificationTokenExpiry?: Date | string | null
+  verificationSendCount?: number
+  lastVerificationSentAt?: Date | string | null
+  resetTokenHash?: string | null
+  resetTokenExpiry?: Date | string | null
+  resetSendCount?: number
+  lastResetSentAt?: Date | string | null
+  tokenVersion?: number
+  googleIdHash?: string | null
+  githubIdHash?: string | null
+  hasPassword?: boolean
+  emailBounced?: boolean
+  emailBouncedAt?: Date | string | null
+  emailOptOut?: boolean
+  emailOptOutAt?: Date | string | null
+  updatedAt?: Date | string
+  avatarUrl?: string | null
+  selectedPresetAvatar?: string | null
+  featuredBadgeId?: string | null
+  showOnLeaderboard?: boolean
+  isHistoryPaused?: boolean
+  deletionRequestedAt?: Date | string | null
+  deletionConfirmToken?: string | null
+  bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
+  readingHistory?: Prisma.ReadingHistoryUncheckedCreateNestedManyWithoutUserInput
+  emailSubscription?: Prisma.EmailSubscriptionUncheckedCreateNestedOneWithoutUserInput
+  emailDigests?: Prisma.EmailDigestUncheckedCreateNestedManyWithoutUserInput
+  userPersonas?: Prisma.UserPersonaUncheckedCreateNestedManyWithoutUserInput
+  badges?: Prisma.UserBadgeUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
+  teamMemberships?: Prisma.TeamMemberUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutApiKeysInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutApiKeysInput, Prisma.UserUncheckedCreateWithoutApiKeysInput>
+}
+
+export type UserUpsertWithoutApiKeysInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutApiKeysInput, Prisma.UserUncheckedUpdateWithoutApiKeysInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutApiKeysInput, Prisma.UserUncheckedCreateWithoutApiKeysInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutApiKeysInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutApiKeysInput, Prisma.UserUncheckedUpdateWithoutApiKeysInput>
+}
+
+export type UserUpdateWithoutApiKeysInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  preferences?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verificationTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationSendCount?: Prisma.IntFieldUpdateOperationsInput | number
+  lastVerificationSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetSendCount?: Prisma.IntFieldUpdateOperationsInput | number
+  lastResetSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  googleIdHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubIdHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hasPassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailBounced?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailBouncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailOptOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailOptOutAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  selectedPresetAvatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  featuredBadgeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  showOnLeaderboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isHistoryPaused?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
+  readingHistory?: Prisma.ReadingHistoryUpdateManyWithoutUserNestedInput
+  emailSubscription?: Prisma.EmailSubscriptionUpdateOneWithoutUserNestedInput
+  emailDigests?: Prisma.EmailDigestUpdateManyWithoutUserNestedInput
+  userPersonas?: Prisma.UserPersonaUpdateManyWithoutUserNestedInput
+  badges?: Prisma.UserBadgeUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
+  teamMemberships?: Prisma.TeamMemberUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutApiKeysInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  preferences?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verificationTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationSendCount?: Prisma.IntFieldUpdateOperationsInput | number
+  lastVerificationSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetSendCount?: Prisma.IntFieldUpdateOperationsInput | number
+  lastResetSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  googleIdHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubIdHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hasPassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailBounced?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailBouncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailOptOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailOptOutAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  selectedPresetAvatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  featuredBadgeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  showOnLeaderboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isHistoryPaused?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
+  readingHistory?: Prisma.ReadingHistoryUncheckedUpdateManyWithoutUserNestedInput
+  emailSubscription?: Prisma.EmailSubscriptionUncheckedUpdateOneWithoutUserNestedInput
+  emailDigests?: Prisma.EmailDigestUncheckedUpdateManyWithoutUserNestedInput
+  userPersonas?: Prisma.UserPersonaUncheckedUpdateManyWithoutUserNestedInput
+  badges?: Prisma.UserBadgeUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
+  teamMemberships?: Prisma.TeamMemberUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -2553,6 +2790,7 @@ export type UserCountOutputType = {
   badges: number
   comments: number
   teamMemberships: number
+  apiKeys: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2563,6 +2801,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   badges?: boolean | UserCountOutputTypeCountBadgesArgs
   comments?: boolean | UserCountOutputTypeCountCommentsArgs
   teamMemberships?: boolean | UserCountOutputTypeCountTeamMembershipsArgs
+  apiKeys?: boolean | UserCountOutputTypeCountApiKeysArgs
 }
 
 /**
@@ -2624,6 +2863,13 @@ export type UserCountOutputTypeCountTeamMembershipsArgs<ExtArgs extends runtime.
   where?: Prisma.TeamMemberWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountApiKeysArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ApiKeyWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2665,6 +2911,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   badges?: boolean | Prisma.User$badgesArgs<ExtArgs>
   comments?: boolean | Prisma.User$commentsArgs<ExtArgs>
   teamMemberships?: boolean | Prisma.User$teamMembershipsArgs<ExtArgs>
+  apiKeys?: boolean | Prisma.User$apiKeysArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -2780,6 +3027,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   badges?: boolean | Prisma.User$badgesArgs<ExtArgs>
   comments?: boolean | Prisma.User$commentsArgs<ExtArgs>
   teamMemberships?: boolean | Prisma.User$teamMembershipsArgs<ExtArgs>
+  apiKeys?: boolean | Prisma.User$apiKeysArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -2796,6 +3044,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     badges: Prisma.$UserBadgePayload<ExtArgs>[]
     comments: Prisma.$CommentPayload<ExtArgs>[]
     teamMemberships: Prisma.$TeamMemberPayload<ExtArgs>[]
+    apiKeys: Prisma.$ApiKeyPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -3231,6 +3480,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   badges<T extends Prisma.User$badgesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$badgesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserBadgePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   comments<T extends Prisma.User$commentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$commentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   teamMemberships<T extends Prisma.User$teamMembershipsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$teamMembershipsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TeamMemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  apiKeys<T extends Prisma.User$apiKeysArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$apiKeysArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApiKeyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3868,6 +4118,30 @@ export type User$teamMembershipsArgs<ExtArgs extends runtime.Types.Extensions.In
   take?: number
   skip?: number
   distinct?: Prisma.TeamMemberScalarFieldEnum | Prisma.TeamMemberScalarFieldEnum[]
+}
+
+/**
+ * User.apiKeys
+ */
+export type User$apiKeysArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ApiKey
+   */
+  select?: Prisma.ApiKeySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ApiKey
+   */
+  omit?: Prisma.ApiKeyOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ApiKeyInclude<ExtArgs> | null
+  where?: Prisma.ApiKeyWhereInput
+  orderBy?: Prisma.ApiKeyOrderByWithRelationInput | Prisma.ApiKeyOrderByWithRelationInput[]
+  cursor?: Prisma.ApiKeyWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ApiKeyScalarFieldEnum | Prisma.ApiKeyScalarFieldEnum[]
 }
 
 /**

@@ -9,7 +9,17 @@
 * 🟢 You can import this file directly.
 */
 
+export const ApiKeyTier = {
+  free: 'free',
+  pro: 'pro'
+} as const
+
+export type ApiKeyTier = (typeof ApiKeyTier)[keyof typeof ApiKeyTier]
 
 
-// This file is empty because there are no enums in the schema.
-export {}
+export const ApiKeyEnv = {
+  live: 'live',
+  test: 'test'
+} as const
+
+export type ApiKeyEnv = (typeof ApiKeyEnv)[keyof typeof ApiKeyEnv]

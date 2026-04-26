@@ -141,3 +141,8 @@ export type TeamBookmark = Prisma.TeamBookmarkModel
  * 
  */
 export type TeamInvite = Prisma.TeamInviteModel
+/**
+ * Model ApiKey
+ * 
+ */
+export type ApiKey = Prisma.ApiKeyModel
