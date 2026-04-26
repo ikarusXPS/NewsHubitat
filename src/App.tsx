@@ -36,6 +36,8 @@ import {
   Privacy,
   TeamDashboard,
   TeamInviteAccept,
+  Pricing,
+  SubscriptionSuccess,
 } from './routes';
 import './index.css';
 
@@ -137,6 +139,9 @@ function AppRoutes() {
               {/* Team pages - invite route must come before :teamId for specificity */}
               <Route path="/team/invite/:token" element={<TeamInviteAccept />} />
               <Route path="/team/:teamId" element={<TeamDashboard />} />
+              {/* Subscription pages (public - Phase 36) */}
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/subscription/success" element={<SubscriptionSuccess />} />
             </Routes>
           </Suspense>
         </ChunkErrorBoundary>
