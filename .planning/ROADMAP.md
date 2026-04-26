@@ -105,7 +105,13 @@
   3. API requests are rate-limited by tier (Free: 10/min, Pro: 100/min) enforced via Redis
   4. Public API endpoints (`/api/v1/public/*`) return versioned responses with OpenAPI documentation
   5. API usage is logged asynchronously without blocking request processing
-**Plans**: TBD
+**Plans**: 5 plans
+n**Plans:**
+- [ ] 35-01-PLAN.md — Monorepo setup with pnpm workspaces and shared types package
+- [ ] 35-02-PLAN.md — API key service with generation, validation, and storage
+- [ ] 35-03-PLAN.md — Public API endpoints with OpenAPI docs and rate limiting
+- [ ] 35-04-PLAN.md — Developer portal UI with Scalar docs and key management
+- [ ] 35-05-PLAN.md — Integration tests for public API and developer workflows
 
 ### Phase 36: Monetization Core
 **Goal**: Users can subscribe to Premium tier and access gated features with Stripe billing
