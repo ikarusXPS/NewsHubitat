@@ -36,6 +36,7 @@ import {
   Privacy,
   TeamDashboard,
   TeamInviteAccept,
+  DevelopersPage,
 } from './routes';
 import './index.css';
 
@@ -137,6 +138,8 @@ function AppRoutes() {
               {/* Team pages - invite route must come before :teamId for specificity */}
               <Route path="/team/invite/:token" element={<TeamInviteAccept />} />
               <Route path="/team/:teamId" element={<TeamDashboard />} />
+              {/* Developer portal - D-09: dedicated /developers page */}
+              <Route path="/developers" element={<DevelopersPage />} />
             </Routes>
           </Suspense>
         </ChunkErrorBoundary>

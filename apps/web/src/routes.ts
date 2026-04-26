@@ -89,6 +89,11 @@ export const TeamInviteAccept = lazyWithRetry(() =>
   }))
 );
 
+// Developer pages
+export const DevelopersPage = lazyWithRetry(() =>
+  import('./pages/DevelopersPage').then(m => ({ default: m.DevelopersPage }))
+);
+
 // ============================================================================
 // Route Preloaders - Map of route paths to preload functions
 // ============================================================================
@@ -135,5 +140,8 @@ export const routePreloaders: Record<string, () => void> = {
   },
   '/profile': () => {
     Profile.preload();
+  },
+  '/developers': () => {
+    DevelopersPage.preload();
   },
 };
