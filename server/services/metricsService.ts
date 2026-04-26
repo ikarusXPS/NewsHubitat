@@ -20,6 +20,11 @@ export class MetricsService {
   public dbConnectionsActive: Gauge<string>;
   public redisConnectionsActive: Gauge<string>;
 
+  // Pool metrics (D-14 - Phase 34)
+  public dbPoolTotal: Gauge<string>;
+  public dbPoolIdle: Gauge<string>;
+  public dbPoolWaiting: Gauge<string>;
+
   // Email metrics (D-11, D-12 - Phase 22)
   public emailSentTotal: Counter<string>;
   public emailDeliveredTotal: Counter<string>;
@@ -80,6 +85,25 @@ export class MetricsService {
     this.redisConnectionsActive = new Gauge({
       name: 'redis_connections_active',
       help: 'Number of active Redis connections',
+      registers: [this.registry],
+    });
+
+    // Database pool metrics (D-14 - Phase 34)
+    this.dbPoolTotal = new Gauge({
+      name: 'db_pool_total_connections',
+      help: 'Total connections in database pool',
+      registers: [this.registry],
+    });
+
+    this.dbPoolIdle = new Gauge({
+      name: 'db_pool_idle_connections',
+      help: 'Idle connections in database pool',
+      registers: [this.registry],
+    });
+
+    this.dbPoolWaiting = new Gauge({
+      name: 'db_pool_waiting_requests',
+      help: 'Requests waiting for database connection',
       registers: [this.registry],
     });
 
@@ -156,6 +180,15 @@ export class MetricsService {
    */
   setRedisConnections(count: number): void {
     this.redisConnectionsActive.set(count);
+  }
+
+  /**
+   * Update database pool metrics (D-14 - Phase 34)
+   */
+  updatePoolMetrics(stats: { totalCount: number; idleCount: number; waitingCount: number }): void {
+    this.dbPoolTotal.set(stats.totalCount);
+    this.dbPoolIdle.set(stats.idleCount);
+    this.dbPoolWaiting.set(stats.waitingCount);
   }
 
   /**
