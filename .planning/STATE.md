@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Infrastructure & Scale
-current_plan: 35-04
+current_plan: 35-05
 status: executing
-last_updated: "2026-04-26T09:13:21Z"
-last_activity: 2026-04-26 — Plan 35-03 complete (Public API endpoints)
+last_updated: "2026-04-26T09:30:00Z"
+last_activity: 2026-04-26 — Plan 35-04 complete (Developer Portal UI)
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 5
-  completed_plans: 3
-  percent: 60
+  completed_plans: 4
+  percent: 80
 ---
 
 # State: NewsHub
@@ -26,12 +26,12 @@ See: .planning/PROJECT.md (updated 2026-04-26)
 ## Current Position
 
 Phase: 35 - Infrastructure Foundation (in progress)
-Current Plan: 35-04
+Current Plan: 35-05
 Status: Executing
-Last activity: 2026-04-26 — Plan 35-03 complete (Public API endpoints)
+Last activity: 2026-04-26 — Plan 35-04 complete (Developer Portal UI)
 
 ```
-v1.6 Progress: [████████████░░░░░░░░] 60% (6 phases, 0 complete, 3/5 plans done)
+v1.6 Progress: [████████████████░░░░] 80% (6 phases, 0 complete, 4/5 plans done)
 ```
 
 ## Milestone Progress
@@ -45,7 +45,7 @@ v1.6 Progress: [████████████░░░░░░░░] 60
 
 | Phase | Name | Requirements | UI | Status |
 |-------|------|--------------|-----|--------|
-| 35 | Infrastructure Foundation | 4 reqs (INFRA-01 partial, PAY-08, PAY-09, PAY-10) | No | **In Progress** (3/5 plans) |
+| 35 | Infrastructure Foundation | 4 reqs (INFRA-01 partial, PAY-08, PAY-09, PAY-10) | No | **In Progress** (4/5 plans) |
 | 36 | Monetization Core | 7 reqs (PAY-01 to PAY-07) | Yes | Not started |
 | 37 | Horizontal Scaling | 5 reqs (INFRA-01 to INFRA-05) | No | Not started |
 | 38 | Advanced AI Features | 7 reqs (AI-01 to AI-07) | Yes | Not started |
@@ -74,9 +74,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Plan 35-03 complete (Public API endpoints)
-**Next step:** Execute Plan 35-04 (Scalar docs page)
-**Resume file:** .planning/phases/35-infrastructure-foundation/35-04-PLAN.md
+**Last action:** Plan 35-04 complete (Developer Portal UI)
+**Next step:** Execute Plan 35-05 (Integration testing)
+**Resume file:** .planning/phases/35-infrastructure-foundation/35-05-PLAN.md
 **Checkpoint:** —
 
 ## Accumulated Context
@@ -246,6 +246,9 @@ v1.6 Architecture Decisions (from research):
 | 5-min Redis cache for validated keys | Phase 35-03 T-35-10 | Cache only first 15 chars as key identifier (security) |
 | Key by API key ID, not IP | Phase 35-03 | NAT/VPN friendly rate limiting |
 | Fire-and-forget usage tracking | Phase 35-03 | Never block requests for analytics |
+| @scalar/api-reference-react 0.9.27 | Phase 35-04 | Plan specified unavailable 1.52.6; installed latest |
+| API key routes at /api/keys | Phase 35-04 | Self-service key management separate from public API |
+| DevelopersPage lazy-loaded | Phase 35-04 | Uses lazyWithRetry with preload support |
 
 ## Reports
 
@@ -255,4 +258,4 @@ v1.6 Architecture Decisions (from research):
 
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-26 — Plan 35-03 complete (Public API endpoints)*
+*Last updated: 2026-04-26 — Plan 35-04 complete (Developer Portal UI)*

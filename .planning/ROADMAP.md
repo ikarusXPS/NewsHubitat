@@ -110,7 +110,7 @@ n**Plans:**
 - [x] 35-01-PLAN.md — Monorepo setup with pnpm workspaces and shared types package
 - [x] 35-02-PLAN.md — API key service with generation, validation, and storage
 - [x] 35-03-PLAN.md — Public API endpoints with OpenAPI docs and rate limiting
-- [ ] 35-04-PLAN.md — Developer portal UI with Scalar docs and key management
+- [x] 35-04-PLAN.md — Developer portal UI with Scalar docs and key management
 - [ ] 35-05-PLAN.md — Integration tests for public API and developer workflows
 
 ### Phase 36: Monetization Core
@@ -221,7 +221,7 @@ n**Plans:**
 | 32. Image Pipeline | v1.5 | 4/4 | Complete | 2026-04-26 |
 | 33. Caching Improvements | v1.5 | 3/3 | Complete | 2026-04-25 |
 | 34. Database Optimization | v1.5 | 4/4 | Complete | 2026-04-26 |
-| 35. Infrastructure Foundation | v1.6 | 3/5 | In Progress | - |
+| 35. Infrastructure Foundation | v1.6 | 4/5 | In Progress | - |
 | 36. Monetization Core | v1.6 | 0/? | Not started | - |
 | 37. Horizontal Scaling | v1.6 | 0/? | Not started | - |
 | 38. Advanced AI Features | v1.6 | 0/? | Not started | - |
@@ -231,4 +231,4 @@ n**Plans:**
 ---
 
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-26 — Plan 35-03 complete (Public API endpoints)*
+*Last updated: 2026-04-26 — Plan 35-04 complete (Developer Portal UI)*
