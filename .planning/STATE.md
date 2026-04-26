@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Infrastructure & Scale
-current_plan: —
-status: ready_to_execute
-last_updated: "2026-04-26T10:30:00Z"
-last_activity: 2026-04-26 — Phase 35 planned (5 plans, 4 waves)
+current_plan: 35-02
+status: executing
+last_updated: "2026-04-26T08:46:40Z"
+last_activity: 2026-04-26 — Plan 35-01 complete (monorepo workspace setup)
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 5
-  completed_plans: 0
-  percent: 0
+  completed_plans: 1
+  percent: 20
 ---
 
 # State: NewsHub
@@ -25,13 +25,13 @@ See: .planning/PROJECT.md (updated 2026-04-26)
 
 ## Current Position
 
-Phase: 35 - Infrastructure Foundation (planned)
-Current Plan: —
-Status: Ready to execute
-Last activity: 2026-04-26 — Phase 35 planned (5 plans, 4 waves)
+Phase: 35 - Infrastructure Foundation (in progress)
+Current Plan: 35-02
+Status: Executing
+Last activity: 2026-04-26 — Plan 35-01 complete (monorepo workspace setup)
 
 ```
-v1.6 Progress: [░░░░░░░░░░░░░░░░░░░░] 0% (6 phases, 0 complete)
+v1.6 Progress: [████░░░░░░░░░░░░░░░░] 20% (6 phases, 0 complete, 1/5 plans done)
 ```
 
 ## Milestone Progress
@@ -45,7 +45,7 @@ v1.6 Progress: [░░░░░░░░░░░░░░░░░░░░] 0%
 
 | Phase | Name | Requirements | UI | Status |
 |-------|------|--------------|-----|--------|
-| 35 | Infrastructure Foundation | 4 reqs (INFRA-01 partial, PAY-08, PAY-09, PAY-10) | No | **Planned** (5 plans) |
+| 35 | Infrastructure Foundation | 4 reqs (INFRA-01 partial, PAY-08, PAY-09, PAY-10) | No | **In Progress** (1/5 plans) |
 | 36 | Monetization Core | 7 reqs (PAY-01 to PAY-07) | Yes | Not started |
 | 37 | Horizontal Scaling | 5 reqs (INFRA-01 to INFRA-05) | No | Not started |
 | 38 | Advanced AI Features | 7 reqs (AI-01 to AI-07) | Yes | Not started |
@@ -74,9 +74,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Phase 35 planned (5 plans, 4 waves)
-**Next step:** Execute Phase 35 (Infrastructure Foundation)
-**Resume file:** —
+**Last action:** Plan 35-01 complete (monorepo workspace setup)
+**Next step:** Execute Plan 35-02 (Public API endpoints)
+**Resume file:** .planning/phases/35-infrastructure-foundation/35-02-PLAN.md
 **Checkpoint:** —
 
 ## Accumulated Context
@@ -233,6 +233,9 @@ v1.6 Architecture Decisions (from research):
 | Composite index [showOnLeaderboard, emailVerified] | Phase 34-03 D-05 | Leaderboard query optimization per audit findings |
 | Partial index idx_team_active | Phase 34-03 D-06 | WHERE deletedAt IS NULL for active teams filter |
 | Standard CREATE INDEX in DO block | Phase 34-03 | CONCURRENTLY cannot run in transaction; documented production workaround |
+| pnpm workspaces apps/packages layout | Phase 35-01 D-01 | Standard monorepo structure for code sharing |
+| Source-only TypeScript exports | Phase 35-01 D-04 | No build step for packages; apps consume .ts directly |
+| tsconfig.base.json extends pattern | Phase 35-01 | Shared TypeScript config inherited by all packages |
 
 ## Reports
 
@@ -242,4 +245,4 @@ v1.6 Architecture Decisions (from research):
 
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-26 — Phase 35 planned (5 plans, 4 waves)*
+*Last updated: 2026-04-26 — Plan 35-01 complete (monorepo workspace setup)*
