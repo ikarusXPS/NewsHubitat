@@ -79,4 +79,4 @@ export function getPoolStats(): { totalCount: number; idleCount: number; waiting
   }
 }
 
-export { prisma, getPoolStats };
+export { prisma };
