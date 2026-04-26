@@ -24,13 +24,15 @@ export function InviteModal({ isOpen, onClose, teamId, teamName }: InviteModalPr
 
   const { mutate: inviteMember, isPending } = useInviteMember(teamId);
 
-  // Reset form on close
+  // Reset form on close - intentional state reset when modal closes
   useEffect(() => {
     if (!isOpen) {
+      /* eslint-disable react-hooks/set-state-in-effect -- Intentional reset on modal close */
       setEmail('');
       setRole('member');
       setError(null);
       setSuccess(false);
+      /* eslint-enable react-hooks/set-state-in-effect */
     }
   }, [isOpen]);
 

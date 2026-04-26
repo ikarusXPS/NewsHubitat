@@ -7,7 +7,7 @@
  * - Max 3 keys per user (D-10)
  * - Usage dashboard with creation date, last used, request count (D-11)
  */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ApiReferenceReact } from '@scalar/api-reference-react';
 import '@scalar/api-reference-react/style.css';
 import { useAuth } from '../contexts/AuthContext';
@@ -43,19 +43,11 @@ export function DevelopersPage() {
     isOpen: false,
   });
 
-  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+  const showToast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'info') => {
     setToast({ message, type, isOpen: true });
-  };
+  }, []);
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      loadApiKeys();
-    } else {
-      setLoading(false);
-    }
-  }, [isAuthenticated]);
-
-  const loadApiKeys = async () => {
+  const loadApiKeys = useCallback(async () => {
     try {
       const response = await fetch('/api/keys', {
         headers: {
@@ -74,7 +66,17 @@ export function DevelopersPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [showToast]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      /* eslint-disable react-hooks/set-state-in-effect -- Data fetching on auth change */
+      loadApiKeys();
+    } else {
+      setLoading(false);
+    }
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [isAuthenticated, loadApiKeys]);
 
   const handleCreateKey = async (e: React.FormEvent) => {
     e.preventDefault();

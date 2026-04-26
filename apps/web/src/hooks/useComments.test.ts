@@ -84,7 +84,7 @@ describe('useComments', () => {
     // This test verifies the socket setup
     const { io } = await import('socket.io-client');
 
-    const { result } = renderHook(() => useComments('article-1'), {
+    const { result: _result } = renderHook(() => useComments('article-1'), {
       wrapper: createWrapper(),
     });
 

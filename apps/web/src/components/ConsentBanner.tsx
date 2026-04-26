@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, Settings, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { Shield, Settings, ChevronUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useConsent, type ConsentState } from '../contexts/ConsentContext';
 import { useAppStore } from '../store';

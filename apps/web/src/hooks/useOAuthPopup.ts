@@ -21,7 +21,9 @@ export function useOAuthPopup(options: UseOAuthPopupOptions = {}) {
   const checkIntervalRef = useRef<number | null>(null);
   // Store options in ref to avoid re-running effect on options change
   const optionsRef = useRef(options);
-  optionsRef.current = options;
+  useEffect(() => {
+    optionsRef.current = options;
+  });
 
   // Message handler for postMessage from popup
   useEffect(() => {

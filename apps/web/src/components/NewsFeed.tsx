@@ -1,7 +1,6 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { AlertCircle, RefreshCw, LayoutGrid, List, Radio, Zap, TrendingUp, TrendingDown } from 'lucide-react';
-import { SignalCard } from './SignalCard';
 import { HeroSection } from './HeroSection';
 import { SourceFilter } from './SourceFilter';
 import { AskAI } from './AskAI';

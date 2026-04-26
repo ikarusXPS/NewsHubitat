@@ -1,5 +1,5 @@
 import { useMemo, useState, useRef, useCallback, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -40,7 +40,6 @@ interface EventStats {
  */
 export function BottomNav() {
   const { t } = useTranslation('common');
-  const navigate = useNavigate();
   const location = useLocation();
   const scrollDirection = useScrollDirection();
   const { lightTap, successPattern } = useHapticFeedback();

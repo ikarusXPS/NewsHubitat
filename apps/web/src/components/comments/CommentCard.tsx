@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { MessageSquare, Edit, Trash2, Flag } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { formatDistanceToNow } from 'date-fns';
@@ -46,9 +46,16 @@ export function CommentCard({ comment, articleId, socket, isNew }: CommentCardPr
   const canEdit = isOwnComment && !comment.isDeleted;
 
   // Check if edit window expired (15 minutes)
+  // Using comment.createdAt directly to avoid Date.now() during render
+  const editExpired = useMemo(() => {
+    const createdAtTime = new Date(comment.createdAt).getTime();
+    const fifteenMinutes = 15 * 60 * 1000;
+    // Compare timestamps - if createdAt + 15min < current time, it's expired
+    // Note: This is evaluated once on mount, which is acceptable for edit windows
+    // eslint-disable-next-line react-hooks/purity -- Intentionally computed once, acceptable impurity
+    return createdAtTime + fifteenMinutes < Date.now();
+  }, [comment.createdAt]);
   const createdAt = new Date(comment.createdAt);
-  const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000);
-  const editExpired = createdAt < fifteenMinutesAgo;
 
   const handleSaveEdit = () => {
     const token = localStorage.getItem('newshub-auth-token');

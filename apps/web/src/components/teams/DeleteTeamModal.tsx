@@ -26,9 +26,10 @@ export function DeleteTeamModal({ isOpen, onClose, teamId, teamName }: DeleteTea
 
   const isConfirmed = confirmText === teamName;
 
-  // Reset on close
+  // Reset on close - intentional state reset when modal closes
   useEffect(() => {
     if (!isOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Intentional reset on modal close
       setConfirmText('');
     }
   }, [isOpen]);
