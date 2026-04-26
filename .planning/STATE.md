@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Infrastructure & Scale
-current_plan: 36-03
+current_plan: 36-04
 status: In progress
-last_updated: "2026-04-26T16:07:12Z"
-last_activity: 2026-04-26 — Phase 36 Plan 03 complete (feature gating middleware + Premium benefits)
+last_updated: "2026-04-26T16:22:00Z"
+last_activity: 2026-04-26 — Phase 36 Plan 04 complete (Pricing Page UI + i18n translations)
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 10
-  completed_plans: 8
-  percent: 80
+  completed_plans: 9
+  percent: 90
 ---
 
 # State: NewsHub
@@ -26,12 +26,12 @@ See: .planning/PROJECT.md (updated 2026-04-26)
 ## Current Position
 
 Phase: 36 - Monetization Core
-Current Plan: 36-03 (complete)
+Current Plan: 36-04 (complete)
 Status: In progress
-Last activity: 2026-04-26 — Phase 36 Plan 03 complete (feature gating + Premium benefits)
+Last activity: 2026-04-26 — Phase 36 Plan 04 complete (Pricing Page UI + i18n)
 
 ```
-v1.6 Progress: [████████████████----] 80% (6 phases, 1 complete, 8/10 plans done)
+v1.6 Progress: [██████████████████--] 90% (6 phases, 1 complete, 9/10 plans done)
 ```
 
 ## Milestone Progress
@@ -46,7 +46,7 @@ v1.6 Progress: [████████████████----] 80% (6 pha
 | Phase | Name | Requirements | UI | Status |
 |-------|------|--------------|-----|--------|
 | 35 | Infrastructure Foundation | 4 reqs (INFRA-01 partial, PAY-08, PAY-09, PAY-10) | No | **Complete** (5/5 plans) |
-| 36 | Monetization Core | 7 reqs (PAY-01 to PAY-07) | Yes | **In Progress** (3/5 plans) |
+| 36 | Monetization Core | 7 reqs (PAY-01 to PAY-07) | Yes | **In Progress** (4/5 plans) |
 | 37 | Horizontal Scaling | 5 reqs (INFRA-01 to INFRA-05) | No | Not started |
 | 38 | Advanced AI Features | 7 reqs (AI-01 to AI-07) | Yes | Not started |
 | 39 | Mobile Apps | 8 reqs (MOB-01 to MOB-08) | Yes | Not started |
@@ -74,8 +74,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Phase 36 Plan 03 complete (feature gating middleware + Premium benefits)
-**Next step:** Continue with Phase 36 Plan 04 (Pricing Page UI)
+**Last action:** Phase 36 Plan 04 complete (Pricing Page UI + i18n translations)
+**Next step:** Continue with Phase 36 Plan 05 (Subscription E2E Tests)
 **Resume file:** None
 **Checkpoint:** None
 
@@ -267,6 +267,12 @@ v1.6 Architecture Decisions (from research):
 | attachUserTier for soft gating | Phase 36-03 | Attaches tier without blocking access |
 | aiTierLimiter 24h window | Phase 36-03 | Daily limit tracking for FREE tier |
 | History max entries by tier | Phase 36-03 | FREE: 100, PREMIUM: 1000 |
+| Premium cyan highlight + scale-105 | Phase 36-04 | TierCard isPopular styling per CONTEXT.md |
+| SubscriptionBadge null for FREE | Phase 36-04 | Badge only shown for paying tiers |
+| AIUsageCounter color thresholds | Phase 36-04 | Green >50%, Yellow 20-50%, Red <20% |
+| Annual billing Save 2 Months | Phase 36-04 | EUR90/year vs EUR9*12=EUR108 |
+| Enterprise opens Calendly | Phase 36-04 | Demo booking via external link |
+| Checkout intent in sessionStorage | Phase 36-04 | Preserved across login redirect |
 
 ## Reports
 
