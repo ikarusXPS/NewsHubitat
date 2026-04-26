@@ -126,7 +126,7 @@ n**Plans:**
   6. Stripe webhooks update subscription status idempotently without duplicate processing
 **Plans**: 5 plans
 **Plans:**
-- [ ] 36-01-PLAN.md — Schema & service foundation (subscription models, SubscriptionService, Stripe config)
+- [x] 36-01-PLAN.md — Schema & service foundation (subscription models, SubscriptionService, Stripe config)
 - [ ] 36-02-PLAN.md — Stripe checkout & webhooks (checkout sessions, idempotent webhook handlers)
 - [ ] 36-03-PLAN.md — Feature gating middleware (requireTier, AI rate limit bypass, history/export)
 - [ ] 36-04-PLAN.md — Pricing page & UI components (TierCard, SubscriptionBadge, i18n)
@@ -226,8 +226,8 @@ n**Plans:**
 | 32. Image Pipeline | v1.5 | 4/4 | Complete | 2026-04-26 |
 | 33. Caching Improvements | v1.5 | 3/3 | Complete | 2026-04-25 |
 | 34. Database Optimization | v1.5 | 4/4 | Complete | 2026-04-26 |
-| 35. Infrastructure Foundation | v1.6 | 5/5 | Awaiting Verification | - |
-| 36. Monetization Core | v1.6 | 0/5 | Planning complete | - |
+| 35. Infrastructure Foundation | v1.6 | 5/5 | Complete | 2026-04-26 |
+| 36. Monetization Core | v1.6 | 1/5 | In Progress | - |
 | 37. Horizontal Scaling | v1.6 | 0/? | Not started | - |
 | 38. Advanced AI Features | v1.6 | 0/? | Not started | - |
 | 39. Mobile Apps | v1.6 | 0/? | Not started | - |
@@ -236,4 +236,4 @@ n**Plans:**
 ---
 
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-26 — Phase 36 plans created (5 plans in 4 waves)*
+*Last updated: 2026-04-26 — Phase 36 Plan 01 complete (subscription schema + service)*

@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Infrastructure & Scale
-current_plan: 35-05
-status: Roadmap ready
-last_updated: "2026-04-26T14:36:25.060Z"
-last_activity: 2026-04-26 — Phase 36 discuss-phase complete, CONTEXT.md created
+current_plan: 36-01
+status: In progress
+last_updated: "2026-04-26T15:46:00Z"
+last_activity: 2026-04-26 — Phase 36 Plan 01 complete (subscription schema + service)
 progress:
   total_phases: 6
   completed_phases: 1
-  total_plans: 5
-  completed_plans: 5
-  percent: 100
+  total_plans: 10
+  completed_plans: 6
+  percent: 60
 ---
 
 # State: NewsHub
@@ -25,13 +25,13 @@ See: .planning/PROJECT.md (updated 2026-04-26)
 
 ## Current Position
 
-Phase: 35 - Infrastructure Foundation (awaiting verification)
-Current Plan: 35-05
-Status: Awaiting human verification
-Last activity: 2026-04-26 — Phase 36 discuss-phase complete
+Phase: 36 - Monetization Core
+Current Plan: 36-01 (complete)
+Status: In progress
+Last activity: 2026-04-26 — Phase 36 Plan 01 complete
 
 ```
-v1.6 Progress: [████████████████████] 100% (6 phases, 0 complete, 5/5 plans done, awaiting verification)
+v1.6 Progress: [████████████--------] 60% (6 phases, 1 complete, 6/10 plans done)
 ```
 
 ## Milestone Progress
@@ -45,8 +45,8 @@ v1.6 Progress: [████████████████████] 10
 
 | Phase | Name | Requirements | UI | Status |
 |-------|------|--------------|-----|--------|
-| 35 | Infrastructure Foundation | 4 reqs (INFRA-01 partial, PAY-08, PAY-09, PAY-10) | No | **Awaiting Verification** (5/5 plans) |
-| 36 | Monetization Core | 7 reqs (PAY-01 to PAY-07) | Yes | **Ready to execute** (5 plans) |
+| 35 | Infrastructure Foundation | 4 reqs (INFRA-01 partial, PAY-08, PAY-09, PAY-10) | No | **Complete** (5/5 plans) |
+| 36 | Monetization Core | 7 reqs (PAY-01 to PAY-07) | Yes | **In Progress** (1/5 plans) |
 | 37 | Horizontal Scaling | 5 reqs (INFRA-01 to INFRA-05) | No | Not started |
 | 38 | Advanced AI Features | 7 reqs (AI-01 to AI-07) | Yes | Not started |
 | 39 | Mobile Apps | 8 reqs (MOB-01 to MOB-08) | Yes | Not started |
@@ -74,10 +74,10 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Phase 36 planning complete (5 plans in 4 waves)
-**Next step:** Run `/gsd-execute-phase 36` to implement monetization
+**Last action:** Phase 36 Plan 01 complete (subscription schema + service)
+**Next step:** Continue with Phase 36 Plan 02 (webhook handlers)
 **Resume file:** None
-**Checkpoint:** None (ready for execution)
+**Checkpoint:** None
 
 ## Accumulated Context
 
@@ -251,6 +251,12 @@ v1.6 Architecture Decisions (from research):
 | DevelopersPage lazy-loaded | Phase 35-04 | Uses lazyWithRetry with preload support |
 | Playwright request context for API testing | Phase 35-05 | Direct API testing without browser overhead |
 | Fresh API keys per rate limit test | Phase 35-05 | Test isolation prevents pollution between runs |
+| stripe@22.1.0 | Phase 36-01 | Official Stripe Node.js SDK for subscription billing |
+| Stripe API version 2024-12-18.acacia | Phase 36-01 | Pin API version for stability |
+| FREE tier: 10 AI queries/day | Phase 36-01 | Per CONTEXT.md Feature Gating table |
+| FREE tier: 7-day history limit | Phase 36-01 | Per CONTEXT.md Feature Gating table |
+| 5-min subscription cache TTL | Phase 36-01 | CACHE_TTL.MEDIUM for subscription status |
+| Graceful Stripe degradation | Phase 36-01 | Service unavailable when STRIPE_SECRET_KEY not set |
 
 ## Reports
 
@@ -260,4 +266,4 @@ v1.6 Architecture Decisions (from research):
 
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-26 — Phase 36 discuss-phase complete, CONTEXT.md created*
+*Last updated: 2026-04-26 — Phase 36 Plan 01 complete (subscription schema + service)*
