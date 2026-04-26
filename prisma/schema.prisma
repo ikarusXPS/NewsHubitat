@@ -128,6 +128,10 @@ model User {
   @@index([emailVerified, createdAt])  // For cleanup job queries
   @@index([googleIdHash])
   @@index([githubIdHash])
+
+  // Leaderboard query optimization (D-05, DB-02 - Phase 34)
+  // Query: WHERE showOnLeaderboard = true AND emailVerified = true
+  @@index([showOnLeaderboard, emailVerified])
 }
 
 model Bookmark {
