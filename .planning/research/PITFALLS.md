@@ -1,1126 +1,951 @@
-# Domain Pitfalls
+# Domain Pitfalls: v1.6 Infrastructure & Scale
 
-**Domain:** Performance Optimization
-**Context:** Adding performance optimizations to existing NewsHub (v1.4) with PostgreSQL, Redis, TanStack Query, React 19, Express 5, Zustand
-**Researched:** 2026-04-25
+**Domain:** Adding infrastructure scaling, advanced AI, mobile platforms, monetization, and content expansion to existing production system
+**Researched:** 2026-04-26
+**Context:** NewsHub v1.5 (10k concurrent users, PostgreSQL + Redis + Docker Compose, existing multi-provider AI)
 
 ---
 
 ## Critical Pitfalls
 
-Mistakes that cause data loss, severe performance degradation, or production outages.
+Mistakes that cause rewrites, outages, or major issues.
 
-### CP-01: Redis Cache Key Explosion from Missing TTLs
+### Pitfall 1: Docker Swarm Volume Strategy Blindness
+**What goes wrong:** Local volumes work fine in Compose, but when Swarm reschedules containers to different nodes, data vanishes. Databases lose state, uploads disappear, and monitoring fails.
 
-**What goes wrong:** Cache keys accumulate indefinitely. Redis memory usage grows unbounded. Eventually hits maxmemory limit, causing evictions of critical data (JWT blacklist, rate limits) or OOM crashes.
-
-**Why it happens:** Storing cache keys without expiration because "we'll handle cleanup manually" or "this data is important." But cleanup never happens. NewsHub currently has:
-- AI response cache (potentially unlimited article combinations)
-- Translation cache (130 sources × many languages)
-- Query result cache (clusters, analytics, sentiment stats)
+**Why it happens:** Teams assume Swarm automatically handles storage the way Compose does with local volumes. It doesn't.
 
 **Consequences:**
-- Redis maxmemory reached → critical data evicted (JWT blacklist fails, allowing revoked tokens)
-- Rate limiting breaks → API abuse succeeds
-- Production outage requiring Redis flush (losing ALL cache data)
-- Cache hit ratio plummets due to constant evictions
+- PostgreSQL data loss if master node fails
+- User uploads (avatars, exports) lost when containers move nodes
+- Prometheus/Grafana metrics reset on reschedule
+- Session data inconsistency across nodes
 
 **Prevention:**
-- **MANDATORY TTL on ALL cache keys** — No exceptions
-- Use Redis `SETEX` or `SET key value EX seconds` — never plain `SET`
-- Different TTLs by data type:
-  - AI responses: 24 hours (content changes daily)
-  - Translation cache: 7 days (static translations)
-  - Query results: 5 minutes (news platform, real-time)
-  - JWT blacklist: 7 days (token expiration)
-- Add jitter to TTLs to prevent thundering herd: `TTL + random(0, 60)`
-- Monitor Redis memory usage with alerts at 70% and 85%
+1. Audit all volume mounts BEFORE migrating to Swarm
+2. Plan storage strategy: NFS, GlusterFS, or managed volume plugins (Portworx, StorageOS)
+3. For databases: use managed services (RDS, Supabase cloud) or persistent volumes with node constraints
+4. For uploads: use object storage (S3, Cloudinary) - already using Cloudinary for images, extend to user exports
+5. For metrics: external Prometheus (cloud) or NFS-backed volume
 
 **Detection:**
-- Warning signs: Redis memory climbing steadily over weeks
-- Grep codebase for `redis.set(` without `EX` parameter
-- Redis CLI: `KEYS *` count growing indefinitely
-- Monitor: Track keys without TTL (`TTL key` returns -1)
+- Container restarts on different node = data missing
+- Database connection errors after node changes
+- Upload URLs return 404 after redeployment
 
-**Phase:** API Response Caching (implementation, first cache added)
-
-**Sources:**
-- [Redis Anti-Patterns: Common Mistakes](https://redis.io/tutorials/redis-anti-patterns-every-developer-should-avoid/) - HIGH confidence
-- [Redis Caching Pitfalls](https://medium.com/@QuarkAndCode/redis-caching-pitfalls-invalidation-testing-best-practices-3950a0660f1a) - HIGH confidence
+**Phase:** Phase 1 (Infrastructure Planning) - must address before Swarm migration
 
 ---
 
-### CP-02: Cache Invalidation Cascade Failures
+### Pitfall 2: Connection Pool Exhaustion from Horizontal Scaling
+**What goes wrong:** Scaling from 1 to 10 Express replicas multiplies database connections 10x. PostgreSQL max_connections (default 100) gets exhausted. New requests hang, timeout, or fail.
 
-**What goes wrong:** Article is updated. Backend invalidates `article:123` cache. BUT related caches remain stale:
-- Story cluster still references old article title
-- Sentiment stats include old sentiment classification
-- NewsSource article count is outdated
-- Translation cache has old content
-
-Users see mixed data: new article headline with old sentiment, breaking trust.
-
-**Why it happens:** Cache keys designed independently. No tracking of dependencies. When NewsHub updates an article (rare but happens: corrections, sentiment re-classification), invalidating just `article:id` isn't enough.
+**Why it happens:** Each Express instance has its own connection pool (Prisma default: 10 connections). 10 replicas = 100 connections. Add monitoring, background workers, and you've exceeded PostgreSQL capacity.
 
 **Consequences:**
-- Data inconsistency visible to users ("This article is positive" but content shows negative sentiment)
-- Breaks coverage gap detection (old article counted in region coverage)
-- User confusion and bug reports
-- Emergency cache flush required (losing all cache benefits)
+- 503 errors under load despite healthy containers
+- Increased latency as requests queue for connections
+- Database performance degradation from connection churn
+- False alarms: looks like DB failure, actually connection exhaustion
 
 **Prevention:**
-- **Tag-based invalidation pattern**: Store tag-to-key mappings
-  ```typescript
-  // When caching article
-  await redis.set(`article:123`, data, 'EX', 3600);
-  await redis.sadd(`tag:article:123`, `article:123`, `cluster:45`, `sentiment:usa`);
-
-  // When invalidating
-  const keys = await redis.smembers(`tag:article:123`);
-  await redis.del(...keys);
-  ```
-- Document cache dependencies in CACHE-DEPENDENCIES.md
-- Prefer short TTLs (5 minutes) over complex invalidation for NewsHub's real-time nature
-- Use `stale-while-revalidate` pattern: serve cached data while fetching fresh in background
+1. Implement PgBouncer connection pooler BEFORE scaling replicas
+   - Centralized pooling: 1000 client connections → 50 PostgreSQL connections
+   - Transaction mode for stateless API, session mode for migrations
+2. Calculate connection budget:
+   ```
+   Total connections needed = (replicas × pool_size) + (workers × pool_size) + monitoring (5)
+   PostgreSQL max = CPU cores × 4 (safe limit)
+   ```
+3. Configure Prisma connection pool per replica:
+   - Production: 5 connections per replica (with PgBouncer)
+   - Without PgBouncer: replicas × 5 must be < max_connections - 20 (reserved)
+4. Monitor pool metrics (already in place from Phase 34)
+5. Set connection_limit in DATABASE_URL
 
 **Detection:**
-- Test scenario: Update article sentiment → verify all related endpoints return updated data
-- Monitor for spikes in support tickets about "wrong data"
-- Automated tests for invalidation coverage
+- Prisma error: "Can't reach database server"
+- PostgreSQL logs: "FATAL: remaining connection slots reserved"
+- Pool wait time > 100ms (Grafana dashboard alert)
 
-**Phase:** API Response Caching (architecture design before implementation)
-
-**Sources:**
-- [Three Ways to Maintain Cache Consistency](https://redis.io/blog/three-ways-to-maintain-cache-consistency/) - HIGH confidence
-- [Tag-Based Invalidation Pattern](https://medium.com/@rup.singh88/redis-caching-cache-invalidation-a-complete-guide-cc822b87aa4d) - MEDIUM confidence
+**Phase:** Phase 1 (Infrastructure Planning) - implement PgBouncer before Swarm replicas
 
 ---
 
-### CP-03: TanStack Query Cache Invalidation Missing at Scale
+### Pitfall 3: Treating Public API Like Internal API
+**What goes wrong:** Expose internal database structure directly in public API. Later you need to refactor schema or rename fields. Breaking changes silently break customer integrations you didn't know existed.
 
-**What goes wrong:** Frontend cache gets stale. User bookmarks an article, but bookmark icon doesn't update. User creates team, but team list doesn't refresh. No warnings, just silent staleness.
-
-**Why it happens:** NewsHub already uses TanStack Query. Adding features means new mutations. Developers forget to invalidate related queries. "No built-in way to catch missing invalidations, other than manually testing."
-
-**Specific NewsHub risks:**
-- Bookmark mutation → must invalidate `['news']`, `['bookmarks']`, `['user-stats']`
-- Team creation → must invalidate `['teams']`, `['leaderboard']`
-- Reading history → must invalidate `['history']`, `['recommendations']`, `['badges']`
+**Why it happens:** Internal API and public API treated as identical. "We'll just expose `/api/news` publicly with API keys."
 
 **Consequences:**
-- Stale UI showing outdated data
-- User sees unbookmarked article despite clicking bookmark
-- Gamification badges don't update (user earned badge but doesn't see it)
-- Users think feature is broken, stop using it
+- Database becomes your contract - can't change schema without versioning
+- Internal refactoring blocked by external compatibility
+- No abstraction layer = direct table exposure
+- Breaking changes discovered only when customers complain
+- Support overhead from undocumented field changes
 
 **Prevention:**
-- **Invalidation checklist** in mutation implementation:
-  ```typescript
-  // BAD: Missing invalidations
-  const { mutate } = useMutation({
-    mutationFn: bookmarkArticle,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['bookmarks'] });
-      // MISSING: ['news'], ['user-stats']
-    },
-  });
+1. Create separate `/api/v1/public/*` routes (NEVER expose `/api/news` directly)
+2. Add abstraction layer with controlled response schemas:
+   ```typescript
+   // BAD: Direct database exposure
+   return prisma.newsArticle.findMany()
 
-  // GOOD: Complete invalidation
-  onSuccess: () => {
-    queryClient.invalidateQueries({ queryKey: ['bookmarks'] });
-    queryClient.invalidateQueries({ queryKey: ['news'] });
-    queryClient.invalidateQueries({ queryKey: ['user-stats'] });
-  }
-  ```
-- Document query key relationships in QUERY-KEYS.md
-- Organize query keys hierarchically: `['news', 'article', id]` so `['news']` invalidates all
-- Test EVERY mutation with React Query DevTools to verify refetch behavior
-- Use `exact: false` for broader invalidation: `invalidateQueries({ queryKey: ['news'] })` invalidates `['news', 'article', 123]`
+   // GOOD: Public API schema
+   return articles.map(a => ({
+     id: a.id,
+     title: a.title,
+     published_at: a.publishedAt,  // Different naming
+     source: { name: a.source.name },  // Nested, not sourceId
+     // Internal fields NOT exposed: internalNotes, processingMetadata
+   }))
+   ```
+3. Version from day one: `/api/v1/news`, `/api/v2/news`
+4. Document public fields as immutable contracts
+5. Use separate TypeScript types: `PublicArticle` vs `NewsArticle` (Prisma model)
+6. Add deprecation warnings before removing fields (X-Deprecation header)
 
 **Detection:**
-- Test: Perform mutation → check if related UI updates immediately
-- React Query DevTools: Watch for queries marked "stale" but not refetching
-- User testing: "Does everything feel live?"
+- Schema migration blocked by "can't change this field, it's in the API"
+- Customer support tickets about field changes
+- Internal refactoring requires API versioning discussion
 
-**Phase:** Query Result Caching (every mutation added to codebase)
-
-**Sources:**
-- [TanStack Query Invalidation Guide](https://tanstack.com/query/v5/docs/framework/react/guides/query-invalidation) - HIGH confidence
-- [Missing Invalidations Discussion](https://github.com/TanStack/query/discussions/2104) - HIGH confidence
-- [Stale UI Intermittently](https://github.com/TanStack/query/discussions/6953) - MEDIUM confidence
+**Phase:** Phase 5 (Developer API) - design before implementing
 
 ---
 
-### CP-04: PostgreSQL Over-Indexing Destroys Write Performance
+### Pitfall 4: Free Tier Too Generous, No Conversion Path
+**What goes wrong:** Free tier solves all user needs. Users sign up, love the product, never upgrade. Revenue = $0 despite high engagement.
 
-**What goes wrong:** Adding indexes to "speed up queries" actually slows down the app. Article insertion latency increases from 50ms to 300ms. RSS aggregation starts timing out.
-
-**Why it happens:** Every index added = slower writes. Benchmark data: increasing indexes from 7 to 39 reduced throughput to 42% (TPS dropped from ~1400 to ~600). NewsHub's write-heavy operations:
-- RSS aggregation: bulk insert 100s of articles
-- User actions: bookmarks, reading history, comments
-- Real-time updates: sentiment re-classification
-
-**Specific NewsHub risks:**
-- Adding indexes to every filterable field (region, sentiment, source, publishedAt, category)
-- Composite indexes that overlap: `(region, sentiment)`, `(region, publishedAt)`, `(region)` — wasteful
-- Text search indexes on large content fields
-- Indexes on columns rarely queried
+**Why it happens:** Fear of losing users leads to giving away premium features. "Just one more feature in free tier to boost signups."
 
 **Consequences:**
-- Write operations become bottleneck
-- RSS feed aggregation can't keep up with real-time news
-- User actions feel slow (bookmark takes 2 seconds)
-- Database CPU spikes during high-traffic periods
-- Autovacuum runs for extremely long durations
+- Tons of new users, few paying customers
+- Infrastructure costs scale with users, revenue doesn't
+- Cannot reduce free tier without backlash and churn
+- Support burden from free users drains resources
+- Impossible to justify premium features when free is complete
 
 **Prevention:**
-- **Index audit protocol**:
-  1. Run query with `EXPLAIN ANALYZE` BEFORE adding index
-  2. Confirm query is actually slow (>500ms) and frequent (>100/min)
-  3. Add index
-  4. Benchmark write operations AFTER adding index
-  5. Rollback if write performance degrades >20%
-- Prioritize indexes on:
-  - Foreign keys (for JOINs)
-  - WHERE clause fields in frequent queries
-  - ORDER BY fields for sorting
-- Avoid indexing:
-  - Columns with low cardinality (few unique values, like boolean flags)
-  - Columns rarely used in WHERE/ORDER BY
-  - Large text fields (use GIN/full-text search instead)
-- Monitor index usage: `pg_stat_user_indexes` to find unused indexes
+1. Define value ladder BEFORE implementing billing:
+   - **Free:** 20 articles/day, 5 AI questions/day, 7-day history, no exports, no teams
+   - **Premium ($9/mo):** Unlimited articles, unlimited AI, full history, CSV exports, email digests, priority support
+   - **Team ($29/mo):** Team collaboration, advanced analytics, API access (100 req/day), custom feeds
+   - **API ($99/mo):** Developer API (10k req/day), webhooks, historical data access
+2. Free tier must create "aha moment" but leave premium value clear
+3. In-app friction points that highlight premium:
+   - Hit 20 articles → "Upgrade for unlimited access"
+   - Try to export → "Premium feature" with upgrade CTA
+   - 8th AI question → "Upgrade for unlimited AI insights"
+4. Track upgrade trigger metrics: which limits cause conversions
+5. NEVER move features from paid → free (trust damage)
+6. NEVER move features from free → paid without grandfather clause
 
 **Detection:**
-- Benchmark: Measure bulk insert time before/after index addition
-- Monitor write latency in production (Prometheus metrics)
-- Check `pg_stat_user_indexes.idx_scan` for zero-usage indexes
+- Free tier signup rate high, upgrade rate < 2%
+- Support load from free users > revenue from paid
+- Feature requests all solvable within free tier
 
-**Phase:** Database Indexing (before adding indexes to existing tables)
-
-**Sources:**
-- [PostgreSQL Indexes Can Hurt Performance](https://www.percona.com/blog/postgresql-indexes-can-hurt-you-negative-effects-and-the-costs-involved/) - HIGH confidence
-- [Benchmarking PostgreSQL: The Hidden Cost of Over-Indexing](https://www.percona.com/blog/benchmarking-postgresql-the-hidden-cost-of-over-indexing/) - HIGH confidence
-- [PostgreSQL Indexing Playbook 2026](https://www.sachith.co.uk/postgresql-indexing-playbook-practical-guide-feb-12-2026/) - HIGH confidence
+**Phase:** Phase 4 (Freemium Model) - design tiers before implementation
 
 ---
 
-### CP-05: N+1 Query Problem with Prisma ORM
+### Pitfall 5: AI Credibility Scoring Without Ground Truth
+**What goes wrong:** Build credibility scoring system, but have no way to validate if scores are accurate. Assign high credibility to propaganda sites or low scores to legitimate news. Users lose trust.
 
-**What goes wrong:** Loading 100 articles with their sources. Database executes 101 queries: 1 for articles, then 1 per article for source. Latency explodes from 38ms to 8.9 seconds. Database CPU from 4% to 78%.
-
-**Why it happens:** ORM makes it easy to write inefficient code. NewsHub currently fetches related data:
-- Articles → NewsSource
-- Articles → Bookmarks (to show bookmark status)
-- StoryCluster → Articles → NewsSource
-- User → Badges → Badge details
-- Team → Members → User details
-
-**Specific NewsHub risks:**
-```typescript
-// BAD: N+1 query
-const articles = await prisma.newsArticle.findMany();
-for (const article of articles) {
-  article.source = await prisma.newsSource.findUnique({ where: { id: article.sourceId } });
-}
-
-// GOOD: Single query with JOIN
-const articles = await prisma.newsArticle.findMany({
-  include: { source: true }
-});
-```
+**Why it happens:** Assume AI can determine credibility without human-validated training data. "Let's use sentiment + keyword analysis to score sources."
 
 **Consequences:**
-- Response times measured in seconds, not milliseconds
-- Database connection pool exhaustion (1000s of queries)
-- Horizontal scaling doesn't help (database becomes bottleneck)
-- Users abandon slow pages
+- Incorrect credibility scores damage platform reputation
+- Bias amplification: training data bias becomes system bias
+- False positives: legitimate sources flagged as unreliable
+- False negatives: propaganda sources rated as credible
+- Legal risk: defamation claims if scores are public
+- Algorithmic opacity: users don't understand why scores assigned
 
 **Prevention:**
-- **ALWAYS use `include` or `select` for related data** — Never fetch in loops
-- Prisma v7.4+ has query caching layer (ensure enabled)
-- Use Prisma Query Insights to detect N+1 patterns
-- Benchmark: Deep include chains (3+ levels) can produce enormous JOINs slower than N+1 → benchmark anything beyond 2 levels
-- Use `relationLoadStrategy: "join"` for one-to-one relationships
-- For large one-to-many (e.g., article with 1000s of comments), use separate queries not `include`
+1. Start with human-validated source ratings:
+   - Use existing datasets: Media Bias/Fact Check, AllSides, NewsGuard
+   - Manual review of top 50 sources before algorithmic expansion
+   - Expert panel review for controversial sources
+2. Multi-signal credibility framework (not just AI):
+   - Editorial standards (masthead, corrections policy, bylines)
+   - Ownership transparency (independent, state-owned, corporate)
+   - Fact-check track record (corrections issued, retractions)
+   - Professional affiliations (press councils, journalism awards)
+   - Cross-reference verification (claims matched by peer sources)
+   - Historical accuracy (track corrections over time)
+3. Confidence scoring: "80% confidence" not binary credible/not
+4. Transparency requirements:
+   - Show which signals contributed to score
+   - Allow source owners to contest scores (appeal process)
+   - Display methodology publicly
+5. Human oversight loop:
+   - Flag low-confidence scores for manual review
+   - Weekly audit of score changes
+   - Quarterly expert panel review
+6. Never display raw scores publicly - use tiers (High/Medium/Low) with explanations
+7. Continuous validation: compare AI predictions against fact-check outcomes
 
 **Detection:**
-- Enable Prisma query logging: `log: ['query']`
-- Count queries per request: Should be <10 for most endpoints
-- Load testing reveals N+1 patterns (latency scales linearly with result count)
-- Use Prisma Query Insights built into Prisma Postgres
+- User reports: "Why is [legitimate source] rated low?"
+- Source complaints about unfair scoring
+- Scores don't correlate with fact-check databases
+- Outlier scores on politically sensitive topics
 
-**Phase:** Database Indexing / Query Result Caching (any code touching database)
-
-**Sources:**
-- [Prisma N+1 in Production: Real Query Plans](https://blog.pratikpatel.pro/prisma-query-optimization-guide) - HIGH confidence
-- [Prisma ORM v7.4: Query Caching](https://www.prisma.io/blog/prisma-orm-v7-4-query-caching-partial-indexes-and-major-performance-improvements) - HIGH confidence
-- [Query Optimization | Prisma Documentation](https://www.prisma.io/docs/orm/prisma-client/queries/advanced/query-optimization-performance) - HIGH confidence
+**Phase:** Phase 2 (AI Credibility) - validation framework required before scoring
 
 ---
 
-### CP-06: React Bundle Splitting Creates Loading Waterfall
+### Pitfall 6: Monorepo Without Build Cache Strategy
+**What goes wrong:** Add React Native alongside React web in monorepo. Every change triggers full rebuild of both apps. CI takes 30+ minutes. Developer iteration slows to a crawl.
 
-**What goes wrong:** Bundle split too aggressively. User navigates to Dashboard → loads route chunk → chunk imports SignalCard → loads SignalCard chunk → SignalCard imports utils → loads utils chunk. 6 sequential network requests instead of 1. Page feels slower despite smaller chunks.
-
-**Why it happens:** "Split everything for smallest bundles!" But splitting at wrong boundaries creates dependency chains.
-
-**Specific NewsHub risks:**
-- Splitting every component individually
-- Splitting utility functions used across routes
-- Splitting UI library components (Recharts, globe.gl)
-- Lazy loading critical above-fold content
+**Why it happens:** Focus on code sharing benefits, ignore build performance implications. Assume tools handle caching automatically.
 
 **Consequences:**
-- Waterfall loading: subsequent chunks can't load until previous finish
-- Slow 3G users wait 10+ seconds for all chunks
-- Lighthouse performance score drops (not improves)
-- User sees blank screen longer
+- CI pipeline timeout (GitHub Actions 60min limit)
+- Developer frustration: 5min builds for one-line change
+- Cannot use watch mode effectively
+- Merge conflicts in lockfiles
+- Deployment delays
 
 **Prevention:**
-- **Split at route level ONLY** for initial implementation:
-  ```typescript
-  const Dashboard = lazy(() => import('./pages/Dashboard'));
-  const Analysis = lazy(() => import('./pages/Analysis'));
-  ```
-- Keep shared utilities in main bundle (loaded once, cached)
-- Group related components: All dashboard components in one chunk
-- Test on slow 3G connection (Chrome DevTools Network throttling)
-- Measure: Bundle size reduction should improve TTI (Time to Interactive), not worsen it
-- Prefetch likely next routes: `<link rel="prefetch" href="/analysis.chunk.js">`
+1. Choose build tool with caching: **Turborepo** (simple) or **Nx** (advanced)
+2. Configure remote caching:
+   - Turborepo Remote Cache (Vercel, self-hosted)
+   - Nx Cloud (distributed task execution)
+   - GitHub Actions cache for dependencies
+3. Define task dependencies:
+   ```json
+   // turbo.json
+   {
+     "pipeline": {
+       "build": {
+         "dependsOn": ["^build"],
+         "outputs": ["dist/**", ".next/**"]
+       },
+       "test": {
+         "dependsOn": ["build"],
+         "cache": true
+       }
+     }
+   }
+   ```
+4. Separate shared code properly:
+   - `packages/core` - business logic (zero UI)
+   - `packages/ui-web` - React web components
+   - `packages/ui-native` - React Native components
+   - `apps/web` - Vite app
+   - `apps/mobile` - React Native app
+5. Platform-specific extensions: `.web.tsx`, `.native.tsx`
+6. Do NOT share UI components (different layout paradigms)
+7. DO share: API client, state management, types, utilities
 
 **Detection:**
-- Network tab: Count sequential requests to load one page
-- Lighthouse: Check for "Avoid chaining critical requests" warning
-- Real User Monitoring (RUM): Track page load time before/after splitting
+- CI build time > 10 minutes for small changes
+- Local dev server startup > 30 seconds
+- Build cache misses on unchanged code
+- Frequent "out of memory" errors in CI
 
-**Phase:** Bundle Splitting (architecture decision before implementation)
-
-**Sources:**
-- [Code Splitting – React](https://legacy.reactjs.org/docs/code-splitting.html) - HIGH confidence
-- [Automatic Code Splitting | React Router](https://reactrouter.com/explanation/code-splitting) - MEDIUM confidence
-- [Code Splitting in React – Loadable Components](https://www.freecodecamp.org/news/code-splitting-in-react-loadable-components/) - MEDIUM confidence
+**Phase:** Phase 3 (React Native Foundation) - before adding native app
 
 ---
 
-### CP-07: Virtual Scrolling Breaks Accessibility
+### Pitfall 7: Video/Podcast Content Without Storage Cost Model
+**What goes wrong:** Add video and podcast features. Users upload hours of content. Monthly CDN bill goes from $500 to $50,000. No revenue model to cover costs.
 
-**What goes wrong:** Implementing virtual scrolling for long news lists. Keyboard-only users can't access content. Screen readers announce "1000 items" but only 20 are in DOM. Footer becomes unreachable.
-
-**Why it happens:** Virtual scrolling renders only visible items. Great for performance, terrible for accessibility. "While role=feed makes infinite scroll accessible for screen reader users, it leaves a number of users with disabilities behind: keyboard-only users cannot access the content."
-
-**Specific NewsHub risks:**
-- NewsFeed with 100s of articles
-- Bookmark list with many saved articles
-- Reading history timeline
-- Comment threads
+**Why it happens:** Excitement about new content types overshadows infrastructure costs. "Let's just add video support."
 
 **Consequences:**
-- WCAG 2.1 Level AA violations (legal liability in EU/US)
-- Keyboard users can't tab through articles (tabbing doesn't trigger loading)
-- Screen reader users miss content (not in DOM = not announced)
-- Switch control users (motor disabilities) face extreme difficulty
-- Footer links inaccessible (new content loads infinitely)
+- Unsustainable CDN costs ($0.01-0.08/GB, 1M viewers = $10-50k/month)
+- Storage costs explode (video: 100MB/min, podcast: 1MB/min)
+- Bandwidth consumption 100x text content
+- Cannot remove feature without user backlash
+- Forced to add paywalls retroactively
 
 **Prevention:**
-- **Use "Load More" button instead of virtual scrolling** for accessibility
-- If virtual scrolling required:
-  - Implement ARIA live regions for loaded content announcements
-  - Ensure keyboard navigation triggers loading
-  - Provide "Skip to footer" landmark
-  - Maintain focus position on load
-  - Add toggle to disable infinite scroll
-- Test with:
-  - Keyboard only (no mouse)
-  - Screen reader (NVDA, JAWS, VoiceOver)
-  - Browser zoom at 200%
-- Consider hybrid: "Load More" button that auto-loads on scroll (user control + convenience)
+1. **Cost model BEFORE implementation:**
+   ```
+   Assumptions:
+   - 10k active users
+   - 20% use video (2k users)
+   - Average: 5 min video/week/user
+   - 100MB/min @ 1080p = 500MB/user/week
+   - 2k users × 500MB × 4 weeks = 4TB/month storage
+   - CDN delivery (3x views): 12TB/month @ $0.02/GB = $240/month
+   - Encoding costs: $0.05/min × 5 min × 2k users × 4 = $2,000/month
+   ```
+   Total: $2,240/month for video alone (current total infra: ~$300/month)
+
+2. **Cost optimization strategies:**
+   - Use tiered storage: S3 Standard → Glacier for old content
+   - Adaptive bitrate: serve 720p to mobile, 1080p to desktop
+   - Compression: AV1 codec (30-50% savings vs H.264)
+   - Multi-CDN: route to cheapest provider per region
+   - Cache hit ratio target: 95%+ (reduce origin fetches)
+
+3. **Feature gating:**
+   - Video/podcast upload: Premium/Team plans only
+   - Free tier: view only, no upload
+   - Storage quotas: 10 videos/month (Premium), unlimited (Team)
+   - Auto-delete after 90 days unless saved
+
+4. **Content strategy:**
+   - Don't host everything: embed YouTube/Spotify links (free)
+   - Upload only when necessary: exclusive content, analysis clips
+   - Prioritize: short analysis clips (1-2 min) over full podcasts
+   - User-generated content: prohibit initially, add later with quotas
+
+5. **Revenue model:**
+   - Premium required for uploads
+   - API access: charge per GB delivered
+   - Sponsorship: offset costs with ads on video content
 
 **Detection:**
-- Keyboard test: Can you reach footer using only Tab key?
-- Screen reader test: Does it announce newly loaded content?
-- Axe DevTools / Lighthouse accessibility audit
-
-**Phase:** Virtual Scrolling (design decision before implementation)
-
-**Sources:**
-- [Infinite Scrolling & Accessibility Issues - Deque](https://www.deque.com/blog/infinite-scrolling-rolefeed-accessibility-issues/) - HIGH confidence
-- [Infinite Scroll & Accessibility - DigitalA11Y](https://www.digitala11y.com/infinite-scroll-accessibility-is-it-any-good/) - HIGH confidence
-- [Is Infinite Scrolling Accessible? - BOIA](https://www.boia.org/blog/is-infinite-scrolling-accessible) - MEDIUM confidence
-
----
-
-## High Severity Pitfalls
-
-Significant problems requiring substantial rework.
-
-### HP-01: CDN Cache Busting Failures with Query Strings
-
-**What goes wrong:** Deploy new version with bug fix. Users still see old broken JavaScript for hours/days because CDN serves cached version. Query string cache busting (`app.js?v=1.2.3`) doesn't work because some CDNs ignore query parameters.
-
-**Why it happens:** Using `?v=` versioning pattern. Works locally, fails in production with certain CDN configurations.
-
-**Specific NewsHub risks:**
-- Critical bug fix deployed but not reaching users
-- Users report "still broken" after deployment
-- Emergency cache purge required (manual process, slow)
-
-**Consequences:**
-- Broken production site for extended period
-- Users see mix of old and new code (old JS with new HTML)
-- Support ticket flood
-- Trust damage
-
-**Prevention:**
-- **Use content hash in filename, not query string**:
-  ```
-  BAD:  app.js?v=1.2.3
-  GOOD: app.abc123def.js
-  ```
-- Vite already does this (`vite build` generates `app.[hash].js`)
-- Verify build output contains hashes: `dist/assets/*.js` should have random strings
-- Set long cache headers for hashed files: `Cache-Control: public, max-age=31536000, immutable`
-- Short cache for HTML: `Cache-Control: public, max-age=300` (5 minutes)
-- Test: Deploy → check browser receives new hash
-
-**Detection:**
-- Build output inspection: Check for `[hash]` in filenames
-- Production test: Deploy → hard refresh → verify new version loads
-- Monitor: CDN hit ratio should be high (>90%) but cache should update on deploy
-
-**Phase:** CDN Integration (configuration before production)
-
-**Sources:**
-- [What is Cache Busting? - KeyCDN](https://www.keycdn.com/support/what-is-cache-busting) - HIGH confidence
-- [CDN Cache Busting Best Practices](https://blog.blazingcdn.com/en-us/cdn-js-best-practices-minification-versioning-cache-bust-rules) - MEDIUM confidence
-- [How to Create CDN Caching Strategies 2026](https://oneuptime.com/blog/post/2026-01-30-cdn-caching-strategies/view) - MEDIUM confidence
-
----
-
-### HP-02: Image Optimization Format Confusion
-
-**What goes wrong:** Converting all images to AVIF for "best compression." But AVIF encoding is CPU-intensive, causing server timeouts during bulk conversion. Plus older Safari users see broken images.
-
-**Why it happens:** Chasing maximum compression without considering encoding cost and browser support.
-
-**Specific NewsHub risks:**
-- Article thumbnails (130 sources × daily articles = 1000s of images)
-- User avatars
-- Share preview images (OG tags)
-- Static assets (logos, icons)
-
-**Consequences:**
-- Image conversion process never completes (times out)
-- Older browsers (Safari 15 and earlier) show broken images
-- Server CPU spikes during batch conversion
-- Slow image serving (encoding on-the-fly)
-
-**Prevention:**
-- **Practical 2026 strategy**:
-  - **Primary format: WebP** (all modern browsers, 25-35% smaller than JPEG, fast encoding)
-  - **Fallback: JPEG** for older browsers
-  - **Selective AVIF**: Only for hero images / critical visuals where 20-30% extra compression matters
-- Encoding settings:
-  - WebP: Quality 75-85
-  - AVIF: Quality 60-70 (looks equivalent to JPEG 85)
-- Use `<picture>` element for format negotiation:
-  ```html
-  <picture>
-    <source srcset="image.avif" type="image/avif">
-    <source srcset="image.webp" type="image/webp">
-    <img src="image.jpg" alt="Fallback">
-  </picture>
-  ```
-- Pre-convert images during build, not runtime
-- Size considerations: Don't upload 2000px image for 300px thumbnail (wastes bandwidth)
-
-**Detection:**
-- Test on Safari 15 to verify fallback works
-- Monitor server CPU during image conversion
-- Check image serving latency (<200ms target)
-
-**Phase:** Image Optimization (format selection before bulk conversion)
-
-**Sources:**
-- [AVIF vs WebP: Which Reigns Supreme in 2026?](https://elementor.com/blog/webp-vs-avif/) - HIGH confidence
-- [Image Optimization in 2026: WebP/AVIF](https://tworowstudio.com/image-optimization-2026/) - HIGH confidence
-- [Best Image Format for Web in 2026](https://www.thecssagency.com/blog/best-web-image-format) - MEDIUM confidence
-
----
-
-### HP-03: Stale-While-Revalidate Without Background Job
-
-**What goes wrong:** Implementing stale-while-revalidate for API caching. User request triggers background revalidation... but there's no background job system. Revalidation happens synchronously, making cache pointless.
-
-**Why it happens:** Misunderstanding the pattern. "Serve stale, fetch fresh" requires background processing infrastructure.
-
-**Specific NewsHub risks:**
-- Express 5 backend has no job queue system
-- Async/await in request handler isn't truly "background"
-- Node.js event loop blocks on heavy operations
-
-**Consequences:**
-- False sense of performance improvement
-- Users still wait for fresh data (no latency reduction)
-- Cache serves stale data indefinitely (background update never happens)
-
-**Prevention:**
-- **For NewsHub's architecture**, use simpler patterns:
-  - **Short TTL (5 minutes) with background refresh**: Set cache, serve from cache, refresh before expiry
-  - **Time-based invalidation**: Cache expires, next request fetches fresh and caches
-- If implementing stale-while-revalidate:
-  - Requires job queue (Bull, BullMQ with Redis)
-  - Or separate worker process
-  - Or cron job for periodic refresh
-- Alternative: Use Redis `GETEX` to extend TTL on access (LRU-like behavior)
-
-**Detection:**
-- Load test: Verify stale data is served instantly (<10ms)
-- Monitor: Background revalidation jobs should complete
-- Check: Stale data shouldn't persist beyond intended freshness window
-
-**Phase:** API Response Caching (pattern selection before implementation)
-
-**Sources:**
-- [Stale-While-Revalidate Pattern](https://www.searchcans.com/blog/api-caching-strategies-real-time-data-performance-2026/) - MEDIUM confidence
-- [API Gateway Caching Strategies 2026](https://oneuptime.com/blog/post/2026-02-09-api-gateway-caching-strategies/view) - MEDIUM confidence
-
----
-
-### HP-04: Real-Time Updates Break Cached Responses
-
-**What goes wrong:** NewsHub has WebSocket updates for real-time news. Add API caching with 5-minute TTL. Now users see: WebSocket says "20 new articles" but API returns cached 0 new articles. Data inconsistency.
-
-**Why it happens:** Caching layer doesn't communicate with WebSocket layer.
-
-**Specific NewsHub risks:**
-- Real-time sentiment updates via WebSocket
-- Live article count in HeroSection
-- "LIVE" badge showing new content available
-- Bookmark sync across devices
-
-**Consequences:**
-- User sees conflicting data (notification says new content, list shows old)
-- User clicks "20 new articles" → sees cached list with 0 new
-- Trust in real-time feature destroyed
-- Bug reports flood in
-
-**Prevention:**
-- **Invalidate cache on WebSocket broadcast**:
-  ```typescript
-  // When WebSocket broadcasts new articles
-  io.emit('news:new', articles);
-  await redis.del('news:latest'); // Invalidate cache
-  ```
-- **Reduce cache TTL for real-time endpoints**: 1-2 minutes max
-- **Use cache versioning**: Include timestamp in cache key
-  ```typescript
-  const cacheKey = `news:${Math.floor(Date.now() / 60000)}`; // 1-min buckets
-  ```
-- **Avoid caching real-time endpoints entirely**: `/api/news/latest` should always hit DB
-- Cache only static/aggregated data: historical events, source list, user profiles
-
-**Detection:**
-- Test: Trigger WebSocket update → verify API returns fresh data
-- Monitor cache hit ratio on real-time endpoints (should be low/zero)
-- User acceptance testing for consistency
-
-**Phase:** API Response Caching (integration with existing WebSocket system)
-
-**Sources:**
-- [API Caching for Real-Time Data](https://www.searchcans.com/blog/api-caching-strategies-real-time-data-performance-2026/) - MEDIUM confidence
-- [How to Handle Caching in REST APIs 2026](https://oneuptime.com/blog/post/2026-02-02-rest-api-caching/view) - MEDIUM confidence
-
----
-
-### HP-05: Missing srcset for Responsive Images
-
-**What goes wrong:** Implementing responsive layout, but images stay desktop-sized. Mobile users download 2MB hero image scaled down to 300px. Bandwidth wasted, page load slow.
-
-**Why it happens:** Focusing on CSS breakpoints, forgetting image optimization.
-
-**Specific NewsHub risks:**
-- Article thumbnails in NewsFeed (grid → list → mobile)
-- Hero images on Analysis page
-- User avatars (tiny on mobile, larger on desktop)
-- Share preview images
-
-**Consequences:**
-- Mobile data usage explosion (important in developing markets)
-- Slow page loads on mobile (3G/4G networks)
-- Lighthouse score penalty
-- User frustration, high bounce rate
-
-**Prevention:**
-- **Use `srcset` and `sizes` attributes**:
-  ```html
-  <img
-    src="thumbnail-800.jpg"
-    srcset="
-      thumbnail-400.jpg 400w,
-      thumbnail-800.jpg 800w,
-      thumbnail-1200.jpg 1200w
-    "
-    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-    alt="Article thumbnail"
-  />
-  ```
-- Generate multiple sizes during build/upload:
-  - Small: 400px (mobile)
-  - Medium: 800px (tablet)
-  - Large: 1200px (desktop)
-- Lazy load below-fold images: `loading="lazy"`
-- Use next-gen formats with fallbacks (see HP-02)
-
-**Detection:**
-- Chrome DevTools Network: Check image sizes loaded on mobile
-- Lighthouse audit: "Properly size images"
-- Test on actual mobile device with network throttling
-
-**Phase:** Image Optimization (implementation)
-
-**Sources:**
-- [Image Optimization in 2026](https://tworowstudio.com/image-optimization-2026/) - HIGH confidence
-- [Website Speed Optimization Guide 2026](https://www.neelnetworks.com/blog/website-speed-optimization-guide-2026/) - MEDIUM confidence
-
----
-
-### HP-06: React Memory Leaks from Missing Cleanup
-
-**What goes wrong:** Adding performance monitoring with timers. Component unmounts but timers keep running. Memory usage climbs from 50MB to 500MB over 1 hour of use. Browser tab crashes.
-
-**Why it happens:** useEffect with async operations but no cleanup function. "setTimeout alone accounts for 40% of all findings: 22,384 instances without clearTimeout."
-
-**Specific NewsHub risks:**
-- Auto-refresh timers for news feed (every 2 minutes)
-- WebSocket subscriptions for real-time updates
-- Event listeners for scroll tracking
-- Fetch requests for article previews (hover cards)
-- Performance monitoring intervals
-
-**Consequences:**
-- Memory leak: grows until browser tab crashes
-- Performance degrades over time (GC thrashing)
-- Users report "app gets slower" after 30 minutes
-- Mobile browsers crash quickly (limited memory)
-
-**Prevention:**
-- **ALWAYS return cleanup function from useEffect**:
-  ```typescript
-  // BAD: Memory leak
-  useEffect(() => {
-    const interval = setInterval(fetchNews, 120000);
-    // Missing cleanup!
-  }, []);
-
-  // GOOD: Cleanup on unmount
-  useEffect(() => {
-    const interval = setInterval(fetchNews, 120000);
-    return () => clearInterval(interval); // Cleanup
-  }, []);
-  ```
-- Cleanup checklist:
-  - `setTimeout` → `clearTimeout`
-  - `setInterval` → `clearInterval`
-  - `addEventListener` → `removeEventListener`
-  - WebSocket → `socket.close()`
-  - Fetch → `abortController.abort()`
-- Use React StrictMode (already enabled) to catch missing cleanups in development
-- ESLint rule `react-hooks/exhaustive-deps` doesn't catch missing cleanup → manual review required
-
-**Detection:**
-- Chrome DevTools Memory profiler: Take heap snapshot, use app, take another snapshot → check growth
-- Monitor: Detached DOM nodes (sign of memory leak)
-- Test: Use app for 30+ minutes → memory should stabilize, not grow unbounded
-- React DevTools Profiler: Check for components not unmounting properly
-
-**Phase:** All performance phases (code review requirement)
-
-**Sources:**
-- [Frontend Memory Leaks: 500-Repository Study](https://stackinsight.dev/blog/memory-leak-empirical-study/) - HIGH confidence
-- [Preventing Memory Leaks in React with useEffect](https://www.c-sharpcorner.com/article/preventing-memory-leaks-in-react-with-useeffect-hooks/) - HIGH confidence
-- [How to Fix Memory Leaks in React](https://www.freecodecamp.org/news/fix-memory-leaks-in-react-apps/) - MEDIUM confidence
+- CDN bill spike month-over-month
+- Storage growth outpaces user growth
+- Video delivery costs > subscription revenue
+- Support tickets: "Why is my video slow?" (bandwidth throttling)
+
+**Phase:** Phase 6 (Video/Podcast) - cost model required before design
 
 ---
 
 ## Moderate Pitfalls
 
-Problems causing delays or quality issues.
+Fixable but cause delays or technical debt.
 
-### MP-01: Premature Optimization Without Profiling
+### Pitfall 8: Docker Swarm Secrets Migration Without Application Support
+**What goes wrong:** Migrate environment variables to Docker Swarm secrets. Applications expect `process.env.DATABASE_URL` but secrets mount to `/run/secrets/database_url`. Apps fail to start.
 
-**What goes wrong:** Team adds Redis caching, CDN, bundle splitting, virtual scrolling... but page is still slow. Turns out bottleneck was unoptimized database query (missing index). Wasted 2 weeks on wrong optimizations.
-
-**Why it happens:** "Premature optimization is the root of all evil." Optimizing before measuring.
+**Why it happens:** Assume Swarm automatically converts secrets to environment variables. It doesn't.
 
 **Prevention:**
-- **ALWAYS profile before optimizing**:
-  1. **Frontend**: Lighthouse audit, React DevTools Profiler, Chrome Performance tab
-  2. **Backend**: PostgreSQL `EXPLAIN ANALYZE`, Prometheus metrics, APM (Sentry Performance)
-  3. **Load testing**: k6 scripts to find bottlenecks under load
-- Identify actual bottleneck first:
-  - Is it database queries? → Add indexes
-  - Is it API latency? → Add caching
-  - Is it bundle size? → Code splitting
-  - Is it images? → Optimize images
-- Establish baseline metrics BEFORE optimization
-- Measure improvement AFTER optimization
-- Only optimize if metrics show problem AND solution targets root cause
+1. Audit application secret access patterns BEFORE Swarm
+2. Modify applications to support `_FILE` suffix:
+   ```typescript
+   // OLD: Direct env var
+   const dbUrl = process.env.DATABASE_URL
+
+   // NEW: Support both env var and file
+   const dbUrl = process.env.DATABASE_URL_FILE
+     ? fs.readFileSync(process.env.DATABASE_URL_FILE, 'utf8').trim()
+     : process.env.DATABASE_URL
+   ```
+3. Update Docker Compose:
+   ```yaml
+   services:
+     api:
+       secrets:
+         - database_url
+       environment:
+         DATABASE_URL_FILE: /run/secrets/database_url
+   ```
+4. Create migration plan:
+   - Phase 1: Add `_FILE` support alongside env vars
+   - Phase 2: Deploy with dual support
+   - Phase 3: Switch to secrets in production
+   - Phase 4: Remove env var fallback
+5. Secrets are immutable: rotation requires new secret + service update
+6. Apply least privilege: each service gets only its secrets
 
 **Detection:**
-- Ask: "Do we have profiling data showing this is slow?"
-- Verify: Optimization improves the profiled metric
+- Container startup failures after Swarm migration
+- Logs: "DATABASE_URL is undefined"
+- Secrets visible in `docker inspect` (using env vars not secrets)
 
-**Phase:** Before any performance work (mandatory first step)
-
-**Sources:**
-- [Why Premature Optimization is Evil](https://stackify.com/premature-optimization-evil/) - HIGH confidence
-- [Software Performance Optimization Tips 2026](https://techlasi.com/savvy/software-performance-optimization-tips/) - MEDIUM confidence
+**Phase:** Phase 1 (Infrastructure Planning) - before Swarm migration
 
 ---
 
-### MP-02: Cache Key Collisions from Poor Design
+### Pitfall 9: Redis Sentinel Without Sentinel-Aware Clients
+**What goes wrong:** Deploy Redis Sentinel for high availability. Application uses standard Redis client, connects directly to master. Master fails, Sentinel promotes replica, but app doesn't know and keeps trying old master.
 
-**What goes wrong:** Caching API response with key `news:latest`. Two users request different regions (USA vs China). Both get same cached response. Wrong data served.
-
-**Why it happens:** Cache key doesn't include all request parameters.
+**Why it happens:** Assume Sentinel handles failover transparently. It doesn't for non-aware clients.
 
 **Prevention:**
-- **Include ALL request parameters in cache key**:
-  ```typescript
-  // BAD: Collisions
-  const key = 'news:latest';
+1. Check if Redis client supports Sentinel (ioredis: YES, node-redis 4+: YES)
+2. Update connection config:
+   ```typescript
+   // OLD: Direct connection
+   const redis = new Redis({
+     host: 'redis',
+     port: 6379
+   })
 
-  // GOOD: Unique per query
-  const key = `news:${region}:${sentiment}:${page}:${limit}`;
-  ```
-- Serialize complex parameters: `JSON.stringify(filters)`
-- Hash long keys to avoid Redis key length limits
-- Document cache key format in code comments
+   // NEW: Sentinel-aware
+   const redis = new Redis({
+     sentinels: [
+       { host: 'sentinel-1', port: 26379 },
+       { host: 'sentinel-2', port: 26379 },
+       { host: 'sentinel-3', port: 26379 }
+     ],
+     name: 'mymaster',  // Sentinel monitor name
+     sentinelPassword: process.env.SENTINEL_PASSWORD
+   })
+   ```
+3. Deploy at least 3 Sentinel instances (quorum: 2)
+4. Set conservative `down-after-milliseconds` (30000ms) to avoid flapping
+5. Configure `min-replicas-to-write: 1` to prevent split-brain data loss
+6. Monitor Sentinel logs for failover events
+7. Test failover manually before production
 
 **Detection:**
-- Test: Two requests with different params → verify different responses
-- Monitor cache hit ratio (collisions → lower hit ratio than expected)
+- Application errors after Redis master failure
+- Clients stuck on old master IP
+- Sentinel logs show promotion, app logs show connection errors
+- Failover doesn't trigger automatic reconnection
 
-**Phase:** API Response Caching (implementation)
+**Phase:** Phase 1 (Infrastructure Planning) - if adding Redis Sentinel
 
 ---
 
-### MP-03: Over-Invalidation Destroying Cache Benefits
+### Pitfall 10: PWA Push Notifications Without Update Strategy
+**What goes wrong:** Implement push notifications, but service worker doesn't update. Critical notification bug deployed, users stuck on old version for days. Notification delivery fails.
 
-**What goes wrong:** Any article update invalidates ALL news cache. Cache hit ratio drops from 90% to 10%. Performance worse than no cache.
-
-**Why it happens:** Invalidation too broad. "Just invalidate everything to be safe."
+**Why it happens:** Service workers don't auto-update like web pages. Default update check happens on navigation, but PWA users don't navigate away.
 
 **Prevention:**
-- Invalidate narrowly: Only affected keys
-- Use cache tags for grouped invalidation
-- Monitor cache hit ratio (should be >70% for effective caching)
-- Balance: Over-invalidation vs stale data
+1. Implement update check strategy:
+   ```typescript
+   // Check for updates every hour (while app open)
+   setInterval(() => {
+     if ('serviceWorker' in navigator) {
+       navigator.serviceWorker.getRegistration().then(reg => {
+         reg?.update()
+       })
+     }
+   }, 60 * 60 * 1000)
+   ```
+2. Notify user when update available:
+   ```typescript
+   // In service worker
+   self.addEventListener('install', (event) => {
+     // Skip waiting to activate immediately
+     self.skipWaiting()
+   })
+
+   // In app
+   navigator.serviceWorker.addEventListener('controllerchange', () => {
+     // New service worker activated
+     showUpdateNotification('New version available. Reload?')
+   })
+   ```
+3. Don't block rendering waiting for update check (harms Core Web Vitals)
+4. Validate push subscription endpoints regularly (monthly)
+5. Test notification flow on multiple browsers (behavior varies)
+6. Handle expired subscriptions gracefully (remove from DB)
+7. Implement retry logic for failed notifications
 
 **Detection:**
-- Redis monitoring: Cache hit ratio dropping
-- Load test: Compare with/without cache (should see improvement)
+- Users report not receiving notifications
+- High unsubscribe rate after notification feature deployment
+- Service worker version stuck on old build number
+- Push endpoint errors (410 Gone) not cleaned up
 
-**Phase:** API Response Caching (tuning after initial implementation)
+**Phase:** Phase 3 (PWA Enhancement) - before push notifications
 
 ---
 
-### MP-04: Missing Database Index Monitoring
+### Pitfall 11: React Native + Capacitor Without App Store Rejection Plan
+**What goes wrong:** Build React Native app with Capacitor, submit to App Store. Rejected under Guideline 4.2 (WebView wrapper). Weeks of delay, redesign required.
 
-**What goes wrong:** Add indexes during performance phase. Six months later, unused indexes waste 2GB disk space and slow writes. No one notices.
-
-**Why it happens:** No monitoring of index usage.
+**Why it happens:** Capacitor apps are web apps in native shell. Apple rejects if indistinguishable from Safari.
 
 **Prevention:**
-- Query `pg_stat_user_indexes` monthly to find unused indexes:
-  ```sql
-  SELECT schemaname, tablename, indexname, idx_scan
-  FROM pg_stat_user_indexes
-  WHERE idx_scan = 0 AND indexrelname NOT LIKE 'pg_toast%';
-  ```
-- Drop indexes with zero scans after 30 days
-- Document why each index exists (query it optimizes)
+1. **Differentiate from web version:**
+   - Native navigation (bottom tabs, gestures)
+   - Platform-specific UI (iOS: Cupertino, Android: Material)
+   - Native features: Face ID, biometrics, share sheet
+   - Offline-first: full functionality without network
+   - Push notifications (not web push)
+2. **Privacy compliance:**
+   - Include PrivacyInfo.xcprivacy (required since May 2024)
+   - Privacy manifest for ALL third-party SDKs
+   - Generate privacy report in Xcode before submission
+3. **OTA update restrictions:**
+   - ONLY update JavaScript/CSS/HTML (35% rejections from native code in OTA)
+   - Do NOT add unreviewed features via OTA
+   - Use encrypted update channels
+4. **Metadata accuracy:**
+   - Screenshots from actual app, not web version
+   - Description matches app functionality
+   - Keywords relevant to mobile experience
+5. **Testing:**
+   - Test on actual devices (not just simulator)
+   - Verify app works identically offline
+   - Ensure native UI patterns used
 
 **Detection:**
-- Scheduled report of unused indexes
-- Disk usage growth without corresponding data growth
+- App Store rejection: Guideline 4.2 (minimal functionality)
+- Rejection: Guideline 2.1 (crashes, bugs)
+- Rejection: Guideline 5.1.1 (privacy non-compliance)
+- Users report "just a wrapper" in reviews
 
-**Phase:** Database Indexing (maintenance after implementation)
+**Phase:** Phase 3 (Mobile Apps) - before App Store submission
 
 ---
 
-### MP-05: Bundle Splitting Without Preloading
+### Pitfall 12: AI Bias Detection Without Continuous Monitoring
+**What goes wrong:** Implement bias detection, validate against test dataset, ship to production. Over time, training data bias amplifies, model drift occurs, detection accuracy degrades. Biased content slips through.
 
-**What goes wrong:** Split critical code into separate chunk. User navigates to page → waits for chunk download → sees blank screen. Feels slower despite smaller initial bundle.
-
-**Why it happens:** Lazy loading without prefetching/preloading.
+**Why it happens:** Treat bias detection as one-time implementation, not ongoing process. "We tested it, it works."
 
 **Prevention:**
-- Preload critical chunks:
-  ```typescript
-  // Prefetch likely next route
-  <Link to="/analysis" onMouseEnter={() => import('./pages/Analysis')}>
-  ```
-- Use `<link rel="preload">` for critical chunks
-- Prioritize: Main bundle → critical chunks → lazy chunks
-- Test: Measure Time to Interactive (TTI) before/after splitting
+1. **Continuous validation pipeline:**
+   - Weekly: compare AI outputs against fact-check databases
+   - Monthly: expert panel review of bias classifications
+   - Quarterly: retrain models with updated data
+2. **Drift detection:**
+   - Monitor prediction confidence scores (declining = drift)
+   - Track error rates by subgroup (demographic, political, geographic)
+   - Alert when accuracy drops below threshold
+3. **Feedback loop:**
+   - User reports: "This article is not biased" → review + retrain
+   - False positive tracking by category
+   - A/B test new models before full deployment
+4. **Transparency:**
+   - Explain which signals triggered bias flag
+   - Provide appeal mechanism for content creators
+   - Publish bias detection methodology
+5. **Complexity vs accuracy trade-off:**
+   - More complex models = higher compute costs, slower inference
+   - Start simple: keyword + sentiment
+   - Add complexity incrementally: framing, loaded language, omission
+6. **Limitations disclosure:**
+   - AI struggles with satire, nuance, cultural context
+   - Human oversight for high-stakes content
+   - Confidence thresholds: only flag if >80% confident
 
 **Detection:**
-- Lighthouse: "Reduce render-blocking resources"
-- User testing: Does navigation feel instant or laggy?
+- User complaints about bias labels
+- False positive rate increasing over time
+- Confidence scores declining
+- Bias detection fails on recent news (model stale)
 
-**Phase:** Bundle Splitting (implementation)
+**Phase:** Phase 2 (AI Bias Detection) - continuous monitoring required
 
 ---
 
-### MP-06: Image Lazy Loading Above the Fold
+### Pitfall 13: Stripe Migration Without Payment Method Portability Plan
+**What goes wrong:** Users have saved payment methods in old system. Migrate to Stripe, payment methods don't transfer. Users forced to re-enter cards, high drop-off rate.
 
-**What goes wrong:** Adding `loading="lazy"` to ALL images. Hero image doesn't load until user scrolls. Largest Contentful Paint (LCP) fails.
-
-**Why it happens:** Lazy loading everything without considering viewport.
+**Why it happens:** Assume payment methods migrate like user data. They don't (PCI compliance, scheme rules).
 
 **Prevention:**
-- **Only lazy load below-the-fold images**
-- First 1-2 images: `loading="eager"` (or omit attribute)
-- Rest: `loading="lazy"`
-- Test on slow connection: Does hero image load immediately?
+1. **Assess portability options:**
+   - Tokenized cards: may be transferable (depends on old processor)
+   - Raw card data: never stored, cannot migrate
+   - Scheme tokens (Network Tokens): sometimes portable
+2. **Migration strategies:**
+   - Best case: old processor supports export to Stripe (rare)
+   - Common case: users must re-enter payment methods
+   - Mitigation: smooth re-entry UX
+3. **User communication plan:**
+   - Email 2 weeks before: "We're upgrading payments"
+   - In-app notice: "Please update payment method by [date]"
+   - Grace period: allow old system for 30 days
+4. **Data migration validation:**
+   - Map old processor fields to Stripe (often not 1:1)
+   - Validate all customer records before import
+   - Test in Stripe test mode first (not live)
+   - Avoid duplicate customer records (match by email)
+5. **Incremental migration:**
+   - Existing customers: keep old processor initially
+   - New customers: Stripe only
+   - Gradual migration over 3-6 months
+   - Parallel run period for validation
+6. **Outstanding requirements:**
+   - Check Stripe account requirements (verification)
+   - Connected accounts must accept ToS before activation
 
 **Detection:**
-- Lighthouse: "Largest Contentful Paint" metric
-- Visual inspection: Hero image should load instantly
+- High subscription churn during migration
+- Support tickets: "My payment method is missing"
+- Duplicate customer records in Stripe
+- Failed payments spike after migration
 
-**Phase:** Image Optimization (implementation)
+**Phase:** Phase 4 (Freemium Model) - before Stripe integration
 
 ---
 
-### MP-07: Query Result Caching Without Cache Warming
+### Pitfall 14: Public API Rate Limiting Without Tiered Strategy
+**What goes wrong:** Implement flat rate limit (100 req/min) for all endpoints. Expensive AI endpoints consume same quota as cheap health checks. Legitimate users hit limits, bad actors exploit cheap endpoints.
 
-**What goes wrong:** Deploy with query caching. First user after cache clear waits 5 seconds for expensive cluster query. Poor first-user experience.
-
-**Why it happens:** No cache warming strategy.
+**Why it happens:** Simplicity bias - single global limit easier than endpoint-specific limits.
 
 **Prevention:**
-- Warm cache on deployment:
-  ```typescript
-  // After deploy, pre-populate common queries
-  await fetchAndCacheStoryList();
-  await fetchAndCacheSentimentStats();
-  ```
-- Cron job to refresh cache before expiry (if using long TTLs)
-- Consider: Is query too slow even uncached? Optimize query first
+1. **Tiered rate limiting:**
+   ```typescript
+   // Endpoint-based limits
+   /api/v1/health        → 1000 req/min (cheap)
+   /api/v1/news          → 100 req/min  (moderate)
+   /api/v1/ai/ask        → 10 req/min   (expensive)
+   /api/v1/analysis      → 20 req/min   (moderate-expensive)
+   ```
+2. **Dimension-based limiting (layered):**
+   - IP-based: 100 req/min (public endpoints, unauthenticated)
+   - API key: 1000 req/min (authenticated, per-key quota)
+   - Per-endpoint: varies (expensive endpoints stricter)
+3. **Plan-based quotas:**
+   - Free API: 100 req/day, 10 AI req/day
+   - Developer ($29/mo): 10k req/day, 100 AI req/day
+   - Business ($99/mo): 100k req/day, 1k AI req/day
+4. **Distributed rate limiting:**
+   - Use Redis for shared counters (already in place)
+   - Token bucket algorithm (AWS API Gateway default)
+   - Sliding window log for accuracy
+5. **Standard HTTP responses:**
+   - Status: 429 Too Many Requests
+   - Headers: `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`
+   - `Retry-After` header with seconds to wait
+6. **Gateway-level enforcement:**
+   - Implement at API gateway (consistent enforcement)
+   - Avoid per-service limits (inconsistent, gaps)
 
 **Detection:**
-- Monitor: First request after deploy should be fast
-- Alerting: Slow query threshold (>1 second)
+- Legitimate users hit limits on cheap endpoints
+- Bad actors abuse expensive endpoints
+- Uneven load: some endpoints overwhelmed, others idle
+- Support tickets: "Rate limit too low for my use case"
 
-**Phase:** Query Result Caching (deployment strategy)
+**Phase:** Phase 5 (Developer API) - before public launch
 
 ---
 
-### MP-08: TanStack Query Over-Invalidation
+### Pitfall 15: AI Fact-Checking With 60%+ Error Rate
+**What goes wrong:** Deploy AI fact-checking feature. Users trust AI-flagged claims. But AI has 60%+ error rate on nuanced statements. False positives damage legitimate sources, false negatives allow misinformation spread.
 
-**What goes wrong:** User bookmarks article. Code invalidates all queries: `queryClient.invalidateQueries()`. Entire app refetches. News feed flashes, global stats reload. User sees loading spinners everywhere.
-
-**Why it happens:** Invalidating too broadly for convenience.
+**Why it happens:** Over-reliance on AI without understanding accuracy limitations. "AI can fact-check automatically."
 
 **Prevention:**
-- **Narrow invalidation**:
-  ```typescript
-  // BAD: Invalidates everything
-  queryClient.invalidateQueries();
-
-  // GOOD: Invalidates only related
-  queryClient.invalidateQueries({ queryKey: ['bookmarks'] });
-  queryClient.invalidateQueries({ queryKey: ['news', 'article', id] });
-  ```
-- Use query key hierarchy for precise control
-- Test: Verify only expected queries refetch
+1. **Accept accuracy limitations:**
+   - Current AI fact-checkers: 60%+ error rate on complex claims
+   - Language complexity, context changes, saturation challenges
+   - AI struggles with: satire, nuance, time/location context shifts
+2. **Human oversight mandatory:**
+   - AI flags potential issues (screening)
+   - Human fact-checkers verify before publication
+   - Never auto-publish AI fact-check results
+3. **Confidence thresholds:**
+   - Only flag claims with >85% confidence
+   - Show confidence score to users
+   - "Needs verification" vs "Confirmed false"
+4. **Multi-source verification:**
+   - Cross-reference with fact-check databases (Snopes, PolitiFact)
+   - Require 2+ independent sources for "false" label
+   - Check official source statements
+5. **Continuous training:**
+   - Use verified fact-checks to retrain models
+   - Track false positive/negative rates by topic
+   - Bias detection: ensure equal error rates across demographics
+6. **User education:**
+   - Explain AI limitations in UI
+   - "AI-assisted fact-checking, human verified"
+   - Allow users to report incorrect labels
 
 **Detection:**
-- React Query DevTools: Watch refetch behavior
-- User reports: "Page flashes on bookmark"
+- User reports of incorrect fact-checks
+- False positive rate > 10%
+- Fact-check database contradicts AI labels
+- Confidence scores declining over time
 
-**Phase:** Query Result Caching (every mutation)
+**Phase:** Phase 2 (Fact-Checking) - human oversight required
 
 ---
 
 ## Minor Pitfalls
 
-Issues causing friction or minor bugs.
+Nuisances that can be fixed quickly.
 
-### mP-01: Cache Headers Misconfiguration
+### Pitfall 16: Docker Compose v3 Syntax Assumptions
+**What goes wrong:** Use Compose file v3 syntax for Swarm. Discover `build:` directive ignored, `depends_on` doesn't control startup order.
 
-**What goes wrong:** Static assets served with `Cache-Control: no-cache`. Browser refetches on every page load. CDN cache useless.
+**Why it happens:** Swarm uses Compose v3 spec, which has different semantics than Compose CLI.
 
 **Prevention:**
-- Hashed assets: `Cache-Control: public, max-age=31536000, immutable`
-- HTML: `Cache-Control: public, max-age=300`
-- API: `Cache-Control: private, max-age=60` or no cache
+1. Remember Swarm limitations:
+   - `build:` ignored (images must be pre-built and pushed to registry)
+   - `depends_on:` doesn't wait for readiness (use healthchecks)
+   - Volume syntax different for Swarm (`type: volume` instead of shorthand)
+2. Add healthchecks to ALL services:
+   ```yaml
+   healthcheck:
+     test: ["CMD", "curl", "-f", "http://localhost:3001/api/health/db"]
+     interval: 30s
+     timeout: 10s
+     retries: 3
+     start_period: 40s
+   ```
+3. Use registry even for single-node Swarm (localhost registry or Docker Hub)
+4. Test Compose file with `docker stack deploy` before production
 
-**Phase:** CDN Integration
+**Detection:**
+- Service fails to start in Swarm mode
+- `depends_on` ignored, startup order wrong
+- Build errors: "image not found"
+
+**Phase:** Phase 1 (Infrastructure Planning) - when creating stack file
 
 ---
 
-### mP-02: Database Connection Pool Too Small
+### Pitfall 17: Monorepo Package Dependency Chaos
+**What goes wrong:** React web imports from React Native package. Native package imports web-only dependencies. Builds break with cryptic errors.
 
-**What goes wrong:** Load test reveals connection errors under 100 concurrent users.
+**Why it happens:** Lack of clear package boundaries and import rules.
 
 **Prevention:**
-- Size pool based on load: `(core_count * 2) + effective_spindle_count`
-- Monitor connection usage
-- Use connection pooling (Prisma already does)
+1. **Strict package architecture:**
+   ```
+   packages/
+     core/          → Zero dependencies on UI packages
+     types/         → Shared types only
+     api-client/    → HTTP client, auth (core dependency)
+     ui-web/        → React web components (CAN import core, NOT ui-native)
+     ui-native/     → RN components (CAN import core, NOT ui-web)
+   apps/
+     web/           → Vite app (imports ui-web, core)
+     mobile/        → RN app (imports ui-native, core)
+   ```
+2. **Dependency rules (enforce with ESLint):**
+   - `core` → no UI imports
+   - `ui-web` → no `ui-native` imports
+   - `ui-native` → no `ui-web` imports
+   - `apps/*` → no cross-app imports
+3. **Use workspace protocol:**
+   ```json
+   // packages/ui-web/package.json
+   {
+     "dependencies": {
+       "@newshub/core": "workspace:*",
+       "@newshub/ui-native": "FORBIDDEN"  // lint rule
+     }
+   }
+   ```
+4. **Platform-specific code:**
+   - Use `.web.ts` and `.native.ts` extensions
+   - Bundler resolves automatically
+   - Example: `logger.web.ts` (console), `logger.native.ts` (react-native-logs)
 
-**Phase:** Database Indexing
+**Detection:**
+- Build errors: "Module not found" (web importing native)
+- Bundle size bloated (web includes native dependencies)
+- TypeScript errors about incompatible types
+
+**Phase:** Phase 3 (React Native Foundation) - setup phase
 
 ---
 
-### mP-03: Redis Eviction Policy Wrong
+### Pitfall 18: Freemium Hard-Coded Feature Flags
+**What goes wrong:** Hard-code feature checks: `if (user.plan === 'free') disableExport()`. Later want to change plan names or add tiers. Must update code everywhere.
 
-**What goes wrong:** JWT blacklist entries evicted before expiry, allowing revoked tokens.
+**Why it happens:** Quick implementation without abstraction.
 
 **Prevention:**
-- Set `maxmemory-policy noeviction` or `allkeys-lru` based on use case
-- Critical data (JWT blacklist): Set generous TTL, don't rely on eviction
+1. **Feature flag abstraction:**
+   ```typescript
+   // BAD: Hard-coded
+   if (user.plan === 'free') {
+     throw new Error('Premium feature')
+   }
 
-**Phase:** API Response Caching
+   // GOOD: Feature check
+   if (!hasFeature(user, 'export_data')) {
+     throw new Error('Premium feature')
+   }
+
+   // Feature matrix
+   const FEATURES = {
+     free: ['view_articles', 'ai_questions_limited'],
+     premium: ['view_articles', 'ai_questions_unlimited', 'export_data', 'email_digest'],
+     team: ['view_articles', 'ai_questions_unlimited', 'export_data', 'email_digest', 'team_collaboration', 'api_access']
+   }
+   ```
+2. **Database-driven feature flags (flexible):**
+   ```sql
+   CREATE TABLE plan_features (
+     plan_id UUID REFERENCES plans(id),
+     feature_key TEXT,
+     quota INTEGER,  -- NULL = unlimited, 0 = disabled, >0 = quota
+     PRIMARY KEY (plan_id, feature_key)
+   )
+   ```
+3. **Usage tracking:**
+   - Track daily usage per feature per user
+   - Enforce quotas: `ai_questions: 5/day (free)`
+   - Show usage in UI: "3 of 5 AI questions used today"
+
+**Detection:**
+- Plan changes require code updates
+- Feature inconsistencies across codebase
+- Cannot A/B test plan features
+
+**Phase:** Phase 4 (Freemium Model) - implementation phase
 
 ---
 
-### mP-04: Missing Compression for API Responses
+### Pitfall 19: Video Content Without Accessibility
+**What goes wrong:** Add video/podcast features, no transcripts or captions. Violates WCAG accessibility standards, excludes deaf/hard-of-hearing users, cannot search video content.
 
-**What goes wrong:** API returns 500KB JSON uncompressed. Slow on mobile.
+**Why it happens:** Focus on video player, forget accessibility requirements.
 
 **Prevention:**
-- Enable gzip/brotli compression in Express
-- Already in NewsHub via `compression` middleware
+1. **Automatic transcription:**
+   - Use speech-to-text API (AWS Transcribe, Google Speech-to-Text, Whisper)
+   - Generate on upload (async job)
+   - Store in database for search indexing
+2. **Caption formats:**
+   - WebVTT for web player
+   - SRT for downloads
+   - Editable by creators (auto-generated not perfect)
+3. **Audio descriptions:**
+   - For analysis clips: describe visual content in audio
+   - Important for screen reader users
+4. **Search integration:**
+   - Index transcript text
+   - Allow search within video content
+   - Jump to timestamp from search results
+5. **Player controls:**
+   - Keyboard navigation (space, arrow keys)
+   - Speed control (0.5x, 1x, 1.5x, 2x)
+   - Volume control, mute
 
-**Phase:** API Response Caching
+**Detection:**
+- No captions available
+- Video content not searchable
+- Keyboard navigation broken
+- Accessibility audit failures
+
+**Phase:** Phase 6 (Video/Podcast) - implementation requirement
 
 ---
 
-### mP-05: Virtual Scrolling Jumpy Scroll Position
+### Pitfall 20: Video Platform Shoehorning Without Content Strategy
+**What goes wrong:** Attempt to convert every podcast/video "as-is" to platform. Long intros lose viewers. Auto-publish doesn't engage audience. Content feels like generic dump, not optimized for platform.
 
-**What goes wrong:** Scroll up, virtual scroller unloads items, scroll position jumps.
-
-**Prevention:**
-- Use battle-tested library (react-window, react-virtuoso)
-- Maintain scroll position on item unload
-- Test: Scroll up/down rapidly → should feel smooth
-
-**Phase:** Virtual Scrolling
-
----
-
-### mP-06: Bundle Analyzer Not Run
-
-**What goes wrong:** Deploy with 2MB bundle containing duplicate Recharts library.
+**Why it happens:** Treat video as simple file upload without considering platform-specific expectations.
 
 **Prevention:**
-- Run `vite-plugin-visualizer` before deploy
-- Check for duplicate dependencies
-- Set budget: Main bundle <500KB gzipped
+1. **Platform-specific optimization:**
+   - YouTube: Remove long intros, optimize for retention
+   - Mobile: Shorter clips (1-2 min), vertical format consideration
+   - Web: Embed quality matters, preview thumbnails
+2. **Content strategy:**
+   - Don't auto-publish everything
+   - Cherry-pick high-value episodes for full video
+   - Create platform-specific clips (highlights, key moments)
+   - Optimize titles/thumbnails for each platform
+3. **Re-editing requirements:**
+   - Remove audio-specific elements that don't translate
+   - Add visual context (on-screen text, graphics)
+   - Adjust pacing for video consumption
+4. **Quality over quantity:**
+   - Better: 1 well-edited video/week
+   - Worse: 10 auto-published full podcasts
 
-**Phase:** Bundle Splitting
+**Detection:**
+- Low video engagement vs audio
+- High drop-off rates (viewers leave quickly)
+- Comments: "Just listen to podcast instead"
+- Platform metrics show content underperforming
 
----
-
-### mP-07: Image Alt Text Missing After Optimization
-
-**What goes wrong:** Converting images breaks alt text. Accessibility regression.
-
-**Prevention:**
-- Preserve alt text in conversion pipeline
-- Automated alt text audit
-
-**Phase:** Image Optimization
-
----
-
-### mP-08: Query Keys Not Documented
-
-**What goes wrong:** Team doesn't know which keys to invalidate. Mutations miss invalidations.
-
-**Prevention:**
-- Document all query keys in QUERY-KEYS.md
-- Show relationships between queries
-
-**Phase:** Query Result Caching
+**Phase:** Phase 6 (Video/Podcast) - content strategy required
 
 ---
 
 ## Phase-Specific Warnings
 
-| Phase | Most Likely Pitfall | Mitigation |
-|-------|---------------------|------------|
-| API Response Caching | CP-01: Missing TTLs | Mandatory TTL code review |
-| API Response Caching | CP-02: Invalidation cascade | Document cache dependencies FIRST |
-| Query Result Caching | CP-03: TanStack Query invalidation | Invalidation checklist per mutation |
-| Database Indexing | CP-04: Over-indexing | Benchmark writes before/after |
-| Database Indexing | CP-05: N+1 queries | Enable query logging, use `include` |
-| Bundle Splitting | CP-06: Loading waterfall | Split at route level only initially |
-| Virtual Scrolling | CP-07: Accessibility | Use "Load More" button instead |
-| CDN Integration | HP-01: Query string cache busting | Verify Vite generates hashed filenames |
-| Image Optimization | HP-02: Format confusion | WebP primary, JPEG fallback |
-| API Response Caching | HP-04: Real-time conflicts | Invalidate cache on WebSocket broadcast |
-| Image Optimization | HP-05: Missing srcset | Generate multiple sizes |
-| ALL | HP-06: Memory leaks | Cleanup function code review |
-| ALL | MP-01: Premature optimization | Profile BEFORE optimizing |
+| Phase Topic | Likely Pitfall | Mitigation | When to Address |
+|-------------|----------------|------------|-----------------|
+| Docker Swarm Migration | Volume strategy, secrets, registry requirement | Storage audit, PgBouncer, healthchecks | BEFORE migration (Phase 1) |
+| AI Credibility Scoring | No ground truth, bias amplification, legal risk | Human-validated dataset, transparency, appeals | Design phase (Phase 2) |
+| AI Bias Detection | Model drift, false positives, complexity costs | Continuous monitoring, feedback loop, simple start | Post-launch (Phase 2) |
+| Fact-Checking | Low accuracy (60%+ errors), context issues | Human oversight, confidence thresholds, multiple sources | Design phase (Phase 2) |
+| PWA Push Notifications | Service worker update lag, platform differences | Update check interval, browser testing | Before implementation (Phase 3) |
+| React Native App | Code sharing scope creep, build performance | Monorepo caching, shared logic only (not UI) | Setup phase (Phase 3) |
+| Capacitor Submission | App Store rejections (Guideline 4.2), privacy | Native features, privacy manifest, differentiation | Before submission (Phase 3) |
+| Freemium Billing | Free tier too generous, no conversion | Value ladder, quota tracking, friction points | Design phase (Phase 4) |
+| Stripe Integration | Payment method portability, duplicate records | Migration plan, incremental rollout, validation | Before migration (Phase 4) |
+| Public API | Database structure exposure, breaking changes | Abstraction layer, versioning, separate routes | Design phase (Phase 5) |
+| Rate Limiting | Flat limits, endpoint cost ignored | Tiered strategy, Redis counters, standard headers | Implementation (Phase 5) |
+| Video/Podcast | CDN cost explosion, storage growth | Cost model, compression, quotas, embed-first | BEFORE implementation (Phase 6) |
+| Video Accessibility | No transcripts, unsearchable content | Auto-transcription, captions, keyboard controls | Implementation (Phase 6) |
 
 ---
 
-## Pre-Implementation Checklist
+## Cross-Cutting Concerns
 
-Before starting each phase:
+### Cost Monitoring
+- Video/podcast CDN costs can 100x current spend
+- Connection pool exhaustion → database upgrade costs
+- Redis Sentinel → 3x Redis instances
+- Multi-region → 2-3x all infrastructure costs
+- Mitigation: Cost alerts, budget caps, gradual rollout
 
-### API Response Caching
-- [ ] Redis TTL policy documented (different TTLs per data type)
-- [ ] Cache key format includes all parameters
-- [ ] Invalidation strategy designed (tags vs TTL vs manual)
-- [ ] WebSocket integration plan (cache invalidation on broadcast)
-- [ ] Monitoring setup (hit ratio, memory usage, key count)
+### Backward Compatibility
+- Public API fields are permanent contracts
+- Freemium plan changes break user expectations
+- Database migrations must support old clients
+- Mitigation: Versioning, deprecation periods, grandfather clauses
 
-### Query Result Caching
-- [ ] Query key hierarchy documented in QUERY-KEYS.md
-- [ ] Invalidation checklist created for mutations
-- [ ] React Query DevTools configured
-- [ ] staleTime and cacheTime values justified
-- [ ] Over-invalidation test plan (verify only expected queries refetch)
+### Data Consistency
+- Redis Sentinel split-brain scenarios
+- Multi-region eventual consistency challenges
+- Payment method migration data loss
+- Mitigation: Quorum settings, validation, incremental migration
 
-### Database Indexing
-- [ ] Baseline query performance measured (EXPLAIN ANALYZE)
-- [ ] Baseline write performance measured (INSERT/UPDATE timing)
-- [ ] Index candidates identified from slow query log
-- [ ] Composite index design documented
-- [ ] Unused index monitoring scheduled
+### Performance Degradation
+- Connection pool exhaustion under scale
+- Monorepo build times without caching
+- Video delivery latency without CDN optimization
+- Mitigation: PgBouncer, Turborepo, multi-CDN, compression
 
-### Bundle Splitting
-- [ ] Current bundle size measured (main chunk size)
-- [ ] Route-level split boundaries identified
-- [ ] Preload/prefetch strategy designed
-- [ ] Bundle analyzer configured (vite-plugin-visualizer)
-- [ ] TTI and FCP targets set
-
-### Image Optimization
-- [ ] Current image sizes audited
-- [ ] Format strategy decided (WebP + JPEG fallback)
-- [ ] Responsive image breakpoints defined (400/800/1200px)
-- [ ] Lazy loading boundaries identified (above/below fold)
-- [ ] Conversion pipeline tested
-
-### Virtual Scrolling
-- [ ] Accessibility strategy decided ("Load More" vs virtual scroll with ARIA)
-- [ ] Library selected (react-window vs react-virtuoso)
-- [ ] Footer access plan (pagination or skip link)
-- [ ] Keyboard navigation tested
-- [ ] Screen reader testing planned
-
-### CDN Integration
-- [ ] Build output verified (hashed filenames present)
-- [ ] Cache headers configured (long for assets, short for HTML)
-- [ ] CDN purge strategy documented
-- [ ] Cache busting tested (deploy → verify new version loads)
-- [ ] Monitoring setup (CDN hit ratio, cache freshness)
-
----
-
-## Performance Monitoring Checklist
-
-Track these metrics before/after each optimization:
-
-### Frontend Metrics
-- [ ] Lighthouse Performance Score (target: 90+)
-- [ ] Time to Interactive (TTI) (target: <3.8s)
-- [ ] Largest Contentful Paint (LCP) (target: <2.5s)
-- [ ] First Contentful Paint (FCP) (target: <1.8s)
-- [ ] Cumulative Layout Shift (CLS) (target: <0.1)
-- [ ] Total Bundle Size (target: <500KB gzipped)
-- [ ] Memory Usage Over Time (should stabilize, not grow)
-
-### Backend Metrics
-- [ ] API Response Time p50/p95/p99 (target: p95 <500ms)
-- [ ] Database Query Time (target: <100ms for 95% of queries)
-- [ ] Redis Hit Ratio (target: >70%)
-- [ ] Cache Memory Usage (should not grow unbounded)
-- [ ] Write Performance (INSERT/UPDATE timing)
-- [ ] Connection Pool Utilization (target: <80% at peak)
-
-### Real User Monitoring (RUM)
-- [ ] Page Load Time by Geography
-- [ ] Error Rate (target: <0.1%)
-- [ ] Bounce Rate (watch for regressions)
-- [ ] Session Duration (should improve with performance)
+### Security & Privacy
+- Docker secrets in environment variables (exposure)
+- AI credibility scores (defamation risk)
+- Payment data migration (PCI compliance)
+- App Store privacy manifests (rejection risk)
+- Mitigation: Swarm secrets, transparency, Stripe handles PCI, PrivacyInfo.xcprivacy
 
 ---
 
 ## Sources
 
-### Redis & Caching
-- [Redis Anti-Patterns: Common Mistakes Every Developer Should Avoid](https://redis.io/tutorials/redis-anti-patterns-every-developer-should-avoid/) - HIGH confidence
-- [Three Ways to Maintain Cache Consistency | Redis](https://redis.io/blog/three-ways-to-maintain-cache-consistency/) - HIGH confidence
-- [Redis Caching Pitfalls: Invalidation, Testing & Best Practices | Medium](https://medium.com/@QuarkAndCode/redis-caching-pitfalls-invalidation-testing-best-practices-3950a0660f1a) - HIGH confidence
-- [Redis Caching & Cache Invalidation: A Complete Guide | Medium](https://medium.com/@rup.singh88/redis-caching-cache-invalidation-a-complete-guide-cc822b87aa4d) - MEDIUM confidence
-- [How to Implement Cache Invalidation with Redis](https://oneuptime.com/blog/post/2026-01-25-redis-cache-invalidation/view) - MEDIUM confidence
-- [Cache Invalidation Strategies 2026](https://oneuptime.com/blog/post/2026-01-30-cache-invalidation-strategies/view) - MEDIUM confidence
+### Docker & Infrastructure
+- [Docker Compose vs Docker Swarm 2026 Guidance](https://thelinuxcode.com/docker-compose-vs-docker-swarm-practical-differences-real-tradeoffs-and-2026-ready-guidance/)
+- [Migrating Docker Compose to Swarm Without Downtime](https://vipinpg.com/blog/migrating-docker-compose-stacks-from-standalone-to-swarm-mode-without-downtime-using-rolling-updates)
+- [Docker Swarm Secrets Management Guide](https://medium.com/@csarat424/secure-secrets-management-in-docker-swarm-a-simple-guide-a498a61ee45d)
+- [PostgreSQL Connection Pool Exhaustion](https://www.c-sharpcorner.com/article/postgresql-connection-pool-exhaustion-lessons-from-a-production-outage/)
+- [Scaling PostgreSQL with PgBouncer 2026](https://tamiltech.in/article/pgbouncer-postgresql-connections-scale-guide)
+- [Redis Sentinel High Availability Guide](https://medium.com/@amila922/redis-sentinel-high-availability-everything-you-need-to-know-from-dev-to-prod-complete-guide-deb198e70ea6)
 
-### PostgreSQL & Database
-- [PostgreSQL Indexes Can Hurt Performance: Negative Effects and Costs](https://www.percona.com/blog/postgresql-indexes-can-hurt-you-negative-effects-and-the-costs-involved/) - HIGH confidence
-- [Benchmarking PostgreSQL: The Hidden Cost of Over-Indexing](https://www.percona.com/blog/benchmarking-postgresql-the-hidden-cost-of-over-indexing/) - HIGH confidence
-- [PostgreSQL Indexing Playbook — Practical Guide (Feb 12, 2026)](https://www.sachith.co.uk/postgresql-indexing-playbook-practical-guide-feb-12-2026/) - HIGH confidence
-- [PostgreSQL Performance: Essential Indexing Guidelines](https://dev.to/shrsv/postgresql-performance-essential-indexing-guidelines-1i90) - MEDIUM confidence
-- [The Postgres Performance Cliff: Why Your Queries Are Slowing Down](https://loke.dev/blog/postgres-performance-indexing-guide) - MEDIUM confidence
+### AI & Machine Learning
+- [AI Bias Detection Best Practices](https://www.brookings.edu/articles/algorithmic-bias-detection-and-mitigation-best-practices-and-policies-to-reduce-consumer-harms/)
+- [AI Fact-Checking Implementation Challenges](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5122225)
+- [AI-Generated Misinformation Detection](https://journals.sagepub.com/doi/10.1177/27523543251325902)
+- [Biases in AI-Generated Content](https://www.sciencedirect.com/science/article/abs/pii/S0261517726000567)
 
-### Prisma ORM & N+1 Queries
-- [Prisma N+1 in Production: Real Query Plans and Fixes](https://blog.pratikpatel.pro/prisma-query-optimization-guide) - HIGH confidence
-- [Prisma ORM v7.4: Query Caching & Performance Boost](https://www.prisma.io/blog/prisma-orm-v7-4-query-caching-partial-indexes-and-major-performance-improvements) - HIGH confidence
-- [Query optimization | Prisma Documentation](https://www.prisma.io/docs/orm/prisma-client/queries/advanced/query-optimization-performance) - HIGH confidence
-- [N+1 Query Problem: The Database Killer | Medium](https://medium.com/@saad.minhas.codes/n-1-query-problem-the-database-killer-youre-creating-f68104b99a2d) - MEDIUM confidence
+### Mobile Development
+- [React Native Code Sharing Best Practices](https://matthewwolfe.github.io/blog/code-sharing-react-and-react-native)
+- [React Native in 2026: Stability](https://medium.com/@andy.a.g/react-native-in-2026-what-changed-and-why-it-finally-feels-stable-fe96b7a7a8b8)
+- [Monorepo 2026: Turborepo vs Nx](https://daily.dev/blog/monorepo-turborepo-vs-nx-vs-bazel-modern-development-teams)
+- [React Native App Store Rejections](https://netforemost.com/avoid-react-native-app-store-rejections/)
+- [Capacitor App Store Approval Guide](https://capgo.app/blog/capacitor-ota-updates-app-store-approval-guide/)
+- [Third-Party Libraries Apple Policy](https://capgo.app/blog/third-party-libraries-apple-policy-compliance/)
 
-### React & TanStack Query
-- [Query Invalidation | TanStack Query React Docs](https://tanstack.com/query/v5/docs/framework/react/guides/query-invalidation) - HIGH confidence
-- [Struggling with query invalidation · TanStack/query Discussion](https://github.com/TanStack/query/discussions/2104) - HIGH confidence
-- [useQuery + invalidateQueries intermittently stale UI](https://github.com/TanStack/query/discussions/6953) - MEDIUM confidence
-- [Managing Query Keys for Cache Invalidation in React Query](https://www.wisp.blog/blog/managing-query-keys-for-cache-invalidation-in-react-query) - MEDIUM confidence
+### Monetization & APIs
+- [Freemium to Premium Conversion Guide](https://www.kinde.com/learn/billing/conversions/from-freemium-to-premium-a-guide-to-converting-free-users-into-paying-customers/)
+- [Subscription Billing Mistakes to Avoid](https://www.zuora.com/guides/7-subscription-billing-mistakes-avoid/)
+- [API Versioning Best Practices 2026](https://stellarcode.io/blog/advanced-api-development-best-practices-2026/)
+- [Managing API Changes 2026](https://www.theneo.io/blog/managing-api-changes-strategies)
+- [API Rate Limiting Best Practices 2026](https://www.getknit.dev/blog/10-best-practices-for-api-rate-limiting-and-throttling)
+- [Stripe Payment Migration Guide](https://docs.stripe.com/payments/payment-intents/migration-synchronous)
 
-### Bundle Splitting & Code Splitting
-- [Code-Splitting – React](https://legacy.reactjs.org/docs/code-splitting.html) - HIGH confidence
-- [Automatic Code Splitting | React Router](https://reactrouter.com/explanation/code-splitting) - MEDIUM confidence
-- [Code Splitting in React – Loadable Components to the Rescue](https://www.freecodecamp.org/news/code-splitting-in-react-loadable-components/) - MEDIUM confidence
-- [Implementing Code Splitting and Lazy Loading in React](https://www.greatfrontend.com/blog/code-splitting-and-lazy-loading-in-react) - MEDIUM confidence
+### Video & Content
+- [Video Podcast Common Mistakes](https://www.cohostpodcasting.com/resources/video-podcast-mistakes)
+- [Video Streaming CDN Architecture](https://mwaretv.com/en/blog/cdn-architecture-streaming)
+- [Cut Video Delivery Costs 40%](https://blog.blazingcdn.com/en-us/video-streaming-cdn-architecture-cost-efficiency-and-performance)
 
-### Virtual Scrolling & Accessibility
-- [Infinite Scrolling & Role=Feed Accessibility Issues - Deque](https://www.deque.com/blog/infinite-scrolling-rolefeed-accessibility-issues/) - HIGH confidence
-- [Infinite Scroll & Accessibility! Is It Any Good? • DigitalA11Y](https://www.digitala11y.com/infinite-scroll-accessibility-is-it-any-good/) - HIGH confidence
-- [Is Infinite Scrolling Accessible? - BOIA](https://www.boia.org/blog/is-infinite-scrolling-accessible) - MEDIUM confidence
-- [Infinite Scrolling and Accessibility (It's Usually Bad)](https://www.webaxe.org/infinite-scrolling-and-accessibility/) - MEDIUM confidence
-- [Scrolling Designs: 8 Patterns and When to Use Each (2026)](https://lovable.dev/guides/scrolling-designs-patterns-when-to-use) - MEDIUM confidence
-
-### CDN & Cache Busting
-- [What is Cache Busting? - KeyCDN Support](https://www.keycdn.com/support/what-is-cache-busting) - HIGH confidence
-- [CDN JS Best Practices: Minification, Versioning & Cache-Bust Rules](https://blog.blazingcdn.com/en-us/cdn-js-best-practices-minification-versioning-cache-bust-rules) - MEDIUM confidence
-- [How to Create CDN Caching Strategies 2026](https://oneuptime.com/blog/post/2026-01-30-cdn-caching-strategies/view) - MEDIUM confidence
-- [CDN Cache Invalidation: Strategies for Delivering Fresh Content](https://enterno.io/en/articles/cdn-cache-invalidation) - MEDIUM confidence
-
-### Image Optimization
-- [AVIF vs WebP: Which Image Format Reigns Supreme in 2026?](https://elementor.com/blog/webp-vs-avif/) - HIGH confidence
-- [Image Optimization in 2026: WebP/AVIF, DPR, and Lazy-Loading](https://tworowstudio.com/image-optimization-2026/) - HIGH confidence
-- [Best Image Format for Web in 2026: JPG vs PNG vs WebP vs AVIF](https://www.thecssagency.com/blog/best-web-image-format) - MEDIUM confidence
-- [AVIF vs WebP: Which Image Format is Best in 2026?](https://www.nextutils.com/blog/webp-vs-avif-image-formats) - MEDIUM confidence
-- [Website Speed Optimization Guide 2026](https://www.neelnetworks.com/blog/website-speed-optimization-guide-2026/) - MEDIUM confidence
-
-### React Memory Leaks
-- [Frontend Memory Leaks: A 500-Repository Static Analysis](https://stackinsight.dev/blog/memory-leak-empirical-study/) - HIGH confidence
-- [Preventing Memory Leaks in React with useEffect Hooks](https://www.c-sharpcorner.com/article/preventing-memory-leaks-in-react-with-useeffect-hooks/) - HIGH confidence
-- [How to Fix Memory Leaks in React Applications](https://www.freecodecamp.org/news/fix-memory-leaks-in-react-apps/) - MEDIUM confidence
-- [Understanding Memory Leaks in React: How to Find and Fix Them | Medium](https://medium.com/@ignatovich.dm/understanding-memory-leaks-in-react-how-to-find-and-fix-them-fc782cf182be) - MEDIUM confidence
-- [Avoiding race conditions and memory leaks in React useEffect](https://www.wisdomgeek.com/development/web-development/react/avoiding-race-conditions-memory-leaks-react-useeffect/) - MEDIUM confidence
-
-### API Caching & Real-Time
-- [API Caching Strategies for Real-Time Data 2026](https://www.searchcans.com/blog/api-caching-strategies-real-time-data-performance-2026/) - MEDIUM confidence
-- [How to Configure API Gateway Caching Strategies for Performance Optimization](https://oneuptime.com/blog/post/2026-02-09-api-gateway-caching-strategies/view) - MEDIUM confidence
-- [How to Handle Caching in REST APIs 2026](https://oneuptime.com/blog/post/2026-02-02-rest-api-caching/view) - MEDIUM confidence
-- [API Caching: Techniques for Better Performance](https://pieces.medium.com/api-caching-techniques-for-better-performance-6297ec1ac02c) - MEDIUM confidence
-
-### Performance Optimization General
-- [Why Premature Optimization Is the Root of All Evil - Stackify](https://stackify.com/premature-optimization-evil/) - HIGH confidence
-- [Software Performance Optimization Tips for 2026: The Ultimate Guide](https://techlasi.com/savvy/software-performance-optimization-tips/) - MEDIUM confidence
-- [Premature Optimization Is the Root of All Evil: 2026 Update](https://copyprogramming.com/howto/premature-optimization-is-the-root-of-all-evil) - MEDIUM confidence
+### PWA
+- [PWA Push Notifications Complete Guide](https://www.magicbell.com/blog/using-push-notifications-in-pwas)
+- [PWA Service Worker Update Strategy](https://web.dev/learn/pwa/update)

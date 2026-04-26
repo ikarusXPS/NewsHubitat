@@ -1,796 +1,1072 @@
-# Architecture Patterns
+# Architecture Patterns: v1.6 Infrastructure & Scale Integration
 
-**Domain:** Performance Optimization for NewsHub
-**Researched:** 2026-04-25
+**Project:** NewsHub
+**Researched:** 2026-04-26
+**Confidence:** MEDIUM
 
 ## Executive Summary
 
-Performance optimization in NewsHub must integrate with existing architecture without disrupting validated patterns. The app already has foundational performance infrastructure (Redis caching, Vite manual chunking, lazy-loaded routes, PostgreSQL with basic indexes) that NEW optimizations should enhance, not replace.
+This document analyzes how v1.6 features (Docker Swarm scaling, Advanced AI services, React Native mobile, Subscription billing, Developer API, Video/podcast pipeline) integrate with NewsHub's existing layered monolith architecture (React SPA + Express REST API + PostgreSQL/Redis).
 
-**Key Integration Points:**
-1. **Caching Layer**: Extend existing CacheService for API response caching
-2. **Frontend**: Add route-level lazy loading to existing React.lazy() setup
-3. **Database**: Add indexes to existing Prisma schema
-4. **Build Pipeline**: Enhance existing Vite config with CDN support and image optimization
+**Key Architecture Decision:** Start with **monorepo structure** for code sharing between web/mobile, deploy **Docker Swarm replicas** for horizontal scaling, introduce **API gateway layer** for developer API, add **microservice option** for heavy AI/media processing while maintaining core monolith.
 
-**Critical Constraint**: All changes must maintain existing API contracts (TanStack Query keys, response formats, WebSocket events).
+**Recommended Build Order (dependency-aware):**
+1. Monorepo setup → Code sharing foundation
+2. API Gateway + Rate limiting → Developer API + tiered access
+3. Subscription schema + Stripe webhooks → Monetization foundation
+4. Docker Swarm deployment → Horizontal scaling
+5. AI credibility service → Enhanced analysis
+6. React Native app + Capacitor wrapper → Mobile apps
+7. Media pipeline service → Video/podcast content
+
+## Integration Points by Feature Area
+
+### 1. Docker Swarm Horizontal Scaling
+
+#### Existing Architecture Integration
+**Current state:** Docker Compose with single app container (3001), PostgreSQL (5433), Redis (6379), Prometheus (9090), Grafana (3000), Alertmanager (9093)
+
+**Integration approach:**
+- Convert `docker-compose.yml` to **Docker Stack** format (Swarm-compatible)
+- Add `deploy.replicas` to app service for horizontal scaling
+- Implement **built-in load balancing** via Swarm routing mesh
+- **No code changes required** — Express app is stateless (sessions in Redis)
+
+**New Components:**
+```yaml
+# docker-stack.yml
+services:
+  app:
+    deploy:
+      replicas: 3                    # Horizontal scaling
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    # ... existing config
+```
+
+**Modified Components:**
+- `server/index.ts` — Add graceful shutdown for rolling updates
+- `docker-compose.yml` → `docker-stack.yml` — Swarm deploy configuration
+- Health checks — Already implemented (`/health`, `/health/db`, `/health/redis`)
+
+**Data Flow Changes:**
+- Swarm **ingress routing mesh** distributes requests to healthy replicas
+- Redis handles shared state (rate limits, JWT blacklist, cache)
+- PostgreSQL connection pooling (already configured via Prisma)
+
+**Sources:**
+- [Docker Swarm horizontal scaling guide](https://betterstack.com/community/guides/scaling-docker/horizontally-scaling-swarm/)
+- [Swarm mode key concepts](https://docs.docker.com/engine/swarm/key-concepts/)
 
 ---
 
-## Current Architecture Overview
+### 2. AI Credibility/Bias/Fact-Check Services
 
-### Component Map (Existing)
+#### Existing Architecture Integration
+**Current state:** Singleton `AIService` with multi-provider fallback (OpenRouter → Gemini → Anthropic), Redis cache for responses
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                         Frontend (React 19)                  │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
-│  │ TanStack     │  │ Zustand      │  │ React Router │      │
-│  │ Query        │  │ (Client      │  │ v7 (Routes)  │      │
-│  │ (Server      │  │  State)      │  │              │      │
-│  │  State)      │  └──────────────┘  └──────────────┘      │
-│  └──────┬───────┘                                           │
-│         │ queryKey: ['news'], ['geo-events'], etc.         │
-│         ▼                                                    │
-│  ┌──────────────────────────────────────────────────┐      │
-│  │ API Client (fetch /api/news, /api/events, etc.) │      │
-│  └──────────────────┬───────────────────────────────┘      │
-└─────────────────────┼───────────────────────────────────────┘
-                      │ HTTP/WebSocket
-┌─────────────────────▼───────────────────────────────────────┐
-│                    Backend (Express 5)                       │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
-│  │ CacheService │  │ NewsAggregator│ │ WebSocket    │      │
-│  │ (Redis)      │  │ (In-memory   │  │ Service      │      │
-│  │ - JWT tokens │  │  article     │  │              │      │
-│  │ - Rate limit │  │  cache)      │  │              │      │
-│  │ - AI cache   │  └──────┬───────┘  └──────────────┘      │
-│  └──────┬───────┘         │                                 │
-│         │                 │                                 │
-│         ▼                 ▼                                 │
-│  ┌──────────────────────────────────────────────────┐      │
-│  │         PostgreSQL (via Prisma 7 ORM)            │      │
-│  │  - NewsArticle (with GIN indexes on JSONB)       │      │
-│  │  - NewsSource                                     │      │
-│  │  - User, Bookmark, ReadingHistory                │      │
-│  └──────────────────────────────────────────────────┘      │
-└─────────────────────────────────────────────────────────────┘
+**Integration approach:**
+- Extend `AIService` with **new analysis methods** (credibilityScore, biasDetection, factCheck)
+- Reuse existing multi-provider pattern for reliability
+- Add **signal-based scoring architecture** (aggregate granular signals → final score)
+- Cache results in Redis with 24h TTL (analysis rarely changes)
+
+**New Components:**
+```typescript
+// server/services/credibilityService.ts
+interface CredibilitySignals {
+  factuality: number;           // Claim verification (0-1)
+  sourceReliability: number;    // From NewsSource.reliability
+  biasScore: number;            // Political bias detection (-1 to +1)
+  persuasionTechniques: string[]; // Detected propaganda patterns
+  logicalFallacies: string[];   // Reasoning errors
+  sentiment: number;            // From existing sentiment analysis
+}
+
+interface CredibilityScore {
+  overall: number;              // Aggregated score (0-100)
+  signals: CredibilitySignals;
+  confidence: number;           // Model confidence (0-1)
+  explanation: string;          // Human-readable reasoning
+}
+
+class CredibilityService {
+  async scoreArticle(article: NewsArticle): Promise<CredibilityScore>
+  async detectBias(article: NewsArticle): Promise<BiasAnalysis>
+  async factCheck(claim: string, context: string[]): Promise<FactCheckResult>
+}
 ```
 
-### Data Flow (Current)
+**Modified Components:**
+- `server/services/aiService.ts` — Add credibility/bias prompts to existing provider methods
+- `prisma/schema.prisma` — Add `NewsArticle.credibilityScore`, `NewsArticle.biasScore`, `NewsArticle.factCheckStatus`
+- `server/routes/analysis.ts` — New endpoints `/api/analysis/credibility/:id`, `/api/analysis/bias/:id`
+- Frontend components — Add credibility badges to `SignalCard.tsx`
 
-1. **Article Fetch Flow**:
-   ```
-   User → Component → TanStack Query → /api/news
-   → NewsAggregator (in-memory cache hit?)
-   → PostgreSQL (if miss)
-   → Response (HTTP Cache-Control: 300s)
-   ```
+**Data Flow Changes:**
+1. Article ingestion → sentiment analysis → **credibility scoring** → database
+2. User requests article → fetch from DB with credibility data → render badge
+3. Background job — recalculate credibility for articles > 7 days old (scores drift)
 
-2. **AI Analysis Flow**:
-   ```
-   User → /api/ai/ask → CacheService.get(ai:topics)
-   → Cache hit? Return
-   → Cache miss? → AIService → Redis cache (30min TTL)
-   ```
+**Architecture Pattern:**
+**Two-step credibility assessment** (research-backed):
+1. Detect granular signals (factuality, bias, fallacies, persuasion)
+2. Aggregate signals via weighted formula → single score
 
-3. **Current Caching Strategy**:
-   - **HTTP Cache-Control headers** (5min for news, 24h for sources)
-   - **In-memory article cache** in NewsAggregator (server-side)
-   - **Redis cache** for AI responses, JWT blacklist, rate limits
-   - **TanStack Query cache** (client-side, 2min stale time)
+**Cache Strategy:**
+```typescript
+// Redis key: "credibility:{articleId}:{version}"
+// TTL: 24 hours (analysis stable within a day)
+// Version bump: when credibility algorithm updates
+```
+
+**Sources:**
+- [Survey on Automatic Credibility Assessment](https://arxiv.org/html/2410.21360v1)
+- [Cognitive Biases in Fact-Checking](https://www.sciencedirect.com/science/article/pii/S0306457324000323)
 
 ---
 
-## Performance Features Integration
+### 3. React Native + Capacitor Code Sharing
 
-### 1. API Response Caching (NEW)
+#### Existing Architecture Integration
+**Current state:** Monolithic React SPA (Vite 8) in `src/`, no mobile app
 
-**Extends**: Existing `CacheService` (D:\NewsHub\server\services\cacheService.ts)
+**Integration approach:**
+- Convert to **pnpm workspaces monorepo** (most stable 2026 stack)
+- Extract platform-agnostic code to shared packages
+- Use **Capacitor** for wrapping web app (highest code reuse ~95%)
+- Use **React Native** only if native UI needed (lower code reuse ~60%)
 
-#### Integration Pattern
+**Monorepo Structure:**
+```
+NewsHub/
+├── apps/
+│   ├── web/              # Existing Vite app (moved from root)
+│   ├── mobile-rn/        # React Native app (if native UI needed)
+│   └── mobile-capacitor/ # Capacitor wrapper (web → native)
+├── packages/
+│   ├── shared-types/     # TypeScript types (NewsArticle, etc.)
+│   ├── shared-utils/     # Date formatting, validation, etc.
+│   ├── shared-api/       # TanStack Query hooks, API client
+│   ├── shared-state/     # Zustand store (platform-agnostic)
+│   └── ui-components/    # Platform-agnostic React components
+├── server/               # Express API (unchanged)
+└── pnpm-workspace.yaml
+```
+
+**New Components:**
+```yaml
+# pnpm-workspace.yaml
+packages:
+  - 'apps/*'
+  - 'packages/*'
+  - 'server'
+```
+
+```json
+// packages/shared-api/package.json
+{
+  "name": "@newshub/shared-api",
+  "exports": {
+    "./client": "./src/apiClient.ts",
+    "./hooks": "./src/hooks/index.ts"
+  }
+}
+```
+
+**Modified Components:**
+- `src/` → `apps/web/src/` — Move existing web app
+- `src/types/` → `packages/shared-types/` — Extract types
+- `src/lib/api.ts` → `packages/shared-api/` — Extract API client
+- `src/store/` → `packages/shared-state/` — Extract Zustand store
+- Root `package.json` → workspace root (scripts orchestration)
+
+**Code Sharing Strategy:**
+
+| Layer | Web | Capacitor | React Native | Location |
+|-------|-----|-----------|--------------|----------|
+| Business Logic | ✓ | ✓ | ✓ | `packages/shared-api/` |
+| State Management | ✓ | ✓ | ✓ | `packages/shared-state/` |
+| API Client | ✓ | ✓ | ✓ | `packages/shared-api/` |
+| Types | ✓ | ✓ | ✓ | `packages/shared-types/` |
+| UI Components | ✓ | ✓ | ⚠ Rewrite | `packages/ui-components/` or platform-specific |
+| Navigation | ⚠ Platform-specific | ⚠ Platform-specific | ⚠ Platform-specific | Per-app |
+
+**Capacitor vs React Native Decision:**
+- **Capacitor:** 95% code reuse, reuse existing web components, faster development
+- **React Native:** 60% code reuse, native UI/UX, requires UI rewrite
+
+**Recommendation:** Start with **Capacitor wrapper** (fast MVP), add React Native later if native UI feedback demands it.
+
+**Data Flow Changes:**
+- Mobile apps → same REST API endpoints → no backend changes
+- Shared `@newshub/shared-api` client → consistent API calls
+- Platform-specific wrappers for Camera, Notifications, etc.
+
+**Sources:**
+- [Capacitor vs React Native 2025](https://nextnative.dev/comparisons/capacitor-vs-react-native)
+- [TypeScript Monorepo Best Practice 2026](https://hsb.horse/en/blog/typescript-monorepo-best-practice-2026/)
+- [pnpm workspaces + Turborepo 2026](https://medium.com/@mernstackdevbykevin/monorepos-with-typescript-93c9233f6df8)
+
+---
+
+### 4. Subscription/Billing System
+
+#### Existing Architecture Integration
+**Current state:** No billing, all users free, PostgreSQL User model with preferences
+
+**Integration approach:**
+- Add **Stripe subscription schema** to Prisma
+- Implement **webhook handler** for subscription events (idempotent)
+- Middleware checks subscription tier before protected endpoints
+- Stripe Node.js SDK for checkout, portal, webhooks
+
+**New Components:**
+```prisma
+// prisma/schema.prisma
+enum SubscriptionTier {
+  FREE
+  PRO
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  TRIALING
+  PAST_DUE
+  CANCELED
+  INCOMPLETE
+}
+
+model Subscription {
+  id                String             @id @default(cuid())
+  userId            String             @unique
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  tier              SubscriptionTier   @default(FREE)
+  status            SubscriptionStatus @default(ACTIVE)
+
+  stripeCustomerId      String?        @unique
+  stripeSubscriptionId  String?        @unique
+  stripePriceId         String?
+
+  currentPeriodStart    DateTime?
+  currentPeriodEnd      DateTime?
+  cancelAtPeriodEnd     Boolean        @default(false)
+
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  @@index([tier, status])
+}
+
+model StripeEvent {
+  id            String   @id  // Stripe event ID
+  type          String
+  processed     Boolean  @default(false)
+  data          Json
+  createdAt     DateTime @default(now())
+
+  @@index([type, processed])
+}
+```
 
 ```typescript
-// NEW: Cache middleware factory (server/middleware/apiCache.ts)
-import { CacheService, CacheKeys, CACHE_TTL } from '../services/cacheService';
+// server/routes/billing.ts
+import Stripe from 'stripe';
 
-export function createCacheMiddleware(ttl: number) {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+
+// POST /api/billing/checkout
+// Create Stripe Checkout session
+router.post('/checkout', requireAuth, async (req, res) => {
+  const session = await stripe.checkout.sessions.create({
+    customer: subscription.stripeCustomerId,
+    line_items: [{ price: PRICE_IDS.PRO, quantity: 1 }],
+    mode: 'subscription',
+    success_url: `${FRONTEND_URL}/settings/billing?success=true`,
+    cancel_url: `${FRONTEND_URL}/settings/billing?canceled=true`,
+  });
+  res.json({ url: session.url });
+});
+
+// POST /api/webhooks/stripe
+// Stripe webhook handler (IDEMPOTENT)
+router.post('/stripe', express.raw({ type: 'application/json' }), async (req, res) => {
+  const sig = req.headers['stripe-signature'];
+  const event = stripe.webhooks.constructEvent(req.body, sig, WEBHOOK_SECRET);
+
+  // Idempotency check
+  const existing = await prisma.stripeEvent.findUnique({ where: { id: event.id } });
+  if (existing?.processed) {
+    return res.json({ received: true }); // Already processed
+  }
+
+  // Queue event for async processing
+  await eventQueue.add({ eventId: event.id, type: event.type, data: event.data });
+
+  // Mark as received
+  await prisma.stripeEvent.create({
+    data: { id: event.id, type: event.type, data: event.data }
+  });
+
+  res.json({ received: true }); // Return 200 within 20 seconds
+});
+```
+
+```typescript
+// server/middleware/subscriptionGuard.ts
+export function requireTier(minTier: SubscriptionTier) {
   return async (req, res, next) => {
-    if (req.method !== 'GET') return next();
+    const subscription = await prisma.subscription.findUnique({
+      where: { userId: req.user.id }
+    });
 
-    const cacheKey = CacheKeys.apiResponse(req.path, req.query);
-    const cached = await CacheService.getInstance().get(cacheKey);
-
-    if (cached) {
-      res.set('X-Cache', 'HIT');
-      return res.json(cached);
+    if (!subscription || TIER_ORDER[subscription.tier] < TIER_ORDER[minTier]) {
+      return res.status(403).json({ error: 'Upgrade required' });
     }
 
-    // Intercept res.json to cache on response
-    const originalJson = res.json.bind(res);
-    res.json = (body) => {
-      CacheService.getInstance().set(cacheKey, body, ttl);
-      res.set('X-Cache', 'MISS');
-      return originalJson(body);
-    };
     next();
   };
 }
 
-// MODIFIED: Apply to routes (server/routes/news.ts)
-newsRoutes.get('/', createCacheMiddleware(CACHE_TTL.MEDIUM), (req, res) => {
-  // Existing logic unchanged
-});
+// Usage:
+// router.get('/api/analysis/credibility/:id', requireAuth, requireTier('PRO'), ...)
 ```
 
-#### New CacheKeys (extends server/services/cacheService.ts)
+**Modified Components:**
+- `prisma/schema.prisma` — Add Subscription, StripeEvent models
+- `server/routes/` — Add `billing.ts` for checkout, portal, webhooks
+- `server/middleware/` — Add `subscriptionGuard.ts` for tier checks
+- Frontend — Add `BillingSettings.tsx`, Stripe Elements for checkout
+
+**Data Flow Changes:**
+1. User clicks "Upgrade" → POST `/api/billing/checkout` → Stripe Checkout
+2. User completes payment → Stripe sends webhook → `/api/webhooks/stripe`
+3. Webhook handler → verify signature → queue event → update `Subscription` model
+4. Protected endpoint → `requireTier('PRO')` → check DB → allow/deny
+
+**Webhook Event Handling:**
+```typescript
+// Critical events to handle
+const SUBSCRIPTION_EVENTS = [
+  'checkout.session.completed',   // Initial subscription
+  'invoice.paid',                  // Recurring payment (use this as primary)
+  'invoice.payment_failed',        // Payment failure
+  'customer.subscription.updated', // Plan change
+  'customer.subscription.deleted', // Cancellation
+];
+```
+
+**Idempotency Pattern:**
+- Store `event.id` in `StripeEvent` table
+- Check existence before processing
+- Return 200 immediately after deduplication
+- Process event in background queue (async)
+
+**Sources:**
+- [Using webhooks with subscriptions (Stripe)](https://docs.stripe.com/billing/subscriptions/webhooks)
+- [Perfect Prisma Schema for SaaS 2026](https://dev.to/huangyongshan46a11y/the-perfect-prisma-schema-for-a-saas-app-nextjs-16-postgresql-5b28)
+- [Stripe webhook best practices](https://www.magicbell.com/blog/stripe-webhooks-guide)
+
+---
+
+### 5. Rate-Limited Developer API
+
+#### Existing Architecture Integration
+**Current state:** `express-rate-limit` with Redis store, 3 tiers (auth 5/min, AI 10/min, news 100/min)
+
+**Integration approach:**
+- Add **API Gateway layer** (Express middleware) before existing routes
+- Tiered rate limiting based on API key → subscription tier mapping
+- Reuse existing Redis rate limit store
+- Add API key management (generate, revoke, rotate)
+
+**New Components:**
+```prisma
+// prisma/schema.prisma
+model ApiKey {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  key           String   @unique  // SHA-256 hash of actual key
+  name          String             // User-friendly label
+  lastUsedAt    DateTime?
+
+  tier          SubscriptionTier   // Inherited from subscription
+  customLimits  Json?              // Optional per-key overrides
+
+  createdAt     DateTime @default(now())
+  revokedAt     DateTime?
+
+  @@index([userId])
+  @@index([key, revokedAt])
+}
+
+model ApiUsage {
+  id            String   @id @default(cuid())
+  apiKeyId      String
+  endpoint      String
+  timestamp     DateTime @default(now())
+  statusCode    Int
+  responseTime  Int      // milliseconds
+
+  @@index([apiKeyId, timestamp])
+  @@index([timestamp])  // For cleanup job
+}
+```
 
 ```typescript
-export const CacheKeys = {
-  // ... existing keys ...
+// server/middleware/apiGateway.ts
+import rateLimit from 'express-rate-limit';
+import RedisStore from 'rate-limit-redis';
 
-  // NEW: API response caching
-  apiResponse: (path: string, query: object) =>
-    `api:${path}:${hashQuery(query)}`,
-
-  // NEW: Query result caching
-  clusterAnalysis: (params: string) => `query:clusters:${params}`,
-  sentimentAnalysis: () => 'query:sentiment',
+const TIER_LIMITS = {
+  FREE:       { windowMs: 60_000, max: 10 },    // 10/min
+  PRO:        { windowMs: 60_000, max: 100 },   // 100/min
+  ENTERPRISE: { windowMs: 60_000, max: 1000 },  // 1000/min
 };
-```
 
-#### Invalidation Strategy
+export async function apiKeyAuth(req, res, next) {
+  const apiKey = req.headers['x-api-key'];
 
-**Pattern**: Time-based (TTL) + Manual invalidation on mutations
-
-```typescript
-// When new articles arrive (server/services/newsAggregator.ts)
-async processNewArticles(articles: NewsArticle[]) {
-  await this.saveToDatabase(articles);
-
-  // NEW: Invalidate related caches
-  await CacheService.getInstance().delPattern('api:/api/news:*');
-  await CacheService.getInstance().delPattern('query:clusters:*');
-  await CacheService.getInstance().delPattern('query:sentiment');
-
-  // Existing WebSocket broadcast
-  this.websocketService.broadcastArticles(articles);
-}
-```
-
-**Confidence**: HIGH — Pattern matches existing CacheService usage for AI cache
-
----
-
-### 2. Query Result Caching (PostgreSQL)
-
-**Extends**: Existing database services using Prisma
-
-#### Integration Pattern
-
-Heavy queries (clusters, analytics) get Redis caching at service layer.
-
-```typescript
-// MODIFIED: server/services/newsAggregator.ts
-async getArticleClusters(options: { withSummaries: boolean }) {
-  const cacheKey = CacheKeys.clusterAnalysis(JSON.stringify(options));
-
-  // NEW: Try cache first
-  const cached = await this.cacheService.get(cacheKey);
-  if (cached) return cached;
-
-  // Existing query logic
-  const clusters = await this.clusteringAlgorithm(options);
-
-  // NEW: Cache results (30min for expensive operations)
-  await this.cacheService.set(cacheKey, clusters, CACHE_TTL.LONG);
-  return clusters;
-}
-```
-
-**Queries to Cache**:
-| Endpoint | Current Speed | Cache Strategy | Invalidation |
-|----------|---------------|----------------|--------------|
-| `/api/analysis/clusters` | ~800ms | 30min TTL | On new articles |
-| `/api/news/sentiment` | ~200ms | 5min TTL | On new articles |
-| `/api/events/geo` | ~150ms | 1min TTL | On event updates |
-| `/api/analysis/framing` | ~600ms | 30min TTL | On new articles |
-
-**Confidence**: HIGH — Follows existing AI cache pattern
-
----
-
-### 3. Database Indexing
-
-**Extends**: Existing Prisma schema with NEW indexes for slow queries
-
-#### Current Indexes (D:\NewsHub\prisma\schema.prisma)
-
-```prisma
-model NewsArticle {
-  // Existing indexes:
-  @@index([publishedAt])
-  @@index([perspective])
-  @@index([sentiment])
-  @@index([sourceId])
-  @@index([publishedAt, perspective])  // Dashboard: filtered timeline
-  @@index([sentiment, publishedAt])    // Sentiment charts
-  @@index([topics(ops: JsonbPathOps)], type: Gin)    // GIN for JSONB
-  @@index([entities(ops: JsonbPathOps)], type: Gin)  // GIN for JSONB
-}
-```
-
-#### NEW Indexes (Based on Query Analysis)
-
-```prisma
-model NewsArticle {
-  // ... existing indexes ...
-
-  // NEW: Composite index for filtered news feed
-  @@index([perspective, sentiment, publishedAt(sort: Desc)])
-
-  // NEW: Partial index for recent articles (90% of queries)
-  @@index([publishedAt(sort: Desc)],
-    where: "publishedAt > NOW() - INTERVAL '7 days'")
-
-  // NEW: Covering index for article list queries
-  @@index([publishedAt, id, title, sentiment, perspective])
-}
-
-model User {
-  // ... existing fields ...
-
-  // NEW: Index for leaderboard queries
-  @@index([createdAt])
-}
-
-model ReadingHistory {
-  // NEW: User activity queries
-  @@index([userId, readAt(sort: Desc)])
-}
-
-model Bookmark {
-  // NEW: User bookmark queries
-  @@index([userId, createdAt(sort: Desc)])
-}
-```
-
-**Rationale**:
-- **Composite index (perspective, sentiment, publishedAt)**: Covers 80% of dashboard queries with filters
-- **Partial index**: PostgreSQL feature — smaller index for recent data reduces index scan time
-- **Covering index**: Includes SELECT columns to enable index-only scans (no table lookup)
-
-**Confidence**: MEDIUM — Partial indexes require PostgreSQL 10+, covering indexes need query validation
-
-**Sources**:
-- [Boosting Query Performance in Prisma ORM: The Impact of Indexing](https://medium.com/@manojbicte/boosting-query-performance-in-prisma-orm-the-impact-of-indexing-on-large-datasets-a55b1972ca72)
-- [Prisma ORM v7.4: Partial Indexes](https://www.prisma.io/blog/prisma-orm-v7-4-query-caching-partial-indexes-and-major-performance-improvements)
-
----
-
-### 4. Route-Based Code Splitting (Frontend)
-
-**Extends**: Existing lazy loading in `src/App.tsx`
-
-#### Current Implementation
-
-```typescript
-// Already lazy-loaded (no changes needed):
-const Analysis = lazy(() => import('./pages/Analysis'));
-const Timeline = lazy(() => import('./pages/Timeline'));
-const Globe = lazy(() => import('./pages/Globe'));
-// ... 12 more routes
-```
-
-**React Router v7** already supports automatic code splitting when using `lazy()`. No framework-mode migration needed.
-
-#### NEW: Granular Component Splitting
-
-Split heavy components WITHIN pages:
-
-```typescript
-// MODIFIED: src/pages/Dashboard.tsx
-const HeroSection = lazy(() => import('../components/HeroSection'));
-const GlobeView = lazy(() => import('../components/GlobeView'));
-const SignalCard = lazy(() => import('../components/SignalCard'));
-
-export function Dashboard() {
-  return (
-    <Suspense fallback={<PageLoader />}>
-      <HeroSection />
-      <Suspense fallback={<div>Loading globe...</div>}>
-        <GlobeView />
-      </Suspense>
-      <NewsFeed />
-    </Suspense>
-  );
-}
-```
-
-**Bundle Impact**:
-- **Current globe-vendor.js**: ~2.5MB (globe.gl + three.js)
-- **After splitting**: Loaded only when user scrolls to globe section
-
-#### NEW: Vite Config Enhancement
-
-```typescript
-// MODIFIED: vite.config.ts
-build: {
-  rollupOptions: {
-    output: {
-      manualChunks(id: string) {
-        // Existing chunks unchanged
-        if (id.includes('globe.gl') || id.includes('three')) {
-          return 'globe-vendor';
-        }
-
-        // NEW: Split by route groups
-        if (id.includes('/src/pages/')) {
-          const match = id.match(/\/src\/pages\/([^/]+)/);
-          if (match) return `page-${match[1].toLowerCase()}`;
-        }
-      },
-    },
-  },
-}
-```
-
-**Confidence**: HIGH — Matches existing manual chunking pattern
-
-**Sources**:
-- [React Router 7 Lazy Loading](https://www.robinwieruch.de/react-router-lazy-loading/)
-- [Faster Lazy Loading in React Router v7.5+](https://remix.run/blog/faster-lazy-loading)
-
----
-
-### 5. CDN Integration
-
-**Extends**: Existing Vite build config
-
-#### Integration Pattern
-
-```typescript
-// MODIFIED: vite.config.ts
-export default defineConfig({
-  base: process.env.CDN_BASE_URL || '/', // NEW: CDN URL for prod
-
-  build: {
-    rollupOptions: {
-      // Existing manualChunks config
-    },
-
-    // NEW: Asset naming with content hashes
-    assetsDir: 'assets',
-    cssCodeSplit: true,
-
-    // NEW: Generate manifest for CDN upload
-    manifest: true,
-  },
-});
-```
-
-#### Deployment Integration
-
-```bash
-# NEW: CI/CD step after build
-npm run build
-# Upload dist/assets/* to CDN
-aws s3 sync dist/assets/ s3://newshub-cdn/assets/ --cache-control "max-age=31536000"
-# Deploy HTML to app server (short cache)
-```
-
-**Cache Strategy**:
-- **Static assets (JS/CSS/images)**: CDN with 1-year cache (immutable)
-- **HTML files**: App server with 5-minute cache
-- **API responses**: Redis cache as defined above
-
-**Confidence**: MEDIUM — Requires CDN setup (AWS CloudFront, Cloudflare, etc.)
-
-**Sources**:
-- [Adding CDN Caching to a Vite Build](https://css-tricks.com/adding-cdn-caching-to-a-vite-build/)
-- [Vite Static Asset Handling](https://vite.dev/guide/assets)
-
----
-
-### 6. Image Optimization
-
-**NEW Pipeline**: Convert, resize, lazy-load images
-
-#### Integration Pattern
-
-```typescript
-// NEW: server/utils/imageOptimizer.ts
-import sharp from 'sharp';
-
-export async function optimizeImage(
-  buffer: Buffer,
-  options: { width?: number; format?: 'webp' | 'avif' }
-) {
-  return sharp(buffer)
-    .resize({ width: options.width, withoutEnlargement: true })
-    .toFormat(options.format || 'webp', { quality: 80 })
-    .toBuffer();
-}
-
-// NEW: Middleware for /api/news/:id/image
-newsRoutes.get('/:id/image', async (req, res) => {
-  const { width, format } = req.query;
-  const imageBuffer = await fetchArticleImage(req.params.id);
-
-  const optimized = await optimizeImage(imageBuffer, {
-    width: parseInt(width || '800'),
-    format: format as 'webp' | 'avif',
-  });
-
-  res.set('Content-Type', `image/${format || 'webp'}`);
-  res.set('Cache-Control', 'public, max-age=86400'); // 24h
-  res.send(optimized);
-});
-```
-
-#### Frontend Integration
-
-```typescript
-// MODIFIED: src/components/SignalCard.tsx
-export function SignalCard({ article }: { article: NewsArticle }) {
-  return (
-    <picture>
-      <source
-        type="image/avif"
-        srcSet={`/api/news/${article.id}/image?format=avif&width=400 400w,
-                 /api/news/${article.id}/image?format=avif&width=800 800w`}
-      />
-      <source
-        type="image/webp"
-        srcSet={`/api/news/${article.id}/image?format=webp&width=400 400w,
-                 /api/news/${article.id}/image?format=webp&width=800 800w`}
-      />
-      <img
-        src={article.imageUrl}
-        loading="lazy"  // Native lazy loading
-        alt={article.title}
-        className="w-full h-48 object-cover"
-      />
-    </picture>
-  );
-}
-```
-
-**Impact**:
-- **AVIF**: 50% smaller than JPEG (1MB → 500KB)
-- **WebP fallback**: 25-35% smaller than JPEG
-- **Lazy loading**: Defers below-fold images (saves ~2MB initial load)
-
-**Confidence**: MEDIUM — Requires `sharp` package, backend processing overhead
-
-**Sources**:
-- [Image Optimization 2026: WebP/AVIF, DPR, and Lazy-Loading](https://tworowstudio.com/image-optimization-2026/)
-- [AVIF in 2026: Complete Guide](https://ide.com/avif-in-2026-the-complete-guide-to-the-image-format-that-beat-jpeg-png-and-webp/)
-
----
-
-### 7. Virtual Scrolling
-
-**NEW Component**: Replace long lists with virtualized rendering
-
-#### Integration Pattern
-
-```typescript
-// NEW: src/components/VirtualNewsFeed.tsx
-import { useVirtualizer } from '@tanstack/react-virtual';
-
-export function VirtualNewsFeed({ articles }: { articles: NewsArticle[] }) {
-  const parentRef = useRef<HTMLDivElement>(null);
-
-  const virtualizer = useVirtualizer({
-    count: articles.length,
-    getScrollElement: () => parentRef.current,
-    estimateSize: () => 320, // Estimated article card height
-    overscan: 5, // Render 5 extra items above/below viewport
-  });
-
-  return (
-    <div ref={parentRef} className="h-screen overflow-auto">
-      <div
-        style={{
-          height: `${virtualizer.getTotalSize()}px`,
-          position: 'relative',
-        }}
-      >
-        {virtualizer.getVirtualItems().map((virtualItem) => (
-          <div
-            key={virtualItem.key}
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              transform: `translateY(${virtualItem.start}px)`,
-            }}
-          >
-            <SignalCard article={articles[virtualItem.index]} />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// MODIFIED: src/components/NewsFeed.tsx
-const VirtualNewsFeed = lazy(() => import('./VirtualNewsFeed'));
-
-export function NewsFeed() {
-  const { data } = useQuery({ queryKey: ['news'], ... });
-
-  if (data.length > 50) {
-    return <VirtualNewsFeed articles={data} />;
+  if (!apiKey) {
+    return res.status(401).json({ error: 'API key required' });
   }
 
-  // Existing grid/list view for small lists
-  return <SignalGrid articles={data} />;
+  const keyHash = hashString(apiKey);
+  const apiKeyRecord = await prisma.apiKey.findUnique({
+    where: { key: keyHash, revokedAt: null },
+    include: { user: { include: { subscription: true } } }
+  });
+
+  if (!apiKeyRecord) {
+    return res.status(403).json({ error: 'Invalid API key' });
+  }
+
+  // Attach tier to request for rate limiter
+  req.apiKey = apiKeyRecord;
+  req.tier = apiKeyRecord.tier;
+
+  // Update last used
+  await prisma.apiKey.update({
+    where: { id: apiKeyRecord.id },
+    data: { lastUsedAt: new Date() }
+  });
+
+  next();
+}
+
+export function createTieredLimiter() {
+  return rateLimit({
+    store: new RedisStore({
+      client: redisClient,
+      prefix: 'rl:api:',
+    }),
+    keyGenerator: (req) => `${req.apiKey.id}:${req.tier}`,
+    handler: (req, res) => {
+      res.status(429).json({
+        error: 'Rate limit exceeded',
+        tier: req.tier,
+        limit: TIER_LIMITS[req.tier].max,
+        resetAt: new Date(Date.now() + TIER_LIMITS[req.tier].windowMs),
+      });
+    },
+    skip: (req) => !req.apiKey, // Skip if no API key (handled by apiKeyAuth)
+    windowMs: (req) => TIER_LIMITS[req.tier].windowMs,
+    max: (req) => TIER_LIMITS[req.tier].max,
+  });
+}
+
+// Usage:
+// app.use('/api/v1', apiKeyAuth, createTieredLimiter(), apiRoutes);
+```
+
+**Modified Components:**
+- `server/routes/` — Prefix existing routes with `/api/v1/` for versioning
+- `server/middleware/rateLimiter.ts` — Extract tiered logic, reuse in API gateway
+- `server/index.ts` — Mount API gateway middleware before `/api/v1` routes
+- Frontend — Add API key management UI in settings
+
+**Data Flow Changes:**
+1. Developer request → `X-API-Key` header → `apiKeyAuth` middleware
+2. Lookup API key → get tier → attach to `req.tier`
+3. Rate limiter → check Redis → `rl:api:{keyId}:{tier}` → allow/deny
+4. Request proceeds to existing routes (no changes to business logic)
+5. Log usage → `ApiUsage` table (async, non-blocking)
+
+**API Gateway Architecture:**
+```
+Client Request
+  ↓
+[API Gateway Middleware]
+  ├─ apiKeyAuth          (validate key, attach tier)
+  ├─ createTieredLimiter (Redis rate limit by tier)
+  ├─ usageLogger         (log to ApiUsage table)
+  └─ errorHandler        (standardized API errors)
+  ↓
+[Existing Express Routes]
+  └─ /api/v1/news, /api/v1/analysis, etc.
+```
+
+**Two-Level Rate Limiting:**
+1. **Global limit** (protect infrastructure): 10,000 req/min across all API keys
+2. **Per-tier limit** (enforce SLA): FREE 10/min, PRO 100/min, ENTERPRISE 1000/min
+
+**Sources:**
+- [Express API Gateway Rate Limiting 2026](https://oneuptime.com/blog/post/2026-02-02-express-rate-limiting/view)
+- [Building API Gateway in Node.js Part III](https://medium.com/@dmytro.misik/building-api-gateway-in-node-js-part-iii-rate-limiting-5d94f3f498ec)
+
+---
+
+### 6. Video/Podcast Content Pipeline
+
+#### Existing Architecture Integration
+**Current state:** RSS/HTML scraping for text articles, Puppeteer stealth scraper for paywalls
+
+**Integration approach:**
+- Add **media ingestion service** (separate from article scraper)
+- Use **external transcoding service** (Cloudinary Video or AWS MediaConvert)
+- Store video metadata in PostgreSQL, video files in CDN
+- **Optional:** Extract to separate microservice if processing is CPU-heavy
+
+**New Components:**
+```prisma
+// prisma/schema.prisma
+enum MediaType {
+  VIDEO
+  PODCAST
+  AUDIO
+}
+
+enum TranscodingStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+model MediaContent {
+  id              String            @id @default(cuid())
+  type            MediaType
+  title           String
+  description     String?
+
+  // Source
+  sourceUrl       String            @unique
+  sourceId        String            // NewsSource reference
+  source          NewsSource        @relation(fields: [sourceId], references: [id])
+
+  // Metadata
+  duration        Int?              // seconds
+  thumbnailUrl    String?
+  publishedAt     DateTime
+
+  // Transcoding
+  originalFileUrl String?
+  transcodedUrls  Json?             // { "1080p": "url", "720p": "url", "480p": "url" }
+  transcodingStatus TranscodingStatus @default(PENDING)
+
+  // Transcript
+  transcript      String?           // AI-generated transcript
+  summary         String?           // AI summary
+
+  // Analytics
+  perspective     String
+  sentiment       String?
+  topics          Json?
+
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@index([type, publishedAt])
+  @@index([sourceId])
+  @@index([transcodingStatus])
 }
 ```
 
-**Performance**:
-- **Before**: 500 articles = 500 DOM nodes (slow scrolling)
-- **After**: 500 articles = ~10 DOM nodes (60fps scrolling)
-
-**Trade-off**: Adds library dependency (@tanstack/react-virtual ~5KB gzipped)
-
-**Confidence**: HIGH — TanStack Virtual is battle-tested, maintained by TanStack team
-
-**Sources**:
-- [TanStack Virtual](https://tanstack.com/virtual/latest)
-- [Virtualization in React: Improving Performance for Large Lists](https://medium.com/@ignatovich.dm/virtualization-in-react-improving-performance-for-large-lists-3df0800022ef)
-
----
-
-## Data Flow Changes
-
-### Before (Current)
-
-```
-User clicks Dashboard
-→ React Router loads Dashboard.tsx (with globe bundle ~2.5MB)
-→ TanStack Query fetches /api/news (HTTP Cache-Control: 300s)
-→ NewsAggregator checks in-memory cache
-→ PostgreSQL query (no specific composite index)
-→ Response (all 500 articles at once)
-→ Render 500 SignalCards (500 DOM nodes)
-```
-
-### After (Optimized)
-
-```
-User clicks Dashboard
-→ React Router loads Dashboard.tsx (WITHOUT globe bundle)
-→ TanStack Query fetches /api/news
-  → API middleware checks Redis cache (HIT → instant response)
-  → Cache MISS → NewsAggregator → PostgreSQL
-    → Query uses composite index (perspective, sentiment, publishedAt)
-→ Response cached in Redis (5min TTL)
-→ Render VirtualNewsFeed (only 10 visible cards, lazy-load images)
-→ User scrolls to globe section → lazy-load globe bundle
-```
-
-**Performance Gain**:
-- **Initial JS bundle**: 5.2MB → 2.7MB (-48%)
-- **API response time**: 200ms → 10ms (cache hit)
-- **DOM nodes**: 500 → 10 (-98%)
-- **Image payload**: 15MB → 3MB (WebP + lazy loading)
-
----
-
-## Component Architecture (NEW vs MODIFIED)
-
-### NEW Components
-
-| Component | Location | Purpose |
-|-----------|----------|---------|
-| `apiCache.ts` | `server/middleware/` | Express middleware for Redis API caching |
-| `imageOptimizer.ts` | `server/utils/` | Sharp-based image conversion |
-| `VirtualNewsFeed.tsx` | `src/components/` | Virtualized article list |
-
-### MODIFIED Components
-
-| Component | Changes |
-|-----------|---------|
-| `cacheService.ts` | Add `apiResponse()` and `clusterAnalysis()` cache keys |
-| `newsAggregator.ts` | Add cache invalidation on new articles |
-| `news.ts` (routes) | Wrap with `createCacheMiddleware()` |
-| `vite.config.ts` | Add CDN base URL, route-based chunking |
-| `schema.prisma` | Add composite and partial indexes |
-| `SignalCard.tsx` | Replace `<img>` with `<picture>` + srcset |
-| `NewsFeed.tsx` | Conditionally use VirtualNewsFeed for long lists |
-
----
-
-## Build Order & Dependencies
-
-**Phase 1: Backend Caching (2-3 days)**
-1. Add `apiResponse()` cache key to `CacheService`
-2. Create `apiCache.ts` middleware
-3. Apply to `/api/news`, `/api/events`, `/api/analysis/clusters`
-4. Add cache invalidation to `newsAggregator.ts`
-
-**Phase 2: Database Optimization (1-2 days)**
-5. Add indexes to Prisma schema
-6. Generate migration: `npx prisma migrate dev --name add-performance-indexes`
-7. Run EXPLAIN ANALYZE on key queries to validate
-
-**Phase 3: Frontend Code Splitting (2 days)**
-8. Split heavy components within pages
-9. Add route-based chunking to Vite config
-10. Test bundle sizes with `npm run build`
-
-**Phase 4: Image Optimization (2-3 days)**
-11. Add `sharp` package
-12. Create `imageOptimizer.ts` service
-13. Add `/api/news/:id/image` endpoint
-14. Update SignalCard to use `<picture>` + srcset
-
-**Phase 5: Virtual Scrolling (1-2 days)**
-15. Add `@tanstack/react-virtual` package
-16. Create `VirtualNewsFeed.tsx` component
-17. Conditionally use in NewsFeed based on article count
-
-**Phase 6: CDN Integration (1 day + infra setup)**
-18. Configure CDN (CloudFront, Cloudflare)
-19. Update Vite config with `base` URL
-20. Add CI/CD step to upload assets to CDN
-
-**Total Estimate**: 9-13 days development + 1-2 days testing
-
-**Critical Dependencies**:
-- Phase 2 depends on Phase 1 (cache invalidation logic)
-- Phase 6 depends on Phase 3 (final bundle output)
-- Phases 3, 4, 5 are independent and can run in parallel
-
----
-
-## TanStack Query Key Compatibility
-
-**CRITICAL**: Performance optimizations MUST NOT change existing query keys. Cache invalidation relies on consistent keys.
-
-### Existing Keys (DO NOT CHANGE)
-
 ```typescript
-// Dashboard.tsx
-queryKey: ['news', { regions, search, sentiment }]
+// server/services/mediaIngestionService.ts
+import axios from 'axios';
+import { v2 as cloudinary } from 'cloudinary';
 
-// Monitor.tsx and EventMap.tsx (MUST MATCH)
-queryKey: ['geo-events']
+export class MediaIngestionService {
+  private static instance: MediaIngestionService;
 
-// Analysis.tsx
-queryKey: ['clusters', { withSummaries: true }]
+  async ingestYouTubeVideo(videoUrl: string): Promise<MediaContent> {
+    // 1. Extract video metadata (YouTube API or yt-dlp)
+    const metadata = await this.extractMetadata(videoUrl);
 
-// NewsFeed.tsx
-queryKey: ['news-sentiment']
+    // 2. Create database record
+    const media = await prisma.mediaContent.create({
+      data: {
+        type: 'VIDEO',
+        sourceUrl: videoUrl,
+        title: metadata.title,
+        description: metadata.description,
+        duration: metadata.duration,
+        thumbnailUrl: metadata.thumbnail,
+        publishedAt: metadata.publishedAt,
+        sourceId: metadata.sourceId,
+        transcodingStatus: 'PENDING',
+      }
+    });
+
+    // 3. Queue transcoding job (async)
+    await this.queueTranscoding(media.id, videoUrl);
+
+    return media;
+  }
+
+  async queueTranscoding(mediaId: string, sourceUrl: string): Promise<void> {
+    // Option 1: Cloudinary Video upload + transformation
+    const result = await cloudinary.uploader.upload(sourceUrl, {
+      resource_type: 'video',
+      eager: [
+        { width: 1920, height: 1080, crop: 'limit', format: 'mp4' },
+        { width: 1280, height: 720, crop: 'limit', format: 'mp4' },
+        { width: 854, height: 480, crop: 'limit', format: 'mp4' },
+      ],
+      eager_async: true, // Process in background
+      notification_url: `${API_URL}/webhooks/cloudinary`, // Callback when done
+    });
+
+    // Update database with transcoding job ID
+    await prisma.mediaContent.update({
+      where: { id: mediaId },
+      data: {
+        transcodingStatus: 'PROCESSING',
+        originalFileUrl: result.secure_url,
+      }
+    });
+  }
+
+  async generateTranscript(mediaId: string): Promise<void> {
+    // Use Whisper API (OpenAI) or Gemini for audio transcription
+    const media = await prisma.mediaContent.findUnique({ where: { id: mediaId } });
+
+    const audioUrl = media.transcodedUrls['audio_only']; // Extract audio track
+    const transcript = await this.transcribeAudio(audioUrl);
+
+    await prisma.mediaContent.update({
+      where: { id: mediaId },
+      data: { transcript }
+    });
+  }
+
+  async summarizeTranscript(mediaId: string): Promise<void> {
+    // Reuse AIService for summarization
+    const media = await prisma.mediaContent.findUnique({ where: { id: mediaId } });
+    const summary = await aiService.summarize(media.transcript);
+
+    await prisma.mediaContent.update({
+      where: { id: mediaId },
+      data: { summary }
+    });
+  }
+}
 ```
 
-### NEW Query Keys
+**Modified Components:**
+- `server/config/sources.ts` — Add video/podcast RSS feeds
+- `server/services/newsAggregator.ts` — Call `mediaIngestionService` for media links
+- Frontend — Add `VideoPlayer.tsx`, `PodcastPlayer.tsx` components
+- `src/pages/Dashboard.tsx` — Add media content section
 
-```typescript
-// For virtual scrolling pagination
-queryKey: ['news', { regions, search, sentiment, offset, limit }]
-
-// For image optimization
-queryKey: ['article-image', articleId, { width, format }]
+**Data Flow (Video Ingestion Pipeline):**
+```
+1. RSS Feed → Detect video link
+   ↓
+2. MediaIngestionService.ingestYouTubeVideo()
+   ↓
+3. Extract metadata → Create MediaContent record (PENDING)
+   ↓
+4. Queue transcoding job → Cloudinary/MediaConvert
+   ↓
+5. Transcoding service → Process video → Webhook callback
+   ↓
+6. Update MediaContent (COMPLETED) → Store transcoded URLs
+   ↓
+7. Background: Generate transcript (Whisper) → Summarize (AI)
+   ↓
+8. Frontend: Fetch `/api/media?type=VIDEO` → Render VideoPlayer
 ```
 
-**Invalidation Example**:
+**Microservice Consideration:**
+If video processing becomes CPU/memory-heavy:
+- Extract to separate **Media Processing Service** (Node.js worker)
+- Communicate via **message queue** (Redis Pub/Sub or RabbitMQ)
+- Main app → publish job → worker processes → webhook callback
 
-```typescript
-// When new articles arrive, invalidate all /api/news queries
-queryClient.invalidateQueries({ queryKey: ['news'] }); // Matches all variants
-```
-
-**Confidence**: HIGH — Follows existing pattern
-
-**Sources**:
-- [TanStack Query: Query Invalidation](https://tanstack.com/query/v4/docs/react/guides/query-invalidation)
-- [Managing Query Keys for Cache Invalidation](https://www.wisp.blog/blog/managing-query-keys-for-cache-invalidation-in-react-query)
+**Sources:**
+- [Video transcoding for streaming platforms](https://www.linkedin.com/pulse/high-level-design-video-transcoding-streaming-platforms-debaraj-rout-nguhf)
+- [Trace audio/podcast processing pipelines](https://oneuptime.com/blog/post/2026-02-06-trace-audio-podcast-processing-pipelines-opentelemetry/view)
+- [4K video podcasting 2026](https://www.podcastvideos.com/articles/switching-to-4k-video-podcasts-2026/)
 
 ---
 
-## Anti-Patterns to Avoid
+## New vs Modified Components Summary
 
-### 1. Over-Caching Dynamic Content
+### New Components (Build from scratch)
 
-**Bad**: Cache user-specific data (bookmarks, reading history) in shared Redis
-**Why**: Cache poisoning — User A sees User B's bookmarks
-**Instead**: Only cache public data; use TanStack Query for user-specific
+| Component | Purpose | Location | Dependencies |
+|-----------|---------|----------|--------------|
+| `docker-stack.yml` | Swarm deployment config | Root | Docker Swarm mode |
+| `CredibilityService` | AI credibility/bias/fact-check | `server/services/` | AIService, Redis |
+| `MediaIngestionService` | Video/podcast pipeline | `server/services/` | Cloudinary, Whisper API |
+| `ApiKey` model | API key management | `prisma/schema.prisma` | Subscription model |
+| `Subscription` model | Stripe billing | `prisma/schema.prisma` | User model |
+| `MediaContent` model | Video/podcast metadata | `prisma/schema.prisma` | NewsSource model |
+| `packages/shared-*` | Monorepo shared code | `packages/` | pnpm workspaces |
+| `apps/mobile-capacitor/` | Capacitor wrapper | `apps/` | Shared packages |
+| `server/middleware/apiGateway.ts` | API key auth + tiered rate limit | `server/middleware/` | Redis, express-rate-limit |
+| `server/routes/billing.ts` | Stripe checkout + webhooks | `server/routes/` | Stripe SDK |
 
-### 2. Aggressive Image Optimization
+### Modified Components (Extend existing)
 
-**Bad**: Convert all images to AVIF with quality=50
-**Why**: Visual degradation on hero images, browser compatibility issues
-**Instead**: WebP quality=80 as default, AVIF as enhancement with fallback
-
-### 3. Premature Virtualization
-
-**Bad**: Virtualize all lists regardless of size
-**Why**: Adds complexity for 10-item lists where it's unnecessary
-**Instead**: Conditional: `if (articles.length > 50) use VirtualNewsFeed`
-
-### 4. Cache Without Invalidation
-
-**Bad**: Set long TTL (1 hour) on `/api/news` without invalidation
-**Why**: Users see stale news after new articles arrive
-**Instead**: Short TTL (5min) + manual invalidation on data mutations
-
-### 5. Blocking Image Processing
-
-**Bad**: Generate optimized images synchronously on request
-**Why**: 200ms image processing blocks API response
-**Instead**: Background job to pre-generate optimized images, or cache generated images
+| Component | Changes | Reason |
+|-----------|---------|--------|
+| `server/services/aiService.ts` | Add credibilityScore(), detectBias(), factCheck() | Extend AI capabilities |
+| `prisma/schema.prisma` | Add Subscription, ApiKey, MediaContent models | New features require data models |
+| `server/routes/analysis.ts` | Add `/credibility/:id`, `/bias/:id` endpoints | Expose new AI services |
+| `src/types/index.ts` → `packages/shared-types/` | Extract to shared package | Code sharing for mobile |
+| `src/store/` → `packages/shared-state/` | Extract to shared package | Code sharing for mobile |
+| `docker-compose.yml` | Convert to docker-stack.yml with deploy config | Swarm compatibility |
+| `server/index.ts` | Add graceful shutdown, mount API gateway | Swarm rolling updates, API versioning |
+| `server/middleware/rateLimiter.ts` | Extract tiered logic for reuse | Shared between web + API gateway |
 
 ---
 
-## Performance Metrics & Targets
+## Suggested Build Order (Dependency-Aware)
 
-### Baseline (Current)
+### Phase 1: Foundation (Weeks 1-2)
+**Goal:** Enable code sharing and API infrastructure
 
-| Metric | Current | Target | Measurement |
-|--------|---------|--------|-------------|
-| Initial JS bundle | 5.2MB | 2.5MB | Lighthouse |
-| LCP (Largest Contentful Paint) | 2.8s | 1.5s | Web Vitals |
-| INP (Interaction to Next Paint) | 180ms | 100ms | Web Vitals |
-| API response (/api/news) | 200ms | 50ms (cache hit) | DevTools Network |
-| Article list scroll (500 items) | 30fps | 60fps | Chrome FPS meter |
-| Image payload (10 articles) | 15MB | 3MB | DevTools Network |
+1. **Monorepo Setup**
+   - Convert to pnpm workspaces
+   - Extract shared packages (types, utils, api, state)
+   - Verify web app still builds
 
-### Monitoring Integration
+   **Why first:** Required for all mobile work (Phase 6), foundational change
 
-Existing Prometheus metrics can track:
+2. **API Gateway + Rate Limiting**
+   - Add ApiKey model to Prisma
+   - Implement `apiGateway.ts` middleware
+   - Add `/api/v1` versioning
+   - Create API key management UI
 
-```typescript
-// NEW: Cache hit rate metric
-cacheHitRate = new Gauge({
-  name: 'newshub_cache_hit_rate',
-  help: 'Redis cache hit rate percentage',
-  labelNames: ['cache_key_prefix'],
-});
+   **Why second:** Required for Developer API (monetization), reused in subscription tier checks
 
-// NEW: Image optimization metric
-imageOptimizationTime = new Histogram({
-  name: 'newshub_image_optimization_duration_ms',
-  help: 'Time to optimize images',
-  buckets: [10, 50, 100, 200, 500],
-});
+### Phase 2: Monetization (Weeks 3-4)
+**Goal:** Enable revenue generation
+
+3. **Subscription Schema + Stripe Integration**
+   - Add Subscription model to Prisma
+   - Implement Stripe checkout flow
+   - Add webhook handler (idempotent)
+   - Create billing settings UI
+
+   **Why third:** Monetization unlocks PRO features, gates advanced AI
+
+4. **Subscription Tier Guards**
+   - Implement `requireTier()` middleware
+   - Gate credibility/bias features behind PRO tier
+   - Add upgrade prompts in UI
+
+   **Why fourth:** Enforces business model, depends on Subscription schema
+
+### Phase 3: Infrastructure (Weeks 5-6)
+**Goal:** Enable horizontal scaling
+
+5. **Docker Swarm Deployment**
+   - Convert `docker-compose.yml` to `docker-stack.yml`
+   - Add graceful shutdown to Express app
+   - Test rolling updates
+   - Configure monitoring for replicas
+
+   **Why fifth:** Can be done in parallel with AI work, no schema changes
+
+### Phase 4: Advanced AI (Weeks 7-9)
+**Goal:** Differentiate product with credibility features
+
+6. **AI Credibility Service**
+   - Extend AIService with credibility/bias methods
+   - Add CredibilityService (signal aggregation)
+   - Add credibility fields to NewsArticle model
+   - Create background job for scoring
+   - Add credibility badges to UI
+
+   **Why sixth:** Depends on subscription tiers (PRO feature), needs API gateway for usage tracking
+
+### Phase 5: Mobile (Weeks 10-12)
+**Goal:** Ship mobile apps
+
+7. **Capacitor Wrapper**
+   - Create `apps/mobile-capacitor/` app
+   - Configure Capacitor plugins (Camera, Push, etc.)
+   - Build iOS/Android apps
+   - Submit to app stores
+
+   **Why seventh:** Depends on monorepo (Phase 1), reuses all shared packages
+
+8. **React Native App (Optional)**
+   - Create `apps/mobile-rn/` if needed
+   - Rewrite UI layer with React Native components
+   - Test platform-specific features
+
+   **Why last:** Only if Capacitor UX feedback demands native UI
+
+### Phase 6: Content Expansion (Weeks 13-15)
+**Goal:** Add video/podcast content
+
+9. **Media Pipeline Service**
+   - Add MediaContent model to Prisma
+   - Implement MediaIngestionService
+   - Integrate Cloudinary for transcoding
+   - Add Whisper for transcription
+   - Create video/podcast player UI
+
+   **Why last:** Independent feature, CPU-heavy (consider microservice extraction)
+
+---
+
+## Data Flow Changes Summary
+
+### Request Flow (Before)
+```
+Client → Express App → Business Logic → PostgreSQL/Redis → Response
 ```
 
-**Confidence**: HIGH — Integrates with existing `metricsService.ts`
+### Request Flow (After v1.6)
+```
+Client (Web/Mobile/API)
+  ↓
+API Gateway (if /api/v1)
+  ├─ API Key Auth
+  ├─ Tiered Rate Limit
+  └─ Usage Logging
+  ↓
+Swarm Load Balancer (routing mesh)
+  ↓
+Express App Replica (1 of N)
+  ├─ Subscription Tier Guard (if protected endpoint)
+  └─ Business Logic
+  ↓
+Services Layer
+  ├─ AIService (+ Credibility/Bias)
+  ├─ MediaIngestionService (video/podcast)
+  └─ TranslationService (existing)
+  ↓
+Data Layer
+  ├─ PostgreSQL (Prisma) — NewsArticle, Subscription, ApiKey, MediaContent
+  └─ Redis — Rate limits, JWT blacklist, AI cache
+  ↓
+External Services
+  ├─ Stripe (webhooks for subscriptions)
+  ├─ Cloudinary (video transcoding)
+  ├─ OpenAI/Gemini (AI analysis, Whisper transcription)
+  └─ CDN (transcoded video files)
+```
 
 ---
 
-## Rollback Strategy
+## Architecture Decision Records (ADRs)
 
-All optimizations are additive — can be disabled without breaking existing functionality:
+### ADR-1: Monorepo with pnpm Workspaces
+**Decision:** Use pnpm workspaces over Nx or Turborepo
+**Rationale:** Most stable 2026 stack, zero config needed, compatible with existing tooling
+**Tradeoff:** No built-in task orchestration (add Turborepo later if needed)
 
-1. **API Cache**: Remove middleware, app functions as before
-2. **Database Indexes**: Drop indexes (degrades performance but doesn't break queries)
-3. **Virtual Scrolling**: Conditional rendering falls back to normal list
-4. **Image Optimization**: Falls back to original image URLs
-5. **CDN**: Change `base` URL back to `/`
+### ADR-2: Capacitor First, React Native Optional
+**Decision:** Start with Capacitor wrapper, add React Native only if UX demands it
+**Rationale:** 95% code reuse vs 60%, faster MVP, reuses existing web components
+**Tradeoff:** Less "native feel" than React Native
 
-**Rollback Testing**: All optimizations must pass E2E tests with feature flag OFF.
+### ADR-3: Monolith + Optional Microservices
+**Decision:** Keep core as monolith, extract media processing if CPU-heavy
+**Rationale:** Avoid premature microservices complexity, extract only when necessary
+**Tradeoff:** Media processing may slow API if kept in monolith
+
+### ADR-4: Stripe for Billing
+**Decision:** Use Stripe Subscriptions over custom billing
+**Rationale:** Battle-tested, PCI compliant, webhook infrastructure included
+**Tradeoff:** 2.9% + 30¢ per transaction
+
+### ADR-5: Redis for Rate Limiting
+**Decision:** Continue using Redis for rate limits (not in-memory)
+**Rationale:** Works across Swarm replicas, already deployed
+**Tradeoff:** Redis dependency (but already required for cache)
+
+### ADR-6: Cloudinary for Video Transcoding
+**Decision:** Use Cloudinary over self-hosted FFmpeg
+**Rationale:** No infrastructure to manage, CDN included, webhook callbacks
+**Tradeoff:** Cost scales with video volume (consider AWS MediaConvert at scale)
+
+---
+
+## Open Questions & Risks
+
+### Open Questions
+1. **Swarm vs Kubernetes?** — Swarm is simpler, but K8s has better autoscaling. Validate load patterns first.
+2. **Monorepo migration strategy?** — Big-bang migration or gradual extraction? (Recommend gradual)
+3. **Video storage costs?** — How many hours/month? Affects Cloudinary vs self-hosted decision.
+4. **AI credibility accuracy?** — Needs validation dataset. Consider human review for first 100 articles.
+5. **Mobile push notifications?** — Requires FCM/APNs integration, not in scope?
+
+### Risks
+| Risk | Impact | Mitigation |
+|------|--------|------------|
+| Swarm rolling updates fail | HIGH | Test in staging, add health checks, set `update_config.failure_action: rollback` |
+| Stripe webhook idempotency bugs | HIGH | Add `StripeEvent` deduplication table, test with Stripe CLI |
+| Video transcoding costs exceed budget | MEDIUM | Set monthly cap in Cloudinary, alert at 80% usage |
+| Mobile app store rejection | MEDIUM | Follow Apple/Google guidelines, have fallback web app |
+| AI credibility model bias | HIGH | Validate with diverse dataset, add human review layer |
+| Monorepo migration breaks build | MEDIUM | Create feature branch, test thoroughly, gradual rollout |
+
+---
+
+## Performance Considerations
+
+### Docker Swarm Scaling
+- **Latency:** Routing mesh adds ~1ms per hop (negligible)
+- **Throughput:** Horizontal scaling → linear capacity increase (10k → 30k users with 3 replicas)
+- **Bottleneck:** PostgreSQL connection pool (already configured, 20 connections max)
+
+### AI Credibility Analysis
+- **Latency:** +500-2000ms per article (add background job, not request-path)
+- **Cache:** Redis cache with 24h TTL (analysis stable)
+- **Throughput:** Batch processing 10 articles/min (acceptable for background job)
+
+### Video Transcoding
+- **Latency:** 5-10 minutes for 10-minute video (async, webhook callback)
+- **Storage:** 1GB raw video → 300MB transcoded (3:1 compression)
+- **Cost:** ~$0.05 per video (Cloudinary pricing)
+
+### Monorepo Build Times
+- **Initial build:** +30s for shared packages
+- **Incremental:** No change (TypeScript project references)
+- **CI:** Cache shared packages, parallel builds
+
+---
+
+## Monitoring & Observability
+
+### New Metrics to Track
+
+**Infrastructure (Prometheus):**
+- `swarm_replicas_total` — Number of healthy replicas
+- `swarm_service_update_duration` — Rolling update time
+- `api_gateway_requests_total{tier}` — API usage by tier
+- `stripe_webhook_latency` — Webhook processing time
+
+**Business Metrics:**
+- Subscription tier distribution (FREE/PRO/ENTERPRISE)
+- API key creation/revocation rate
+- Video transcoding success/failure rate
+- AI credibility analysis coverage (% of articles scored)
+
+**Alerting:**
+- Stripe webhook processing > 10 seconds (risk timeout)
+- API rate limit hit rate > 20% (tier may be too low)
+- Video transcoding failure rate > 5%
+- Swarm replica count < desired replicas
+
+---
+
+## Security Considerations
+
+### API Key Security
+- Store SHA-256 hashes, never plaintext keys
+- Generate keys with `crypto.randomBytes(32)` (256-bit entropy)
+- Allow key rotation (invalidate old, generate new)
+- Log all API key usage for audit trail
+
+### Stripe Webhook Security
+- **Verify signature** on every webhook (`stripe.webhooks.constructEvent`)
+- Use HTTPS-only webhook URLs
+- Idempotency check (prevent replay attacks)
+- Timeout protection (return 200 within 20s)
+
+### Video Content Security
+- Validate video URLs before ingestion (prevent SSRF)
+- Scan uploaded videos for malware (ClamAV or VirusTotal API)
+- Rate limit video uploads (prevent abuse)
+- CDN signed URLs for premium content (prevent hotlinking)
+
+### Swarm Security
+- TLS encryption for swarm overlay network (enabled by default)
+- Secrets management via Docker Secrets (not env vars)
+- Node authorization tokens for worker joins
+- Regular security updates (automated with Watchtower)
+
+---
+
+## Cost Estimates (Monthly)
+
+### Infrastructure (Assuming 10k users, 3 Swarm replicas)
+- **Compute:** 3 × $20 (DigitalOcean Droplets) = $60
+- **PostgreSQL:** $15 (managed instance)
+- **Redis:** $10 (managed instance)
+- **Monitoring:** $0 (self-hosted Prometheus/Grafana)
+
+### Third-Party Services
+- **Stripe:** 2.9% + 30¢ per transaction (variable)
+- **Cloudinary:** $99/month (50GB storage, 10 hours video)
+- **OpenAI/Gemini:** $50/month (AI analysis, transcription)
+- **Sentry:** $26/month (50k events)
+
+**Total:** ~$260/month base cost (before revenue from subscriptions)
+
+**Break-even:** 30 PRO users at $9/month ($270 revenue)
 
 ---
 
 ## Sources
 
-- [React 19 Code Splitting and Lazy Loading](https://medium.com/@ignatovich.dm/optimizing-react-apps-with-code-splitting-and-lazy-loading-e8c8791006e3)
-- [React Performance Optimization 2026: Advanced Techniques](https://softaims.com/blog/react-performance-optimization-advanced-2026)
-- [Vite Build Optimization Guide](https://ndlab.blog/posts/part7-5-vite-build-optimization)
-- [Redis API Response Caching with Express](https://oneuptime.com/blog/post/2026-02-02-express-redis-caching/view)
-- [Cache-Aside Pattern with Redis](https://redis.io/tutorials/howtos/solutions/microservices/caching/)
-- [Prisma ORM v7.4: Partial Indexes & Performance](https://www.prisma.io/blog/prisma-orm-v7-4-query-caching-partial-indexes-and-major-performance-improvements)
-- [PostgreSQL Indexing with Prisma](https://medium.com/@manojbicte/boosting-query-performance-in-prisma-orm-the-impact-of-indexing-on-large-datasets-a55b1972ca72)
-- [TanStack Virtual Documentation](https://tanstack.com/virtual/latest)
-- [Virtualization in React for Large Lists](https://medium.com/@ignatovich.dm/virtualization-in-react-improving-performance-for-large-lists-3df0800022ef)
-- [Image Optimization 2026: WebP/AVIF Guide](https://tworowstudio.com/image-optimization-2026/)
-- [AVIF Complete Guide 2026](https://ide.com/avif-in-2026-the-complete-guide-to-the-image-format-that-beat-jpeg-png-and-webp/)
-- [Adding CDN Caching to Vite Build](https://css-tricks.com/adding-cdn-caching-to-a-vite-build/)
-- [React Router 7 Lazy Loading](https://www.robinwieruch.de/react-router-lazy-loading/)
-- [TanStack Query Cache Invalidation](https://tanstack.com/query/v4/docs/react/guides/query-invalidation)
+### Docker Swarm Scaling
+- [How to Scale Docker Swarm Horizontally in Production](https://betterstack.com/community/guides/scaling-docker/horizontally-scaling-swarm/)
+- [Swarm mode key concepts | Docker Docs](https://docs.docker.com/engine/swarm/key-concepts/)
+- [Scaling Applications with Docker Swarm](https://www.codingexplorations.com/blog/scaling-applications-with-docker-swarm-achieving-horizontally-scalable-and-highly-available-systems)
+
+### React Native Code Sharing
+- [Capacitor vs React Native: Complete Comparison 2025](https://nextnative.dev/comparisons/capacitor-vs-react-native)
+- [Monorepos with TypeScript in 2026](https://medium.com/@mernstackdevbykevin/monorepos-with-typescript-93c9233f6df8)
+- [TypeScript Monorepo Best Practice 2026](https://hsb.horse/en/blog/typescript-monorepo-best-practice-2026/)
+
+### Stripe Subscription Billing
+- [Using webhooks with subscriptions | Stripe Documentation](https://docs.stripe.com/billing/subscriptions/webhooks)
+- [The Perfect Prisma Schema for a SaaS App (Next.js 16 + PostgreSQL)](https://dev.to/huangyongshan46a11y/the-perfect-prisma-schema-for-a-saas-app-nextjs-16-postgresql-5b28)
+- [Stripe Webhooks: Complete Guide with Event Examples](https://www.magicbell.com/blog/stripe-webhooks-guide)
+
+### API Gateway Rate Limiting
+- [How to Add Rate Limiting to Express APIs](https://oneuptime.com/blog/post/2026-02-02-express-rate-limiting/view)
+- [Building API Gateway in Node.js: Part III — Rate Limiting](https://medium.com/@dmytro.misik/building-api-gateway-in-node-js-part-iii-rate-limiting-5d94f3f498ec)
+- [Node.js Rate Limiting: Complete Guide to API Protection](https://reintech.io/blog/nodejs-rate-limiting-protecting-apis-from-abuse)
+
+### Video/Podcast Pipeline
+- [High-Level Design of Video Transcoding for Streaming Platforms](https://www.linkedin.com/pulse/high-level-design-video-transcoding-streaming-platforms-debaraj-rout-nguhf)
+- [How to Trace Audio and Podcast Processing Pipelines](https://oneuptime.com/blog/post/2026-02-06-trace-audio-podcast-processing-pipelines-opentelemetry/view)
+- [The Strategic Transition to 4K Video Podcasting in 2026](https://www.podcastvideos.com/articles/switching-to-4k-video-podcasts-2026/)
+
+### AI Credibility/Bias Detection
+- [A Survey on Automatic Credibility Assessment](https://arxiv.org/html/2410.21360v1)
+- [Cognitive Biases in Fact-Checking and Their Countermeasures](https://www.sciencedirect.com/science/article/pii/S0306457324000323)
+- [Microservices Architecture for AI Applications 2025](https://medium.com/@meeran03/microservices-architecture-for-ai-applications-scalable-patterns-and-2025-trends-5ac273eac232)
+
+---
+
+**End of Architecture Integration Analysis**
+
+**Next Steps:** Use this document to inform roadmap creation in `.planning/ROADMAP.md`. Prioritize phases based on build order and dependencies outlined above.
