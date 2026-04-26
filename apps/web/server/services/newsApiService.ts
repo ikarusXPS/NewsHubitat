@@ -64,7 +64,59 @@ export class NewsApiService {
   private readonly NEWSAPI_KEY = process.env.NEWSAPI_KEY;
   private readonly MEDIASTACK_API_KEY = process.env.MEDIASTACK_API_KEY;
 
+  // Retry configuration
+  private readonly MAX_RETRIES = 3;
+  private readonly BASE_DELAY_MS = 1000;
+
   private constructor() {}
+
+  /**
+   * Fetch with exponential backoff retry for rate limit errors (429)
+   */
+  private async fetchWithRetry(
+    url: string,
+    options: { maxRetries?: number; baseDelay?: number } = {}
+  ): Promise<Response> {
+    const maxRetries = options.maxRetries ?? this.MAX_RETRIES;
+    const baseDelay = options.baseDelay ?? this.BASE_DELAY_MS;
+
+    let lastError: Error | null = null;
+
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        const response = await fetch(url);
+
+        // If rate limited (429), retry with backoff
+        if (response.status === 429 && attempt < maxRetries) {
+          const delay = baseDelay * Math.pow(2, attempt); // 1s, 2s, 4s
+          const retryAfter = response.headers.get('Retry-After');
+          const waitTime = retryAfter ? parseInt(retryAfter, 10) * 1000 : delay;
+
+          console.log(`Rate limited (429). Retrying in ${waitTime}ms (attempt ${attempt + 1}/${maxRetries})...`);
+          await this.sleep(waitTime);
+          continue;
+        }
+
+        return response;
+      } catch (err) {
+        lastError = err instanceof Error ? err : new Error(String(err));
+
+        // Network errors: retry with backoff
+        if (attempt < maxRetries) {
+          const delay = baseDelay * Math.pow(2, attempt);
+          console.log(`Network error. Retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries})...`);
+          await this.sleep(delay);
+          continue;
+        }
+      }
+    }
+
+    throw lastError ?? new Error('Max retries exceeded');
+  }
+
+  private sleep(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
 
   static getInstance(): NewsApiService {
     if (!NewsApiService.instance) {
@@ -150,7 +202,11 @@ export class NewsApiService {
         limit: '25',
       });
 
-      const response = await fetch(`http://api.mediastack.com/v1/news?${params}`);
+      const response = await this.fetchWithRetry(
+        `http://api.mediastack.com/v1/news?${params}`,
+        { maxRetries: 3, baseDelay: 1000 }
+      );
+
       if (!response.ok) {
         throw new Error(`MediaStack API error: ${response.status}`);
       }

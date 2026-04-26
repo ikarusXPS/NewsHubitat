@@ -244,9 +244,25 @@ export class NewsAggregator {
             // Ensure source exists before saving article (prevents P2003 foreign key error)
             await this.ensureSourceExists(article.source);
 
+            // Use URL as unique key to prevent duplicates from different providers
+            // (e.g., mediastack-abc123 vs newsapi-abc123 for same article URL)
             await prisma.newsArticle.upsert({
-              where: { id: article.id },
-              update: this.toPrismaArticle(article),
+              where: { url: article.url },
+              update: {
+                // Only update non-identifying fields; preserve original ID and source
+                title: article.title,
+                titleTranslated: article.titleTranslated ? JSON.stringify(article.titleTranslated) : null,
+                content: article.content,
+                contentTranslated: article.contentTranslated ? JSON.stringify(article.contentTranslated) : null,
+                summary: article.summary,
+                sentiment: article.sentiment,
+                sentimentScore: article.sentimentScore,
+                topics: JSON.stringify(article.topics),
+                entities: JSON.stringify(article.entities),
+                imageUrl: article.imageUrl,
+                cached: article.cached,
+                confidence: article.confidence,
+              },
               create: this.toPrismaArticle(article),
             });
           } catch (err) {
