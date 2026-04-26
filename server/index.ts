@@ -35,7 +35,7 @@ import commentRoutes from './routes/comments';
 import teamsRoutes from './routes/teams';
 import stripeWebhookRouter from './routes/webhooks/stripe';
 import subscriptionRoutes from './routes/subscriptions';
-import { authLimiter, aiLimiter, newsLimiter } from './middleware/rateLimiter';
+import { authLimiter, aiTierLimiter, newsLimiter } from './middleware/rateLimiter';
 import { isBot, generateOGHtml } from './middleware/botDetection';
 import { SharingService } from './services/sharingService';
 import { serverTimingMiddleware } from './middleware/serverTiming';
@@ -142,9 +142,9 @@ app.use('/api/auth', authRoutes);
 // OAuth routes (Google, GitHub) - uses same /api/auth prefix
 app.use('/api/auth', oauthRoutes);
 
-// AI endpoints - moderate (10 req/min per user) - D-05
-app.use('/api/ai', aiLimiter, aiRoutes);
-app.use('/api/analysis', aiLimiter, analysisRoutes);
+// AI endpoints - tier-aware (FREE: 10/day, PREMIUM: unlimited) - Phase 36
+app.use('/api/ai', aiTierLimiter, aiRoutes);
+app.use('/api/analysis', aiTierLimiter, analysisRoutes);
 
 // News/Events endpoints - relaxed (100 req/min per IP) - D-05
 app.use('/api/news', newsLimiter, newsRoutes);
