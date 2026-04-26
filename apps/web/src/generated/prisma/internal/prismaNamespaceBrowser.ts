@@ -70,7 +70,8 @@ export const ModelName = {
   Team: 'Team',
   TeamMember: 'TeamMember',
   TeamBookmark: 'TeamBookmark',
-  TeamInvite: 'TeamInvite'
+  TeamInvite: 'TeamInvite',
+  ApiKey: 'ApiKey'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -401,6 +402,23 @@ export const TeamInviteScalarFieldEnum = {
 } as const
 
 export type TeamInviteScalarFieldEnum = (typeof TeamInviteScalarFieldEnum)[keyof typeof TeamInviteScalarFieldEnum]
+
+
+export const ApiKeyScalarFieldEnum = {
+  id: 'id',
+  keyHash: 'keyHash',
+  name: 'name',
+  tier: 'tier',
+  environment: 'environment',
+  userId: 'userId',
+  createdAt: 'createdAt',
+  lastUsedAt: 'lastUsedAt',
+  requestCount: 'requestCount',
+  revokedAt: 'revokedAt',
+  revokedReason: 'revokedReason'
+} as const
+
+export type ApiKeyScalarFieldEnum = (typeof ApiKeyScalarFieldEnum)[keyof typeof ApiKeyScalarFieldEnum]
 
 
 export const SortOrder = {
