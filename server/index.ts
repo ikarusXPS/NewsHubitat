@@ -33,6 +33,8 @@ import bookmarksRoutes from './routes/bookmarks';
 import historyRoutes from './routes/history';
 import commentRoutes from './routes/comments';
 import teamsRoutes from './routes/teams';
+import stripeWebhookRouter from './routes/webhooks/stripe';
+import subscriptionRoutes from './routes/subscriptions';
 import { authLimiter, aiLimiter, newsLimiter } from './middleware/rateLimiter';
 import { isBot, generateOGHtml } from './middleware/botDetection';
 import { SharingService } from './services/sharingService';
@@ -102,6 +104,9 @@ app.use(queryCounterMiddleware);
 app.use(passport.initialize());
 configurePassport();
 
+// Stripe webhook route - MUST be before express.json() for raw body signature verification
+app.use('/api/webhooks/stripe', stripeWebhookRouter);
+
 // JSON parser with raw body preservation for webhook signature verification (Phase 22)
 app.use(express.json({
   verify: (req: express.Request, _res, buf) => {
@@ -164,6 +169,9 @@ app.use('/api/comments', commentRoutes);
 
 // Team routes (Phase 28)
 app.use('/api/teams', teamsRoutes);
+
+// Subscription routes (Phase 36)
+app.use('/api/subscriptions', subscriptionRoutes);
 
 // Make services available to routes
 app.locals.wsService = wsService;
