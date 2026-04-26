@@ -33,7 +33,10 @@ import bookmarksRoutes from './routes/bookmarks';
 import historyRoutes from './routes/history';
 import commentRoutes from './routes/comments';
 import teamsRoutes from './routes/teams';
+import { publicApiRoutes } from './routes/publicApi';
 import { authLimiter, aiLimiter, newsLimiter } from './middleware/rateLimiter';
+import { apiKeyAuth } from './middleware/apiKeyAuth';
+import { createApiKeyLimiter } from './middleware/apiKeyRateLimiter';
 import { isBot, generateOGHtml } from './middleware/botDetection';
 import { SharingService } from './services/sharingService';
 import { serverTimingMiddleware } from './middleware/serverTiming';
@@ -80,7 +83,7 @@ app.use(cors({
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key'],
 }));
 
 // Compression middleware - gzip responses over 1KB
@@ -164,6 +167,18 @@ app.use('/api/comments', commentRoutes);
 
 // Team routes (Phase 28)
 app.use('/api/teams', teamsRoutes);
+
+// =============================================================================
+// Public API v1 (Phase 35) - D-05: versioned at /api/v1/public/*
+// =============================================================================
+// Apply API key authentication and tiered rate limiting to all public API routes
+const apiKeyLimiter = createApiKeyLimiter();
+app.use('/api/v1/public', apiKeyAuth, apiKeyLimiter, publicApiRoutes);
+
+// Serve OpenAPI spec (no auth required - public documentation)
+app.get('/api/openapi.json', (_req, res) => {
+  res.sendFile('openapi.json', { root: './public' });
+});
 
 // Make services available to routes
 app.locals.wsService = wsService;
