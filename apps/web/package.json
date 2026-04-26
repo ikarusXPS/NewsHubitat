@@ -34,12 +34,14 @@
     "seed:personas": "npx tsx prisma/seed-personas.ts",
     "seed:load-test": "tsx scripts/seed-load-test-users.js",
     "load:smoke": "k6 run k6/load-test.js --env K6_SCENARIO=smoke",
-    "load:full": "k6 run k6/load-test.js --env K6_SCENARIO=load"
+    "load:full": "k6 run k6/load-test.js --env K6_SCENARIO=load",
+    "openapi:generate": "tsx server/openapi/generator.ts public/openapi.json"
   },
   "dependencies": {
-    "@newshub/types": "workspace:*",
     "@anthropic-ai/sdk": "^0.90.0",
+    "@asteasolutions/zod-to-openapi": "8.5.0",
     "@google/generative-ai": "^0.24.1",
+    "@newshub/types": "workspace:*",
     "@prisma/adapter-pg": "^7.7.0",
     "@prisma/client": "^7.7.0",
     "@radix-ui/react-dialog": "^1.1.15",

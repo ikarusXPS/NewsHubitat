@@ -1,0 +1,900 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "NewsHub Public API",
+    "version": "1.0.0",
+    "description": "Multi-perspective global news analysis API.\n\nNewsHub aggregates news from 130+ sources across 13 global regions, providing:\n- Real-time news articles with sentiment analysis\n- Geo-located events extracted from news\n- Regional sentiment statistics\n\n## Authentication\n\nAll endpoints require an API key passed in the `X-API-Key` header:\n\n```bash\ncurl -H \"X-API-Key: nh_live_your_key_here\" https://api.newshub.example.com/api/v1/public/news\n```\n\nObtain your API key from the [Developer Portal](/developers).\n\n## Rate Limits\n\n| Tier | Requests | Window |\n|------|----------|--------|\n| Free | 10 | per minute |\n| Pro | 100 | per minute |\n\nRate limit headers are included in all responses:\n- `RateLimit-Limit`: Maximum requests per window\n- `RateLimit-Remaining`: Requests remaining\n- `RateLimit-Reset`: Seconds until window resets\n\n## Caching\n\nResponses include `Cache-Control` headers. Honor these for optimal performance:\n- News list: 5 minutes\n- Single article: 1 hour\n- Events: 15 minutes\n- Sentiment: 10 minutes",
+    "contact": {
+      "name": "NewsHub API Support",
+      "url": "https://newshub.example.com/developers"
+    },
+    "license": {
+      "name": "Proprietary"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.newshub.example.com",
+      "description": "Production"
+    },
+    {
+      "url": "http://localhost:3001",
+      "description": "Development"
+    }
+  ],
+  "tags": [
+    {
+      "name": "News",
+      "description": "News article endpoints - access articles from 130+ global sources"
+    },
+    {
+      "name": "Events",
+      "description": "Geo-located event endpoints - events extracted from news articles"
+    },
+    {
+      "name": "Analytics",
+      "description": "Statistics and analytics - sentiment and trend data"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key",
+        "description": "API key for authentication. Format: nh_live_xxxx or nh_test_xxxx. Obtain from /developers page."
+      }
+    },
+    "schemas": {
+      "NewsListResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NewsArticle"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMeta"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "meta"
+        ]
+      },
+      "NewsArticle": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "article-abc123"
+          },
+          "title": {
+            "type": "string",
+            "example": "Breaking News: Major Event Unfolds"
+          },
+          "content": {
+            "type": "string",
+            "example": "Article content describing the event..."
+          },
+          "summary": {
+            "type": "string",
+            "example": "Brief summary of the article"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "example": "https://example.com/news/article-123"
+          },
+          "imageUrl": {
+            "type": "string",
+            "format": "uri",
+            "example": "https://example.com/images/article-123.jpg"
+          },
+          "sourceId": {
+            "type": "string",
+            "example": "cnn-usa"
+          },
+          "source": {
+            "$ref": "#/components/schemas/NewsSource"
+          },
+          "perspective": {
+            "type": "string",
+            "enum": [
+              "usa",
+              "europa",
+              "deutschland",
+              "nahost",
+              "tuerkei",
+              "russland",
+              "china",
+              "asien",
+              "afrika",
+              "lateinamerika",
+              "ozeanien",
+              "kanada",
+              "alternative"
+            ],
+            "description": "Geographic region perspective"
+          },
+          "topics": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "politics",
+              "international"
+            ]
+          },
+          "sentiment": {
+            "type": "string",
+            "enum": [
+              "positive",
+              "negative",
+              "neutral"
+            ],
+            "description": "Article sentiment classification"
+          },
+          "sentimentScore": {
+            "type": "number",
+            "minimum": -1,
+            "maximum": 1,
+            "example": 0.65
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-04-26T12:00:00Z"
+          },
+          "originalLanguage": {
+            "type": "string",
+            "example": "en"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "content",
+          "url",
+          "sourceId",
+          "perspective",
+          "topics",
+          "sentiment",
+          "publishedAt",
+          "originalLanguage"
+        ]
+      },
+      "NewsSource": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "cnn-usa"
+          },
+          "name": {
+            "type": "string",
+            "example": "CNN"
+          },
+          "country": {
+            "type": "string",
+            "example": "US"
+          },
+          "region": {
+            "type": "string",
+            "enum": [
+              "usa",
+              "europa",
+              "deutschland",
+              "nahost",
+              "tuerkei",
+              "russland",
+              "china",
+              "asien",
+              "afrika",
+              "lateinamerika",
+              "ozeanien",
+              "kanada",
+              "alternative"
+            ],
+            "description": "Geographic region perspective"
+          },
+          "language": {
+            "type": "string",
+            "example": "en"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "country",
+          "region",
+          "language"
+        ]
+      },
+      "PaginationMeta": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "example": 1523
+          },
+          "page": {
+            "type": "integer",
+            "example": 1
+          },
+          "limit": {
+            "type": "integer",
+            "example": 20
+          },
+          "hasMore": {
+            "type": "boolean",
+            "example": true
+          }
+        },
+        "required": [
+          "total",
+          "page",
+          "limit",
+          "hasMore"
+        ]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "error": {
+            "type": "string",
+            "example": "Invalid API key"
+          }
+        },
+        "required": [
+          "success",
+          "error"
+        ]
+      },
+      "RateLimitErrorResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "error": {
+            "type": "string",
+            "example": "Rate limit exceeded"
+          },
+          "tier": {
+            "type": "string",
+            "example": "free"
+          },
+          "limit": {
+            "type": "integer",
+            "example": 10
+          },
+          "window": {
+            "type": "string",
+            "example": "1 minute"
+          },
+          "upgradeUrl": {
+            "type": "string",
+            "example": "/pricing"
+          }
+        },
+        "required": [
+          "success",
+          "error",
+          "tier",
+          "limit",
+          "window",
+          "upgradeUrl"
+        ]
+      },
+      "NewsDetailResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/NewsArticle"
+          }
+        },
+        "required": [
+          "success",
+          "data"
+        ]
+      },
+      "GeoEventsResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GeoEvent"
+            }
+          },
+          "meta": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "integer",
+                "example": 42
+              }
+            },
+            "required": [
+              "total"
+            ]
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "meta"
+        ]
+      },
+      "GeoEvent": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "event-xyz789"
+          },
+          "title": {
+            "type": "string",
+            "example": "Political Crisis in Region X"
+          },
+          "description": {
+            "type": "string",
+            "example": "Detailed description of the event..."
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "conflict",
+              "humanitarian",
+              "political",
+              "economic",
+              "military",
+              "protest"
+            ],
+            "description": "Event category classification"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "critical",
+              "high",
+              "medium",
+              "low"
+            ],
+            "description": "Event severity level"
+          },
+          "location": {
+            "$ref": "#/components/schemas/GeoLocation"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-04-26T14:30:00Z"
+          },
+          "sourceArticles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "article-1",
+              "article-2"
+            ]
+          },
+          "aiExtracted": {
+            "type": "boolean",
+            "example": true
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "example": 0.85
+          },
+          "perspectives": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "usa",
+                "europa",
+                "deutschland",
+                "nahost",
+                "tuerkei",
+                "russland",
+                "china",
+                "asien",
+                "afrika",
+                "lateinamerika",
+                "ozeanien",
+                "kanada",
+                "alternative"
+              ],
+              "description": "Geographic region perspective"
+            },
+            "example": [
+              "usa",
+              "europa"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "description",
+          "category",
+          "severity",
+          "location",
+          "timestamp",
+          "sourceArticles",
+          "aiExtracted",
+          "confidence",
+          "perspectives"
+        ]
+      },
+      "GeoLocation": {
+        "type": "object",
+        "properties": {
+          "lat": {
+            "type": "number",
+            "example": 40.7128
+          },
+          "lng": {
+            "type": "number",
+            "example": -74.006
+          },
+          "name": {
+            "type": "string",
+            "example": "New York"
+          },
+          "country": {
+            "type": "string",
+            "example": "US"
+          }
+        },
+        "required": [
+          "lat",
+          "lng"
+        ]
+      },
+      "SentimentStatsResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SentimentStats"
+            }
+          }
+        },
+        "required": [
+          "success",
+          "data"
+        ]
+      },
+      "SentimentStats": {
+        "type": "object",
+        "properties": {
+          "region": {
+            "type": "string",
+            "enum": [
+              "usa",
+              "europa",
+              "deutschland",
+              "nahost",
+              "tuerkei",
+              "russland",
+              "china",
+              "asien",
+              "afrika",
+              "lateinamerika",
+              "ozeanien",
+              "kanada",
+              "alternative"
+            ],
+            "description": "Geographic region perspective"
+          },
+          "positive": {
+            "type": "integer",
+            "example": 45
+          },
+          "negative": {
+            "type": "integer",
+            "example": 30
+          },
+          "neutral": {
+            "type": "integer",
+            "example": 25
+          },
+          "total": {
+            "type": "integer",
+            "example": 100
+          }
+        },
+        "required": [
+          "region",
+          "positive",
+          "negative",
+          "neutral",
+          "total"
+        ]
+      }
+    },
+    "parameters": {}
+  },
+  "paths": {
+    "/api/v1/public/news": {
+      "get": {
+        "summary": "List news articles",
+        "description": "Retrieve paginated list of news articles from 130+ sources across 13 global regions. Supports filtering by region, topics, sentiment, and full-text search.",
+        "tags": [
+          "News"
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "description": "Comma-separated regions filter (e.g., \"usa,europa,deutschland\")",
+              "example": "usa,europa"
+            },
+            "required": false,
+            "description": "Comma-separated regions filter (e.g., \"usa,europa,deutschland\")",
+            "name": "regions",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Comma-separated topics filter",
+              "example": "politics,economy"
+            },
+            "required": false,
+            "description": "Comma-separated topics filter",
+            "name": "topics",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "positive",
+                "negative",
+                "neutral"
+              ],
+              "description": "Article sentiment classification"
+            },
+            "required": false,
+            "description": "Article sentiment classification",
+            "name": "sentiment",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Search term for title/content matching",
+              "example": "election"
+            },
+            "required": false,
+            "description": "Search term for title/content matching",
+            "name": "search",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "example": 1
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "example": 20
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success - Returns paginated list of articles",
+            "headers": {
+              "Cache-Control": {
+                "description": "Cache directive for response",
+                "schema": {
+                  "type": "string",
+                  "example": "public, max-age=300"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewsListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "headers": {
+              "RateLimit-Limit": {
+                "description": "Maximum requests allowed per window",
+                "schema": {
+                  "type": "integer",
+                  "example": 10
+                }
+              },
+              "RateLimit-Remaining": {
+                "description": "Remaining requests in current window",
+                "schema": {
+                  "type": "integer",
+                  "example": 0
+                }
+              },
+              "RateLimit-Reset": {
+                "description": "Seconds until window resets",
+                "schema": {
+                  "type": "integer",
+                  "example": 45
+                }
+              },
+              "Retry-After": {
+                "description": "Seconds to wait before retry",
+                "schema": {
+                  "type": "integer",
+                  "example": 45
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RateLimitErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/public/news/{id}": {
+      "get": {
+        "summary": "Get single news article",
+        "description": "Retrieve detailed information for a specific article by ID.",
+        "tags": [
+          "News"
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "description": "Article ID",
+              "example": "article-abc123"
+            },
+            "required": true,
+            "description": "Article ID",
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success - Returns article details",
+            "headers": {
+              "Cache-Control": {
+                "description": "Cache directive for response",
+                "schema": {
+                  "type": "string",
+                  "example": "public, max-age=3600"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewsDetailResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Article not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RateLimitErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/public/events": {
+      "get": {
+        "summary": "List geo-located events",
+        "description": "Retrieve all geo-located events extracted from news articles. Events include location coordinates, severity classification, and source article references.",
+        "tags": [
+          "Events"
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success - Returns list of geo-located events",
+            "headers": {
+              "Cache-Control": {
+                "description": "Cache directive for response",
+                "schema": {
+                  "type": "string",
+                  "example": "public, max-age=900"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeoEventsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RateLimitErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/public/sentiment": {
+      "get": {
+        "summary": "Get sentiment statistics",
+        "description": "Retrieve sentiment distribution (positive/negative/neutral) by geographic region.",
+        "tags": [
+          "Analytics"
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success - Returns sentiment statistics per region",
+            "headers": {
+              "Cache-Control": {
+                "description": "Cache directive for response",
+                "schema": {
+                  "type": "string",
+                  "example": "public, max-age=600"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SentimentStatsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RateLimitErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "webhooks": {}
+}
