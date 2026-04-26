@@ -118,14 +118,19 @@ n**Plans:**
 **Depends on**: Phase 35 (API infrastructure)
 **Requirements**: PAY-01, PAY-02, PAY-03, PAY-04, PAY-05, PAY-06, PAY-07
 **Success Criteria** (what must be TRUE):
-  1. User can view subscription tiers (Free, Premium $9/mo, Enterprise custom) with clear feature comparison
+  1. User can view subscription tiers (Free, Premium EUR9/mo, Enterprise custom) with clear feature comparison
   2. User can subscribe to Premium via Stripe Checkout and manage subscription via Customer Portal
   3. Premium users experience ad-free interface with unlimited AI queries
   4. Premium users can access full reading history without 7-day limit
   5. Premium users can export data in JSON and CSV formats
   6. Stripe webhooks update subscription status idempotently without duplicate processing
-**Plans**: TBD
-**UI hint**: yes
+**Plans**: 5 plans
+**Plans:**
+- [ ] 36-01-PLAN.md — Schema & service foundation (subscription models, SubscriptionService, Stripe config)
+- [ ] 36-02-PLAN.md — Stripe checkout & webhooks (checkout sessions, idempotent webhook handlers)
+- [ ] 36-03-PLAN.md — Feature gating middleware (requireTier, AI rate limit bypass, history/export)
+- [ ] 36-04-PLAN.md — Pricing page & UI components (TierCard, SubscriptionBadge, i18n)
+- [ ] 36-05-PLAN.md — Integration testing & human verification (unit tests, E2E, Stripe flow verification)
 
 ### Phase 37: Horizontal Scaling
 **Goal**: System handles 30k concurrent users through horizontal scaling and connection pooling
@@ -222,7 +227,7 @@ n**Plans:**
 | 33. Caching Improvements | v1.5 | 3/3 | Complete | 2026-04-25 |
 | 34. Database Optimization | v1.5 | 4/4 | Complete | 2026-04-26 |
 | 35. Infrastructure Foundation | v1.6 | 5/5 | Awaiting Verification | - |
-| 36. Monetization Core | v1.6 | 0/? | Not started | - |
+| 36. Monetization Core | v1.6 | 0/5 | Planning complete | - |
 | 37. Horizontal Scaling | v1.6 | 0/? | Not started | - |
 | 38. Advanced AI Features | v1.6 | 0/? | Not started | - |
 | 39. Mobile Apps | v1.6 | 0/? | Not started | - |
@@ -231,4 +236,4 @@ n**Plans:**
 ---
 
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-26 — Plan 35-05 complete (E2E tests, awaiting human verification)*
+*Last updated: 2026-04-26 — Phase 36 plans created (5 plans in 4 waves)*
