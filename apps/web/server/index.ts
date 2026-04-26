@@ -34,6 +34,7 @@ import historyRoutes from './routes/history';
 import commentRoutes from './routes/comments';
 import teamsRoutes from './routes/teams';
 import { publicApiRoutes } from './routes/publicApi';
+import { apiKeyRoutes } from './routes/apiKeys';
 import { authLimiter, aiLimiter, newsLimiter } from './middleware/rateLimiter';
 import { apiKeyAuth } from './middleware/apiKeyAuth';
 import { createApiKeyLimiter } from './middleware/apiKeyRateLimiter';
@@ -167,6 +168,9 @@ app.use('/api/comments', commentRoutes);
 
 // Team routes (Phase 28)
 app.use('/api/teams', teamsRoutes);
+
+// API key management routes (Phase 35-04) - for developer self-service
+app.use('/api/keys', apiKeyRoutes);
 
 // =============================================================================
 // Public API v1 (Phase 35) - D-05: versioned at /api/v1/public/*
