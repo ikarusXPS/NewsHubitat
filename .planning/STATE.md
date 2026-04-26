@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Performance Optimization
-current_plan: 34-03
+current_plan: 34-04
 status: ready
-last_updated: "2026-04-26T00:24:11Z"
-last_activity: 2026-04-26 — Phase 34 Plan 02 complete (Pool Metrics)
+last_updated: "2026-04-26T00:32:43Z"
+last_activity: 2026-04-26 — Phase 34 Plan 03 complete (Composite Indexes)
 progress:
   total_phases: 6
   completed_phases: 5
   total_plans: 21
-  completed_plans: 19
-  percent: 90
+  completed_plans: 20
+  percent: 95
 ---
 
 # State: NewsHub
@@ -26,12 +26,12 @@ See: .planning/PROJECT.md (updated 2026-04-25)
 ## Current Position
 
 Phase: 34 - Database Optimization
-Current Plan: 03 (pending)
-Status: Plan 02 complete (2/4 plans)
-Last activity: 2026-04-26 — Plan 02 complete (Pool Metrics)
+Current Plan: 04 (pending)
+Status: Plan 03 complete (3/4 plans)
+Last activity: 2026-04-26 — Plan 03 complete (Composite Indexes)
 
 ```
-v1.5 Progress: [██████████████████░░] 90% (6 phases, 5 complete)
+v1.5 Progress: [███████████████████░] 95% (6 phases, 5 complete)
 ```
 
 ## Milestone Progress
@@ -50,7 +50,7 @@ v1.5 Progress: [██████████████████░░] 90
 | 31 | Virtual Scrolling | FRON-02 | Complete (3 plans) |
 | 32 | Image Pipeline | IMG-01, IMG-02, IMG-03 | Complete (4 plans) |
 | 33 | Caching Improvements | CACHE-01, CACHE-02, CACHE-03 | Complete (3 plans) |
-| 34 | Database Optimization | DB-01, DB-02, DB-03, DB-04 | In Progress (2/4 plans) |
+| 34 | Database Optimization | DB-01, DB-02, DB-03, DB-04 | In Progress (3/4 plans) |
 
 ## Deferred Items
 
@@ -70,9 +70,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Plan 34-02 complete (Pool Metrics)
-**Next step:** Execute Phase 34 Plan 03 (Composite Indexes)
-**Resume file:** .planning/phases/34-database-optimization/34-02-SUMMARY.md
+**Last action:** Plan 34-03 complete (Composite Indexes)
+**Next step:** Execute Phase 34 Plan 04 (Grafana Dashboard)
+**Resume file:** .planning/phases/34-database-optimization/34-03-SUMMARY.md
 **Checkpoint:** —
 
 ## Accumulated Context
@@ -218,6 +218,9 @@ v1.4 Stack Decisions (from research):
 | Development-only query counter | Phase 34-01 D-08 | NODE_ENV !== 'production' guard for zero production overhead |
 | Pool metrics via adapter internals | Phase 34-02 D-14 | getPoolStats attempts pool access with null fallback |
 | 10-second pool metrics interval | Phase 34-02 D-14 | Matches WebSocket metrics collection pattern |
+| Composite index [showOnLeaderboard, emailVerified] | Phase 34-03 D-05 | Leaderboard query optimization per audit findings |
+| Partial index idx_team_active | Phase 34-03 D-06 | WHERE deletedAt IS NULL for active teams filter |
+| Standard CREATE INDEX in DO block | Phase 34-03 | CONCURRENTLY cannot run in transaction; documented production workaround |
 
 ## Reports
 
@@ -227,4 +230,4 @@ v1.4 Stack Decisions (from research):
 
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-26 — Phase 34 Plan 02 complete (Pool Metrics)*
+*Last updated: 2026-04-26 — Phase 34 Plan 03 complete (Composite Indexes)*
