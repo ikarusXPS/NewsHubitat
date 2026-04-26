@@ -51,4 +51,32 @@ if (isDev) {
   });
 }
 
-export { prisma };
+/**
+ * Get connection pool statistics for Prometheus metrics (D-14 - Phase 34)
+ * Note: PrismaPg wraps pg-pool; direct access may be limited
+ */
+export function getPoolStats(): { totalCount: number; idleCount: number; waitingCount: number } | null {
+  try {
+    // Attempt to access pool from adapter internals
+    // PrismaPg uses @prisma/driver-adapter-utils which may expose pool
+    const adapterAny = adapter as any;
+
+    // Check common patterns for pool access
+    const pool = adapterAny.pool || adapterAny._pool || adapterAny.client?.pool;
+
+    if (pool && typeof pool.totalCount === 'number') {
+      return {
+        totalCount: pool.totalCount,
+        idleCount: pool.idleCount ?? 0,
+        waitingCount: pool.waitingCount ?? 0,
+      };
+    }
+
+    // Fallback: return null to indicate unavailable
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+export { prisma, getPoolStats };
