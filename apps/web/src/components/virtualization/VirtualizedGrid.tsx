@@ -68,49 +68,43 @@ export function VirtualizedGrid({
       return;
     }
 
-    let newIndex: number | null = null;
-
     switch (e.key) {
-      case 'ArrowDown':
+      case 'ArrowDown': {
         e.preventDefault();
         // Start at first item when no selection exists
-        if (focusedIndex === null) {
-          newIndex = 0;
-        } else {
-          // Move down by columns (next row, same column)
-          newIndex = Math.min(focusedIndex + columns, articles.length - 1);
-        }
-        break;
-      case 'ArrowUp':
+        const downIndex = focusedIndex === null ? 0 : Math.min(focusedIndex + columns, articles.length - 1);
+        setFocusedIndex(downIndex);
+        virtualizer.scrollToIndex(Math.floor(downIndex / columns), { align: 'auto' });
+        return;
+      }
+      case 'ArrowUp': {
         e.preventDefault();
         // Do nothing if no selection
         if (focusedIndex === null) return;
         // Move up by columns (previous row, same column)
-        newIndex = Math.max(focusedIndex - columns, 0);
-        break;
-      case 'ArrowRight':
+        const upIndex = Math.max(focusedIndex - columns, 0);
+        setFocusedIndex(upIndex);
+        virtualizer.scrollToIndex(Math.floor(upIndex / columns), { align: 'auto' });
+        return;
+      }
+      case 'ArrowRight': {
         e.preventDefault();
-        if (focusedIndex === null) {
-          newIndex = 0;
-        } else {
-          newIndex = Math.min(focusedIndex + 1, articles.length - 1);
-        }
-        break;
-      case 'ArrowLeft':
+        const rightIndex = focusedIndex === null ? 0 : Math.min(focusedIndex + 1, articles.length - 1);
+        setFocusedIndex(rightIndex);
+        virtualizer.scrollToIndex(Math.floor(rightIndex / columns), { align: 'auto' });
+        return;
+      }
+      case 'ArrowLeft': {
         e.preventDefault();
         // Do nothing if no selection
         if (focusedIndex === null) return;
-        newIndex = Math.max(focusedIndex - 1, 0);
-        break;
+        const leftIndex = Math.max(focusedIndex - 1, 0);
+        setFocusedIndex(leftIndex);
+        virtualizer.scrollToIndex(Math.floor(leftIndex / columns), { align: 'auto' });
+        return;
+      }
       default:
         return;
-    }
-
-    if (newIndex !== null && newIndex >= 0) {
-      setFocusedIndex(newIndex);
-      // Scroll to the row containing this index
-      const rowIndex = Math.floor(newIndex / columns);
-      virtualizer.scrollToIndex(rowIndex, { align: 'auto' });
     }
   }, [focusedIndex, articles.length, columns, virtualizer]);
 

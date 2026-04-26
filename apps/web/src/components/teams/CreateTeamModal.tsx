@@ -23,12 +23,14 @@ export function CreateTeamModal({ isOpen, onClose, onSuccess }: CreateTeamModalP
 
   const { mutate: createTeam, isPending } = useCreateTeam();
 
-  // Reset form on close
+  // Reset form on close - intentional state reset when modal closes
   useEffect(() => {
     if (!isOpen) {
+      /* eslint-disable react-hooks/set-state-in-effect -- Intentional reset on modal close */
       setName('');
       setDescription('');
       setError(null);
+      /* eslint-enable react-hooks/set-state-in-effect */
     }
   }, [isOpen]);
 

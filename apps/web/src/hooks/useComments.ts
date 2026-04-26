@@ -109,10 +109,13 @@ export function useComments(articleId: string) {
     };
   }, [articleId, queryClient]);
 
+  // Return socket getter function to avoid accessing ref during render
+  const getSocket = useCallback(() => socketRef.current, []);
+
   return {
     comments: comments || [],
     isLoading,
-    socket: socketRef.current,
+    getSocket,
   };
 }
 

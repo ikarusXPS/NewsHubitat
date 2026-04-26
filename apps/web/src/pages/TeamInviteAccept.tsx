@@ -4,7 +4,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Users, Loader2, CheckCircle, XCircle } from 'lucide-react';
+import { Loader2, CheckCircle, XCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -20,8 +20,10 @@ export function TeamInviteAccept() {
 
   useEffect(() => {
     if (!token) {
+      /* eslint-disable react-hooks/set-state-in-effect -- Initial validation on mount */
       setStatus('error');
       setError(t('errors.invalidInvite', 'Invalid invite link'));
+      /* eslint-enable react-hooks/set-state-in-effect */
       return;
     }
 

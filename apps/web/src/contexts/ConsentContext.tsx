@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
+/* eslint-disable react-refresh/only-export-components -- Context files export both Provider and hooks */
+import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
 
 const CONSENT_KEY = 'newshub-consent';
 

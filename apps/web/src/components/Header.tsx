@@ -9,7 +9,6 @@ import { FocusSelector } from './FocusSelector';
 import { FeedManagerButton } from './FeedManagerButton';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { TeamSwitcher } from './teams/TeamSwitcher';
-import { cn } from '../lib/utils';
 
 interface HeaderProps {
   onMenuClick?: () => void;

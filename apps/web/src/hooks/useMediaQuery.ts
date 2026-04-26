@@ -34,6 +34,7 @@ export function useMediaQuery(query: string): boolean {
     const mediaQueryList = window.matchMedia(query);
 
     // Set initial value (in case it changed between render and effect)
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Initial sync with external API
     setMatches(mediaQueryList.matches);
 
     // Handler for media query changes

@@ -59,6 +59,7 @@ export function getPoolStats(): { totalCount: number; idleCount: number; waiting
   try {
     // Attempt to access pool from adapter internals
     // PrismaPg uses @prisma/driver-adapter-utils which may expose pool
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const adapterAny = adapter as any;
 
     // Check common patterns for pool access

@@ -13,7 +13,7 @@ describe('useOAuthPopup', () => {
     close: ReturnType<typeof vi.fn>;
   };
   let messageHandler: ((event: MessageEvent) => void) | null = null;
-  let originalWindow: typeof window;
+  let _originalWindow: typeof window;
   let mockSetInterval: ReturnType<typeof vi.fn>;
   let mockClearInterval: ReturnType<typeof vi.fn>;
 
@@ -21,7 +21,7 @@ describe('useOAuthPopup', () => {
     vi.useFakeTimers();
 
     // Store original window
-    originalWindow = window;
+    _originalWindow = window;
 
     // Create mock popup
     mockPopup = {

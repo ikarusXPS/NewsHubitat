@@ -11,18 +11,19 @@
  *
  * Reference: D-06 (X-API-Key), D-15 (rate limits), D-13 (IETF headers)
  */
+/* eslint-disable react-hooks/rules-of-hooks */
 import { test as base, expect } from '@playwright/test';
 
 // Extend base test to add API request context
 const test = base.extend<{
-  apiContext: ReturnType<typeof base.request.newContext> extends Promise<infer T> ? T : never;
+  apiRequestContext: ReturnType<typeof base.request.newContext> extends Promise<infer T> ? T : never;
 }>({
-  apiContext: async ({ playwright }, use) => {
-    const apiContext = await playwright.request.newContext({
+  apiRequestContext: async ({ playwright }, use) => {
+    const context = await playwright.request.newContext({
       baseURL: 'http://localhost:3001',
     });
-    await use(apiContext);
-    await apiContext.dispose();
+    await use(context);
+    await context.dispose();
   },
 });
 

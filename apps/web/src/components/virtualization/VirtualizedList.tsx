@@ -52,27 +52,26 @@ export function VirtualizedList({
       return;
     }
 
-    let newIndex: number | null = null;
-
     switch (e.key) {
-      case 'ArrowDown':
+      case 'ArrowDown': {
         e.preventDefault();
         // Start at first item when no selection exists
-        newIndex = focusedIndex === null ? 0 : Math.min(focusedIndex + 1, articles.length - 1);
-        break;
-      case 'ArrowUp':
+        const downIndex = focusedIndex === null ? 0 : Math.min(focusedIndex + 1, articles.length - 1);
+        setFocusedIndex(downIndex);
+        virtualizer.scrollToIndex(downIndex, { align: 'auto' });
+        return;
+      }
+      case 'ArrowUp': {
         e.preventDefault();
         // Do nothing if no selection
         if (focusedIndex === null) return;
-        newIndex = Math.max(focusedIndex - 1, 0);
-        break;
+        const upIndex = Math.max(focusedIndex - 1, 0);
+        setFocusedIndex(upIndex);
+        virtualizer.scrollToIndex(upIndex, { align: 'auto' });
+        return;
+      }
       default:
         return;
-    }
-
-    if (newIndex !== null && newIndex >= 0) {
-      setFocusedIndex(newIndex);
-      virtualizer.scrollToIndex(newIndex, { align: 'auto' });
     }
   }, [focusedIndex, articles.length, virtualizer]);
 
