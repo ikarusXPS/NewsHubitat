@@ -34,7 +34,7 @@ Developers can access NewsHub data via public API with code sharing infrastructu
 ### Developer Portal
 - **D-09:** Create dedicated `/developers` page with docs, examples, and key management
 - **D-10:** Maximum 3 API keys per user (dev/staging/prod pattern)
-- **D-11:** Dashboard shows: list of API keys, creation date, last used timestamp, request count this month
+- **D-11:** Dashboard shows: list of API keys, creation date, last used timestamp, request count (cumulative total, not monthly — simplified per user clarification 2026-04-26)
 
 ### Rate Limit Enforcement
 - **D-12:** Store tier on ApiKey model (`tier: 'free' | 'pro'`). Lookup from Redis-cached key metadata.
