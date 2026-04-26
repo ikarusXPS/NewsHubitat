@@ -186,6 +186,12 @@ Plans:
   5. 95th percentile database query time under 50ms
 **Plans**: 4 plans
 
+Plans:
+- [ ] 34-01-PLAN.md — N+1 detection middleware and EXPLAIN ANALYZE audit (DB-01, DB-03)
+- [ ] 34-02-PLAN.md — Pool metrics exposure to Prometheus (DB-04)
+- [ ] 34-03-PLAN.md — Composite and partial indexes based on audit findings (DB-02)
+- [ ] 34-04-PLAN.md — Grafana dashboard update and phase validation
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -285,4 +291,4 @@ v1.8 Advanced          -> Demand-driven expansion
 
 ---
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-26 — Phase 33 planned (Caching Improvements, 3 plans)*
+*Last updated: 2026-04-26 — Phase 34 planned (Database Optimization, 4 plans)*
