@@ -1,56 +1,49 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.5
-milestone_name: Performance Optimization
+milestone: v1.6
+milestone_name: Infrastructure & Scale
 current_plan: —
-status: milestone_complete
-last_updated: "2026-04-26T03:00:00Z"
-last_activity: 2026-04-26 — Milestone v1.5 complete (Phase 34 Database Optimization)
+status: defining_requirements
+last_updated: "2026-04-26T12:00:00Z"
+last_activity: 2026-04-26 — Milestone v1.6 started
 progress:
-  total_phases: 6
-  completed_phases: 6
-  total_plans: 21
-  completed_plans: 21
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # State: NewsHub
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-25)
+See: .planning/PROJECT.md (updated 2026-04-26)
 
 **Core value:** Users can see how the same story is covered by different regional perspectives
-**Current focus:** v1.5 Performance Optimization
+**Current focus:** v1.6 Infrastructure & Scale
 
 ## Current Position
 
-Phase: — (milestone complete)
+Phase: Not started (defining requirements)
 Current Plan: —
-Status: Milestone v1.5 complete (6/6 phases, 21/21 plans)
-Last activity: 2026-04-26 — Phase 34 Database Optimization complete
+Status: Defining requirements
+Last activity: 2026-04-26 — Milestone v1.6 started
 
 ```
-v1.5 Progress: [████████████████████] 100% (6 phases, 6 complete) 🎉
+v1.6 Progress: [░░░░░░░░░░░░░░░░░░░░] 0% (0 phases, 0 complete)
 ```
 
 ## Milestone Progress
 
-**Milestone:** v1.5 - Performance Optimization
-**Goal:** Comprehensive performance improvements across API, database, frontend, and caching layers
-**Status:** Ready to execute Phase 29
-**Previous:** v1.4 complete 2026-04-25
+**Milestone:** v1.6 - Infrastructure & Scale
+**Goal:** Comprehensive expansion across infrastructure, AI, mobile, monetization, and content
+**Status:** Defining requirements
+**Previous:** v1.5 complete 2026-04-26
 
 ### Phase Summary
 
-| Phase | Name | Requirements | Status |
-|-------|------|--------------|--------|
-| 29 | Measurement Foundation | MEAS-01, MEAS-02, MEAS-03 | Complete (3 plans) |
-| 30 | Frontend Code Splitting | FRON-01, FRON-03, FRON-04 | Complete (4 plans) |
-| 31 | Virtual Scrolling | FRON-02 | Complete (3 plans) |
-| 32 | Image Pipeline | IMG-01, IMG-02, IMG-03 | Complete (4 plans) |
-| 33 | Caching Improvements | CACHE-01, CACHE-02, CACHE-03 | Complete (3 plans) |
-| 34 | Database Optimization | DB-01, DB-02, DB-03, DB-04 | Complete (4 plans) |
+(Phases will be defined after roadmap creation)
 
 ## Deferred Items
 

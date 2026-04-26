@@ -8,19 +8,19 @@ A multi-perspective global news analysis platform that aggregates news from 130 
 
 Users can see how the same story is covered by different regional perspectives — Western, Middle East, Turkish, Russian, Chinese, and alternative media — enabling informed analysis beyond single-source narratives.
 
-## Current State (v1.0 shipped)
+## Current State (v1.5 shipped)
 
-**Shipped:** 2026-04-20
-**Codebase:** ~17,000 lines TypeScript across 79 files
-**Tech stack:** React 19, Express 5, SQLite/Prisma, Zustand, TanStack Query
+**Shipped:** 2026-04-26
+**Codebase:** ~25,000 lines TypeScript
+**Tech stack:** React 19, Express 5, PostgreSQL/Prisma, Redis, Zustand, TanStack Query
 
 **What's Working:**
+- Multi-perspective news from 130 sources across 13 regions
 - AI Q&A with citations and coverage gap detection
-- Bilingual historical events database (111 events, 1914-2025)
-- Email verification and password reset with secure tokens
-- Reading history with gamification (10 badge types, 4 tiers)
-- Personalized "For You" carousel based on reading patterns
-- Account management: data export, deletion with grace period
+- i18n (DE/EN/FR/ES/IT), OAuth (Google/GitHub), Teams, Comments
+- Performance optimized: code splitting, virtual scroll, image pipeline
+- Production-ready: Docker, CI/CD, Prometheus/Grafana, Sentry
+- 10k concurrent users validated (k6)
 
 ## Requirements
 
@@ -61,55 +61,41 @@ Users can see how the same story is covered by different regional perspectives �
 
 ### Active
 
-<!-- v1.1: Quality & Testing -->
+<!-- v1.6: Infrastructure & Scale -->
 
-- [ ] Unit test coverage 80%+ across backend services, frontend hooks, utilities
-- [ ] E2E tests for critical user flows (auth, bookmarks, reading history, personalization)
-- [ ] Fix B7: Article thumbnail fallback system
-- [ ] Code quality improvements (linting, type coverage, dead code cleanup)
+(See REQUIREMENTS.md for detailed requirements)
 
 ### Out of Scope
 
-<!-- Deferred to future milestones -->
+<!-- Explicit exclusions -->
 
-- PostgreSQL migration — Future (performance optimization)
-- Redis caching — Future (performance optimization)
-- Service Worker offline — Future (performance optimization)
-- OAuth integration (Google, GitHub) — Future (advanced features)
-- Load testing (10k concurrent users) — Future (QA milestone)
-- CI/CD pipeline — Future (deployment milestone)
-- Docker containerization — Future (deployment milestone)
-- Sentry error tracking — Future (deployment milestone)
-- i18n multi-language UI — Future (advanced features)
-- Team collaboration features — Future (advanced features)
-- Premium export features — Future (advanced features)
-- Mobile native app — Web-first approach, PWA sufficient
 - Real-time chat — Not core to news analysis value
-- Video content — Storage/bandwidth costs, text focus
-- Paid subscriptions — Monetization deferred post-validation
+- User-generated articles — Focus on aggregation, not content creation
+- Blockchain/Web3 — No clear value for news analysis
 
 ## Context
 
 **Architecture:**
 - Layered monolith: React SPA + Express REST API
-- SQLite via Prisma ORM with in-memory caching
+- PostgreSQL via Prisma ORM with Redis caching
 - Multi-provider AI fallback chain (OpenRouter → Gemini → Anthropic)
 - Socket.IO for real-time updates
-- 130 news sources configured in `server/config/sources.ts`
-
-**Known Issues:**
-- B7: Article thumbnail fallback system missing (deferred)
+- Docker Compose deployment with health checks
+- CI/CD via GitHub Actions
+- Monitoring: Prometheus + Grafana + Sentry
 
 **Testing Status:**
-- Phase 03 auth flows: Code complete, needs SMTP for production testing
-- Phase 06 UAT: Needs live RSS feeds for full validation
+- 1051+ unit tests, 91.65% coverage
+- 62+ E2E tests
+- 10k concurrent users validated (k6)
 
 ## Constraints
 
-- **Tech Stack**: React 19, Express 5, TypeScript, SQLite (fixed for v1.x)
+- **Tech Stack**: React 19, Express 5, TypeScript, PostgreSQL, Redis
 - **AI Providers**: Must work with OpenRouter, Gemini, or Anthropic API keys
 - **Performance**: Frontend Lighthouse score 90+ target
 - **Browser**: Chrome, Firefox, Safari (latest 2 versions)
+- **Mobile**: iOS 15+, Android 10+ for native apps
 
 ## Key Decisions
 
@@ -134,37 +120,44 @@ This document evolves at phase transitions and milestone boundaries.
 - Core Value confirmed: multi-perspective comparison is the differentiator
 - Gamification and personalization added as key engagement features
 
-## Current Milestone: v1.5 Performance Optimization
+## Current Milestone: v1.6 Infrastructure & Scale
 
-**Goal:** Comprehensive performance improvements across API, database, frontend, and caching layers
+**Goal:** Comprehensive expansion across infrastructure, AI capabilities, mobile platforms, monetization, and content.
 
 **Target features:**
 
-**Caching:**
-- API response caching in Redis with smart invalidation
-- Query result caching for expensive operations (clusters, analytics)
-- CDN integration for static assets (JS/CSS/images)
+**Infrastructure & Scale:**
+- Docker Swarm/Compose with replicas for horizontal scaling
+- Multi-region architecture preparation (single region first)
 
-**Database:**
-- Query analysis with EXPLAIN ANALYZE
-- Add missing indexes for slow queries
-- Fix N+1 query patterns
+**Advanced AI Features:**
+- Source credibility scoring (reliability per source)
+- Bias detection (political/framing analysis)
+- Fact-checking (claim verification)
 
-**Frontend:**
-- Route-based bundle splitting (reduce initial JS)
-- Image optimization (next-gen formats, lazy loading, srcset)
-- Virtual scrolling for long news lists
+**Mobile Experience:**
+- Enhanced PWA (push notifications, better offline)
+- React Native cross-platform app
+- Capacitor wrapper for app stores
 
-**Baseline (2026-04-25):**
-- Unit tests: 1051+ passing, 91.65% coverage
-- E2E tests: 62+ passing
-- Database: PostgreSQL (Docker)
-- Caching: Redis (JWT blacklist, rate limits, AI cache)
-- Deployment: Docker Compose with CI/CD
-- Monitoring: Prometheus + Grafana + Sentry
-- 10k concurrent users validated (k6)
+**Monetization:**
+- Freemium model (free tier + premium features)
+- Developer API (news data and analysis access)
+
+**Content Expansion:**
+- More news sources beyond 130
+- New content types (video, podcasts, social)
+- Source quality improvements (metadata, verification)
 
 ## Completed Milestones
+
+### v1.5 Performance Optimization (2026-04-26)
+- Measurement Foundation (metrics, query logging, Lighthouse CI)
+- Frontend Code Splitting (lazy loading, prefetch)
+- Virtual Scrolling for long lists
+- Image Pipeline (Cloudinary, AVIF/WebP)
+- Caching Improvements (ETags, TTL jitter)
+- Database Optimization (N+1 detection, indexes, pool metrics)
 
 ### v1.4 User & Community Features (2026-04-25)
 - i18n Foundation (DE/EN/FR/ES/IT)
@@ -198,4 +191,4 @@ This document evolves at phase transitions and milestone boundaries.
 - Gamification and personalization
 
 ---
-*Last updated: 2026-04-25 after v1.5 milestone started*
+*Last updated: 2026-04-26 after v1.6 milestone started*
