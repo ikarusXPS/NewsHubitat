@@ -127,7 +127,7 @@ n**Plans:**
 **Plans**: 5 plans
 **Plans:**
 - [x] 36-01-PLAN.md — Schema & service foundation (subscription models, SubscriptionService, Stripe config)
-- [ ] 36-02-PLAN.md — Stripe checkout & webhooks (checkout sessions, idempotent webhook handlers)
+- [x] 36-02-PLAN.md — Stripe checkout & webhooks (checkout sessions, idempotent webhook handlers)
 - [ ] 36-03-PLAN.md — Feature gating middleware (requireTier, AI rate limit bypass, history/export)
 - [ ] 36-04-PLAN.md — Pricing page & UI components (TierCard, SubscriptionBadge, i18n)
 - [ ] 36-05-PLAN.md — Integration testing & human verification (unit tests, E2E, Stripe flow verification)

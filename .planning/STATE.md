@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Infrastructure & Scale
-current_plan: 36-01
+current_plan: 36-02
 status: In progress
-last_updated: "2026-04-26T15:46:00Z"
-last_activity: 2026-04-26 — Phase 36 Plan 01 complete (subscription schema + service)
+last_updated: "2026-04-26T15:57:31Z"
+last_activity: 2026-04-26 — Phase 36 Plan 02 complete (webhook handlers + subscription API)
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 10
-  completed_plans: 6
-  percent: 60
+  completed_plans: 7
+  percent: 70
 ---
 
 # State: NewsHub
@@ -26,12 +26,12 @@ See: .planning/PROJECT.md (updated 2026-04-26)
 ## Current Position
 
 Phase: 36 - Monetization Core
-Current Plan: 36-01 (complete)
+Current Plan: 36-02 (complete)
 Status: In progress
-Last activity: 2026-04-26 — Phase 36 Plan 01 complete
+Last activity: 2026-04-26 — Phase 36 Plan 02 complete
 
 ```
-v1.6 Progress: [████████████--------] 60% (6 phases, 1 complete, 6/10 plans done)
+v1.6 Progress: [██████████████------] 70% (6 phases, 1 complete, 7/10 plans done)
 ```
 
 ## Milestone Progress
@@ -46,7 +46,7 @@ v1.6 Progress: [████████████--------] 60% (6 phases, 1 c
 | Phase | Name | Requirements | UI | Status |
 |-------|------|--------------|-----|--------|
 | 35 | Infrastructure Foundation | 4 reqs (INFRA-01 partial, PAY-08, PAY-09, PAY-10) | No | **Complete** (5/5 plans) |
-| 36 | Monetization Core | 7 reqs (PAY-01 to PAY-07) | Yes | **In Progress** (1/5 plans) |
+| 36 | Monetization Core | 7 reqs (PAY-01 to PAY-07) | Yes | **In Progress** (2/5 plans) |
 | 37 | Horizontal Scaling | 5 reqs (INFRA-01 to INFRA-05) | No | Not started |
 | 38 | Advanced AI Features | 7 reqs (AI-01 to AI-07) | Yes | Not started |
 | 39 | Mobile Apps | 8 reqs (MOB-01 to MOB-08) | Yes | Not started |
@@ -74,8 +74,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Phase 36 Plan 01 complete (subscription schema + service)
-**Next step:** Continue with Phase 36 Plan 02 (webhook handlers)
+**Last action:** Phase 36 Plan 02 complete (webhook handlers + subscription API)
+**Next step:** Continue with Phase 36 Plan 03 (feature gating middleware)
 **Resume file:** None
 **Checkpoint:** None
 
@@ -257,6 +257,10 @@ v1.6 Architecture Decisions (from research):
 | FREE tier: 7-day history limit | Phase 36-01 | Per CONTEXT.md Feature Gating table |
 | 5-min subscription cache TTL | Phase 36-01 | CACHE_TTL.MEDIUM for subscription status |
 | Graceful Stripe degradation | Phase 36-01 | Service unavailable when STRIPE_SECRET_KEY not set |
+| Webhook route before express.json() | Phase 36-02 | Raw body required for HMAC signature verification |
+| 24h webhook idempotency TTL (Stripe) | Phase 36-02 | Redis+DB dual storage per CONTEXT.md |
+| Return 200 on processing errors | Phase 36-02 | Prevent Stripe retries; idempotency already recorded |
+| Price ID whitelist validation | Phase 36-02 | T-36-06 mitigation prevents arbitrary price injection |
 
 ## Reports
 
@@ -266,4 +270,4 @@ v1.6 Architecture Decisions (from research):
 
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-26 — Phase 36 Plan 01 complete (subscription schema + service)*
+*Last updated: 2026-04-26 — Phase 36 Plan 02 complete (webhook handlers + subscription API)*
