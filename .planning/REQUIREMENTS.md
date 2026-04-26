@@ -1,54 +1,63 @@
 # Requirements: NewsHub
 
-**Defined:** 2026-04-23
+**Defined:** 2026-04-26
 **Core Value:** Users can see how the same story is covered by different regional perspectives
 
-## v1.5 Requirements
+## v1.6 Requirements
 
-Requirements for Performance Optimization milestone. Each maps to roadmap phases.
+Requirements for Infrastructure & Scale milestone. Each maps to roadmap phases.
 
-### Measurement Foundation
+### Infrastructure & Scaling
 
-- [x] **MEAS-01**: Bundle analysis tooling configured with rollup-plugin-visualizer
-- [x] **MEAS-02**: Prisma query logging enabled to expose N+1 patterns and slow queries
-- [x] **MEAS-03**: Lighthouse CI baseline established with LCP, INP, CLS metrics
+- [ ] **INFRA-01**: System can horizontally scale to N replicas via Docker Swarm
+- [ ] **INFRA-02**: Load balancer (Traefik) distributes traffic across replicas with health checks
+- [ ] **INFRA-03**: Connection pooling (PgBouncer) handles 100+ concurrent database connections
+- [ ] **INFRA-04**: WebSocket connections maintain sticky sessions across replicas
+- [ ] **INFRA-05**: Architecture supports future multi-region deployment (documented patterns)
 
-### Frontend Optimization
+### Advanced AI Features
 
-- [x] **FRON-01**: Route-based code splitting implemented for Dashboard, Analysis, Monitor, Timeline, EventMap pages
-- [x] **FRON-02**: Virtual scrolling implemented for NewsFeed with @tanstack/react-virtual
-- [x] **FRON-03**: Lazy image loading enabled for article thumbnails (native loading="lazy")
-- [x] **FRON-04**: Initial JS bundle reduced to < 250KB (from ~800KB estimated)
+- [ ] **AI-01**: User can see source credibility score (0-100) on each news source
+- [ ] **AI-02**: Credibility score reflects multiple dimensions (accuracy, transparency, corrections)
+- [ ] **AI-03**: User can see political bias indicator (left/center/right) per source
+- [ ] **AI-04**: User can see framing analysis comparing how sources cover same topic
+- [ ] **AI-05**: User can request fact-check on specific claims in articles
+- [ ] **AI-06**: Fact-check results include confidence level and source citations
+- [ ] **AI-07**: AI analysis results are cached to minimize inference costs
 
-### Image Pipeline
+### Mobile Experience
 
-- [ ] **IMG-01**: WebP/AVIF format conversion implemented via Sharp
-- [ ] **IMG-02**: Responsive srcset configured for article thumbnails (320w, 640w, 960w, 1280w)
-- [ ] **IMG-03**: Image optimization integrated with existing Cloudinary fetch mode
+- [ ] **MOB-01**: User can install app from iOS App Store via Capacitor wrapper
+- [ ] **MOB-02**: User can install app from Google Play Store via Capacitor wrapper
+- [ ] **MOB-03**: User receives push notifications for breaking news
+- [ ] **MOB-04**: User receives personalized alerts based on reading patterns
+- [ ] **MOB-05**: User can authenticate via biometric (Face ID/Touch ID/fingerprint)
+- [ ] **MOB-06**: App works offline with cached articles (read-only)
+- [ ] **MOB-07**: React Native app provides native performance for core screens
+- [ ] **MOB-08**: Mobile apps share 60%+ business logic with web
 
-### Caching
+### Monetization
 
-- [ ] **CACHE-01**: Smart cache invalidation implemented with WebSocket event hooks
-- [ ] **CACHE-02**: HTTP cache headers optimized (Cache-Control, ETag) for static assets
-- [ ] **CACHE-03**: Jitter-based TTL implemented in CacheService to prevent thundering herd
+- [ ] **PAY-01**: User can subscribe to Free tier (limited features)
+- [ ] **PAY-02**: User can subscribe to Premium tier ($9/month via Stripe)
+- [ ] **PAY-03**: User can subscribe to Enterprise tier (custom pricing)
+- [ ] **PAY-04**: Premium users get ad-free experience
+- [ ] **PAY-05**: Premium users get unlimited AI queries
+- [ ] **PAY-06**: Premium users get full reading history (no limit)
+- [ ] **PAY-07**: Premium users can export data in multiple formats
+- [ ] **PAY-08**: Developer can register for API key via self-service portal
+- [ ] **PAY-09**: Developer API has tiered rate limits (Free: 10/min, Pro: 100/min)
+- [ ] **PAY-10**: Developer API includes OpenAPI/Swagger documentation
 
-### Database
+### Content Expansion
 
-- [ ] **DB-01**: EXPLAIN ANALYZE audit completed for all major query patterns
-- [ ] **DB-02**: Composite indexes added for identified slow queries
-- [ ] **DB-03**: N+1 query patterns identified and fixed in Prisma queries
-- [ ] **DB-04**: Connection pool tuned based on workload analysis
-
-## Performance Targets
-
-| Metric | Current | Target | Validation |
-|--------|---------|--------|------------|
-| LCP (Largest Contentful Paint) | TBD | < 2.0s | Lighthouse |
-| INP (Interaction to Next Paint) | TBD | < 150ms | Chrome DevTools |
-| CLS (Cumulative Layout Shift) | TBD | < 0.05 | Lighthouse |
-| Initial JS Bundle | ~800KB | < 250KB | rollup-plugin-visualizer |
-| API Cache Hit Ratio | TBD | > 90% | Redis INFO stats |
-| Database Query P95 | TBD | < 50ms | Prisma logging |
+- [ ] **CONT-01**: System aggregates from 200+ news sources (up from 130)
+- [ ] **CONT-02**: System supports new regions/languages for source expansion
+- [ ] **CONT-03**: User can browse podcast episodes related to news topics
+- [ ] **CONT-04**: Podcast episodes show transcription (premium feature)
+- [ ] **CONT-05**: User can view embedded video content (YouTube/Vimeo)
+- [ ] **CONT-06**: Video content includes auto-generated transcription (premium)
+- [ ] **CONT-07**: Content pipeline handles video/audio with minimal storage costs
 
 ## Traceability
 
@@ -56,68 +65,72 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| MEAS-01 | Phase 29 | Complete |
-| MEAS-02 | Phase 29 | Complete |
-| MEAS-03 | Phase 29 | Complete |
-| FRON-01 | Phase 30 | Complete |
-| FRON-02 | Phase 31 | Complete |
-| FRON-03 | Phase 30 | Complete |
-| FRON-04 | Phase 30 | Complete |
-| IMG-01 | Phase 32 | Pending |
-| IMG-02 | Phase 32 | Pending |
-| IMG-03 | Phase 32 | Pending |
-| CACHE-01 | Phase 33 | Pending |
-| CACHE-02 | Phase 33 | Pending |
-| CACHE-03 | Phase 33 | Pending |
-| DB-01 | Phase 34 | Pending |
-| DB-02 | Phase 34 | Pending |
-| DB-03 | Phase 34 | Pending |
-| DB-04 | Phase 34 | Pending |
+| INFRA-01 | TBD | Pending |
+| INFRA-02 | TBD | Pending |
+| INFRA-03 | TBD | Pending |
+| INFRA-04 | TBD | Pending |
+| INFRA-05 | TBD | Pending |
+| AI-01 | TBD | Pending |
+| AI-02 | TBD | Pending |
+| AI-03 | TBD | Pending |
+| AI-04 | TBD | Pending |
+| AI-05 | TBD | Pending |
+| AI-06 | TBD | Pending |
+| AI-07 | TBD | Pending |
+| MOB-01 | TBD | Pending |
+| MOB-02 | TBD | Pending |
+| MOB-03 | TBD | Pending |
+| MOB-04 | TBD | Pending |
+| MOB-05 | TBD | Pending |
+| MOB-06 | TBD | Pending |
+| MOB-07 | TBD | Pending |
+| MOB-08 | TBD | Pending |
+| PAY-01 | TBD | Pending |
+| PAY-02 | TBD | Pending |
+| PAY-03 | TBD | Pending |
+| PAY-04 | TBD | Pending |
+| PAY-05 | TBD | Pending |
+| PAY-06 | TBD | Pending |
+| PAY-07 | TBD | Pending |
+| PAY-08 | TBD | Pending |
+| PAY-09 | TBD | Pending |
+| PAY-10 | TBD | Pending |
+| CONT-01 | TBD | Pending |
+| CONT-02 | TBD | Pending |
+| CONT-03 | TBD | Pending |
+| CONT-04 | TBD | Pending |
+| CONT-05 | TBD | Pending |
+| CONT-06 | TBD | Pending |
+| CONT-07 | TBD | Pending |
 
 **Coverage:**
-- v1.5 requirements: 17 total
-- Mapped to phases: 17
-- Unmapped: 0 ✓
+- v1.6 requirements: 37 total
+- Mapped to phases: 0 (pending roadmap)
+- Unmapped: 37
 
 ---
 
-## Future Requirements
+## Future Requirements (v1.7+)
 
-Planned for v1.6+ milestones. Requirements defined, phases TBD during milestone planning.
+### Advanced Infrastructure
+- **INFRA-F01**: Active-active multi-region deployment
+- **INFRA-F02**: Kubernetes migration for cloud-native scaling
+- **INFRA-F03**: Edge caching with CDN for global latency
 
-### v1.6 Infrastructure & Scale
+### Advanced AI
+- **AI-F01**: Article-level bias detection (vs source-level)
+- **AI-F02**: Real-time propaganda detection
+- **AI-F03**: AI-generated summaries of topic clusters
 
-**Goal:** CDN integration and infrastructure scaling
+### Advanced Mobile
+- **MOB-F01**: Apple Watch / Wear OS companion apps
+- **MOB-F02**: Widgets for home screen news updates
+- **MOB-F03**: Deep linking for shared articles
 
-- [ ] **INFRA-01**: CDN integration for static assets (Cloudflare/Vercel Edge)
-- [ ] **INFRA-02**: Predictive prefetch for likely-next routes
-- [ ] **INFRA-03**: PgBouncer transaction pooling (if connection metrics warrant)
-- [ ] **SCALE-01**: Kubernetes Deployment mit Helm Charts
-- [ ] **SCALE-02**: Horizontal Pod Autoscaling basierend auf CPU/Memory
-- [ ] **SCALE-03**: Multi-Region Deployment (EU, US)
-- [ ] **SCALE-04**: Database Read Replicas für Geo-Routing
-- [ ] **LOG-01**: Zentrales Log Aggregation (Loki oder ELK)
-- [ ] **LOG-02**: Structured Logging mit Correlation IDs
-
-### v1.7 Growth & Monetization
-
-**Goal:** Enable data-driven decisions and generate revenue
-
-- [ ] **AB-01**: A/B Testing Framework integriert
-- [ ] **AB-02**: Feature Flags für graduelle Rollouts
-- [ ] **ANALYTICS-01**: User Behavior Analytics Dashboard
-- [ ] **PAID-01**: Subscription Tiers (Free, Pro, Team)
-- [ ] **PAID-02**: Stripe Payment Integration
-- [ ] **PAID-03**: Premium Export Features (PDF, Excel)
-
-### v1.8 Advanced Features (Demand-Driven)
-
-**Goal:** Expand capabilities based on validated user demand
-
-- [ ] **NATIVE-01**: iOS/Android App (React Native)
-- [ ] **NATIVE-02**: Push Notifications für Breaking News
-- [ ] **VIDEO-01**: Video Content Integration
-- [ ] **CHAT-01**: Real-time Chat für Teams
+### Enterprise Features
+- **ENT-01**: A/B Testing Framework
+- **ENT-02**: Feature Flags for gradual rollouts
+- **ENT-03**: Enterprise SSO (SAML/SCIM)
 
 ## Out of Scope
 
@@ -125,17 +138,49 @@ Explicitly excluded. Documented to prevent scope creep.
 
 | Feature | Reason |
 |---------|--------|
-| Custom Service Worker strategies | VitePWA defaults sufficient for NewsHub |
-| Client-side heavy computation | AI/clustering stays server-side per architecture |
-| Infinite scroll without virtual scrolling | Anti-pattern, causes DOM bloat |
-| Over-aggressive caching (>24h TTL) | News freshness critical, contradicts "LIVE" badge |
-| Manual lazy loading (Intersection Observer) | Native loading="lazy" sufficient for 96% cases |
-| Increasing PostgreSQL max_connections | Use pooling instead per best practices |
+| Real-time chat | Not core to news analysis value |
+| User-generated articles | Focus on aggregation, not content creation |
+| Blockchain/Web3 | No clear value for news analysis |
+| Self-hosted video | Storage/bandwidth costs prohibitive (embed-first) |
+| Unlimited free tier | Kills conversion, unsustainable |
+| RTL Language Support | Significant layout work, defer to future |
 | Apple Sign-In | Defer to future OAuth expansion |
-| RTL Language Support (Arabic, Hebrew) | Significant layout work, defer to v1.6+ |
-| Enterprise SSO (SAML/SCIM) | Defer to enterprise tier |
 
 ---
+
+## Archived: v1.5 Requirements (Complete)
+
+<details>
+<summary>v1.5 Performance Optimization — 17 requirements (all complete)</summary>
+
+### Measurement Foundation
+- [x] MEAS-01: Bundle analysis tooling configured with rollup-plugin-visualizer
+- [x] MEAS-02: Prisma query logging enabled to expose N+1 patterns and slow queries
+- [x] MEAS-03: Lighthouse CI baseline established with LCP, INP, CLS metrics
+
+### Frontend Optimization
+- [x] FRON-01: Route-based code splitting implemented for Dashboard, Analysis, Monitor, Timeline, EventMap pages
+- [x] FRON-02: Virtual scrolling implemented for NewsFeed with @tanstack/react-virtual
+- [x] FRON-03: Lazy image loading enabled for article thumbnails (native loading="lazy")
+- [x] FRON-04: Initial JS bundle reduced to < 250KB (from ~800KB estimated)
+
+### Image Pipeline
+- [x] IMG-01: WebP/AVIF format conversion implemented via Cloudinary
+- [x] IMG-02: Responsive srcset configured for article thumbnails (320w, 640w, 960w, 1280w)
+- [x] IMG-03: Image optimization integrated with existing Cloudinary fetch mode
+
+### Caching
+- [x] CACHE-01: Smart cache invalidation implemented with WebSocket event hooks
+- [x] CACHE-02: HTTP cache headers optimized (Cache-Control, ETag) for static assets
+- [x] CACHE-03: Jitter-based TTL implemented in CacheService to prevent thundering herd
+
+### Database
+- [x] DB-01: EXPLAIN ANALYZE audit completed for all major query patterns
+- [x] DB-02: Composite indexes added for identified slow queries
+- [x] DB-03: N+1 query patterns identified and fixed in Prisma queries
+- [x] DB-04: Connection pool tuned based on workload analysis
+
+</details>
 
 ## Archived: v1.4 Requirements (Complete)
 
@@ -177,7 +222,7 @@ Explicitly excluded. Documented to prevent scope creep.
 ## Archived: v1.3 Requirements (Complete)
 
 <details>
-<summary>v1.3 Production Ready — 19 requirements</summary>
+<summary>v1.3 Production Ready — 19 requirements (all complete)</summary>
 
 ### CI/CD Pipeline
 - [x] CICD-01: Build und Tests laufen automatisch bei Pull Requests
@@ -237,4 +282,4 @@ Explicitly excluded. Documented to prevent scope creep.
 
 ---
 *Requirements defined: 2026-04-23*
-*Last updated: 2026-04-25 — v1.5 requirements defined (17 total)*
+*Last updated: 2026-04-26 — v1.6 requirements defined (37 total)*
