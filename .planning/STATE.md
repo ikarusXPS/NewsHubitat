@@ -3,11 +3,11 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Infrastructure & Scale
 current_plan: —
-status: defining_requirements
-last_updated: "2026-04-26T12:00:00Z"
-last_activity: 2026-04-26 — Milestone v1.6 started
+status: roadmap_ready
+last_updated: "2026-04-26T12:30:00Z"
+last_activity: 2026-04-26 — v1.6 roadmap created (Phases 35-40)
 progress:
-  total_phases: 0
+  total_phases: 6
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -25,25 +25,36 @@ See: .planning/PROJECT.md (updated 2026-04-26)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: Not started (roadmap ready)
 Current Plan: —
-Status: Defining requirements
-Last activity: 2026-04-26 — Milestone v1.6 started
+Status: Roadmap created, ready for phase planning
+Last activity: 2026-04-26 — v1.6 roadmap created (Phases 35-40)
 
 ```
-v1.6 Progress: [░░░░░░░░░░░░░░░░░░░░] 0% (0 phases, 0 complete)
+v1.6 Progress: [░░░░░░░░░░░░░░░░░░░░] 0% (6 phases, 0 complete)
 ```
 
 ## Milestone Progress
 
 **Milestone:** v1.6 - Infrastructure & Scale
 **Goal:** Comprehensive expansion across infrastructure, AI, mobile, monetization, and content
-**Status:** Defining requirements
+**Status:** Roadmap ready
 **Previous:** v1.5 complete 2026-04-26
 
 ### Phase Summary
 
-(Phases will be defined after roadmap creation)
+| Phase | Name | Requirements | UI | Status |
+|-------|------|--------------|-----|--------|
+| 35 | Infrastructure Foundation | 4 reqs (INFRA-01 partial, PAY-08, PAY-09, PAY-10) | No | Not started |
+| 36 | Monetization Core | 7 reqs (PAY-01 to PAY-07) | Yes | Not started |
+| 37 | Horizontal Scaling | 5 reqs (INFRA-01 to INFRA-05) | No | Not started |
+| 38 | Advanced AI Features | 7 reqs (AI-01 to AI-07) | Yes | Not started |
+| 39 | Mobile Apps | 8 reqs (MOB-01 to MOB-08) | Yes | Not started |
+| 40 | Content Expansion | 7 reqs (CONT-01 to CONT-07) | Yes | Not started |
+
+**Coverage:** 37/37 requirements mapped (100%)
+
+**Next step:** `/gsd-plan-phase 35`
 
 ## Deferred Items
 
@@ -63,8 +74,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Milestone v1.5 complete (Phase 34 Database Optimization)
-**Next step:** Start v1.6 Infrastructure & Scale milestone
+**Last action:** v1.6 roadmap created (Phases 35-40)
+**Next step:** Plan Phase 35 (Infrastructure Foundation)
 **Resume file:** —
 **Checkpoint:** —
 
@@ -90,6 +101,14 @@ v1.4 Stack Decisions (from research):
 - Responsive: Tailwind CSS v4 mobile-first utilities
 - Comments: Custom with Socket.io (existing WebSocket infrastructure)
 - Teams: Custom RBAC with CASL (owner/admin/member)
+
+v1.6 Architecture Decisions (from research):
+
+- **Monorepo:** pnpm workspaces for code sharing (web + mobile)
+- **Monetization:** Stripe v22.1.0 for subscription billing
+- **Scaling:** Docker Swarm + Traefik + PgBouncer (not Kubernetes yet)
+- **Mobile:** Capacitor first (95% code reuse), React Native optional
+- **Content:** Embed-first strategy (YouTube/Spotify), upload = Premium only
 
 ## Decisions
 
@@ -223,4 +242,4 @@ v1.4 Stack Decisions (from research):
 
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-26 — Milestone v1.5 complete (Phase 34 Database Optimization)*
+*Last updated: 2026-04-26 — v1.6 roadmap created (Phases 35-40)*

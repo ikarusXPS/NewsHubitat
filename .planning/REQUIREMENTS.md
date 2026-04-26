@@ -65,48 +65,48 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INFRA-01 | TBD | Pending |
-| INFRA-02 | TBD | Pending |
-| INFRA-03 | TBD | Pending |
-| INFRA-04 | TBD | Pending |
-| INFRA-05 | TBD | Pending |
-| AI-01 | TBD | Pending |
-| AI-02 | TBD | Pending |
-| AI-03 | TBD | Pending |
-| AI-04 | TBD | Pending |
-| AI-05 | TBD | Pending |
-| AI-06 | TBD | Pending |
-| AI-07 | TBD | Pending |
-| MOB-01 | TBD | Pending |
-| MOB-02 | TBD | Pending |
-| MOB-03 | TBD | Pending |
-| MOB-04 | TBD | Pending |
-| MOB-05 | TBD | Pending |
-| MOB-06 | TBD | Pending |
-| MOB-07 | TBD | Pending |
-| MOB-08 | TBD | Pending |
-| PAY-01 | TBD | Pending |
-| PAY-02 | TBD | Pending |
-| PAY-03 | TBD | Pending |
-| PAY-04 | TBD | Pending |
-| PAY-05 | TBD | Pending |
-| PAY-06 | TBD | Pending |
-| PAY-07 | TBD | Pending |
-| PAY-08 | TBD | Pending |
-| PAY-09 | TBD | Pending |
-| PAY-10 | TBD | Pending |
-| CONT-01 | TBD | Pending |
-| CONT-02 | TBD | Pending |
-| CONT-03 | TBD | Pending |
-| CONT-04 | TBD | Pending |
-| CONT-05 | TBD | Pending |
-| CONT-06 | TBD | Pending |
-| CONT-07 | TBD | Pending |
+| INFRA-01 | Phase 35, 37 | Pending |
+| INFRA-02 | Phase 37 | Pending |
+| INFRA-03 | Phase 37 | Pending |
+| INFRA-04 | Phase 37 | Pending |
+| INFRA-05 | Phase 37 | Pending |
+| AI-01 | Phase 38 | Pending |
+| AI-02 | Phase 38 | Pending |
+| AI-03 | Phase 38 | Pending |
+| AI-04 | Phase 38 | Pending |
+| AI-05 | Phase 38 | Pending |
+| AI-06 | Phase 38 | Pending |
+| AI-07 | Phase 38 | Pending |
+| MOB-01 | Phase 39 | Pending |
+| MOB-02 | Phase 39 | Pending |
+| MOB-03 | Phase 39 | Pending |
+| MOB-04 | Phase 39 | Pending |
+| MOB-05 | Phase 39 | Pending |
+| MOB-06 | Phase 39 | Pending |
+| MOB-07 | Phase 39 | Pending |
+| MOB-08 | Phase 39 | Pending |
+| PAY-01 | Phase 36 | Pending |
+| PAY-02 | Phase 36 | Pending |
+| PAY-03 | Phase 36 | Pending |
+| PAY-04 | Phase 36 | Pending |
+| PAY-05 | Phase 36 | Pending |
+| PAY-06 | Phase 36 | Pending |
+| PAY-07 | Phase 36 | Pending |
+| PAY-08 | Phase 35 | Pending |
+| PAY-09 | Phase 35 | Pending |
+| PAY-10 | Phase 35 | Pending |
+| CONT-01 | Phase 40 | Pending |
+| CONT-02 | Phase 40 | Pending |
+| CONT-03 | Phase 40 | Pending |
+| CONT-04 | Phase 40 | Pending |
+| CONT-05 | Phase 40 | Pending |
+| CONT-06 | Phase 40 | Pending |
+| CONT-07 | Phase 40 | Pending |
 
 **Coverage:**
 - v1.6 requirements: 37 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 37
+- Mapped to phases: 37 (100% coverage)
+- Unmapped: 0
 
 ---
 
@@ -282,4 +282,4 @@ Explicitly excluded. Documented to prevent scope creep.
 
 ---
 *Requirements defined: 2026-04-23*
-*Last updated: 2026-04-26 — v1.6 requirements defined (37 total)*
+*Last updated: 2026-04-26 — v1.6 roadmap created (37 requirements, 100% coverage)*
