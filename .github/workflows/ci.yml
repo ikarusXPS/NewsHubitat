@@ -18,17 +18,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: pnpm install --frozen-lockfile
 
       - name: Run linter
-        run: npm run lint
+        run: pnpm lint
 
   typecheck:
     name: Type Check
@@ -37,17 +42,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: pnpm install --frozen-lockfile
 
       - name: Run type check
-        run: npm run typecheck
+        run: pnpm typecheck
 
   test:
     name: Unit Tests
@@ -86,23 +96,28 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma client
-        run: npx prisma generate
+        run: pnpm --filter @newshub/web exec prisma generate
 
       - name: Push database schema
-        run: npx prisma db push
+        run: pnpm --filter @newshub/web exec prisma db push
 
       - name: Run unit tests with coverage
-        run: npm run test:coverage
+        run: pnpm test:coverage
 
   bundle-analysis:
     name: Bundle Analysis
@@ -112,20 +127,25 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma client
-        run: npx prisma generate
+        run: pnpm --filter @newshub/web exec prisma generate
 
       - name: Build with visualizer
-        run: npm run build
+        run: pnpm build
 
       # Bundle size warning (per D-16 - warn but don't block)
       - name: Check bundle size
@@ -136,7 +156,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
 
           # Find the main index chunk (not vendor chunks)
-          MAIN_CHUNK=$(find dist/assets -name "index-*.js" -type f | head -1)
+          MAIN_CHUNK=$(find apps/web/dist/assets -name "index-*.js" -type f | head -1)
           if [ -n "$MAIN_CHUNK" ]; then
             SIZE=$(stat --printf="%s" "$MAIN_CHUNK" 2>/dev/null || stat -f%z "$MAIN_CHUNK" 2>/dev/null)
             SIZE_KB=$((SIZE / 1024))
@@ -154,7 +174,7 @@ jobs:
           fi
 
           # Also report total JS size
-          TOTAL_JS=$(find dist/assets -name "*.js" -type f -exec stat --printf="%s\n" {} + 2>/dev/null | awk '{s+=$1}END{print s}' || find dist/assets -name "*.js" -type f -exec stat -f%z {} + 2>/dev/null | awk '{s+=$1}END{print s}')
+          TOTAL_JS=$(find apps/web/dist/assets -name "*.js" -type f -exec stat --printf="%s\n" {} + 2>/dev/null | awk '{s+=$1}END{print s}' || find apps/web/dist/assets -name "*.js" -type f -exec stat -f%z {} + 2>/dev/null | awk '{s+=$1}END{print s}')
           TOTAL_JS_KB=$((TOTAL_JS / 1024))
           echo "Total JS: ${TOTAL_JS_KB}KB" >> $GITHUB_STEP_SUMMARY
 
@@ -166,14 +186,14 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: bundle-stats
-          path: dist/stats.html
+          path: apps/web/dist/stats.html
           retention-days: 30
 
       - name: Report bundle size
         uses: preactjs/compressed-size-action@v2
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          pattern: './dist/**/*.{js,css}'
+          pattern: './apps/web/dist/**/*.{js,css}'
           compression: 'brotli'
 
   build:
@@ -184,20 +204,25 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma client
-        run: npx prisma generate
+        run: pnpm --filter @newshub/web exec prisma generate
 
       - name: Build with source map upload
-        run: npm run build
+        run: pnpm build
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
@@ -274,29 +299,34 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma client
-        run: npx prisma generate
+        run: pnpm --filter @newshub/web exec prisma generate
 
       - name: Push database schema
-        run: npx prisma db push
+        run: pnpm --filter @newshub/web exec prisma db push
 
       - name: Seed test data
-        run: npm run seed
+        run: pnpm seed
 
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
+        run: pnpm --filter @newshub/web exec playwright install --with-deps chromium
 
       - name: Run E2E tests
-        run: npx playwright test --reporter=html
+        run: pnpm --filter @newshub/web exec playwright test --reporter=html
         timeout-minutes: 30
         env:
           DEBUG: pw:api
@@ -306,7 +336,7 @@ jobs:
         if: always()
         with:
           name: playwright-report
-          path: playwright-report/
+          path: apps/web/playwright-report/
           retention-days: 7
 
   deploy-staging:
