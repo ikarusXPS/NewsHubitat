@@ -2,6 +2,12 @@
   "name": "newshub-monorepo",
   "version": "0.0.0",
   "private": true,
+  "pnpm": {
+    "overrides": {
+      "serialize-javascript": ">=7.0.5",
+      "@hono/node-server": ">=1.19.13"
+    }
+  },
   "scripts": {
     "dev": "pnpm --filter @newshub/web dev",
     "dev:frontend": "pnpm --filter @newshub/web dev:frontend",
@@ -24,6 +30,7 @@
     "validate:ci": "npx --yes action-validator .github/workflows/ci.yml"
   },
   "devDependencies": {
+    "dotenv": "^17.4.2",
     "typescript": "~6.0.3"
   },
   "dependencies": {
