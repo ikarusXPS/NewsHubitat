@@ -67,3 +67,30 @@ export const RATE_LIMITS = {
 } as const;
 
 export type RateLimitTier = keyof typeof RATE_LIMITS;
+
+/**
+ * Public API tier limits (D-15)
+ * Applied via API key middleware - separate from internal rate limits
+ */
+export const API_TIER_LIMITS = {
+  /**
+   * Free tier - 10 requests per minute
+   * For evaluation and low-volume use cases
+   */
+  free: {
+    windowMs: 60_000,  // 1 minute
+    max: 10,
+    description: 'Free tier: 10 requests per minute',
+  },
+  /**
+   * Pro tier - 100 requests per minute
+   * For production applications
+   */
+  pro: {
+    windowMs: 60_000,
+    max: 100,
+    description: 'Pro tier: 100 requests per minute',
+  },
+} as const;
+
+export type ApiTier = keyof typeof API_TIER_LIMITS;
