@@ -1,0 +1,65 @@
+{
+  "title": "Choose Your Plan",
+  "subtitle": "Unlock the full power of multi-perspective news analysis",
+  "monthly": "Monthly",
+  "annual": "Annual",
+  "perMonth": "/month",
+  "perYear": "/year",
+  "save2Months": "Save 2 months",
+  "mostPopular": "Most Popular",
+  "customPricing": "Custom",
+  "currentPlan": "Current Plan",
+  "subscribe": "Subscribe",
+  "loading": "Loading...",
+  "tiers": {
+    "free": {
+      "name": "Free",
+      "description": "Get started with essential news analysis features",
+      "cta": "Get Started"
+    },
+    "premium": {
+      "name": "Premium",
+      "description": "Unlimited access to all features and AI capabilities"
+    },
+    "enterprise": {
+      "name": "Enterprise",
+      "description": "Custom solutions for teams and organizations",
+      "cta": "Contact Sales"
+    }
+  },
+  "features": {
+    "aiQueries": "AI Analysis Queries",
+    "readingHistory": "Reading History",
+    "allRegions": "All 13 Regions",
+    "eventMapGlobe": "Event Map & Globe View",
+    "timeline": "Historical Timeline",
+    "bookmarks": "Unlimited Bookmarks",
+    "gamification": "Badges & Leaderboard",
+    "dataExport": "Data Export",
+    "comments": "Article Comments",
+    "aiPersonas": "AI Personas",
+    "realtimeUpdates": "Real-time Updates",
+    "customPresets": "Custom Focus Presets",
+    "teamCreation": "Team Workspaces",
+    "advancedFilters": "Advanced Filters",
+    "adFree": "Ad-free Experience",
+    "teamBilling": "Centralized Team Billing",
+    "enterpriseAnalytics": "Enterprise Analytics",
+    "prioritySupport": "Priority Support",
+    "sla": "99.9% SLA"
+  },
+  "badges": {
+    "secure": "Secure Payment",
+    "paymentMethods": "Visa, Mastercard, SEPA",
+    "moneyBack": "14-day Money-back Guarantee"
+  },
+  "success": {
+    "title": "Welcome to Premium!",
+    "message": "Your subscription is now active. Enjoy unlimited access to all features.",
+    "verifying": "Verifying your subscription...",
+    "error": "Something went wrong. Please contact support.",
+    "goHome": "Go to Dashboard",
+    "explore": "Start Exploring",
+    "redirect": "Redirecting to dashboard in 3 seconds..."
+  }
+}
