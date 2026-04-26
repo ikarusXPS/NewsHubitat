@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Infrastructure & Scale
-current_plan: 35-02
+current_plan: 35-03
 status: executing
-last_updated: "2026-04-26T08:46:40Z"
-last_activity: 2026-04-26 — Plan 35-01 complete (monorepo workspace setup)
+last_updated: "2026-04-26T08:59:11Z"
+last_activity: 2026-04-26 — Plan 35-02 complete (API key generation service)
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 5
-  completed_plans: 1
-  percent: 20
+  completed_plans: 2
+  percent: 40
 ---
 
 # State: NewsHub
@@ -26,12 +26,12 @@ See: .planning/PROJECT.md (updated 2026-04-26)
 ## Current Position
 
 Phase: 35 - Infrastructure Foundation (in progress)
-Current Plan: 35-02
+Current Plan: 35-03
 Status: Executing
-Last activity: 2026-04-26 — Plan 35-01 complete (monorepo workspace setup)
+Last activity: 2026-04-26 — Plan 35-02 complete (API key generation service)
 
 ```
-v1.6 Progress: [████░░░░░░░░░░░░░░░░] 20% (6 phases, 0 complete, 1/5 plans done)
+v1.6 Progress: [████████░░░░░░░░░░░░] 40% (6 phases, 0 complete, 2/5 plans done)
 ```
 
 ## Milestone Progress
@@ -45,7 +45,7 @@ v1.6 Progress: [████░░░░░░░░░░░░░░░░] 20
 
 | Phase | Name | Requirements | UI | Status |
 |-------|------|--------------|-----|--------|
-| 35 | Infrastructure Foundation | 4 reqs (INFRA-01 partial, PAY-08, PAY-09, PAY-10) | No | **In Progress** (1/5 plans) |
+| 35 | Infrastructure Foundation | 4 reqs (INFRA-01 partial, PAY-08, PAY-09, PAY-10) | No | **In Progress** (2/5 plans) |
 | 36 | Monetization Core | 7 reqs (PAY-01 to PAY-07) | Yes | Not started |
 | 37 | Horizontal Scaling | 5 reqs (INFRA-01 to INFRA-05) | No | Not started |
 | 38 | Advanced AI Features | 7 reqs (AI-01 to AI-07) | Yes | Not started |
@@ -74,9 +74,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Plan 35-01 complete (monorepo workspace setup)
-**Next step:** Execute Plan 35-02 (Public API endpoints)
-**Resume file:** .planning/phases/35-infrastructure-foundation/35-02-PLAN.md
+**Last action:** Plan 35-02 complete (API key generation service)
+**Next step:** Execute Plan 35-03 (Public API endpoints)
+**Resume file:** .planning/phases/35-infrastructure-foundation/35-03-PLAN.md
 **Checkpoint:** —
 
 ## Accumulated Context
@@ -236,6 +236,10 @@ v1.6 Architecture Decisions (from research):
 | pnpm workspaces apps/packages layout | Phase 35-01 D-01 | Standard monorepo structure for code sharing |
 | Source-only TypeScript exports | Phase 35-01 D-04 | No build step for packages; apps consume .ts directly |
 | tsconfig.base.json extends pattern | Phase 35-01 | Shared TypeScript config inherited by all packages |
+| API key format nh_{env}_{random}_{checksum} | Phase 35-02 D-06 | Stripe-inspired format for developer familiarity |
+| bcrypt factor 10 for API key hashing | Phase 35-02 | Consistent with password hashing pattern |
+| Max 3 keys per user | Phase 35-02 D-10 | Prevents rate limit bypass via key multiplication |
+| Checksum pre-validation | Phase 35-02 T-35-08 | SHA-256 checksum prevents invalid DB lookups |
 
 ## Reports
 
@@ -245,4 +249,4 @@ v1.6 Architecture Decisions (from research):
 
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-26 — Plan 35-01 complete (monorepo workspace setup)*
+*Last updated: 2026-04-26 — Plan 35-02 complete (API key generation service)*
