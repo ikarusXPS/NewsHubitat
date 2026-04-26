@@ -1,0 +1,111 @@
+{
+  "title": "Einstellungen",
+  "close": "Schliessen",
+  "account": {
+    "title": "Konto",
+    "notLoggedIn": "Nicht angemeldet",
+    "loginPrompt": "Melden Sie sich an, um Ihre Einstellungen zu synchronisieren und auf allen Geraten zu nutzen.",
+    "security": "Sicherheit",
+    "logout": "Abmelden",
+    "readingHistory": "Lesehistorie",
+    "articleCount": "{count, plural, =0 {Keine Artikel} one {# Artikel} other {# Artikel}}",
+    "deleteHistory": "Loschen",
+    "confirmDeleteHistory": "Mochten Sie Ihre gesamte Lesehistorie loschen?",
+    "historyDeleted": "Lesehistorie geloscht",
+    "exportData": "Daten exportieren",
+    "deleteAccount": "Konto loschen"
+  },
+  "profile": {
+    "title": "Profil bearbeiten",
+    "changeAvatar": "Avatar andern",
+    "changeName": "Namen andern",
+    "newName": "Neuer Name",
+    "confirmPassword": "Passwort bestatigen",
+    "nameUpdated": "Name aktualisiert",
+    "updateFailed": "Fehler beim Aktualisieren",
+    "avatarUpdated": "Avatar aktualisiert"
+  },
+  "reading": {
+    "title": "Lesen & Personalisierung",
+    "personalization": "Personalisierte Empfehlungen",
+    "personalizationDesc": "'Fur Dich'-Vorschlage basierend auf Leseverlauf",
+    "pauseTracking": "Verlaufsverfolgung pausieren",
+    "pauseTrackingDesc": "Leseaktivitat wird nicht aufgezeichnet"
+  },
+  "appearance": {
+    "title": "Erscheinungsbild",
+    "darkMode": "Dark Mode",
+    "lightMode": "Light Mode"
+  },
+  "sorting": {
+    "title": "Sortierung",
+    "sortBy": "Sortieren nach",
+    "date": "Datum",
+    "relevance": "Relevanz",
+    "order": "Reihenfolge",
+    "newestFirst": "Neueste zuerst",
+    "oldestFirst": "Alteste zuerst"
+  },
+  "perspectives": {
+    "title": "Standard-Perspektiven",
+    "description": "Wahlen Sie die Perspektiven, die beim Start automatisch geladen werden",
+    "count": "{count, plural, one {# Perspektive} other {# Perspektiven}}"
+  },
+  "presets": {
+    "title": "Filter-Presets",
+    "namePlaceholder": "Preset-Name...",
+    "saved": "Gespeicherte Presets:",
+    "builtIn": "Built-in Presets",
+    "custom": "Custom Presets",
+    "createCustom": "Custom Preset erstellen",
+    "createHint": "Schliessen Sie das Onboarding ab, um benutzerdefinierte Focus Presets zu erstellen",
+    "confirmDelete": "Mochten Sie das Preset \"{name}\" wirklich loschen?",
+    "deleted": "Preset erfolgreich geloscht"
+  },
+  "focusManagement": {
+    "title": "Focus Management",
+    "description": "Verwalte deine Focus Presets. Built-in Presets konnen nicht bearbeitet werden."
+  },
+  "resetFilters": {
+    "title": "Filter zurucksetzen",
+    "button": "Alle Filter zurucksetzen"
+  },
+  "commandPalette": {
+    "title": "Command Palette",
+    "show": "Command Palette anzeigen",
+    "hint": "Schnellzugriff mit"
+  },
+  "api": {
+    "title": "API-Konfiguration",
+    "description": "Konfiguriere deine API-Keys fur erweiterte Funktionen.",
+    "deeplKey": "DeepL API Key",
+    "deeplPlaceholder": "API-Key eingeben...",
+    "deeplHint": "Fur automatische Ubersetzungen. Kostenlos unter deepl.com/pro-api"
+  },
+  "dataCache": {
+    "title": "Daten & Cache",
+    "exportTitle": "Einstellungen exportieren",
+    "exportDesc": "Exportiere alle Einstellungen, Presets und Praferenzen als JSON-Datei",
+    "exportButton": "Einstellungen exportieren",
+    "importTitle": "Einstellungen importieren",
+    "importDesc": "Importiere zuvor exportierte Einstellungen",
+    "importButton": "Einstellungen importieren",
+    "importSuccess": "Einstellungen erfolgreich importiert",
+    "importError": "Fehler beim Importieren der Einstellungen",
+    "clearCacheTitle": "Cache leeren",
+    "clearCacheDesc": "Entferne gecachte Artikel-Daten und erzwinge einen vollstandigen Reload",
+    "clearCacheButton": "Cache leeren",
+    "confirmClearCache": "Mochten Sie wirklich den gesamten Cache leeren?",
+    "cacheCleared": "Cache erfolgreich geleert"
+  },
+  "toast": {
+    "loggedOut": "Erfolgreich abgemeldet"
+  },
+  "connectedAccounts": {
+    "title": "Verbundene Konten",
+    "description": "Verknuepfe dein Google- oder GitHub-Konto fuer schnellere Anmeldung",
+    "noPasswordHint": "Du verwendest nur OAuth-Anmeldung. Lege zuerst ein Passwort in den Sicherheitseinstellungen fest, bevor du alle Anbieter trennst.",
+    "unlinkTitle": "{{provider}} trennen",
+    "unlinkMessage": "Moechtest du {{provider}} wirklich trennen? Du kannst jederzeit erneut verbinden."
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "buttons": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "close": "Close",
+    "apply": "Apply",
+    "load": "Load",
+    "clearAll": "Clear all",
+    "signIn": "Sign In",
+    "signOut": "Sign Out"
+  },
+  "errors": {
+    "generic": "Something went wrong",
+    "network": "Network error. Please try again.",
+    "loadFailed": "Failed to load data",
+    "saveFailed": "Failed to save"
+  },
+  "status": {
+    "connected": "Connected",
+    "loading": "Loading...",
+    "noData": "No data available"
+  },
+  "time": {
+    "justNow": "Just now",
+    "minutesAgo": "{count, plural, one {# minute ago} other {# minutes ago}}",
+    "hoursAgo": "{count, plural, one {# hour ago} other {# hours ago}}",
+    "daysAgo": "{count, plural, one {# day ago} other {# days ago}}"
+  },
+  "articles": {
+    "count": "{count, plural, =0 {No articles} one {# article} other {# articles}}",
+    "available": "{count} of {total} articles available"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "monitor": "Monitor",
+    "analysis": "Analysis",
+    "timeline": "Timeline",
+    "events": "Events",
+    "globe": "Globe",
+    "map": "Map",
+    "community": "Community",
+    "bookmarks": "Bookmarks",
+    "history": "History",
+    "settings": "Settings",
+    "profile": "Profile"
+  },
+  "search": {
+    "placeholder": "Search signals...",
+    "clear": "Clear search"
+  },
+  "regions": {
+    "usa": "USA",
+    "europa": "Europe",
+    "deutschland": "Germany",
+    "nahost": "Middle East",
+    "tuerkei": "Turkey",
+    "russland": "Russia",
+    "china": "China",
+    "asien": "Asia",
+    "afrika": "Africa",
+    "lateinamerika": "Latin America",
+    "ozeanien": "Oceania",
+    "kanada": "Canada",
+    "alternative": "Alternative"
+  },
+  "comments": {
+    "post": "Post Comment",
+    "reply": "Reply",
+    "edit": "Edit",
+    "delete": "Delete",
+    "flag": "Flag",
+    "showReplies": "Show {{count}} replies",
+    "hideReplies": "Hide replies",
+    "typing": "Someone is typing...",
+    "deleted": "[Comment deleted]",
+    "edited": "(edited)",
+    "flagged": "Flagged for review",
+    "characterCount": "{{current}} / {{max}}",
+    "characterLimitExceeded": "Comment too long",
+    "authRequired": "Sign in to join the discussion",
+    "emptyState": {
+      "heading": "No comments yet",
+      "body": "Be the first to share your thoughts on this article."
+    },
+    "errors": {
+      "postFailed": "Failed to post comment. Please try again.",
+      "rateLimit": "Too many comments. Please wait a moment.",
+      "flagged": "Your comment was flagged for review.",
+      "editExpired": "Edit time expired",
+      "deleteFailed": "Failed to delete comment."
+    },
+    "deleteConfirm": {
+      "heading": "Delete comment?",
+      "body": "This will remove your comment from the discussion. Replies will remain visible.",
+      "confirm": "Delete"
+    }
+  }
+}
