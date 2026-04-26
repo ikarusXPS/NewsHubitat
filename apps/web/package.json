@@ -45,6 +45,7 @@
     "@prisma/adapter-pg": "^7.7.0",
     "@prisma/client": "^7.7.0",
     "@radix-ui/react-dialog": "^1.1.15",
+    "@scalar/api-reference-react": "^0.9.27",
     "@sendgrid/eventwebhook": "^8.0.0",
     "@sentry/node": "^10.49.0",
     "@sentry/react": "^10.49.0",
