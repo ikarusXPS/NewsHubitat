@@ -39,6 +39,7 @@ import { SharingService } from './services/sharingService';
 import { serverTimingMiddleware } from './middleware/serverTiming';
 import { etagMiddleware } from './middleware/etagMiddleware';
 import { metricsMiddleware } from './middleware/metricsMiddleware';
+import { queryCounterMiddleware } from './middleware/queryCounter';
 import { NewsAggregator } from './services/newsAggregator';
 import { MetricsService } from './services/metricsService';
 import { WebSocketService } from './services/websocketService';
@@ -93,6 +94,9 @@ app.use(etagMiddleware);
 
 // Prometheus metrics collection (D-05)
 app.use(metricsMiddleware);
+
+// N+1 query detection (D-08 - Phase 34, dev only)
+app.use(queryCounterMiddleware);
 
 // Initialize Passport (no session - stateless JWT per D-05)
 app.use(passport.initialize());
