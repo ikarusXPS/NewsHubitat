@@ -46,7 +46,7 @@ import { WebSocketService } from './services/websocketService';
 import { CacheService } from './services/cacheService';
 import { AIService } from './services/aiService';
 import { CleanupService } from './services/cleanupService';
-import { prisma } from './db/prisma';
+import { prisma, getPoolStats } from './db/prisma';
 import { logDbHealthCheck } from './utils/dbLogger';
 
 const app = express();
@@ -443,9 +443,15 @@ httpServer.listen(PORT, () => {
   const cleanupService = CleanupService.getInstance();
   cleanupService.start();
 
-  // Update WebSocket metrics periodically
+  // Update metrics periodically (D-14 - Phase 34: add pool metrics)
   setInterval(() => {
     metricsService.setWebSocketConnections(wsService.getClientCount());
+
+    // Pool metrics (D-14 - Phase 34)
+    const poolStats = getPoolStats();
+    if (poolStats) {
+      metricsService.updatePoolMetrics(poolStats);
+    }
   }, 10000);
 });
 
