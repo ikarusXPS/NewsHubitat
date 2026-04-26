@@ -41,10 +41,10 @@ Requirements for Infrastructure & Scale milestone. Each maps to roadmap phases.
 - [ ] **PAY-01**: User can subscribe to Free tier (limited features)
 - [ ] **PAY-02**: User can subscribe to Premium tier ($9/month via Stripe)
 - [ ] **PAY-03**: User can subscribe to Enterprise tier (custom pricing)
-- [ ] **PAY-04**: Premium users get ad-free experience
-- [ ] **PAY-05**: Premium users get unlimited AI queries
-- [ ] **PAY-06**: Premium users get full reading history (no limit)
-- [ ] **PAY-07**: Premium users can export data in multiple formats
+- [x] **PAY-04**: Premium users get ad-free experience
+- [x] **PAY-05**: Premium users get unlimited AI queries
+- [x] **PAY-06**: Premium users get full reading history (no limit)
+- [x] **PAY-07**: Premium users can export data in multiple formats
 - [x] **PAY-08**: Developer can register for API key via self-service portal
 - [x] **PAY-09**: Developer API has tiered rate limits (Free: 10/min, Pro: 100/min)
 - [x] **PAY-10**: Developer API includes OpenAPI/Swagger documentation
@@ -88,10 +88,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PAY-01 | Phase 36 | Pending |
 | PAY-02 | Phase 36 | Pending |
 | PAY-03 | Phase 36 | Pending |
-| PAY-04 | Phase 36 | Pending |
-| PAY-05 | Phase 36 | Pending |
-| PAY-06 | Phase 36 | Pending |
-| PAY-07 | Phase 36 | Pending |
+| PAY-04 | Phase 36 | Complete |
+| PAY-05 | Phase 36 | Complete |
+| PAY-06 | Phase 36 | Complete |
+| PAY-07 | Phase 36 | Complete |
 | PAY-08 | Phase 35 | Complete |
 | PAY-09 | Phase 35 | Complete |
 | PAY-10 | Phase 35 | Complete |
