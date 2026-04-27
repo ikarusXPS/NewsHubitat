@@ -6,6 +6,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 NewsHub is a multi-perspective global news analysis platform. It aggregates news from 130 sources across 13 regions, with real-time translation, sentiment analysis, perspective comparison visualization, and AI-powered insights.
 
+## Planning Workflow (.planning/)
+
+This repo is driven by the GSD planning system. Read these before resuming work:
+
+- `.planning/STATE.md` — Current milestone, phase, in-flight plan, and decisions log (read first)
+- `.planning/ROADMAP.md` — Phase breakdown, dependencies, and goals
+- `.planning/PROJECT.md` — Product vision and core value
+- `.planning/phases/<NN-name>/` — Per-phase artifacts: `PLAN.md`, `RESEARCH.md`, `CONTEXT.md`, `SUMMARY.md`, `UAT.md`, `VERIFICATION.md`
+- `.planning/debug/` — Active debug sessions (anything not `*-resolved*` is unresolved)
+- `.planning/todos/pending/` — Pending operational todos
+
+When picking up a phase, read its `PLAN.md` plus the relevant Decisions rows in `STATE.md`. Don't duplicate decisions into new docs — append to STATE.md.
+
 ## Monorepo Structure
 
 This is a pnpm monorepo with workspace packages:
@@ -59,6 +72,18 @@ cd apps/web && npx prisma studio      # Database GUI (localhost:5555)
 pnpm seed                 # All seed scripts (badges + personas)
 pnpm seed:badges          # Gamification badges only
 pnpm seed:personas        # AI personas only
+pnpm seed:load-test       # Pre-create 100 verified test users (loadtest1-100@example.com)
+
+# Load Testing (k6)
+pnpm load:smoke           # Quick smoke scenario
+pnpm load:full            # Full load scenario
+# Manual via GitHub Actions: workflow_dispatch on load-test.yml (STAGING_URL only)
+
+# OpenAPI Spec
+cd apps/web && pnpm openapi:generate   # Regenerate public/openapi.json from Zod schemas
+
+# CI Validation
+pnpm validate:ci          # Validate .github/workflows/ci.yml syntax
 
 # Run Single Tests
 pnpm test -- apps/web/src/lib/utils.test.ts      # Single unit test file
@@ -209,6 +234,66 @@ interface ApiResponse<T> {
 | `/api/teams` | GET/POST | Team management |
 | `/api/health` | GET | Server status |
 | `/api/metrics` | GET | Prometheus metrics |
+
+## Public API & OpenAPI
+
+External developers consume `apps/web/server/routes/publicApi.ts`, gated by API keys.
+
+- **Key format:** `nh_{env}_{random}_{checksum}` (Stripe-inspired); `bcrypt` factor 10 hashing
+- **Header:** `X-API-Key` (per OpenAPI security scheme)
+- **Limits:** Max 3 keys per user (prevents rate-limit bypass via key multiplication); checksum pre-validation prevents wasteful DB lookups
+- **Rate limiting:** Keyed by API key ID (NAT/VPN friendly); IETF `RateLimit-*` headers
+- **Spec source:** Code-first via `@asteasolutions/zod-to-openapi` — Zod schemas in `server/openapi/schemas.ts` are the single source of truth for runtime validation AND API docs
+- **Docs UI:** Scalar at `/api-docs`; spec served from `/openapi.json`
+- **Cache:** Validated keys cached 5 min in Redis (only first 15 chars stored as identifier for security)
+
+## Subscription Tiers (Stripe)
+
+Tiered access enforced via middleware. Tiers: `FREE` / `PREMIUM` / `ENTERPRISE`.
+
+- **SDK:** `stripe@22.1.0`, API version pinned to `2024-12-18.acacia`
+- **FREE limits:** 10 AI queries/day, 7-day reading history visibility, 100 history entries (PREMIUM: 1000)
+- **Middleware:**
+  - `requireTier(tier)` — hard gate; returns 403 with `upgradeUrl` for `CANCELED`/`PAUSED`
+  - `attachUserTier` — soft attach without blocking (for tier-aware UI)
+  - `aiTierLimiter` — 24h sliding window for FREE tier AI usage
+- **Grace period:** `PAST_DUE` allows access for 7 days; `CANCELED`/`PAUSED` blocks Premium routes immediately
+- **Webhook (CRITICAL):** Webhook route MUST be registered **before** `express.json()` so the raw body is preserved for HMAC signature verification. Idempotency: 24h dual-storage (Redis + DB).
+- **Security:** Price ID whitelist on checkout (prevents arbitrary price injection); return 200 on processing errors so Stripe doesn't retry duplicates
+- **Cache:** 5-min subscription status TTL; gracefully degrades when `STRIPE_SECRET_KEY` not set
+
+## i18n & PWA
+
+- **i18n:** `react-i18next` + `i18next-icu` for ICU plural rules; languages **DE / EN / FR**
+- **Translation files:** `apps/web/src/i18n/locales/{de,en,fr}/`
+- **Language sync:** Bidirectional between Zustand store and i18next — `useAppStore.subscribe` watches language, syncs to i18next on load (so language persists across sessions)
+- **Date format:** Hybrid — relative ("5 min ago") for < 7 days, absolute ("Apr 23, 2026") for >= 7 days
+- **PWA:** `vite-plugin-pwa` ships service worker + offline shell; install banner via `InstallPromptBanner`
+- **Mobile:** `md:` (768px) is the primary breakpoint, not `lg:`; safe-area insets via CSS `env(safe-area-inset-*)` for notched devices
+
+## CI/CD
+
+- **`.github/workflows/ci.yml`** — Lint, typecheck, test (80% coverage gate), build; Lighthouse CI runs **after deploy-staging on master only** (90+ required for performance / accessibility / best-practices / SEO; Core Web Vitals tracked warn-only)
+- **`.github/workflows/load-test.yml`** — k6 load tests via `workflow_dispatch` against `STAGING_URL` (manual trigger; never runs on production)
+- **Validate locally:** `pnpm validate:ci` (uses `action-validator`)
+- **Sentry:** `@sentry/vite-plugin` uploads source maps during CI build; release tag `newshub@${{ github.sha }}`; environment set per deploy job (staging vs production)
+- **Bundle budget:** 250KB warning threshold (CI annotation, non-blocking)
+- **Artifacts:** Lighthouse reports retained 30 days; load-test JSON+HTML retained 30 days
+
+## Performance Budgets
+
+Codified targets (validated via k6 + Lighthouse):
+
+| Metric | Threshold |
+|--------|-----------|
+| News API p95 | < 500ms |
+| AI API p95 | < 5s |
+| Auth API p95 | < 300ms |
+| LCP / CLS / INP / FCP | < 2s / < 0.05 / < 150ms / < 1.5s (warn-only) |
+| Slow query warning | > 100ms (dev only, via `queryCounter` middleware) |
+| N+1 detection | Warn if request issues > 5 queries (dev only, `AsyncLocalStorage` request scope) |
+
+Dev-only diagnostics are gated by `NODE_ENV !== 'production'`.
 
 ## E2E Testing Structure
 
