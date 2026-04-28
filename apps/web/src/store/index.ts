@@ -12,8 +12,8 @@ interface AppState {
   toggleTheme: () => void;
 
   // Language
-  language: 'de' | 'en';
-  setLanguage: (lang: 'de' | 'en') => void;
+  language: 'de' | 'en' | 'fr';
+  setLanguage: (lang: 'de' | 'en' | 'fr') => void;
 
   // Command Palette
   commandPaletteEnabled: boolean;

@@ -12,8 +12,8 @@ i18n
   .use(initReactI18next)       // React bindings
   .init({
     fallbackLng: 'en',         // D-08: English fallback
-    supportedLngs: ['de', 'en'],
-    ns: ['common', 'share', 'teams'],   // Default namespace + share + teams namespace
+    supportedLngs: ['de', 'en', 'fr'],
+    ns: ['common', 'share', 'teams', 'pricing'],   // Default namespace + share + teams + pricing (Phase 36.4)
     defaultNS: 'common',
 
     backend: {
@@ -37,7 +37,7 @@ i18n
 
 // Sync i18next -> Zustand when language changes via i18n.changeLanguage()
 i18n.on('languageChanged', (lng: string) => {
-  const validLng = lng === 'de' || lng === 'en' ? lng : 'en';
+  const validLng = lng === 'de' || lng === 'en' || lng === 'fr' ? lng : 'en';
   const currentStoreLang = useAppStore.getState().language;
   // Only update if different to avoid loops
   if (currentStoreLang !== validLng) {
@@ -51,7 +51,7 @@ let previousLanguage = useAppStore.getState().language;
 useAppStore.subscribe((state) => {
   const language = state.language;
   // Only change if different to avoid loops
-  if (language !== previousLanguage && (language === 'de' || language === 'en')) {
+  if (language !== previousLanguage && (language === 'de' || language === 'en' || language === 'fr')) {
     previousLanguage = language;
     if (i18n.language !== language) {
       i18n.changeLanguage(language);
