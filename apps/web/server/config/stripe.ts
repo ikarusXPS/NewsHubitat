@@ -3,7 +3,12 @@
  * Externalizes all Stripe-related configuration for subscription management
  */
 
-export type SubscriptionTier = 'FREE' | 'PREMIUM' | 'ENTERPRISE';
+// D-03 (Phase 36.2): Re-export Prisma enums as the single source of truth.
+// UPPERCASE values match existing string literals (D-01), so all call-sites
+// continue to typecheck unchanged. SubscriptionStatus is also re-exported
+// here so subscriptionService.ts can tighten its inline union if desired
+// (currently it still spells 'ACTIVE' | 'PAST_DUE' | 'CANCELED' | 'PAUSED' inline).
+export type { SubscriptionTier, SubscriptionStatus } from '../../src/generated/prisma/client';
 
 // Environment-based price IDs
 export const STRIPE_CONFIG = {
