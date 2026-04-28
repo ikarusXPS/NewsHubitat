@@ -58,7 +58,7 @@ export function Toast({ message, type = 'info', isOpen, onClose, duration = 3000
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -20, scale: 0.95 }}
           transition={{ duration: 0.2 }}
-          className="fixed top-20 right-6 z-50 max-w-sm"
+          className="fixed top-24 right-6 z-[100] max-w-sm"
         >
           <div
             className={cn(

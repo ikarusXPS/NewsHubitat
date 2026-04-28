@@ -82,7 +82,6 @@ export class SubscriptionService {
       mode: 'subscription',
       customer: user?.stripeCustomerId || undefined,
       customer_email: user?.stripeCustomerId ? undefined : customerEmail,
-      customer_creation: user?.stripeCustomerId ? undefined : 'always',
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${process.env.APP_URL}/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.APP_URL}/pricing`,
