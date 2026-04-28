@@ -148,8 +148,11 @@ app.use('/api/auth', authRoutes);
 app.use('/api/auth', oauthRoutes);
 
 // AI endpoints - tier-aware (FREE: 10/day; PREMIUM/ENTERPRISE: unlimited) - Phase 36.4 D-01/D-02
-app.use('/api/ai', aiTierLimiter, aiRoutes);
-app.use('/api/analysis', aiTierLimiter, analysisRoutes);
+// authMiddleware MUST run before aiTierLimiter so the limiter's skip() can read
+// the resolved subscriptionTier (otherwise authReq.user is undefined and every
+// request keys by IP under the FREE quota — defeats the PREMIUM bypass).
+app.use('/api/ai', authMiddleware, aiTierLimiter, aiRoutes);
+app.use('/api/analysis', authMiddleware, aiTierLimiter, analysisRoutes);
 
 // News/Events endpoints - relaxed (100 req/min per IP) - D-05
 app.use('/api/news', newsLimiter, newsRoutes);

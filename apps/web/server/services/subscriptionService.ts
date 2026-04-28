@@ -181,11 +181,17 @@ export class SubscriptionService {
   }
 
   /**
-   * Invalidate subscription cache for user
+   * Invalidate both tier-related caches for a user.
+   * `user:subscription:` is read by getSubscriptionStatus().
+   * `user:tier:` is read by aiTierLimiter and requireTier middleware.
+   * Both must be evicted together — same root cause as Phase 35.1's
+   * stale-revocation hotfix.
    */
   async invalidateCache(userId: string): Promise<void> {
-    const cacheKey = `user:subscription:${userId}`;
-    await this.cacheService.del(cacheKey);
+    await Promise.all([
+      this.cacheService.del(`user:subscription:${userId}`),
+      this.cacheService.del(`user:tier:${userId}`),
+    ]);
   }
 
   /**
