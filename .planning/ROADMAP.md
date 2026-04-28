@@ -159,7 +159,7 @@ n**Plans:**
 **Plans** (4 plans, 3 waves):
 
 **Wave 1** *(parallel — disjoint files)*:
-- [ ] 36.2-01-PLAN.md — Schema additions: 4 new models + 8 User fields + 2 enums + back-relations (no db push)
+- [x] 36.2-01-PLAN.md — Schema additions: 4 new models + 8 User fields + 2 enums + back-relations (no db push) — completed 2026-04-28 (1976489, 44aa829)
 - [ ] 36.2-02-PLAN.md — Depcheck cleanup: remove 5 unused deps from apps/web/package.json + regenerate lockfile
 
 **Wave 2** *(blocked on Plan 01)*:
