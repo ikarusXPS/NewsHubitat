@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Infrastructure & Scale
-current_plan: 1
-status: executing
-last_updated: "2026-04-28T20:15:57.002Z"
-last_activity: 2026-04-28 -- Phase 36.5 execution started
+current_plan: Not started
+status: planning
+last_updated: "2026-04-28T22:51:07.378Z"
+last_activity: 2026-04-28
 progress:
   total_phases: 6
   completed_phases: 2
@@ -25,11 +25,11 @@ See: .planning/PROJECT.md (updated 2026-04-26)
 
 ## Current Position
 
-Phase: 36.5 (fix-monetization-followup-bugs) — EXECUTING
+Phase: 37
 Plan: 1 of 4
-Current Plan: 1
+Current Plan: Not started
 Status: Executing Phase 36.5
-Last activity: 2026-04-28 -- Phase 36.5 execution started
+Last activity: 2026-04-28
 
 ```
 v1.6 Progress: [████████████████████] (8 phases incl. 36.4 complete; Phase 36 closed by user-approved human-verify on Plan 05; verifier still owed for 36, 36.3, 36.2 before milestone close)
@@ -39,7 +39,7 @@ v1.6 Progress: [████████████████████] (8
 
 **Milestone:** v1.6 - Infrastructure & Scale
 **Goal:** Comprehensive expansion across infrastructure, AI, mobile, monetization, and content
-**Status:** Executing Phase 36.5
+**Status:** Ready to plan
 **Previous:** v1.5 complete 2026-04-26
 
 ### Phase Summary
