@@ -37,6 +37,8 @@ import {
   TeamDashboard,
   TeamInviteAccept,
   DevelopersPage,
+  Pricing,
+  SubscriptionSuccess,
 } from './routes';
 import './index.css';
 
@@ -140,6 +142,9 @@ function AppRoutes() {
               <Route path="/team/:teamId" element={<TeamDashboard />} />
               {/* Developer portal - D-09: dedicated /developers page */}
               <Route path="/developers" element={<DevelopersPage />} />
+              {/* Subscription pages (public - Phase 36) */}
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/subscription/success" element={<SubscriptionSuccess />} />
             </Routes>
           </Suspense>
         </ChunkErrorBoundary>

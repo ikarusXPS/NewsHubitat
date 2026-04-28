@@ -94,6 +94,15 @@ export const DevelopersPage = lazyWithRetry(() =>
   import('./pages/DevelopersPage').then(m => ({ default: m.DevelopersPage }))
 );
 
+// Subscription pages (Phase 36)
+export const Pricing = lazyWithRetry(() =>
+  import('./pages/Pricing').then(m => ({ default: m.Pricing }))
+);
+
+export const SubscriptionSuccess = lazyWithRetry(() =>
+  import('./pages/SubscriptionSuccess').then(m => ({ default: m.SubscriptionSuccess }))
+);
+
 // ============================================================================
 // Route Preloaders - Map of route paths to preload functions
 // ============================================================================
@@ -143,5 +152,8 @@ export const routePreloaders: Record<string, () => void> = {
   },
   '/developers': () => {
     DevelopersPage.preload();
+  },
+  '/pricing': () => {
+    Pricing.preload();
   },
 };
