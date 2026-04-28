@@ -20,9 +20,12 @@ const router = Router();
 // VALIDATION SCHEMAS
 // ============================================================================
 
+// priceId is the source of truth: clients must pass a whitelisted
+// monthly/annual price ID. The previous billingCycle field was dead
+// code (priceId is required, so the `priceId || billingCycle-fallback`
+// branch could never execute) — see WR-01.
 const checkoutSchema = z.object({
   priceId: z.string().min(1, 'Price ID required'),
-  billingCycle: z.enum(['monthly', 'annual']).optional(),
 });
 
 function formatZodError(error: z.ZodError): string {
@@ -61,15 +64,10 @@ router.post('/checkout', authMiddleware, async (req: AuthRequest, res: Response)
 
     const userId = req.user!.userId;
     const email = req.user!.email;
-    const { priceId, billingCycle } = result.data;
-
-    // Determine price ID from billing cycle if not provided directly
-    const finalPriceId = priceId || (billingCycle === 'annual'
-      ? STRIPE_CONFIG.priceIds.annual
-      : STRIPE_CONFIG.priceIds.monthly);
+    const { priceId } = result.data;
 
     // Validate price ID against whitelist (T-36-01 mitigation)
-    if (!isValidPriceId(finalPriceId)) {
+    if (!isValidPriceId(priceId)) {
       res.status(400).json({
         success: false,
         error: 'Invalid price ID',
@@ -89,7 +87,7 @@ router.post('/checkout', authMiddleware, async (req: AuthRequest, res: Response)
 
     const checkoutUrl = await subscriptionService.createCheckoutSession(
       userId,
-      finalPriceId,
+      priceId,
       email
     );
 
