@@ -184,7 +184,14 @@ n**Plans:**
   4. `stripe trigger checkout.session.completed` against the live backend returns HTTP 200 (not 404) for all forwarded events in `stripe listen` output
   5. Orphaned files at root `server/services/stripeWebhookService.ts`, `server/routes/webhooks/stripe.ts`, `server/routes/subscriptions.ts` removed; root `server/index.ts` reverted or deleted (no longer used by `pnpm dev:backend`)
   6. `pnpm typecheck && pnpm test:run` exits 0 with no regressions
-**Plans**: To be created via `/gsd-plan-phase 36.3`
+**Plans**: 5 plans
+
+Plans:
+- [ ] 36.3-01-PLAN.md — Relocate 3 webhook/subscription source files from root server/ to apps/web/server/ via git mv (preserves history)
+- [ ] 36.3-02-PLAN.md — Mount webhook + subscription routes in live apps/web/server/index.ts (diff-only, before express.json for raw body)
+- [ ] 36.3-03-PLAN.md — Wholesale delete orphan root trees (server/, prisma/, src/, prisma.config.ts, tsup.config.ts, vite.config.ts, tsconfig.{,app,node}.json) + D-08 verification gate
+- [ ] 36.3-04-PLAN.md — End-to-end verification: stripe trigger 8 events return HTTP 200; ProcessedWebhookEvent rows persisted; idempotency replay PASS
+- [ ] 36.3-05-PLAN.md — Anti-pattern markers (.continue-here.md phase-local + milestone-level) per D-11 and Q-03
 
 ### Phase 37: Horizontal Scaling
 **Goal**: System handles 30k concurrent users through horizontal scaling and connection pooling
