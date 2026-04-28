@@ -30,12 +30,14 @@ export type UserAvgAggregateOutputType = {
   verificationSendCount: number | null
   resetSendCount: number | null
   tokenVersion: number | null
+  freeMonthsEarned: number | null
 }
 
 export type UserSumAggregateOutputType = {
   verificationSendCount: number | null
   resetSendCount: number | null
   tokenVersion: number | null
+  freeMonthsEarned: number | null
 }
 
 export type UserMinAggregateOutputType = {
@@ -71,9 +73,17 @@ export type UserMinAggregateOutputType = {
   deletionConfirmToken: string | null
   stripeCustomerId: string | null
   stripeSubscriptionId: string | null
-  subscriptionTier: string | null
-  subscriptionStatus: string | null
+  subscriptionTier: $Enums.SubscriptionTier | null
+  subscriptionStatus: $Enums.SubscriptionStatus | null
   subscriptionEndsAt: Date | null
+  pausedUntil: Date | null
+  showPremiumBadge: boolean | null
+  customAccentColor: string | null
+  referralCode: string | null
+  referredBy: string | null
+  freeMonthsEarned: number | null
+  isStudent: boolean | null
+  studentVerifiedUntil: Date | null
 }
 
 export type UserMaxAggregateOutputType = {
@@ -109,9 +119,17 @@ export type UserMaxAggregateOutputType = {
   deletionConfirmToken: string | null
   stripeCustomerId: string | null
   stripeSubscriptionId: string | null
-  subscriptionTier: string | null
-  subscriptionStatus: string | null
+  subscriptionTier: $Enums.SubscriptionTier | null
+  subscriptionStatus: $Enums.SubscriptionStatus | null
   subscriptionEndsAt: Date | null
+  pausedUntil: Date | null
+  showPremiumBadge: boolean | null
+  customAccentColor: string | null
+  referralCode: string | null
+  referredBy: string | null
+  freeMonthsEarned: number | null
+  isStudent: boolean | null
+  studentVerifiedUntil: Date | null
 }
 
 export type UserCountAggregateOutputType = {
@@ -151,6 +169,14 @@ export type UserCountAggregateOutputType = {
   subscriptionTier: number
   subscriptionStatus: number
   subscriptionEndsAt: number
+  pausedUntil: number
+  showPremiumBadge: number
+  customAccentColor: number
+  referralCode: number
+  referredBy: number
+  freeMonthsEarned: number
+  isStudent: number
+  studentVerifiedUntil: number
   _all: number
 }
 
@@ -159,12 +185,14 @@ export type UserAvgAggregateInputType = {
   verificationSendCount?: true
   resetSendCount?: true
   tokenVersion?: true
+  freeMonthsEarned?: true
 }
 
 export type UserSumAggregateInputType = {
   verificationSendCount?: true
   resetSendCount?: true
   tokenVersion?: true
+  freeMonthsEarned?: true
 }
 
 export type UserMinAggregateInputType = {
@@ -203,6 +231,14 @@ export type UserMinAggregateInputType = {
   subscriptionTier?: true
   subscriptionStatus?: true
   subscriptionEndsAt?: true
+  pausedUntil?: true
+  showPremiumBadge?: true
+  customAccentColor?: true
+  referralCode?: true
+  referredBy?: true
+  freeMonthsEarned?: true
+  isStudent?: true
+  studentVerifiedUntil?: true
 }
 
 export type UserMaxAggregateInputType = {
@@ -241,6 +277,14 @@ export type UserMaxAggregateInputType = {
   subscriptionTier?: true
   subscriptionStatus?: true
   subscriptionEndsAt?: true
+  pausedUntil?: true
+  showPremiumBadge?: true
+  customAccentColor?: true
+  referralCode?: true
+  referredBy?: true
+  freeMonthsEarned?: true
+  isStudent?: true
+  studentVerifiedUntil?: true
 }
 
 export type UserCountAggregateInputType = {
@@ -280,6 +324,14 @@ export type UserCountAggregateInputType = {
   subscriptionTier?: true
   subscriptionStatus?: true
   subscriptionEndsAt?: true
+  pausedUntil?: true
+  showPremiumBadge?: true
+  customAccentColor?: true
+  referralCode?: true
+  referredBy?: true
+  freeMonthsEarned?: true
+  isStudent?: true
+  studentVerifiedUntil?: true
   _all?: true
 }
 
@@ -403,9 +455,17 @@ export type UserGroupByOutputType = {
   deletionConfirmToken: string | null
   stripeCustomerId: string | null
   stripeSubscriptionId: string | null
-  subscriptionTier: string | null
-  subscriptionStatus: string | null
+  subscriptionTier: $Enums.SubscriptionTier
+  subscriptionStatus: $Enums.SubscriptionStatus
   subscriptionEndsAt: Date | null
+  pausedUntil: Date | null
+  showPremiumBadge: boolean
+  customAccentColor: string | null
+  referralCode: string | null
+  referredBy: string | null
+  freeMonthsEarned: number
+  isStudent: boolean
+  studentVerifiedUntil: Date | null
   _count: UserCountAggregateOutputType | null
   _avg: UserAvgAggregateOutputType | null
   _sum: UserSumAggregateOutputType | null
@@ -465,9 +525,17 @@ export type UserWhereInput = {
   deletionConfirmToken?: Prisma.StringNullableFilter<"User"> | string | null
   stripeCustomerId?: Prisma.StringNullableFilter<"User"> | string | null
   stripeSubscriptionId?: Prisma.StringNullableFilter<"User"> | string | null
-  subscriptionTier?: Prisma.StringNullableFilter<"User"> | string | null
-  subscriptionStatus?: Prisma.StringNullableFilter<"User"> | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierFilter<"User"> | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFilter<"User"> | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  pausedUntil?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  showPremiumBadge?: Prisma.BoolFilter<"User"> | boolean
+  customAccentColor?: Prisma.StringNullableFilter<"User"> | string | null
+  referralCode?: Prisma.StringNullableFilter<"User"> | string | null
+  referredBy?: Prisma.StringNullableFilter<"User"> | string | null
+  freeMonthsEarned?: Prisma.IntFilter<"User"> | number
+  isStudent?: Prisma.BoolFilter<"User"> | boolean
+  studentVerifiedUntil?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   bookmarks?: Prisma.BookmarkListRelationFilter
   readingHistory?: Prisma.ReadingHistoryListRelationFilter
   emailSubscription?: Prisma.XOR<Prisma.EmailSubscriptionNullableScalarRelationFilter, Prisma.EmailSubscriptionWhereInput> | null
@@ -477,6 +545,11 @@ export type UserWhereInput = {
   comments?: Prisma.CommentListRelationFilter
   teamMemberships?: Prisma.TeamMemberListRelationFilter
   apiKeys?: Prisma.ApiKeyListRelationFilter
+  referralRewardsAsReferrer?: Prisma.ReferralRewardListRelationFilter
+  referralRewardsAsReferred?: Prisma.ReferralRewardListRelationFilter
+  referredByUser?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  referredUsers?: Prisma.UserListRelationFilter
+  studentVerifications?: Prisma.StudentVerificationListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -513,9 +586,17 @@ export type UserOrderByWithRelationInput = {
   deletionConfirmToken?: Prisma.SortOrderInput | Prisma.SortOrder
   stripeCustomerId?: Prisma.SortOrderInput | Prisma.SortOrder
   stripeSubscriptionId?: Prisma.SortOrderInput | Prisma.SortOrder
-  subscriptionTier?: Prisma.SortOrderInput | Prisma.SortOrder
-  subscriptionStatus?: Prisma.SortOrderInput | Prisma.SortOrder
+  subscriptionTier?: Prisma.SortOrder
+  subscriptionStatus?: Prisma.SortOrder
   subscriptionEndsAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  pausedUntil?: Prisma.SortOrderInput | Prisma.SortOrder
+  showPremiumBadge?: Prisma.SortOrder
+  customAccentColor?: Prisma.SortOrderInput | Prisma.SortOrder
+  referralCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  referredBy?: Prisma.SortOrderInput | Prisma.SortOrder
+  freeMonthsEarned?: Prisma.SortOrder
+  isStudent?: Prisma.SortOrder
+  studentVerifiedUntil?: Prisma.SortOrderInput | Prisma.SortOrder
   bookmarks?: Prisma.BookmarkOrderByRelationAggregateInput
   readingHistory?: Prisma.ReadingHistoryOrderByRelationAggregateInput
   emailSubscription?: Prisma.EmailSubscriptionOrderByWithRelationInput
@@ -525,6 +606,11 @@ export type UserOrderByWithRelationInput = {
   comments?: Prisma.CommentOrderByRelationAggregateInput
   teamMemberships?: Prisma.TeamMemberOrderByRelationAggregateInput
   apiKeys?: Prisma.ApiKeyOrderByRelationAggregateInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardOrderByRelationAggregateInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardOrderByRelationAggregateInput
+  referredByUser?: Prisma.UserOrderByWithRelationInput
+  referredUsers?: Prisma.UserOrderByRelationAggregateInput
+  studentVerifications?: Prisma.StudentVerificationOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -534,6 +620,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   githubIdHash?: string
   stripeCustomerId?: string
   stripeSubscriptionId?: string
+  referralCode?: string
   AND?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
@@ -564,9 +651,16 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   isHistoryPaused?: Prisma.BoolFilter<"User"> | boolean
   deletionRequestedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   deletionConfirmToken?: Prisma.StringNullableFilter<"User"> | string | null
-  subscriptionTier?: Prisma.StringNullableFilter<"User"> | string | null
-  subscriptionStatus?: Prisma.StringNullableFilter<"User"> | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierFilter<"User"> | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFilter<"User"> | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  pausedUntil?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  showPremiumBadge?: Prisma.BoolFilter<"User"> | boolean
+  customAccentColor?: Prisma.StringNullableFilter<"User"> | string | null
+  referredBy?: Prisma.StringNullableFilter<"User"> | string | null
+  freeMonthsEarned?: Prisma.IntFilter<"User"> | number
+  isStudent?: Prisma.BoolFilter<"User"> | boolean
+  studentVerifiedUntil?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   bookmarks?: Prisma.BookmarkListRelationFilter
   readingHistory?: Prisma.ReadingHistoryListRelationFilter
   emailSubscription?: Prisma.XOR<Prisma.EmailSubscriptionNullableScalarRelationFilter, Prisma.EmailSubscriptionWhereInput> | null
@@ -576,7 +670,12 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   comments?: Prisma.CommentListRelationFilter
   teamMemberships?: Prisma.TeamMemberListRelationFilter
   apiKeys?: Prisma.ApiKeyListRelationFilter
-}, "id" | "email" | "googleIdHash" | "githubIdHash" | "stripeCustomerId" | "stripeSubscriptionId">
+  referralRewardsAsReferrer?: Prisma.ReferralRewardListRelationFilter
+  referralRewardsAsReferred?: Prisma.ReferralRewardListRelationFilter
+  referredByUser?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  referredUsers?: Prisma.UserListRelationFilter
+  studentVerifications?: Prisma.StudentVerificationListRelationFilter
+}, "id" | "email" | "googleIdHash" | "githubIdHash" | "stripeCustomerId" | "stripeSubscriptionId" | "referralCode">
 
 export type UserOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -612,9 +711,17 @@ export type UserOrderByWithAggregationInput = {
   deletionConfirmToken?: Prisma.SortOrderInput | Prisma.SortOrder
   stripeCustomerId?: Prisma.SortOrderInput | Prisma.SortOrder
   stripeSubscriptionId?: Prisma.SortOrderInput | Prisma.SortOrder
-  subscriptionTier?: Prisma.SortOrderInput | Prisma.SortOrder
-  subscriptionStatus?: Prisma.SortOrderInput | Prisma.SortOrder
+  subscriptionTier?: Prisma.SortOrder
+  subscriptionStatus?: Prisma.SortOrder
   subscriptionEndsAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  pausedUntil?: Prisma.SortOrderInput | Prisma.SortOrder
+  showPremiumBadge?: Prisma.SortOrder
+  customAccentColor?: Prisma.SortOrderInput | Prisma.SortOrder
+  referralCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  referredBy?: Prisma.SortOrderInput | Prisma.SortOrder
+  freeMonthsEarned?: Prisma.SortOrder
+  isStudent?: Prisma.SortOrder
+  studentVerifiedUntil?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _avg?: Prisma.UserAvgOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
@@ -659,9 +766,17 @@ export type UserScalarWhereWithAggregatesInput = {
   deletionConfirmToken?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   stripeCustomerId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   stripeSubscriptionId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
-  subscriptionTier?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
-  subscriptionStatus?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierWithAggregatesFilter<"User"> | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusWithAggregatesFilter<"User"> | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  pausedUntil?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  showPremiumBadge?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
+  customAccentColor?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  referralCode?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  referredBy?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  freeMonthsEarned?: Prisma.IntWithAggregatesFilter<"User"> | number
+  isStudent?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
+  studentVerifiedUntil?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
 }
 
 export type UserCreateInput = {
@@ -698,9 +813,16 @@ export type UserCreateInput = {
   deletionConfirmToken?: string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
-  subscriptionTier?: string | null
-  subscriptionStatus?: string | null
+  subscriptionTier?: $Enums.SubscriptionTier
+  subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
+  pausedUntil?: Date | string | null
+  showPremiumBadge?: boolean
+  customAccentColor?: string | null
+  referralCode?: string | null
+  freeMonthsEarned?: number
+  isStudent?: boolean
+  studentVerifiedUntil?: Date | string | null
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   readingHistory?: Prisma.ReadingHistoryCreateNestedManyWithoutUserInput
   emailSubscription?: Prisma.EmailSubscriptionCreateNestedOneWithoutUserInput
@@ -710,6 +832,11 @@ export type UserCreateInput = {
   comments?: Prisma.CommentCreateNestedManyWithoutUserInput
   teamMemberships?: Prisma.TeamMemberCreateNestedManyWithoutUserInput
   apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutUserInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardCreateNestedManyWithoutReferrerInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardCreateNestedManyWithoutReferredInput
+  referredByUser?: Prisma.UserCreateNestedOneWithoutReferredUsersInput
+  referredUsers?: Prisma.UserCreateNestedManyWithoutReferredByUserInput
+  studentVerifications?: Prisma.StudentVerificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -746,9 +873,17 @@ export type UserUncheckedCreateInput = {
   deletionConfirmToken?: string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
-  subscriptionTier?: string | null
-  subscriptionStatus?: string | null
+  subscriptionTier?: $Enums.SubscriptionTier
+  subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
+  pausedUntil?: Date | string | null
+  showPremiumBadge?: boolean
+  customAccentColor?: string | null
+  referralCode?: string | null
+  referredBy?: string | null
+  freeMonthsEarned?: number
+  isStudent?: boolean
+  studentVerifiedUntil?: Date | string | null
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   readingHistory?: Prisma.ReadingHistoryUncheckedCreateNestedManyWithoutUserInput
   emailSubscription?: Prisma.EmailSubscriptionUncheckedCreateNestedOneWithoutUserInput
@@ -758,6 +893,10 @@ export type UserUncheckedCreateInput = {
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
   teamMemberships?: Prisma.TeamMemberUncheckedCreateNestedManyWithoutUserInput
   apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutUserInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferrerInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferredInput
+  referredUsers?: Prisma.UserUncheckedCreateNestedManyWithoutReferredByUserInput
+  studentVerifications?: Prisma.StudentVerificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -794,9 +933,16 @@ export type UserUpdateInput = {
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierFieldUpdateOperationsInput | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
+  isStudent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  studentVerifiedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   readingHistory?: Prisma.ReadingHistoryUpdateManyWithoutUserNestedInput
   emailSubscription?: Prisma.EmailSubscriptionUpdateOneWithoutUserNestedInput
@@ -806,6 +952,11 @@ export type UserUpdateInput = {
   comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
   teamMemberships?: Prisma.TeamMemberUpdateManyWithoutUserNestedInput
   apiKeys?: Prisma.ApiKeyUpdateManyWithoutUserNestedInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUpdateManyWithoutReferrerNestedInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUpdateManyWithoutReferredNestedInput
+  referredByUser?: Prisma.UserUpdateOneWithoutReferredUsersNestedInput
+  referredUsers?: Prisma.UserUpdateManyWithoutReferredByUserNestedInput
+  studentVerifications?: Prisma.StudentVerificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -842,9 +993,17 @@ export type UserUncheckedUpdateInput = {
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierFieldUpdateOperationsInput | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referredBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
+  isStudent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  studentVerifiedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   readingHistory?: Prisma.ReadingHistoryUncheckedUpdateManyWithoutUserNestedInput
   emailSubscription?: Prisma.EmailSubscriptionUncheckedUpdateOneWithoutUserNestedInput
@@ -854,6 +1013,10 @@ export type UserUncheckedUpdateInput = {
   comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
   teamMemberships?: Prisma.TeamMemberUncheckedUpdateManyWithoutUserNestedInput
   apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutUserNestedInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferrerNestedInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferredNestedInput
+  referredUsers?: Prisma.UserUncheckedUpdateManyWithoutReferredByUserNestedInput
+  studentVerifications?: Prisma.StudentVerificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -890,9 +1053,17 @@ export type UserCreateManyInput = {
   deletionConfirmToken?: string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
-  subscriptionTier?: string | null
-  subscriptionStatus?: string | null
+  subscriptionTier?: $Enums.SubscriptionTier
+  subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
+  pausedUntil?: Date | string | null
+  showPremiumBadge?: boolean
+  customAccentColor?: string | null
+  referralCode?: string | null
+  referredBy?: string | null
+  freeMonthsEarned?: number
+  isStudent?: boolean
+  studentVerifiedUntil?: Date | string | null
 }
 
 export type UserUpdateManyMutationInput = {
@@ -929,9 +1100,16 @@ export type UserUpdateManyMutationInput = {
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierFieldUpdateOperationsInput | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
+  isStudent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  studentVerifiedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type UserUncheckedUpdateManyInput = {
@@ -968,9 +1146,32 @@ export type UserUncheckedUpdateManyInput = {
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierFieldUpdateOperationsInput | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referredBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
+  isStudent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  studentVerifiedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+export type UserNullableScalarRelationFilter = {
+  is?: Prisma.UserWhereInput | null
+  isNot?: Prisma.UserWhereInput | null
+}
+
+export type UserListRelationFilter = {
+  every?: Prisma.UserWhereInput
+  some?: Prisma.UserWhereInput
+  none?: Prisma.UserWhereInput
+}
+
+export type UserOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type UserCountOrderByAggregateInput = {
@@ -1010,12 +1211,21 @@ export type UserCountOrderByAggregateInput = {
   subscriptionTier?: Prisma.SortOrder
   subscriptionStatus?: Prisma.SortOrder
   subscriptionEndsAt?: Prisma.SortOrder
+  pausedUntil?: Prisma.SortOrder
+  showPremiumBadge?: Prisma.SortOrder
+  customAccentColor?: Prisma.SortOrder
+  referralCode?: Prisma.SortOrder
+  referredBy?: Prisma.SortOrder
+  freeMonthsEarned?: Prisma.SortOrder
+  isStudent?: Prisma.SortOrder
+  studentVerifiedUntil?: Prisma.SortOrder
 }
 
 export type UserAvgOrderByAggregateInput = {
   verificationSendCount?: Prisma.SortOrder
   resetSendCount?: Prisma.SortOrder
   tokenVersion?: Prisma.SortOrder
+  freeMonthsEarned?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -1054,6 +1264,14 @@ export type UserMaxOrderByAggregateInput = {
   subscriptionTier?: Prisma.SortOrder
   subscriptionStatus?: Prisma.SortOrder
   subscriptionEndsAt?: Prisma.SortOrder
+  pausedUntil?: Prisma.SortOrder
+  showPremiumBadge?: Prisma.SortOrder
+  customAccentColor?: Prisma.SortOrder
+  referralCode?: Prisma.SortOrder
+  referredBy?: Prisma.SortOrder
+  freeMonthsEarned?: Prisma.SortOrder
+  isStudent?: Prisma.SortOrder
+  studentVerifiedUntil?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
@@ -1092,17 +1310,92 @@ export type UserMinOrderByAggregateInput = {
   subscriptionTier?: Prisma.SortOrder
   subscriptionStatus?: Prisma.SortOrder
   subscriptionEndsAt?: Prisma.SortOrder
+  pausedUntil?: Prisma.SortOrder
+  showPremiumBadge?: Prisma.SortOrder
+  customAccentColor?: Prisma.SortOrder
+  referralCode?: Prisma.SortOrder
+  referredBy?: Prisma.SortOrder
+  freeMonthsEarned?: Prisma.SortOrder
+  isStudent?: Prisma.SortOrder
+  studentVerifiedUntil?: Prisma.SortOrder
 }
 
 export type UserSumOrderByAggregateInput = {
   verificationSendCount?: Prisma.SortOrder
   resetSendCount?: Prisma.SortOrder
   tokenVersion?: Prisma.SortOrder
+  freeMonthsEarned?: Prisma.SortOrder
 }
 
 export type UserScalarRelationFilter = {
   is?: Prisma.UserWhereInput
   isNot?: Prisma.UserWhereInput
+}
+
+export type UserCreateNestedOneWithoutReferredUsersInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReferredUsersInput, Prisma.UserUncheckedCreateWithoutReferredUsersInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReferredUsersInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedManyWithoutReferredByUserInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReferredByUserInput, Prisma.UserUncheckedCreateWithoutReferredByUserInput> | Prisma.UserCreateWithoutReferredByUserInput[] | Prisma.UserUncheckedCreateWithoutReferredByUserInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReferredByUserInput | Prisma.UserCreateOrConnectWithoutReferredByUserInput[]
+  createMany?: Prisma.UserCreateManyReferredByUserInputEnvelope
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+}
+
+export type UserUncheckedCreateNestedManyWithoutReferredByUserInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReferredByUserInput, Prisma.UserUncheckedCreateWithoutReferredByUserInput> | Prisma.UserCreateWithoutReferredByUserInput[] | Prisma.UserUncheckedCreateWithoutReferredByUserInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReferredByUserInput | Prisma.UserCreateOrConnectWithoutReferredByUserInput[]
+  createMany?: Prisma.UserCreateManyReferredByUserInputEnvelope
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+}
+
+export type EnumSubscriptionTierFieldUpdateOperationsInput = {
+  set?: $Enums.SubscriptionTier
+}
+
+export type EnumSubscriptionStatusFieldUpdateOperationsInput = {
+  set?: $Enums.SubscriptionStatus
+}
+
+export type UserUpdateOneWithoutReferredUsersNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReferredUsersInput, Prisma.UserUncheckedCreateWithoutReferredUsersInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReferredUsersInput
+  upsert?: Prisma.UserUpsertWithoutReferredUsersInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutReferredUsersInput, Prisma.UserUpdateWithoutReferredUsersInput>, Prisma.UserUncheckedUpdateWithoutReferredUsersInput>
+}
+
+export type UserUpdateManyWithoutReferredByUserNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReferredByUserInput, Prisma.UserUncheckedCreateWithoutReferredByUserInput> | Prisma.UserCreateWithoutReferredByUserInput[] | Prisma.UserUncheckedCreateWithoutReferredByUserInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReferredByUserInput | Prisma.UserCreateOrConnectWithoutReferredByUserInput[]
+  upsert?: Prisma.UserUpsertWithWhereUniqueWithoutReferredByUserInput | Prisma.UserUpsertWithWhereUniqueWithoutReferredByUserInput[]
+  createMany?: Prisma.UserCreateManyReferredByUserInputEnvelope
+  set?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  disconnect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  delete?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  update?: Prisma.UserUpdateWithWhereUniqueWithoutReferredByUserInput | Prisma.UserUpdateWithWhereUniqueWithoutReferredByUserInput[]
+  updateMany?: Prisma.UserUpdateManyWithWhereWithoutReferredByUserInput | Prisma.UserUpdateManyWithWhereWithoutReferredByUserInput[]
+  deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
+}
+
+export type UserUncheckedUpdateManyWithoutReferredByUserNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReferredByUserInput, Prisma.UserUncheckedCreateWithoutReferredByUserInput> | Prisma.UserCreateWithoutReferredByUserInput[] | Prisma.UserUncheckedCreateWithoutReferredByUserInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReferredByUserInput | Prisma.UserCreateOrConnectWithoutReferredByUserInput[]
+  upsert?: Prisma.UserUpsertWithWhereUniqueWithoutReferredByUserInput | Prisma.UserUpsertWithWhereUniqueWithoutReferredByUserInput[]
+  createMany?: Prisma.UserCreateManyReferredByUserInputEnvelope
+  set?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  disconnect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  delete?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  update?: Prisma.UserUpdateWithWhereUniqueWithoutReferredByUserInput | Prisma.UserUpdateWithWhereUniqueWithoutReferredByUserInput[]
+  updateMany?: Prisma.UserUpdateManyWithWhereWithoutReferredByUserInput | Prisma.UserUpdateManyWithWhereWithoutReferredByUserInput[]
+  deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
 }
 
 export type UserCreateNestedOneWithoutBookmarksInput = {
@@ -1217,6 +1510,48 @@ export type UserUpdateOneRequiredWithoutTeamMembershipsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutTeamMembershipsInput, Prisma.UserUpdateWithoutTeamMembershipsInput>, Prisma.UserUncheckedUpdateWithoutTeamMembershipsInput>
 }
 
+export type UserCreateNestedOneWithoutReferralRewardsAsReferrerInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReferralRewardsAsReferrerInput, Prisma.UserUncheckedCreateWithoutReferralRewardsAsReferrerInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReferralRewardsAsReferrerInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutReferralRewardsAsReferredInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReferralRewardsAsReferredInput, Prisma.UserUncheckedCreateWithoutReferralRewardsAsReferredInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReferralRewardsAsReferredInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutReferralRewardsAsReferrerNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReferralRewardsAsReferrerInput, Prisma.UserUncheckedCreateWithoutReferralRewardsAsReferrerInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReferralRewardsAsReferrerInput
+  upsert?: Prisma.UserUpsertWithoutReferralRewardsAsReferrerInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutReferralRewardsAsReferrerInput, Prisma.UserUpdateWithoutReferralRewardsAsReferrerInput>, Prisma.UserUncheckedUpdateWithoutReferralRewardsAsReferrerInput>
+}
+
+export type UserUpdateOneRequiredWithoutReferralRewardsAsReferredNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReferralRewardsAsReferredInput, Prisma.UserUncheckedCreateWithoutReferralRewardsAsReferredInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReferralRewardsAsReferredInput
+  upsert?: Prisma.UserUpsertWithoutReferralRewardsAsReferredInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutReferralRewardsAsReferredInput, Prisma.UserUpdateWithoutReferralRewardsAsReferredInput>, Prisma.UserUncheckedUpdateWithoutReferralRewardsAsReferredInput>
+}
+
+export type UserCreateNestedOneWithoutStudentVerificationsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutStudentVerificationsInput, Prisma.UserUncheckedCreateWithoutStudentVerificationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutStudentVerificationsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutStudentVerificationsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutStudentVerificationsInput, Prisma.UserUncheckedCreateWithoutStudentVerificationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutStudentVerificationsInput
+  upsert?: Prisma.UserUpsertWithoutStudentVerificationsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutStudentVerificationsInput, Prisma.UserUpdateWithoutStudentVerificationsInput>, Prisma.UserUncheckedUpdateWithoutStudentVerificationsInput>
+}
+
 export type UserCreateNestedOneWithoutApiKeysInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutApiKeysInput, Prisma.UserUncheckedCreateWithoutApiKeysInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutApiKeysInput
@@ -1229,6 +1564,452 @@ export type UserUpdateOneRequiredWithoutApiKeysNestedInput = {
   upsert?: Prisma.UserUpsertWithoutApiKeysInput
   connect?: Prisma.UserWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutApiKeysInput, Prisma.UserUpdateWithoutApiKeysInput>, Prisma.UserUncheckedUpdateWithoutApiKeysInput>
+}
+
+export type UserCreateWithoutReferredUsersInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  name: string
+  createdAt?: Date | string
+  preferences?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  emailVerified?: boolean
+  verificationTokenHash?: string | null
+  verificationTokenExpiry?: Date | string | null
+  verificationSendCount?: number
+  lastVerificationSentAt?: Date | string | null
+  resetTokenHash?: string | null
+  resetTokenExpiry?: Date | string | null
+  resetSendCount?: number
+  lastResetSentAt?: Date | string | null
+  tokenVersion?: number
+  googleIdHash?: string | null
+  githubIdHash?: string | null
+  hasPassword?: boolean
+  emailBounced?: boolean
+  emailBouncedAt?: Date | string | null
+  emailOptOut?: boolean
+  emailOptOutAt?: Date | string | null
+  updatedAt?: Date | string
+  avatarUrl?: string | null
+  selectedPresetAvatar?: string | null
+  featuredBadgeId?: string | null
+  showOnLeaderboard?: boolean
+  isHistoryPaused?: boolean
+  deletionRequestedAt?: Date | string | null
+  deletionConfirmToken?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  subscriptionTier?: $Enums.SubscriptionTier
+  subscriptionStatus?: $Enums.SubscriptionStatus
+  subscriptionEndsAt?: Date | string | null
+  pausedUntil?: Date | string | null
+  showPremiumBadge?: boolean
+  customAccentColor?: string | null
+  referralCode?: string | null
+  freeMonthsEarned?: number
+  isStudent?: boolean
+  studentVerifiedUntil?: Date | string | null
+  bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
+  readingHistory?: Prisma.ReadingHistoryCreateNestedManyWithoutUserInput
+  emailSubscription?: Prisma.EmailSubscriptionCreateNestedOneWithoutUserInput
+  emailDigests?: Prisma.EmailDigestCreateNestedManyWithoutUserInput
+  userPersonas?: Prisma.UserPersonaCreateNestedManyWithoutUserInput
+  badges?: Prisma.UserBadgeCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutUserInput
+  teamMemberships?: Prisma.TeamMemberCreateNestedManyWithoutUserInput
+  apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutUserInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardCreateNestedManyWithoutReferrerInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardCreateNestedManyWithoutReferredInput
+  referredByUser?: Prisma.UserCreateNestedOneWithoutReferredUsersInput
+  studentVerifications?: Prisma.StudentVerificationCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutReferredUsersInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  name: string
+  createdAt?: Date | string
+  preferences?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  emailVerified?: boolean
+  verificationTokenHash?: string | null
+  verificationTokenExpiry?: Date | string | null
+  verificationSendCount?: number
+  lastVerificationSentAt?: Date | string | null
+  resetTokenHash?: string | null
+  resetTokenExpiry?: Date | string | null
+  resetSendCount?: number
+  lastResetSentAt?: Date | string | null
+  tokenVersion?: number
+  googleIdHash?: string | null
+  githubIdHash?: string | null
+  hasPassword?: boolean
+  emailBounced?: boolean
+  emailBouncedAt?: Date | string | null
+  emailOptOut?: boolean
+  emailOptOutAt?: Date | string | null
+  updatedAt?: Date | string
+  avatarUrl?: string | null
+  selectedPresetAvatar?: string | null
+  featuredBadgeId?: string | null
+  showOnLeaderboard?: boolean
+  isHistoryPaused?: boolean
+  deletionRequestedAt?: Date | string | null
+  deletionConfirmToken?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  subscriptionTier?: $Enums.SubscriptionTier
+  subscriptionStatus?: $Enums.SubscriptionStatus
+  subscriptionEndsAt?: Date | string | null
+  pausedUntil?: Date | string | null
+  showPremiumBadge?: boolean
+  customAccentColor?: string | null
+  referralCode?: string | null
+  referredBy?: string | null
+  freeMonthsEarned?: number
+  isStudent?: boolean
+  studentVerifiedUntil?: Date | string | null
+  bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
+  readingHistory?: Prisma.ReadingHistoryUncheckedCreateNestedManyWithoutUserInput
+  emailSubscription?: Prisma.EmailSubscriptionUncheckedCreateNestedOneWithoutUserInput
+  emailDigests?: Prisma.EmailDigestUncheckedCreateNestedManyWithoutUserInput
+  userPersonas?: Prisma.UserPersonaUncheckedCreateNestedManyWithoutUserInput
+  badges?: Prisma.UserBadgeUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
+  teamMemberships?: Prisma.TeamMemberUncheckedCreateNestedManyWithoutUserInput
+  apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutUserInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferrerInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferredInput
+  studentVerifications?: Prisma.StudentVerificationUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutReferredUsersInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutReferredUsersInput, Prisma.UserUncheckedCreateWithoutReferredUsersInput>
+}
+
+export type UserCreateWithoutReferredByUserInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  name: string
+  createdAt?: Date | string
+  preferences?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  emailVerified?: boolean
+  verificationTokenHash?: string | null
+  verificationTokenExpiry?: Date | string | null
+  verificationSendCount?: number
+  lastVerificationSentAt?: Date | string | null
+  resetTokenHash?: string | null
+  resetTokenExpiry?: Date | string | null
+  resetSendCount?: number
+  lastResetSentAt?: Date | string | null
+  tokenVersion?: number
+  googleIdHash?: string | null
+  githubIdHash?: string | null
+  hasPassword?: boolean
+  emailBounced?: boolean
+  emailBouncedAt?: Date | string | null
+  emailOptOut?: boolean
+  emailOptOutAt?: Date | string | null
+  updatedAt?: Date | string
+  avatarUrl?: string | null
+  selectedPresetAvatar?: string | null
+  featuredBadgeId?: string | null
+  showOnLeaderboard?: boolean
+  isHistoryPaused?: boolean
+  deletionRequestedAt?: Date | string | null
+  deletionConfirmToken?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  subscriptionTier?: $Enums.SubscriptionTier
+  subscriptionStatus?: $Enums.SubscriptionStatus
+  subscriptionEndsAt?: Date | string | null
+  pausedUntil?: Date | string | null
+  showPremiumBadge?: boolean
+  customAccentColor?: string | null
+  referralCode?: string | null
+  freeMonthsEarned?: number
+  isStudent?: boolean
+  studentVerifiedUntil?: Date | string | null
+  bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
+  readingHistory?: Prisma.ReadingHistoryCreateNestedManyWithoutUserInput
+  emailSubscription?: Prisma.EmailSubscriptionCreateNestedOneWithoutUserInput
+  emailDigests?: Prisma.EmailDigestCreateNestedManyWithoutUserInput
+  userPersonas?: Prisma.UserPersonaCreateNestedManyWithoutUserInput
+  badges?: Prisma.UserBadgeCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutUserInput
+  teamMemberships?: Prisma.TeamMemberCreateNestedManyWithoutUserInput
+  apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutUserInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardCreateNestedManyWithoutReferrerInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardCreateNestedManyWithoutReferredInput
+  referredUsers?: Prisma.UserCreateNestedManyWithoutReferredByUserInput
+  studentVerifications?: Prisma.StudentVerificationCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutReferredByUserInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  name: string
+  createdAt?: Date | string
+  preferences?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  emailVerified?: boolean
+  verificationTokenHash?: string | null
+  verificationTokenExpiry?: Date | string | null
+  verificationSendCount?: number
+  lastVerificationSentAt?: Date | string | null
+  resetTokenHash?: string | null
+  resetTokenExpiry?: Date | string | null
+  resetSendCount?: number
+  lastResetSentAt?: Date | string | null
+  tokenVersion?: number
+  googleIdHash?: string | null
+  githubIdHash?: string | null
+  hasPassword?: boolean
+  emailBounced?: boolean
+  emailBouncedAt?: Date | string | null
+  emailOptOut?: boolean
+  emailOptOutAt?: Date | string | null
+  updatedAt?: Date | string
+  avatarUrl?: string | null
+  selectedPresetAvatar?: string | null
+  featuredBadgeId?: string | null
+  showOnLeaderboard?: boolean
+  isHistoryPaused?: boolean
+  deletionRequestedAt?: Date | string | null
+  deletionConfirmToken?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  subscriptionTier?: $Enums.SubscriptionTier
+  subscriptionStatus?: $Enums.SubscriptionStatus
+  subscriptionEndsAt?: Date | string | null
+  pausedUntil?: Date | string | null
+  showPremiumBadge?: boolean
+  customAccentColor?: string | null
+  referralCode?: string | null
+  freeMonthsEarned?: number
+  isStudent?: boolean
+  studentVerifiedUntil?: Date | string | null
+  bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
+  readingHistory?: Prisma.ReadingHistoryUncheckedCreateNestedManyWithoutUserInput
+  emailSubscription?: Prisma.EmailSubscriptionUncheckedCreateNestedOneWithoutUserInput
+  emailDigests?: Prisma.EmailDigestUncheckedCreateNestedManyWithoutUserInput
+  userPersonas?: Prisma.UserPersonaUncheckedCreateNestedManyWithoutUserInput
+  badges?: Prisma.UserBadgeUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
+  teamMemberships?: Prisma.TeamMemberUncheckedCreateNestedManyWithoutUserInput
+  apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutUserInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferrerInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferredInput
+  referredUsers?: Prisma.UserUncheckedCreateNestedManyWithoutReferredByUserInput
+  studentVerifications?: Prisma.StudentVerificationUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutReferredByUserInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutReferredByUserInput, Prisma.UserUncheckedCreateWithoutReferredByUserInput>
+}
+
+export type UserCreateManyReferredByUserInputEnvelope = {
+  data: Prisma.UserCreateManyReferredByUserInput | Prisma.UserCreateManyReferredByUserInput[]
+  skipDuplicates?: boolean
+}
+
+export type UserUpsertWithoutReferredUsersInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutReferredUsersInput, Prisma.UserUncheckedUpdateWithoutReferredUsersInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutReferredUsersInput, Prisma.UserUncheckedCreateWithoutReferredUsersInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutReferredUsersInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutReferredUsersInput, Prisma.UserUncheckedUpdateWithoutReferredUsersInput>
+}
+
+export type UserUpdateWithoutReferredUsersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  preferences?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verificationTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationSendCount?: Prisma.IntFieldUpdateOperationsInput | number
+  lastVerificationSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetSendCount?: Prisma.IntFieldUpdateOperationsInput | number
+  lastResetSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  googleIdHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubIdHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hasPassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailBounced?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailBouncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailOptOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailOptOutAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  selectedPresetAvatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  featuredBadgeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  showOnLeaderboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isHistoryPaused?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierFieldUpdateOperationsInput | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
+  isStudent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  studentVerifiedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
+  readingHistory?: Prisma.ReadingHistoryUpdateManyWithoutUserNestedInput
+  emailSubscription?: Prisma.EmailSubscriptionUpdateOneWithoutUserNestedInput
+  emailDigests?: Prisma.EmailDigestUpdateManyWithoutUserNestedInput
+  userPersonas?: Prisma.UserPersonaUpdateManyWithoutUserNestedInput
+  badges?: Prisma.UserBadgeUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
+  teamMemberships?: Prisma.TeamMemberUpdateManyWithoutUserNestedInput
+  apiKeys?: Prisma.ApiKeyUpdateManyWithoutUserNestedInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUpdateManyWithoutReferrerNestedInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUpdateManyWithoutReferredNestedInput
+  referredByUser?: Prisma.UserUpdateOneWithoutReferredUsersNestedInput
+  studentVerifications?: Prisma.StudentVerificationUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutReferredUsersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  preferences?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verificationTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationSendCount?: Prisma.IntFieldUpdateOperationsInput | number
+  lastVerificationSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetSendCount?: Prisma.IntFieldUpdateOperationsInput | number
+  lastResetSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  googleIdHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubIdHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hasPassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailBounced?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailBouncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailOptOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailOptOutAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  selectedPresetAvatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  featuredBadgeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  showOnLeaderboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isHistoryPaused?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierFieldUpdateOperationsInput | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referredBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
+  isStudent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  studentVerifiedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
+  readingHistory?: Prisma.ReadingHistoryUncheckedUpdateManyWithoutUserNestedInput
+  emailSubscription?: Prisma.EmailSubscriptionUncheckedUpdateOneWithoutUserNestedInput
+  emailDigests?: Prisma.EmailDigestUncheckedUpdateManyWithoutUserNestedInput
+  userPersonas?: Prisma.UserPersonaUncheckedUpdateManyWithoutUserNestedInput
+  badges?: Prisma.UserBadgeUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
+  teamMemberships?: Prisma.TeamMemberUncheckedUpdateManyWithoutUserNestedInput
+  apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutUserNestedInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferrerNestedInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferredNestedInput
+  studentVerifications?: Prisma.StudentVerificationUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserUpsertWithWhereUniqueWithoutReferredByUserInput = {
+  where: Prisma.UserWhereUniqueInput
+  update: Prisma.XOR<Prisma.UserUpdateWithoutReferredByUserInput, Prisma.UserUncheckedUpdateWithoutReferredByUserInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutReferredByUserInput, Prisma.UserUncheckedCreateWithoutReferredByUserInput>
+}
+
+export type UserUpdateWithWhereUniqueWithoutReferredByUserInput = {
+  where: Prisma.UserWhereUniqueInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutReferredByUserInput, Prisma.UserUncheckedUpdateWithoutReferredByUserInput>
+}
+
+export type UserUpdateManyWithWhereWithoutReferredByUserInput = {
+  where: Prisma.UserScalarWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateManyMutationInput, Prisma.UserUncheckedUpdateManyWithoutReferredByUserInput>
+}
+
+export type UserScalarWhereInput = {
+  AND?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
+  OR?: Prisma.UserScalarWhereInput[]
+  NOT?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
+  id?: Prisma.StringFilter<"User"> | string
+  email?: Prisma.StringFilter<"User"> | string
+  passwordHash?: Prisma.StringFilter<"User"> | string
+  name?: Prisma.StringFilter<"User"> | string
+  createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
+  preferences?: Prisma.JsonNullableFilter<"User">
+  emailVerified?: Prisma.BoolFilter<"User"> | boolean
+  verificationTokenHash?: Prisma.StringNullableFilter<"User"> | string | null
+  verificationTokenExpiry?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  verificationSendCount?: Prisma.IntFilter<"User"> | number
+  lastVerificationSentAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  resetTokenHash?: Prisma.StringNullableFilter<"User"> | string | null
+  resetTokenExpiry?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  resetSendCount?: Prisma.IntFilter<"User"> | number
+  lastResetSentAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  tokenVersion?: Prisma.IntFilter<"User"> | number
+  googleIdHash?: Prisma.StringNullableFilter<"User"> | string | null
+  githubIdHash?: Prisma.StringNullableFilter<"User"> | string | null
+  hasPassword?: Prisma.BoolFilter<"User"> | boolean
+  emailBounced?: Prisma.BoolFilter<"User"> | boolean
+  emailBouncedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  emailOptOut?: Prisma.BoolFilter<"User"> | boolean
+  emailOptOutAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
+  avatarUrl?: Prisma.StringNullableFilter<"User"> | string | null
+  selectedPresetAvatar?: Prisma.StringNullableFilter<"User"> | string | null
+  featuredBadgeId?: Prisma.StringNullableFilter<"User"> | string | null
+  showOnLeaderboard?: Prisma.BoolFilter<"User"> | boolean
+  isHistoryPaused?: Prisma.BoolFilter<"User"> | boolean
+  deletionRequestedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  deletionConfirmToken?: Prisma.StringNullableFilter<"User"> | string | null
+  stripeCustomerId?: Prisma.StringNullableFilter<"User"> | string | null
+  stripeSubscriptionId?: Prisma.StringNullableFilter<"User"> | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierFilter<"User"> | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFilter<"User"> | $Enums.SubscriptionStatus
+  subscriptionEndsAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  pausedUntil?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  showPremiumBadge?: Prisma.BoolFilter<"User"> | boolean
+  customAccentColor?: Prisma.StringNullableFilter<"User"> | string | null
+  referralCode?: Prisma.StringNullableFilter<"User"> | string | null
+  referredBy?: Prisma.StringNullableFilter<"User"> | string | null
+  freeMonthsEarned?: Prisma.IntFilter<"User"> | number
+  isStudent?: Prisma.BoolFilter<"User"> | boolean
+  studentVerifiedUntil?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
 }
 
 export type UserCreateWithoutBookmarksInput = {
@@ -1265,9 +2046,16 @@ export type UserCreateWithoutBookmarksInput = {
   deletionConfirmToken?: string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
-  subscriptionTier?: string | null
-  subscriptionStatus?: string | null
+  subscriptionTier?: $Enums.SubscriptionTier
+  subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
+  pausedUntil?: Date | string | null
+  showPremiumBadge?: boolean
+  customAccentColor?: string | null
+  referralCode?: string | null
+  freeMonthsEarned?: number
+  isStudent?: boolean
+  studentVerifiedUntil?: Date | string | null
   readingHistory?: Prisma.ReadingHistoryCreateNestedManyWithoutUserInput
   emailSubscription?: Prisma.EmailSubscriptionCreateNestedOneWithoutUserInput
   emailDigests?: Prisma.EmailDigestCreateNestedManyWithoutUserInput
@@ -1276,6 +2064,11 @@ export type UserCreateWithoutBookmarksInput = {
   comments?: Prisma.CommentCreateNestedManyWithoutUserInput
   teamMemberships?: Prisma.TeamMemberCreateNestedManyWithoutUserInput
   apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutUserInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardCreateNestedManyWithoutReferrerInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardCreateNestedManyWithoutReferredInput
+  referredByUser?: Prisma.UserCreateNestedOneWithoutReferredUsersInput
+  referredUsers?: Prisma.UserCreateNestedManyWithoutReferredByUserInput
+  studentVerifications?: Prisma.StudentVerificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBookmarksInput = {
@@ -1312,9 +2105,17 @@ export type UserUncheckedCreateWithoutBookmarksInput = {
   deletionConfirmToken?: string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
-  subscriptionTier?: string | null
-  subscriptionStatus?: string | null
+  subscriptionTier?: $Enums.SubscriptionTier
+  subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
+  pausedUntil?: Date | string | null
+  showPremiumBadge?: boolean
+  customAccentColor?: string | null
+  referralCode?: string | null
+  referredBy?: string | null
+  freeMonthsEarned?: number
+  isStudent?: boolean
+  studentVerifiedUntil?: Date | string | null
   readingHistory?: Prisma.ReadingHistoryUncheckedCreateNestedManyWithoutUserInput
   emailSubscription?: Prisma.EmailSubscriptionUncheckedCreateNestedOneWithoutUserInput
   emailDigests?: Prisma.EmailDigestUncheckedCreateNestedManyWithoutUserInput
@@ -1323,6 +2124,10 @@ export type UserUncheckedCreateWithoutBookmarksInput = {
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
   teamMemberships?: Prisma.TeamMemberUncheckedCreateNestedManyWithoutUserInput
   apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutUserInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferrerInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferredInput
+  referredUsers?: Prisma.UserUncheckedCreateNestedManyWithoutReferredByUserInput
+  studentVerifications?: Prisma.StudentVerificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBookmarksInput = {
@@ -1375,9 +2180,16 @@ export type UserUpdateWithoutBookmarksInput = {
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierFieldUpdateOperationsInput | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
+  isStudent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  studentVerifiedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   readingHistory?: Prisma.ReadingHistoryUpdateManyWithoutUserNestedInput
   emailSubscription?: Prisma.EmailSubscriptionUpdateOneWithoutUserNestedInput
   emailDigests?: Prisma.EmailDigestUpdateManyWithoutUserNestedInput
@@ -1386,6 +2198,11 @@ export type UserUpdateWithoutBookmarksInput = {
   comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
   teamMemberships?: Prisma.TeamMemberUpdateManyWithoutUserNestedInput
   apiKeys?: Prisma.ApiKeyUpdateManyWithoutUserNestedInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUpdateManyWithoutReferrerNestedInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUpdateManyWithoutReferredNestedInput
+  referredByUser?: Prisma.UserUpdateOneWithoutReferredUsersNestedInput
+  referredUsers?: Prisma.UserUpdateManyWithoutReferredByUserNestedInput
+  studentVerifications?: Prisma.StudentVerificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBookmarksInput = {
@@ -1422,9 +2239,17 @@ export type UserUncheckedUpdateWithoutBookmarksInput = {
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierFieldUpdateOperationsInput | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referredBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
+  isStudent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  studentVerifiedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   readingHistory?: Prisma.ReadingHistoryUncheckedUpdateManyWithoutUserNestedInput
   emailSubscription?: Prisma.EmailSubscriptionUncheckedUpdateOneWithoutUserNestedInput
   emailDigests?: Prisma.EmailDigestUncheckedUpdateManyWithoutUserNestedInput
@@ -1433,6 +2258,10 @@ export type UserUncheckedUpdateWithoutBookmarksInput = {
   comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
   teamMemberships?: Prisma.TeamMemberUncheckedUpdateManyWithoutUserNestedInput
   apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutUserNestedInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferrerNestedInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferredNestedInput
+  referredUsers?: Prisma.UserUncheckedUpdateManyWithoutReferredByUserNestedInput
+  studentVerifications?: Prisma.StudentVerificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutReadingHistoryInput = {
@@ -1469,9 +2298,16 @@ export type UserCreateWithoutReadingHistoryInput = {
   deletionConfirmToken?: string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
-  subscriptionTier?: string | null
-  subscriptionStatus?: string | null
+  subscriptionTier?: $Enums.SubscriptionTier
+  subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
+  pausedUntil?: Date | string | null
+  showPremiumBadge?: boolean
+  customAccentColor?: string | null
+  referralCode?: string | null
+  freeMonthsEarned?: number
+  isStudent?: boolean
+  studentVerifiedUntil?: Date | string | null
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   emailSubscription?: Prisma.EmailSubscriptionCreateNestedOneWithoutUserInput
   emailDigests?: Prisma.EmailDigestCreateNestedManyWithoutUserInput
@@ -1480,6 +2316,11 @@ export type UserCreateWithoutReadingHistoryInput = {
   comments?: Prisma.CommentCreateNestedManyWithoutUserInput
   teamMemberships?: Prisma.TeamMemberCreateNestedManyWithoutUserInput
   apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutUserInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardCreateNestedManyWithoutReferrerInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardCreateNestedManyWithoutReferredInput
+  referredByUser?: Prisma.UserCreateNestedOneWithoutReferredUsersInput
+  referredUsers?: Prisma.UserCreateNestedManyWithoutReferredByUserInput
+  studentVerifications?: Prisma.StudentVerificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReadingHistoryInput = {
@@ -1516,9 +2357,17 @@ export type UserUncheckedCreateWithoutReadingHistoryInput = {
   deletionConfirmToken?: string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
-  subscriptionTier?: string | null
-  subscriptionStatus?: string | null
+  subscriptionTier?: $Enums.SubscriptionTier
+  subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
+  pausedUntil?: Date | string | null
+  showPremiumBadge?: boolean
+  customAccentColor?: string | null
+  referralCode?: string | null
+  referredBy?: string | null
+  freeMonthsEarned?: number
+  isStudent?: boolean
+  studentVerifiedUntil?: Date | string | null
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   emailSubscription?: Prisma.EmailSubscriptionUncheckedCreateNestedOneWithoutUserInput
   emailDigests?: Prisma.EmailDigestUncheckedCreateNestedManyWithoutUserInput
@@ -1527,6 +2376,10 @@ export type UserUncheckedCreateWithoutReadingHistoryInput = {
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
   teamMemberships?: Prisma.TeamMemberUncheckedCreateNestedManyWithoutUserInput
   apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutUserInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferrerInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferredInput
+  referredUsers?: Prisma.UserUncheckedCreateNestedManyWithoutReferredByUserInput
+  studentVerifications?: Prisma.StudentVerificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReadingHistoryInput = {
@@ -1579,9 +2432,16 @@ export type UserUpdateWithoutReadingHistoryInput = {
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierFieldUpdateOperationsInput | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
+  isStudent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  studentVerifiedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   emailSubscription?: Prisma.EmailSubscriptionUpdateOneWithoutUserNestedInput
   emailDigests?: Prisma.EmailDigestUpdateManyWithoutUserNestedInput
@@ -1590,6 +2450,11 @@ export type UserUpdateWithoutReadingHistoryInput = {
   comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
   teamMemberships?: Prisma.TeamMemberUpdateManyWithoutUserNestedInput
   apiKeys?: Prisma.ApiKeyUpdateManyWithoutUserNestedInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUpdateManyWithoutReferrerNestedInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUpdateManyWithoutReferredNestedInput
+  referredByUser?: Prisma.UserUpdateOneWithoutReferredUsersNestedInput
+  referredUsers?: Prisma.UserUpdateManyWithoutReferredByUserNestedInput
+  studentVerifications?: Prisma.StudentVerificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReadingHistoryInput = {
@@ -1626,9 +2491,17 @@ export type UserUncheckedUpdateWithoutReadingHistoryInput = {
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierFieldUpdateOperationsInput | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referredBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
+  isStudent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  studentVerifiedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   emailSubscription?: Prisma.EmailSubscriptionUncheckedUpdateOneWithoutUserNestedInput
   emailDigests?: Prisma.EmailDigestUncheckedUpdateManyWithoutUserNestedInput
@@ -1637,6 +2510,10 @@ export type UserUncheckedUpdateWithoutReadingHistoryInput = {
   comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
   teamMemberships?: Prisma.TeamMemberUncheckedUpdateManyWithoutUserNestedInput
   apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutUserNestedInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferrerNestedInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferredNestedInput
+  referredUsers?: Prisma.UserUncheckedUpdateManyWithoutReferredByUserNestedInput
+  studentVerifications?: Prisma.StudentVerificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutEmailSubscriptionInput = {
@@ -1673,9 +2550,16 @@ export type UserCreateWithoutEmailSubscriptionInput = {
   deletionConfirmToken?: string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
-  subscriptionTier?: string | null
-  subscriptionStatus?: string | null
+  subscriptionTier?: $Enums.SubscriptionTier
+  subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
+  pausedUntil?: Date | string | null
+  showPremiumBadge?: boolean
+  customAccentColor?: string | null
+  referralCode?: string | null
+  freeMonthsEarned?: number
+  isStudent?: boolean
+  studentVerifiedUntil?: Date | string | null
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   readingHistory?: Prisma.ReadingHistoryCreateNestedManyWithoutUserInput
   emailDigests?: Prisma.EmailDigestCreateNestedManyWithoutUserInput
@@ -1684,6 +2568,11 @@ export type UserCreateWithoutEmailSubscriptionInput = {
   comments?: Prisma.CommentCreateNestedManyWithoutUserInput
   teamMemberships?: Prisma.TeamMemberCreateNestedManyWithoutUserInput
   apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutUserInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardCreateNestedManyWithoutReferrerInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardCreateNestedManyWithoutReferredInput
+  referredByUser?: Prisma.UserCreateNestedOneWithoutReferredUsersInput
+  referredUsers?: Prisma.UserCreateNestedManyWithoutReferredByUserInput
+  studentVerifications?: Prisma.StudentVerificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutEmailSubscriptionInput = {
@@ -1720,9 +2609,17 @@ export type UserUncheckedCreateWithoutEmailSubscriptionInput = {
   deletionConfirmToken?: string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
-  subscriptionTier?: string | null
-  subscriptionStatus?: string | null
+  subscriptionTier?: $Enums.SubscriptionTier
+  subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
+  pausedUntil?: Date | string | null
+  showPremiumBadge?: boolean
+  customAccentColor?: string | null
+  referralCode?: string | null
+  referredBy?: string | null
+  freeMonthsEarned?: number
+  isStudent?: boolean
+  studentVerifiedUntil?: Date | string | null
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   readingHistory?: Prisma.ReadingHistoryUncheckedCreateNestedManyWithoutUserInput
   emailDigests?: Prisma.EmailDigestUncheckedCreateNestedManyWithoutUserInput
@@ -1731,6 +2628,10 @@ export type UserUncheckedCreateWithoutEmailSubscriptionInput = {
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
   teamMemberships?: Prisma.TeamMemberUncheckedCreateNestedManyWithoutUserInput
   apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutUserInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferrerInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferredInput
+  referredUsers?: Prisma.UserUncheckedCreateNestedManyWithoutReferredByUserInput
+  studentVerifications?: Prisma.StudentVerificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutEmailSubscriptionInput = {
@@ -1783,9 +2684,16 @@ export type UserUpdateWithoutEmailSubscriptionInput = {
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierFieldUpdateOperationsInput | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
+  isStudent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  studentVerifiedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   readingHistory?: Prisma.ReadingHistoryUpdateManyWithoutUserNestedInput
   emailDigests?: Prisma.EmailDigestUpdateManyWithoutUserNestedInput
@@ -1794,6 +2702,11 @@ export type UserUpdateWithoutEmailSubscriptionInput = {
   comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
   teamMemberships?: Prisma.TeamMemberUpdateManyWithoutUserNestedInput
   apiKeys?: Prisma.ApiKeyUpdateManyWithoutUserNestedInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUpdateManyWithoutReferrerNestedInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUpdateManyWithoutReferredNestedInput
+  referredByUser?: Prisma.UserUpdateOneWithoutReferredUsersNestedInput
+  referredUsers?: Prisma.UserUpdateManyWithoutReferredByUserNestedInput
+  studentVerifications?: Prisma.StudentVerificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEmailSubscriptionInput = {
@@ -1830,9 +2743,17 @@ export type UserUncheckedUpdateWithoutEmailSubscriptionInput = {
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierFieldUpdateOperationsInput | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referredBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
+  isStudent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  studentVerifiedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   readingHistory?: Prisma.ReadingHistoryUncheckedUpdateManyWithoutUserNestedInput
   emailDigests?: Prisma.EmailDigestUncheckedUpdateManyWithoutUserNestedInput
@@ -1841,6 +2762,10 @@ export type UserUncheckedUpdateWithoutEmailSubscriptionInput = {
   comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
   teamMemberships?: Prisma.TeamMemberUncheckedUpdateManyWithoutUserNestedInput
   apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutUserNestedInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferrerNestedInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferredNestedInput
+  referredUsers?: Prisma.UserUncheckedUpdateManyWithoutReferredByUserNestedInput
+  studentVerifications?: Prisma.StudentVerificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutEmailDigestsInput = {
@@ -1877,9 +2802,16 @@ export type UserCreateWithoutEmailDigestsInput = {
   deletionConfirmToken?: string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
-  subscriptionTier?: string | null
-  subscriptionStatus?: string | null
+  subscriptionTier?: $Enums.SubscriptionTier
+  subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
+  pausedUntil?: Date | string | null
+  showPremiumBadge?: boolean
+  customAccentColor?: string | null
+  referralCode?: string | null
+  freeMonthsEarned?: number
+  isStudent?: boolean
+  studentVerifiedUntil?: Date | string | null
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   readingHistory?: Prisma.ReadingHistoryCreateNestedManyWithoutUserInput
   emailSubscription?: Prisma.EmailSubscriptionCreateNestedOneWithoutUserInput
@@ -1888,6 +2820,11 @@ export type UserCreateWithoutEmailDigestsInput = {
   comments?: Prisma.CommentCreateNestedManyWithoutUserInput
   teamMemberships?: Prisma.TeamMemberCreateNestedManyWithoutUserInput
   apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutUserInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardCreateNestedManyWithoutReferrerInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardCreateNestedManyWithoutReferredInput
+  referredByUser?: Prisma.UserCreateNestedOneWithoutReferredUsersInput
+  referredUsers?: Prisma.UserCreateNestedManyWithoutReferredByUserInput
+  studentVerifications?: Prisma.StudentVerificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutEmailDigestsInput = {
@@ -1924,9 +2861,17 @@ export type UserUncheckedCreateWithoutEmailDigestsInput = {
   deletionConfirmToken?: string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
-  subscriptionTier?: string | null
-  subscriptionStatus?: string | null
+  subscriptionTier?: $Enums.SubscriptionTier
+  subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
+  pausedUntil?: Date | string | null
+  showPremiumBadge?: boolean
+  customAccentColor?: string | null
+  referralCode?: string | null
+  referredBy?: string | null
+  freeMonthsEarned?: number
+  isStudent?: boolean
+  studentVerifiedUntil?: Date | string | null
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   readingHistory?: Prisma.ReadingHistoryUncheckedCreateNestedManyWithoutUserInput
   emailSubscription?: Prisma.EmailSubscriptionUncheckedCreateNestedOneWithoutUserInput
@@ -1935,6 +2880,10 @@ export type UserUncheckedCreateWithoutEmailDigestsInput = {
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
   teamMemberships?: Prisma.TeamMemberUncheckedCreateNestedManyWithoutUserInput
   apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutUserInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferrerInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferredInput
+  referredUsers?: Prisma.UserUncheckedCreateNestedManyWithoutReferredByUserInput
+  studentVerifications?: Prisma.StudentVerificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutEmailDigestsInput = {
@@ -1987,9 +2936,16 @@ export type UserUpdateWithoutEmailDigestsInput = {
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierFieldUpdateOperationsInput | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
+  isStudent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  studentVerifiedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   readingHistory?: Prisma.ReadingHistoryUpdateManyWithoutUserNestedInput
   emailSubscription?: Prisma.EmailSubscriptionUpdateOneWithoutUserNestedInput
@@ -1998,6 +2954,11 @@ export type UserUpdateWithoutEmailDigestsInput = {
   comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
   teamMemberships?: Prisma.TeamMemberUpdateManyWithoutUserNestedInput
   apiKeys?: Prisma.ApiKeyUpdateManyWithoutUserNestedInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUpdateManyWithoutReferrerNestedInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUpdateManyWithoutReferredNestedInput
+  referredByUser?: Prisma.UserUpdateOneWithoutReferredUsersNestedInput
+  referredUsers?: Prisma.UserUpdateManyWithoutReferredByUserNestedInput
+  studentVerifications?: Prisma.StudentVerificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEmailDigestsInput = {
@@ -2034,9 +2995,17 @@ export type UserUncheckedUpdateWithoutEmailDigestsInput = {
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierFieldUpdateOperationsInput | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referredBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
+  isStudent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  studentVerifiedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   readingHistory?: Prisma.ReadingHistoryUncheckedUpdateManyWithoutUserNestedInput
   emailSubscription?: Prisma.EmailSubscriptionUncheckedUpdateOneWithoutUserNestedInput
@@ -2045,6 +3014,10 @@ export type UserUncheckedUpdateWithoutEmailDigestsInput = {
   comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
   teamMemberships?: Prisma.TeamMemberUncheckedUpdateManyWithoutUserNestedInput
   apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutUserNestedInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferrerNestedInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferredNestedInput
+  referredUsers?: Prisma.UserUncheckedUpdateManyWithoutReferredByUserNestedInput
+  studentVerifications?: Prisma.StudentVerificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutUserPersonasInput = {
@@ -2081,9 +3054,16 @@ export type UserCreateWithoutUserPersonasInput = {
   deletionConfirmToken?: string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
-  subscriptionTier?: string | null
-  subscriptionStatus?: string | null
+  subscriptionTier?: $Enums.SubscriptionTier
+  subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
+  pausedUntil?: Date | string | null
+  showPremiumBadge?: boolean
+  customAccentColor?: string | null
+  referralCode?: string | null
+  freeMonthsEarned?: number
+  isStudent?: boolean
+  studentVerifiedUntil?: Date | string | null
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   readingHistory?: Prisma.ReadingHistoryCreateNestedManyWithoutUserInput
   emailSubscription?: Prisma.EmailSubscriptionCreateNestedOneWithoutUserInput
@@ -2092,6 +3072,11 @@ export type UserCreateWithoutUserPersonasInput = {
   comments?: Prisma.CommentCreateNestedManyWithoutUserInput
   teamMemberships?: Prisma.TeamMemberCreateNestedManyWithoutUserInput
   apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutUserInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardCreateNestedManyWithoutReferrerInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardCreateNestedManyWithoutReferredInput
+  referredByUser?: Prisma.UserCreateNestedOneWithoutReferredUsersInput
+  referredUsers?: Prisma.UserCreateNestedManyWithoutReferredByUserInput
+  studentVerifications?: Prisma.StudentVerificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutUserPersonasInput = {
@@ -2128,9 +3113,17 @@ export type UserUncheckedCreateWithoutUserPersonasInput = {
   deletionConfirmToken?: string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
-  subscriptionTier?: string | null
-  subscriptionStatus?: string | null
+  subscriptionTier?: $Enums.SubscriptionTier
+  subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
+  pausedUntil?: Date | string | null
+  showPremiumBadge?: boolean
+  customAccentColor?: string | null
+  referralCode?: string | null
+  referredBy?: string | null
+  freeMonthsEarned?: number
+  isStudent?: boolean
+  studentVerifiedUntil?: Date | string | null
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   readingHistory?: Prisma.ReadingHistoryUncheckedCreateNestedManyWithoutUserInput
   emailSubscription?: Prisma.EmailSubscriptionUncheckedCreateNestedOneWithoutUserInput
@@ -2139,6 +3132,10 @@ export type UserUncheckedCreateWithoutUserPersonasInput = {
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
   teamMemberships?: Prisma.TeamMemberUncheckedCreateNestedManyWithoutUserInput
   apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutUserInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferrerInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferredInput
+  referredUsers?: Prisma.UserUncheckedCreateNestedManyWithoutReferredByUserInput
+  studentVerifications?: Prisma.StudentVerificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutUserPersonasInput = {
@@ -2191,9 +3188,16 @@ export type UserUpdateWithoutUserPersonasInput = {
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierFieldUpdateOperationsInput | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
+  isStudent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  studentVerifiedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   readingHistory?: Prisma.ReadingHistoryUpdateManyWithoutUserNestedInput
   emailSubscription?: Prisma.EmailSubscriptionUpdateOneWithoutUserNestedInput
@@ -2202,6 +3206,11 @@ export type UserUpdateWithoutUserPersonasInput = {
   comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
   teamMemberships?: Prisma.TeamMemberUpdateManyWithoutUserNestedInput
   apiKeys?: Prisma.ApiKeyUpdateManyWithoutUserNestedInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUpdateManyWithoutReferrerNestedInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUpdateManyWithoutReferredNestedInput
+  referredByUser?: Prisma.UserUpdateOneWithoutReferredUsersNestedInput
+  referredUsers?: Prisma.UserUpdateManyWithoutReferredByUserNestedInput
+  studentVerifications?: Prisma.StudentVerificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUserPersonasInput = {
@@ -2238,9 +3247,17 @@ export type UserUncheckedUpdateWithoutUserPersonasInput = {
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierFieldUpdateOperationsInput | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referredBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
+  isStudent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  studentVerifiedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   readingHistory?: Prisma.ReadingHistoryUncheckedUpdateManyWithoutUserNestedInput
   emailSubscription?: Prisma.EmailSubscriptionUncheckedUpdateOneWithoutUserNestedInput
@@ -2249,6 +3266,10 @@ export type UserUncheckedUpdateWithoutUserPersonasInput = {
   comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
   teamMemberships?: Prisma.TeamMemberUncheckedUpdateManyWithoutUserNestedInput
   apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutUserNestedInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferrerNestedInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferredNestedInput
+  referredUsers?: Prisma.UserUncheckedUpdateManyWithoutReferredByUserNestedInput
+  studentVerifications?: Prisma.StudentVerificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutBadgesInput = {
@@ -2285,9 +3306,16 @@ export type UserCreateWithoutBadgesInput = {
   deletionConfirmToken?: string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
-  subscriptionTier?: string | null
-  subscriptionStatus?: string | null
+  subscriptionTier?: $Enums.SubscriptionTier
+  subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
+  pausedUntil?: Date | string | null
+  showPremiumBadge?: boolean
+  customAccentColor?: string | null
+  referralCode?: string | null
+  freeMonthsEarned?: number
+  isStudent?: boolean
+  studentVerifiedUntil?: Date | string | null
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   readingHistory?: Prisma.ReadingHistoryCreateNestedManyWithoutUserInput
   emailSubscription?: Prisma.EmailSubscriptionCreateNestedOneWithoutUserInput
@@ -2296,6 +3324,11 @@ export type UserCreateWithoutBadgesInput = {
   comments?: Prisma.CommentCreateNestedManyWithoutUserInput
   teamMemberships?: Prisma.TeamMemberCreateNestedManyWithoutUserInput
   apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutUserInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardCreateNestedManyWithoutReferrerInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardCreateNestedManyWithoutReferredInput
+  referredByUser?: Prisma.UserCreateNestedOneWithoutReferredUsersInput
+  referredUsers?: Prisma.UserCreateNestedManyWithoutReferredByUserInput
+  studentVerifications?: Prisma.StudentVerificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBadgesInput = {
@@ -2332,9 +3365,17 @@ export type UserUncheckedCreateWithoutBadgesInput = {
   deletionConfirmToken?: string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
-  subscriptionTier?: string | null
-  subscriptionStatus?: string | null
+  subscriptionTier?: $Enums.SubscriptionTier
+  subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
+  pausedUntil?: Date | string | null
+  showPremiumBadge?: boolean
+  customAccentColor?: string | null
+  referralCode?: string | null
+  referredBy?: string | null
+  freeMonthsEarned?: number
+  isStudent?: boolean
+  studentVerifiedUntil?: Date | string | null
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   readingHistory?: Prisma.ReadingHistoryUncheckedCreateNestedManyWithoutUserInput
   emailSubscription?: Prisma.EmailSubscriptionUncheckedCreateNestedOneWithoutUserInput
@@ -2343,6 +3384,10 @@ export type UserUncheckedCreateWithoutBadgesInput = {
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
   teamMemberships?: Prisma.TeamMemberUncheckedCreateNestedManyWithoutUserInput
   apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutUserInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferrerInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferredInput
+  referredUsers?: Prisma.UserUncheckedCreateNestedManyWithoutReferredByUserInput
+  studentVerifications?: Prisma.StudentVerificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBadgesInput = {
@@ -2395,9 +3440,16 @@ export type UserUpdateWithoutBadgesInput = {
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierFieldUpdateOperationsInput | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
+  isStudent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  studentVerifiedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   readingHistory?: Prisma.ReadingHistoryUpdateManyWithoutUserNestedInput
   emailSubscription?: Prisma.EmailSubscriptionUpdateOneWithoutUserNestedInput
@@ -2406,6 +3458,11 @@ export type UserUpdateWithoutBadgesInput = {
   comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
   teamMemberships?: Prisma.TeamMemberUpdateManyWithoutUserNestedInput
   apiKeys?: Prisma.ApiKeyUpdateManyWithoutUserNestedInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUpdateManyWithoutReferrerNestedInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUpdateManyWithoutReferredNestedInput
+  referredByUser?: Prisma.UserUpdateOneWithoutReferredUsersNestedInput
+  referredUsers?: Prisma.UserUpdateManyWithoutReferredByUserNestedInput
+  studentVerifications?: Prisma.StudentVerificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBadgesInput = {
@@ -2442,9 +3499,17 @@ export type UserUncheckedUpdateWithoutBadgesInput = {
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierFieldUpdateOperationsInput | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referredBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
+  isStudent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  studentVerifiedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   readingHistory?: Prisma.ReadingHistoryUncheckedUpdateManyWithoutUserNestedInput
   emailSubscription?: Prisma.EmailSubscriptionUncheckedUpdateOneWithoutUserNestedInput
@@ -2453,6 +3518,10 @@ export type UserUncheckedUpdateWithoutBadgesInput = {
   comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
   teamMemberships?: Prisma.TeamMemberUncheckedUpdateManyWithoutUserNestedInput
   apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutUserNestedInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferrerNestedInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferredNestedInput
+  referredUsers?: Prisma.UserUncheckedUpdateManyWithoutReferredByUserNestedInput
+  studentVerifications?: Prisma.StudentVerificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCommentsInput = {
@@ -2489,9 +3558,16 @@ export type UserCreateWithoutCommentsInput = {
   deletionConfirmToken?: string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
-  subscriptionTier?: string | null
-  subscriptionStatus?: string | null
+  subscriptionTier?: $Enums.SubscriptionTier
+  subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
+  pausedUntil?: Date | string | null
+  showPremiumBadge?: boolean
+  customAccentColor?: string | null
+  referralCode?: string | null
+  freeMonthsEarned?: number
+  isStudent?: boolean
+  studentVerifiedUntil?: Date | string | null
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   readingHistory?: Prisma.ReadingHistoryCreateNestedManyWithoutUserInput
   emailSubscription?: Prisma.EmailSubscriptionCreateNestedOneWithoutUserInput
@@ -2500,6 +3576,11 @@ export type UserCreateWithoutCommentsInput = {
   badges?: Prisma.UserBadgeCreateNestedManyWithoutUserInput
   teamMemberships?: Prisma.TeamMemberCreateNestedManyWithoutUserInput
   apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutUserInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardCreateNestedManyWithoutReferrerInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardCreateNestedManyWithoutReferredInput
+  referredByUser?: Prisma.UserCreateNestedOneWithoutReferredUsersInput
+  referredUsers?: Prisma.UserCreateNestedManyWithoutReferredByUserInput
+  studentVerifications?: Prisma.StudentVerificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCommentsInput = {
@@ -2536,9 +3617,17 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   deletionConfirmToken?: string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
-  subscriptionTier?: string | null
-  subscriptionStatus?: string | null
+  subscriptionTier?: $Enums.SubscriptionTier
+  subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
+  pausedUntil?: Date | string | null
+  showPremiumBadge?: boolean
+  customAccentColor?: string | null
+  referralCode?: string | null
+  referredBy?: string | null
+  freeMonthsEarned?: number
+  isStudent?: boolean
+  studentVerifiedUntil?: Date | string | null
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   readingHistory?: Prisma.ReadingHistoryUncheckedCreateNestedManyWithoutUserInput
   emailSubscription?: Prisma.EmailSubscriptionUncheckedCreateNestedOneWithoutUserInput
@@ -2547,6 +3636,10 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   badges?: Prisma.UserBadgeUncheckedCreateNestedManyWithoutUserInput
   teamMemberships?: Prisma.TeamMemberUncheckedCreateNestedManyWithoutUserInput
   apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutUserInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferrerInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferredInput
+  referredUsers?: Prisma.UserUncheckedCreateNestedManyWithoutReferredByUserInput
+  studentVerifications?: Prisma.StudentVerificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCommentsInput = {
@@ -2599,9 +3692,16 @@ export type UserUpdateWithoutCommentsInput = {
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierFieldUpdateOperationsInput | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
+  isStudent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  studentVerifiedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   readingHistory?: Prisma.ReadingHistoryUpdateManyWithoutUserNestedInput
   emailSubscription?: Prisma.EmailSubscriptionUpdateOneWithoutUserNestedInput
@@ -2610,6 +3710,11 @@ export type UserUpdateWithoutCommentsInput = {
   badges?: Prisma.UserBadgeUpdateManyWithoutUserNestedInput
   teamMemberships?: Prisma.TeamMemberUpdateManyWithoutUserNestedInput
   apiKeys?: Prisma.ApiKeyUpdateManyWithoutUserNestedInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUpdateManyWithoutReferrerNestedInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUpdateManyWithoutReferredNestedInput
+  referredByUser?: Prisma.UserUpdateOneWithoutReferredUsersNestedInput
+  referredUsers?: Prisma.UserUpdateManyWithoutReferredByUserNestedInput
+  studentVerifications?: Prisma.StudentVerificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCommentsInput = {
@@ -2646,9 +3751,17 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierFieldUpdateOperationsInput | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referredBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
+  isStudent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  studentVerifiedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   readingHistory?: Prisma.ReadingHistoryUncheckedUpdateManyWithoutUserNestedInput
   emailSubscription?: Prisma.EmailSubscriptionUncheckedUpdateOneWithoutUserNestedInput
@@ -2657,6 +3770,10 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   badges?: Prisma.UserBadgeUncheckedUpdateManyWithoutUserNestedInput
   teamMemberships?: Prisma.TeamMemberUncheckedUpdateManyWithoutUserNestedInput
   apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutUserNestedInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferrerNestedInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferredNestedInput
+  referredUsers?: Prisma.UserUncheckedUpdateManyWithoutReferredByUserNestedInput
+  studentVerifications?: Prisma.StudentVerificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutTeamMembershipsInput = {
@@ -2693,9 +3810,16 @@ export type UserCreateWithoutTeamMembershipsInput = {
   deletionConfirmToken?: string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
-  subscriptionTier?: string | null
-  subscriptionStatus?: string | null
+  subscriptionTier?: $Enums.SubscriptionTier
+  subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
+  pausedUntil?: Date | string | null
+  showPremiumBadge?: boolean
+  customAccentColor?: string | null
+  referralCode?: string | null
+  freeMonthsEarned?: number
+  isStudent?: boolean
+  studentVerifiedUntil?: Date | string | null
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   readingHistory?: Prisma.ReadingHistoryCreateNestedManyWithoutUserInput
   emailSubscription?: Prisma.EmailSubscriptionCreateNestedOneWithoutUserInput
@@ -2704,6 +3828,11 @@ export type UserCreateWithoutTeamMembershipsInput = {
   badges?: Prisma.UserBadgeCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentCreateNestedManyWithoutUserInput
   apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutUserInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardCreateNestedManyWithoutReferrerInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardCreateNestedManyWithoutReferredInput
+  referredByUser?: Prisma.UserCreateNestedOneWithoutReferredUsersInput
+  referredUsers?: Prisma.UserCreateNestedManyWithoutReferredByUserInput
+  studentVerifications?: Prisma.StudentVerificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutTeamMembershipsInput = {
@@ -2740,9 +3869,17 @@ export type UserUncheckedCreateWithoutTeamMembershipsInput = {
   deletionConfirmToken?: string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
-  subscriptionTier?: string | null
-  subscriptionStatus?: string | null
+  subscriptionTier?: $Enums.SubscriptionTier
+  subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
+  pausedUntil?: Date | string | null
+  showPremiumBadge?: boolean
+  customAccentColor?: string | null
+  referralCode?: string | null
+  referredBy?: string | null
+  freeMonthsEarned?: number
+  isStudent?: boolean
+  studentVerifiedUntil?: Date | string | null
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   readingHistory?: Prisma.ReadingHistoryUncheckedCreateNestedManyWithoutUserInput
   emailSubscription?: Prisma.EmailSubscriptionUncheckedCreateNestedOneWithoutUserInput
@@ -2751,6 +3888,10 @@ export type UserUncheckedCreateWithoutTeamMembershipsInput = {
   badges?: Prisma.UserBadgeUncheckedCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
   apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutUserInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferrerInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferredInput
+  referredUsers?: Prisma.UserUncheckedCreateNestedManyWithoutReferredByUserInput
+  studentVerifications?: Prisma.StudentVerificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutTeamMembershipsInput = {
@@ -2803,9 +3944,16 @@ export type UserUpdateWithoutTeamMembershipsInput = {
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierFieldUpdateOperationsInput | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
+  isStudent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  studentVerifiedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   readingHistory?: Prisma.ReadingHistoryUpdateManyWithoutUserNestedInput
   emailSubscription?: Prisma.EmailSubscriptionUpdateOneWithoutUserNestedInput
@@ -2814,6 +3962,11 @@ export type UserUpdateWithoutTeamMembershipsInput = {
   badges?: Prisma.UserBadgeUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
   apiKeys?: Prisma.ApiKeyUpdateManyWithoutUserNestedInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUpdateManyWithoutReferrerNestedInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUpdateManyWithoutReferredNestedInput
+  referredByUser?: Prisma.UserUpdateOneWithoutReferredUsersNestedInput
+  referredUsers?: Prisma.UserUpdateManyWithoutReferredByUserNestedInput
+  studentVerifications?: Prisma.StudentVerificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTeamMembershipsInput = {
@@ -2850,9 +4003,17 @@ export type UserUncheckedUpdateWithoutTeamMembershipsInput = {
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierFieldUpdateOperationsInput | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referredBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
+  isStudent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  studentVerifiedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   readingHistory?: Prisma.ReadingHistoryUncheckedUpdateManyWithoutUserNestedInput
   emailSubscription?: Prisma.EmailSubscriptionUncheckedUpdateOneWithoutUserNestedInput
@@ -2861,6 +4022,766 @@ export type UserUncheckedUpdateWithoutTeamMembershipsInput = {
   badges?: Prisma.UserBadgeUncheckedUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
   apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutUserNestedInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferrerNestedInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferredNestedInput
+  referredUsers?: Prisma.UserUncheckedUpdateManyWithoutReferredByUserNestedInput
+  studentVerifications?: Prisma.StudentVerificationUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutReferralRewardsAsReferrerInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  name: string
+  createdAt?: Date | string
+  preferences?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  emailVerified?: boolean
+  verificationTokenHash?: string | null
+  verificationTokenExpiry?: Date | string | null
+  verificationSendCount?: number
+  lastVerificationSentAt?: Date | string | null
+  resetTokenHash?: string | null
+  resetTokenExpiry?: Date | string | null
+  resetSendCount?: number
+  lastResetSentAt?: Date | string | null
+  tokenVersion?: number
+  googleIdHash?: string | null
+  githubIdHash?: string | null
+  hasPassword?: boolean
+  emailBounced?: boolean
+  emailBouncedAt?: Date | string | null
+  emailOptOut?: boolean
+  emailOptOutAt?: Date | string | null
+  updatedAt?: Date | string
+  avatarUrl?: string | null
+  selectedPresetAvatar?: string | null
+  featuredBadgeId?: string | null
+  showOnLeaderboard?: boolean
+  isHistoryPaused?: boolean
+  deletionRequestedAt?: Date | string | null
+  deletionConfirmToken?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  subscriptionTier?: $Enums.SubscriptionTier
+  subscriptionStatus?: $Enums.SubscriptionStatus
+  subscriptionEndsAt?: Date | string | null
+  pausedUntil?: Date | string | null
+  showPremiumBadge?: boolean
+  customAccentColor?: string | null
+  referralCode?: string | null
+  freeMonthsEarned?: number
+  isStudent?: boolean
+  studentVerifiedUntil?: Date | string | null
+  bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
+  readingHistory?: Prisma.ReadingHistoryCreateNestedManyWithoutUserInput
+  emailSubscription?: Prisma.EmailSubscriptionCreateNestedOneWithoutUserInput
+  emailDigests?: Prisma.EmailDigestCreateNestedManyWithoutUserInput
+  userPersonas?: Prisma.UserPersonaCreateNestedManyWithoutUserInput
+  badges?: Prisma.UserBadgeCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutUserInput
+  teamMemberships?: Prisma.TeamMemberCreateNestedManyWithoutUserInput
+  apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutUserInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardCreateNestedManyWithoutReferredInput
+  referredByUser?: Prisma.UserCreateNestedOneWithoutReferredUsersInput
+  referredUsers?: Prisma.UserCreateNestedManyWithoutReferredByUserInput
+  studentVerifications?: Prisma.StudentVerificationCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutReferralRewardsAsReferrerInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  name: string
+  createdAt?: Date | string
+  preferences?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  emailVerified?: boolean
+  verificationTokenHash?: string | null
+  verificationTokenExpiry?: Date | string | null
+  verificationSendCount?: number
+  lastVerificationSentAt?: Date | string | null
+  resetTokenHash?: string | null
+  resetTokenExpiry?: Date | string | null
+  resetSendCount?: number
+  lastResetSentAt?: Date | string | null
+  tokenVersion?: number
+  googleIdHash?: string | null
+  githubIdHash?: string | null
+  hasPassword?: boolean
+  emailBounced?: boolean
+  emailBouncedAt?: Date | string | null
+  emailOptOut?: boolean
+  emailOptOutAt?: Date | string | null
+  updatedAt?: Date | string
+  avatarUrl?: string | null
+  selectedPresetAvatar?: string | null
+  featuredBadgeId?: string | null
+  showOnLeaderboard?: boolean
+  isHistoryPaused?: boolean
+  deletionRequestedAt?: Date | string | null
+  deletionConfirmToken?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  subscriptionTier?: $Enums.SubscriptionTier
+  subscriptionStatus?: $Enums.SubscriptionStatus
+  subscriptionEndsAt?: Date | string | null
+  pausedUntil?: Date | string | null
+  showPremiumBadge?: boolean
+  customAccentColor?: string | null
+  referralCode?: string | null
+  referredBy?: string | null
+  freeMonthsEarned?: number
+  isStudent?: boolean
+  studentVerifiedUntil?: Date | string | null
+  bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
+  readingHistory?: Prisma.ReadingHistoryUncheckedCreateNestedManyWithoutUserInput
+  emailSubscription?: Prisma.EmailSubscriptionUncheckedCreateNestedOneWithoutUserInput
+  emailDigests?: Prisma.EmailDigestUncheckedCreateNestedManyWithoutUserInput
+  userPersonas?: Prisma.UserPersonaUncheckedCreateNestedManyWithoutUserInput
+  badges?: Prisma.UserBadgeUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
+  teamMemberships?: Prisma.TeamMemberUncheckedCreateNestedManyWithoutUserInput
+  apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutUserInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferredInput
+  referredUsers?: Prisma.UserUncheckedCreateNestedManyWithoutReferredByUserInput
+  studentVerifications?: Prisma.StudentVerificationUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutReferralRewardsAsReferrerInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutReferralRewardsAsReferrerInput, Prisma.UserUncheckedCreateWithoutReferralRewardsAsReferrerInput>
+}
+
+export type UserCreateWithoutReferralRewardsAsReferredInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  name: string
+  createdAt?: Date | string
+  preferences?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  emailVerified?: boolean
+  verificationTokenHash?: string | null
+  verificationTokenExpiry?: Date | string | null
+  verificationSendCount?: number
+  lastVerificationSentAt?: Date | string | null
+  resetTokenHash?: string | null
+  resetTokenExpiry?: Date | string | null
+  resetSendCount?: number
+  lastResetSentAt?: Date | string | null
+  tokenVersion?: number
+  googleIdHash?: string | null
+  githubIdHash?: string | null
+  hasPassword?: boolean
+  emailBounced?: boolean
+  emailBouncedAt?: Date | string | null
+  emailOptOut?: boolean
+  emailOptOutAt?: Date | string | null
+  updatedAt?: Date | string
+  avatarUrl?: string | null
+  selectedPresetAvatar?: string | null
+  featuredBadgeId?: string | null
+  showOnLeaderboard?: boolean
+  isHistoryPaused?: boolean
+  deletionRequestedAt?: Date | string | null
+  deletionConfirmToken?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  subscriptionTier?: $Enums.SubscriptionTier
+  subscriptionStatus?: $Enums.SubscriptionStatus
+  subscriptionEndsAt?: Date | string | null
+  pausedUntil?: Date | string | null
+  showPremiumBadge?: boolean
+  customAccentColor?: string | null
+  referralCode?: string | null
+  freeMonthsEarned?: number
+  isStudent?: boolean
+  studentVerifiedUntil?: Date | string | null
+  bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
+  readingHistory?: Prisma.ReadingHistoryCreateNestedManyWithoutUserInput
+  emailSubscription?: Prisma.EmailSubscriptionCreateNestedOneWithoutUserInput
+  emailDigests?: Prisma.EmailDigestCreateNestedManyWithoutUserInput
+  userPersonas?: Prisma.UserPersonaCreateNestedManyWithoutUserInput
+  badges?: Prisma.UserBadgeCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutUserInput
+  teamMemberships?: Prisma.TeamMemberCreateNestedManyWithoutUserInput
+  apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutUserInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardCreateNestedManyWithoutReferrerInput
+  referredByUser?: Prisma.UserCreateNestedOneWithoutReferredUsersInput
+  referredUsers?: Prisma.UserCreateNestedManyWithoutReferredByUserInput
+  studentVerifications?: Prisma.StudentVerificationCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutReferralRewardsAsReferredInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  name: string
+  createdAt?: Date | string
+  preferences?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  emailVerified?: boolean
+  verificationTokenHash?: string | null
+  verificationTokenExpiry?: Date | string | null
+  verificationSendCount?: number
+  lastVerificationSentAt?: Date | string | null
+  resetTokenHash?: string | null
+  resetTokenExpiry?: Date | string | null
+  resetSendCount?: number
+  lastResetSentAt?: Date | string | null
+  tokenVersion?: number
+  googleIdHash?: string | null
+  githubIdHash?: string | null
+  hasPassword?: boolean
+  emailBounced?: boolean
+  emailBouncedAt?: Date | string | null
+  emailOptOut?: boolean
+  emailOptOutAt?: Date | string | null
+  updatedAt?: Date | string
+  avatarUrl?: string | null
+  selectedPresetAvatar?: string | null
+  featuredBadgeId?: string | null
+  showOnLeaderboard?: boolean
+  isHistoryPaused?: boolean
+  deletionRequestedAt?: Date | string | null
+  deletionConfirmToken?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  subscriptionTier?: $Enums.SubscriptionTier
+  subscriptionStatus?: $Enums.SubscriptionStatus
+  subscriptionEndsAt?: Date | string | null
+  pausedUntil?: Date | string | null
+  showPremiumBadge?: boolean
+  customAccentColor?: string | null
+  referralCode?: string | null
+  referredBy?: string | null
+  freeMonthsEarned?: number
+  isStudent?: boolean
+  studentVerifiedUntil?: Date | string | null
+  bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
+  readingHistory?: Prisma.ReadingHistoryUncheckedCreateNestedManyWithoutUserInput
+  emailSubscription?: Prisma.EmailSubscriptionUncheckedCreateNestedOneWithoutUserInput
+  emailDigests?: Prisma.EmailDigestUncheckedCreateNestedManyWithoutUserInput
+  userPersonas?: Prisma.UserPersonaUncheckedCreateNestedManyWithoutUserInput
+  badges?: Prisma.UserBadgeUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
+  teamMemberships?: Prisma.TeamMemberUncheckedCreateNestedManyWithoutUserInput
+  apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutUserInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferrerInput
+  referredUsers?: Prisma.UserUncheckedCreateNestedManyWithoutReferredByUserInput
+  studentVerifications?: Prisma.StudentVerificationUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutReferralRewardsAsReferredInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutReferralRewardsAsReferredInput, Prisma.UserUncheckedCreateWithoutReferralRewardsAsReferredInput>
+}
+
+export type UserUpsertWithoutReferralRewardsAsReferrerInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutReferralRewardsAsReferrerInput, Prisma.UserUncheckedUpdateWithoutReferralRewardsAsReferrerInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutReferralRewardsAsReferrerInput, Prisma.UserUncheckedCreateWithoutReferralRewardsAsReferrerInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutReferralRewardsAsReferrerInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutReferralRewardsAsReferrerInput, Prisma.UserUncheckedUpdateWithoutReferralRewardsAsReferrerInput>
+}
+
+export type UserUpdateWithoutReferralRewardsAsReferrerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  preferences?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verificationTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationSendCount?: Prisma.IntFieldUpdateOperationsInput | number
+  lastVerificationSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetSendCount?: Prisma.IntFieldUpdateOperationsInput | number
+  lastResetSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  googleIdHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubIdHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hasPassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailBounced?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailBouncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailOptOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailOptOutAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  selectedPresetAvatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  featuredBadgeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  showOnLeaderboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isHistoryPaused?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierFieldUpdateOperationsInput | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
+  isStudent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  studentVerifiedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
+  readingHistory?: Prisma.ReadingHistoryUpdateManyWithoutUserNestedInput
+  emailSubscription?: Prisma.EmailSubscriptionUpdateOneWithoutUserNestedInput
+  emailDigests?: Prisma.EmailDigestUpdateManyWithoutUserNestedInput
+  userPersonas?: Prisma.UserPersonaUpdateManyWithoutUserNestedInput
+  badges?: Prisma.UserBadgeUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
+  teamMemberships?: Prisma.TeamMemberUpdateManyWithoutUserNestedInput
+  apiKeys?: Prisma.ApiKeyUpdateManyWithoutUserNestedInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUpdateManyWithoutReferredNestedInput
+  referredByUser?: Prisma.UserUpdateOneWithoutReferredUsersNestedInput
+  referredUsers?: Prisma.UserUpdateManyWithoutReferredByUserNestedInput
+  studentVerifications?: Prisma.StudentVerificationUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutReferralRewardsAsReferrerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  preferences?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verificationTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationSendCount?: Prisma.IntFieldUpdateOperationsInput | number
+  lastVerificationSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetSendCount?: Prisma.IntFieldUpdateOperationsInput | number
+  lastResetSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  googleIdHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubIdHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hasPassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailBounced?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailBouncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailOptOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailOptOutAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  selectedPresetAvatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  featuredBadgeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  showOnLeaderboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isHistoryPaused?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierFieldUpdateOperationsInput | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referredBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
+  isStudent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  studentVerifiedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
+  readingHistory?: Prisma.ReadingHistoryUncheckedUpdateManyWithoutUserNestedInput
+  emailSubscription?: Prisma.EmailSubscriptionUncheckedUpdateOneWithoutUserNestedInput
+  emailDigests?: Prisma.EmailDigestUncheckedUpdateManyWithoutUserNestedInput
+  userPersonas?: Prisma.UserPersonaUncheckedUpdateManyWithoutUserNestedInput
+  badges?: Prisma.UserBadgeUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
+  teamMemberships?: Prisma.TeamMemberUncheckedUpdateManyWithoutUserNestedInput
+  apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutUserNestedInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferredNestedInput
+  referredUsers?: Prisma.UserUncheckedUpdateManyWithoutReferredByUserNestedInput
+  studentVerifications?: Prisma.StudentVerificationUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserUpsertWithoutReferralRewardsAsReferredInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutReferralRewardsAsReferredInput, Prisma.UserUncheckedUpdateWithoutReferralRewardsAsReferredInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutReferralRewardsAsReferredInput, Prisma.UserUncheckedCreateWithoutReferralRewardsAsReferredInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutReferralRewardsAsReferredInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutReferralRewardsAsReferredInput, Prisma.UserUncheckedUpdateWithoutReferralRewardsAsReferredInput>
+}
+
+export type UserUpdateWithoutReferralRewardsAsReferredInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  preferences?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verificationTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationSendCount?: Prisma.IntFieldUpdateOperationsInput | number
+  lastVerificationSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetSendCount?: Prisma.IntFieldUpdateOperationsInput | number
+  lastResetSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  googleIdHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubIdHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hasPassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailBounced?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailBouncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailOptOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailOptOutAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  selectedPresetAvatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  featuredBadgeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  showOnLeaderboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isHistoryPaused?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierFieldUpdateOperationsInput | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
+  isStudent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  studentVerifiedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
+  readingHistory?: Prisma.ReadingHistoryUpdateManyWithoutUserNestedInput
+  emailSubscription?: Prisma.EmailSubscriptionUpdateOneWithoutUserNestedInput
+  emailDigests?: Prisma.EmailDigestUpdateManyWithoutUserNestedInput
+  userPersonas?: Prisma.UserPersonaUpdateManyWithoutUserNestedInput
+  badges?: Prisma.UserBadgeUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
+  teamMemberships?: Prisma.TeamMemberUpdateManyWithoutUserNestedInput
+  apiKeys?: Prisma.ApiKeyUpdateManyWithoutUserNestedInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUpdateManyWithoutReferrerNestedInput
+  referredByUser?: Prisma.UserUpdateOneWithoutReferredUsersNestedInput
+  referredUsers?: Prisma.UserUpdateManyWithoutReferredByUserNestedInput
+  studentVerifications?: Prisma.StudentVerificationUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutReferralRewardsAsReferredInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  preferences?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verificationTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationSendCount?: Prisma.IntFieldUpdateOperationsInput | number
+  lastVerificationSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetSendCount?: Prisma.IntFieldUpdateOperationsInput | number
+  lastResetSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  googleIdHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubIdHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hasPassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailBounced?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailBouncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailOptOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailOptOutAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  selectedPresetAvatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  featuredBadgeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  showOnLeaderboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isHistoryPaused?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierFieldUpdateOperationsInput | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referredBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
+  isStudent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  studentVerifiedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
+  readingHistory?: Prisma.ReadingHistoryUncheckedUpdateManyWithoutUserNestedInput
+  emailSubscription?: Prisma.EmailSubscriptionUncheckedUpdateOneWithoutUserNestedInput
+  emailDigests?: Prisma.EmailDigestUncheckedUpdateManyWithoutUserNestedInput
+  userPersonas?: Prisma.UserPersonaUncheckedUpdateManyWithoutUserNestedInput
+  badges?: Prisma.UserBadgeUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
+  teamMemberships?: Prisma.TeamMemberUncheckedUpdateManyWithoutUserNestedInput
+  apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutUserNestedInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferrerNestedInput
+  referredUsers?: Prisma.UserUncheckedUpdateManyWithoutReferredByUserNestedInput
+  studentVerifications?: Prisma.StudentVerificationUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutStudentVerificationsInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  name: string
+  createdAt?: Date | string
+  preferences?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  emailVerified?: boolean
+  verificationTokenHash?: string | null
+  verificationTokenExpiry?: Date | string | null
+  verificationSendCount?: number
+  lastVerificationSentAt?: Date | string | null
+  resetTokenHash?: string | null
+  resetTokenExpiry?: Date | string | null
+  resetSendCount?: number
+  lastResetSentAt?: Date | string | null
+  tokenVersion?: number
+  googleIdHash?: string | null
+  githubIdHash?: string | null
+  hasPassword?: boolean
+  emailBounced?: boolean
+  emailBouncedAt?: Date | string | null
+  emailOptOut?: boolean
+  emailOptOutAt?: Date | string | null
+  updatedAt?: Date | string
+  avatarUrl?: string | null
+  selectedPresetAvatar?: string | null
+  featuredBadgeId?: string | null
+  showOnLeaderboard?: boolean
+  isHistoryPaused?: boolean
+  deletionRequestedAt?: Date | string | null
+  deletionConfirmToken?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  subscriptionTier?: $Enums.SubscriptionTier
+  subscriptionStatus?: $Enums.SubscriptionStatus
+  subscriptionEndsAt?: Date | string | null
+  pausedUntil?: Date | string | null
+  showPremiumBadge?: boolean
+  customAccentColor?: string | null
+  referralCode?: string | null
+  freeMonthsEarned?: number
+  isStudent?: boolean
+  studentVerifiedUntil?: Date | string | null
+  bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
+  readingHistory?: Prisma.ReadingHistoryCreateNestedManyWithoutUserInput
+  emailSubscription?: Prisma.EmailSubscriptionCreateNestedOneWithoutUserInput
+  emailDigests?: Prisma.EmailDigestCreateNestedManyWithoutUserInput
+  userPersonas?: Prisma.UserPersonaCreateNestedManyWithoutUserInput
+  badges?: Prisma.UserBadgeCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutUserInput
+  teamMemberships?: Prisma.TeamMemberCreateNestedManyWithoutUserInput
+  apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutUserInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardCreateNestedManyWithoutReferrerInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardCreateNestedManyWithoutReferredInput
+  referredByUser?: Prisma.UserCreateNestedOneWithoutReferredUsersInput
+  referredUsers?: Prisma.UserCreateNestedManyWithoutReferredByUserInput
+}
+
+export type UserUncheckedCreateWithoutStudentVerificationsInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  name: string
+  createdAt?: Date | string
+  preferences?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  emailVerified?: boolean
+  verificationTokenHash?: string | null
+  verificationTokenExpiry?: Date | string | null
+  verificationSendCount?: number
+  lastVerificationSentAt?: Date | string | null
+  resetTokenHash?: string | null
+  resetTokenExpiry?: Date | string | null
+  resetSendCount?: number
+  lastResetSentAt?: Date | string | null
+  tokenVersion?: number
+  googleIdHash?: string | null
+  githubIdHash?: string | null
+  hasPassword?: boolean
+  emailBounced?: boolean
+  emailBouncedAt?: Date | string | null
+  emailOptOut?: boolean
+  emailOptOutAt?: Date | string | null
+  updatedAt?: Date | string
+  avatarUrl?: string | null
+  selectedPresetAvatar?: string | null
+  featuredBadgeId?: string | null
+  showOnLeaderboard?: boolean
+  isHistoryPaused?: boolean
+  deletionRequestedAt?: Date | string | null
+  deletionConfirmToken?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  subscriptionTier?: $Enums.SubscriptionTier
+  subscriptionStatus?: $Enums.SubscriptionStatus
+  subscriptionEndsAt?: Date | string | null
+  pausedUntil?: Date | string | null
+  showPremiumBadge?: boolean
+  customAccentColor?: string | null
+  referralCode?: string | null
+  referredBy?: string | null
+  freeMonthsEarned?: number
+  isStudent?: boolean
+  studentVerifiedUntil?: Date | string | null
+  bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
+  readingHistory?: Prisma.ReadingHistoryUncheckedCreateNestedManyWithoutUserInput
+  emailSubscription?: Prisma.EmailSubscriptionUncheckedCreateNestedOneWithoutUserInput
+  emailDigests?: Prisma.EmailDigestUncheckedCreateNestedManyWithoutUserInput
+  userPersonas?: Prisma.UserPersonaUncheckedCreateNestedManyWithoutUserInput
+  badges?: Prisma.UserBadgeUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
+  teamMemberships?: Prisma.TeamMemberUncheckedCreateNestedManyWithoutUserInput
+  apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutUserInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferrerInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferredInput
+  referredUsers?: Prisma.UserUncheckedCreateNestedManyWithoutReferredByUserInput
+}
+
+export type UserCreateOrConnectWithoutStudentVerificationsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutStudentVerificationsInput, Prisma.UserUncheckedCreateWithoutStudentVerificationsInput>
+}
+
+export type UserUpsertWithoutStudentVerificationsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutStudentVerificationsInput, Prisma.UserUncheckedUpdateWithoutStudentVerificationsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutStudentVerificationsInput, Prisma.UserUncheckedCreateWithoutStudentVerificationsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutStudentVerificationsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutStudentVerificationsInput, Prisma.UserUncheckedUpdateWithoutStudentVerificationsInput>
+}
+
+export type UserUpdateWithoutStudentVerificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  preferences?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verificationTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationSendCount?: Prisma.IntFieldUpdateOperationsInput | number
+  lastVerificationSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetSendCount?: Prisma.IntFieldUpdateOperationsInput | number
+  lastResetSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  googleIdHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubIdHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hasPassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailBounced?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailBouncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailOptOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailOptOutAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  selectedPresetAvatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  featuredBadgeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  showOnLeaderboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isHistoryPaused?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierFieldUpdateOperationsInput | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
+  isStudent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  studentVerifiedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
+  readingHistory?: Prisma.ReadingHistoryUpdateManyWithoutUserNestedInput
+  emailSubscription?: Prisma.EmailSubscriptionUpdateOneWithoutUserNestedInput
+  emailDigests?: Prisma.EmailDigestUpdateManyWithoutUserNestedInput
+  userPersonas?: Prisma.UserPersonaUpdateManyWithoutUserNestedInput
+  badges?: Prisma.UserBadgeUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
+  teamMemberships?: Prisma.TeamMemberUpdateManyWithoutUserNestedInput
+  apiKeys?: Prisma.ApiKeyUpdateManyWithoutUserNestedInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUpdateManyWithoutReferrerNestedInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUpdateManyWithoutReferredNestedInput
+  referredByUser?: Prisma.UserUpdateOneWithoutReferredUsersNestedInput
+  referredUsers?: Prisma.UserUpdateManyWithoutReferredByUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutStudentVerificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  preferences?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verificationTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationSendCount?: Prisma.IntFieldUpdateOperationsInput | number
+  lastVerificationSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetSendCount?: Prisma.IntFieldUpdateOperationsInput | number
+  lastResetSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  googleIdHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubIdHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hasPassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailBounced?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailBouncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailOptOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailOptOutAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  selectedPresetAvatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  featuredBadgeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  showOnLeaderboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isHistoryPaused?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierFieldUpdateOperationsInput | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referredBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
+  isStudent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  studentVerifiedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
+  readingHistory?: Prisma.ReadingHistoryUncheckedUpdateManyWithoutUserNestedInput
+  emailSubscription?: Prisma.EmailSubscriptionUncheckedUpdateOneWithoutUserNestedInput
+  emailDigests?: Prisma.EmailDigestUncheckedUpdateManyWithoutUserNestedInput
+  userPersonas?: Prisma.UserPersonaUncheckedUpdateManyWithoutUserNestedInput
+  badges?: Prisma.UserBadgeUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
+  teamMemberships?: Prisma.TeamMemberUncheckedUpdateManyWithoutUserNestedInput
+  apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutUserNestedInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferrerNestedInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferredNestedInput
+  referredUsers?: Prisma.UserUncheckedUpdateManyWithoutReferredByUserNestedInput
 }
 
 export type UserCreateWithoutApiKeysInput = {
@@ -2897,9 +4818,16 @@ export type UserCreateWithoutApiKeysInput = {
   deletionConfirmToken?: string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
-  subscriptionTier?: string | null
-  subscriptionStatus?: string | null
+  subscriptionTier?: $Enums.SubscriptionTier
+  subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
+  pausedUntil?: Date | string | null
+  showPremiumBadge?: boolean
+  customAccentColor?: string | null
+  referralCode?: string | null
+  freeMonthsEarned?: number
+  isStudent?: boolean
+  studentVerifiedUntil?: Date | string | null
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   readingHistory?: Prisma.ReadingHistoryCreateNestedManyWithoutUserInput
   emailSubscription?: Prisma.EmailSubscriptionCreateNestedOneWithoutUserInput
@@ -2908,6 +4836,11 @@ export type UserCreateWithoutApiKeysInput = {
   badges?: Prisma.UserBadgeCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentCreateNestedManyWithoutUserInput
   teamMemberships?: Prisma.TeamMemberCreateNestedManyWithoutUserInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardCreateNestedManyWithoutReferrerInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardCreateNestedManyWithoutReferredInput
+  referredByUser?: Prisma.UserCreateNestedOneWithoutReferredUsersInput
+  referredUsers?: Prisma.UserCreateNestedManyWithoutReferredByUserInput
+  studentVerifications?: Prisma.StudentVerificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutApiKeysInput = {
@@ -2944,9 +4877,17 @@ export type UserUncheckedCreateWithoutApiKeysInput = {
   deletionConfirmToken?: string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
-  subscriptionTier?: string | null
-  subscriptionStatus?: string | null
+  subscriptionTier?: $Enums.SubscriptionTier
+  subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
+  pausedUntil?: Date | string | null
+  showPremiumBadge?: boolean
+  customAccentColor?: string | null
+  referralCode?: string | null
+  referredBy?: string | null
+  freeMonthsEarned?: number
+  isStudent?: boolean
+  studentVerifiedUntil?: Date | string | null
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   readingHistory?: Prisma.ReadingHistoryUncheckedCreateNestedManyWithoutUserInput
   emailSubscription?: Prisma.EmailSubscriptionUncheckedCreateNestedOneWithoutUserInput
@@ -2955,6 +4896,10 @@ export type UserUncheckedCreateWithoutApiKeysInput = {
   badges?: Prisma.UserBadgeUncheckedCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
   teamMemberships?: Prisma.TeamMemberUncheckedCreateNestedManyWithoutUserInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferrerInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferredInput
+  referredUsers?: Prisma.UserUncheckedCreateNestedManyWithoutReferredByUserInput
+  studentVerifications?: Prisma.StudentVerificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutApiKeysInput = {
@@ -3007,9 +4952,16 @@ export type UserUpdateWithoutApiKeysInput = {
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierFieldUpdateOperationsInput | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
+  isStudent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  studentVerifiedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   readingHistory?: Prisma.ReadingHistoryUpdateManyWithoutUserNestedInput
   emailSubscription?: Prisma.EmailSubscriptionUpdateOneWithoutUserNestedInput
@@ -3018,6 +4970,11 @@ export type UserUpdateWithoutApiKeysInput = {
   badges?: Prisma.UserBadgeUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
   teamMemberships?: Prisma.TeamMemberUpdateManyWithoutUserNestedInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUpdateManyWithoutReferrerNestedInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUpdateManyWithoutReferredNestedInput
+  referredByUser?: Prisma.UserUpdateOneWithoutReferredUsersNestedInput
+  referredUsers?: Prisma.UserUpdateManyWithoutReferredByUserNestedInput
+  studentVerifications?: Prisma.StudentVerificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutApiKeysInput = {
@@ -3054,9 +5011,17 @@ export type UserUncheckedUpdateWithoutApiKeysInput = {
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierFieldUpdateOperationsInput | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referredBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
+  isStudent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  studentVerifiedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   readingHistory?: Prisma.ReadingHistoryUncheckedUpdateManyWithoutUserNestedInput
   emailSubscription?: Prisma.EmailSubscriptionUncheckedUpdateOneWithoutUserNestedInput
@@ -3065,6 +5030,220 @@ export type UserUncheckedUpdateWithoutApiKeysInput = {
   badges?: Prisma.UserBadgeUncheckedUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
   teamMemberships?: Prisma.TeamMemberUncheckedUpdateManyWithoutUserNestedInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferrerNestedInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferredNestedInput
+  referredUsers?: Prisma.UserUncheckedUpdateManyWithoutReferredByUserNestedInput
+  studentVerifications?: Prisma.StudentVerificationUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateManyReferredByUserInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  name: string
+  createdAt?: Date | string
+  preferences?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  emailVerified?: boolean
+  verificationTokenHash?: string | null
+  verificationTokenExpiry?: Date | string | null
+  verificationSendCount?: number
+  lastVerificationSentAt?: Date | string | null
+  resetTokenHash?: string | null
+  resetTokenExpiry?: Date | string | null
+  resetSendCount?: number
+  lastResetSentAt?: Date | string | null
+  tokenVersion?: number
+  googleIdHash?: string | null
+  githubIdHash?: string | null
+  hasPassword?: boolean
+  emailBounced?: boolean
+  emailBouncedAt?: Date | string | null
+  emailOptOut?: boolean
+  emailOptOutAt?: Date | string | null
+  updatedAt?: Date | string
+  avatarUrl?: string | null
+  selectedPresetAvatar?: string | null
+  featuredBadgeId?: string | null
+  showOnLeaderboard?: boolean
+  isHistoryPaused?: boolean
+  deletionRequestedAt?: Date | string | null
+  deletionConfirmToken?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  subscriptionTier?: $Enums.SubscriptionTier
+  subscriptionStatus?: $Enums.SubscriptionStatus
+  subscriptionEndsAt?: Date | string | null
+  pausedUntil?: Date | string | null
+  showPremiumBadge?: boolean
+  customAccentColor?: string | null
+  referralCode?: string | null
+  freeMonthsEarned?: number
+  isStudent?: boolean
+  studentVerifiedUntil?: Date | string | null
+}
+
+export type UserUpdateWithoutReferredByUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  preferences?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verificationTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationSendCount?: Prisma.IntFieldUpdateOperationsInput | number
+  lastVerificationSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetSendCount?: Prisma.IntFieldUpdateOperationsInput | number
+  lastResetSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  googleIdHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubIdHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hasPassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailBounced?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailBouncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailOptOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailOptOutAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  selectedPresetAvatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  featuredBadgeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  showOnLeaderboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isHistoryPaused?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierFieldUpdateOperationsInput | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
+  isStudent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  studentVerifiedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
+  readingHistory?: Prisma.ReadingHistoryUpdateManyWithoutUserNestedInput
+  emailSubscription?: Prisma.EmailSubscriptionUpdateOneWithoutUserNestedInput
+  emailDigests?: Prisma.EmailDigestUpdateManyWithoutUserNestedInput
+  userPersonas?: Prisma.UserPersonaUpdateManyWithoutUserNestedInput
+  badges?: Prisma.UserBadgeUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
+  teamMemberships?: Prisma.TeamMemberUpdateManyWithoutUserNestedInput
+  apiKeys?: Prisma.ApiKeyUpdateManyWithoutUserNestedInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUpdateManyWithoutReferrerNestedInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUpdateManyWithoutReferredNestedInput
+  referredUsers?: Prisma.UserUpdateManyWithoutReferredByUserNestedInput
+  studentVerifications?: Prisma.StudentVerificationUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutReferredByUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  preferences?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verificationTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationSendCount?: Prisma.IntFieldUpdateOperationsInput | number
+  lastVerificationSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetSendCount?: Prisma.IntFieldUpdateOperationsInput | number
+  lastResetSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  googleIdHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubIdHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hasPassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailBounced?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailBouncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailOptOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailOptOutAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  selectedPresetAvatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  featuredBadgeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  showOnLeaderboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isHistoryPaused?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierFieldUpdateOperationsInput | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
+  isStudent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  studentVerifiedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
+  readingHistory?: Prisma.ReadingHistoryUncheckedUpdateManyWithoutUserNestedInput
+  emailSubscription?: Prisma.EmailSubscriptionUncheckedUpdateOneWithoutUserNestedInput
+  emailDigests?: Prisma.EmailDigestUncheckedUpdateManyWithoutUserNestedInput
+  userPersonas?: Prisma.UserPersonaUncheckedUpdateManyWithoutUserNestedInput
+  badges?: Prisma.UserBadgeUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
+  teamMemberships?: Prisma.TeamMemberUncheckedUpdateManyWithoutUserNestedInput
+  apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutUserNestedInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferrerNestedInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferredNestedInput
+  referredUsers?: Prisma.UserUncheckedUpdateManyWithoutReferredByUserNestedInput
+  studentVerifications?: Prisma.StudentVerificationUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateManyWithoutReferredByUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  preferences?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verificationTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationSendCount?: Prisma.IntFieldUpdateOperationsInput | number
+  lastVerificationSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetSendCount?: Prisma.IntFieldUpdateOperationsInput | number
+  lastResetSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  googleIdHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubIdHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hasPassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailBounced?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailBouncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailOptOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailOptOutAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  selectedPresetAvatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  featuredBadgeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  showOnLeaderboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isHistoryPaused?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierFieldUpdateOperationsInput | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
+  isStudent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  studentVerifiedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -3081,6 +5260,10 @@ export type UserCountOutputType = {
   comments: number
   teamMemberships: number
   apiKeys: number
+  referralRewardsAsReferrer: number
+  referralRewardsAsReferred: number
+  referredUsers: number
+  studentVerifications: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -3092,6 +5275,10 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   comments?: boolean | UserCountOutputTypeCountCommentsArgs
   teamMemberships?: boolean | UserCountOutputTypeCountTeamMembershipsArgs
   apiKeys?: boolean | UserCountOutputTypeCountApiKeysArgs
+  referralRewardsAsReferrer?: boolean | UserCountOutputTypeCountReferralRewardsAsReferrerArgs
+  referralRewardsAsReferred?: boolean | UserCountOutputTypeCountReferralRewardsAsReferredArgs
+  referredUsers?: boolean | UserCountOutputTypeCountReferredUsersArgs
+  studentVerifications?: boolean | UserCountOutputTypeCountStudentVerificationsArgs
 }
 
 /**
@@ -3160,6 +5347,34 @@ export type UserCountOutputTypeCountApiKeysArgs<ExtArgs extends runtime.Types.Ex
   where?: Prisma.ApiKeyWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountReferralRewardsAsReferrerArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ReferralRewardWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountReferralRewardsAsReferredArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ReferralRewardWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountReferredUsersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UserWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountStudentVerificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.StudentVerificationWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -3198,6 +5413,14 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   subscriptionTier?: boolean
   subscriptionStatus?: boolean
   subscriptionEndsAt?: boolean
+  pausedUntil?: boolean
+  showPremiumBadge?: boolean
+  customAccentColor?: boolean
+  referralCode?: boolean
+  referredBy?: boolean
+  freeMonthsEarned?: boolean
+  isStudent?: boolean
+  studentVerifiedUntil?: boolean
   bookmarks?: boolean | Prisma.User$bookmarksArgs<ExtArgs>
   readingHistory?: boolean | Prisma.User$readingHistoryArgs<ExtArgs>
   emailSubscription?: boolean | Prisma.User$emailSubscriptionArgs<ExtArgs>
@@ -3207,6 +5430,11 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   comments?: boolean | Prisma.User$commentsArgs<ExtArgs>
   teamMemberships?: boolean | Prisma.User$teamMembershipsArgs<ExtArgs>
   apiKeys?: boolean | Prisma.User$apiKeysArgs<ExtArgs>
+  referralRewardsAsReferrer?: boolean | Prisma.User$referralRewardsAsReferrerArgs<ExtArgs>
+  referralRewardsAsReferred?: boolean | Prisma.User$referralRewardsAsReferredArgs<ExtArgs>
+  referredByUser?: boolean | Prisma.User$referredByUserArgs<ExtArgs>
+  referredUsers?: boolean | Prisma.User$referredUsersArgs<ExtArgs>
+  studentVerifications?: boolean | Prisma.User$studentVerificationsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -3247,6 +5475,15 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   subscriptionTier?: boolean
   subscriptionStatus?: boolean
   subscriptionEndsAt?: boolean
+  pausedUntil?: boolean
+  showPremiumBadge?: boolean
+  customAccentColor?: boolean
+  referralCode?: boolean
+  referredBy?: boolean
+  freeMonthsEarned?: boolean
+  isStudent?: boolean
+  studentVerifiedUntil?: boolean
+  referredByUser?: boolean | Prisma.User$referredByUserArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -3286,6 +5523,15 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   subscriptionTier?: boolean
   subscriptionStatus?: boolean
   subscriptionEndsAt?: boolean
+  pausedUntil?: boolean
+  showPremiumBadge?: boolean
+  customAccentColor?: boolean
+  referralCode?: boolean
+  referredBy?: boolean
+  freeMonthsEarned?: boolean
+  isStudent?: boolean
+  studentVerifiedUntil?: boolean
+  referredByUser?: boolean | Prisma.User$referredByUserArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
@@ -3325,9 +5571,17 @@ export type UserSelectScalar = {
   subscriptionTier?: boolean
   subscriptionStatus?: boolean
   subscriptionEndsAt?: boolean
+  pausedUntil?: boolean
+  showPremiumBadge?: boolean
+  customAccentColor?: boolean
+  referralCode?: boolean
+  referredBy?: boolean
+  freeMonthsEarned?: boolean
+  isStudent?: boolean
+  studentVerifiedUntil?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "passwordHash" | "name" | "createdAt" | "preferences" | "emailVerified" | "verificationTokenHash" | "verificationTokenExpiry" | "verificationSendCount" | "lastVerificationSentAt" | "resetTokenHash" | "resetTokenExpiry" | "resetSendCount" | "lastResetSentAt" | "tokenVersion" | "googleIdHash" | "githubIdHash" | "hasPassword" | "emailBounced" | "emailBouncedAt" | "emailOptOut" | "emailOptOutAt" | "updatedAt" | "avatarUrl" | "selectedPresetAvatar" | "featuredBadgeId" | "showOnLeaderboard" | "isHistoryPaused" | "deletionRequestedAt" | "deletionConfirmToken" | "stripeCustomerId" | "stripeSubscriptionId" | "subscriptionTier" | "subscriptionStatus" | "subscriptionEndsAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "passwordHash" | "name" | "createdAt" | "preferences" | "emailVerified" | "verificationTokenHash" | "verificationTokenExpiry" | "verificationSendCount" | "lastVerificationSentAt" | "resetTokenHash" | "resetTokenExpiry" | "resetSendCount" | "lastResetSentAt" | "tokenVersion" | "googleIdHash" | "githubIdHash" | "hasPassword" | "emailBounced" | "emailBouncedAt" | "emailOptOut" | "emailOptOutAt" | "updatedAt" | "avatarUrl" | "selectedPresetAvatar" | "featuredBadgeId" | "showOnLeaderboard" | "isHistoryPaused" | "deletionRequestedAt" | "deletionConfirmToken" | "stripeCustomerId" | "stripeSubscriptionId" | "subscriptionTier" | "subscriptionStatus" | "subscriptionEndsAt" | "pausedUntil" | "showPremiumBadge" | "customAccentColor" | "referralCode" | "referredBy" | "freeMonthsEarned" | "isStudent" | "studentVerifiedUntil", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   bookmarks?: boolean | Prisma.User$bookmarksArgs<ExtArgs>
   readingHistory?: boolean | Prisma.User$readingHistoryArgs<ExtArgs>
@@ -3338,10 +5592,19 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   comments?: boolean | Prisma.User$commentsArgs<ExtArgs>
   teamMemberships?: boolean | Prisma.User$teamMembershipsArgs<ExtArgs>
   apiKeys?: boolean | Prisma.User$apiKeysArgs<ExtArgs>
+  referralRewardsAsReferrer?: boolean | Prisma.User$referralRewardsAsReferrerArgs<ExtArgs>
+  referralRewardsAsReferred?: boolean | Prisma.User$referralRewardsAsReferredArgs<ExtArgs>
+  referredByUser?: boolean | Prisma.User$referredByUserArgs<ExtArgs>
+  referredUsers?: boolean | Prisma.User$referredUsersArgs<ExtArgs>
+  studentVerifications?: boolean | Prisma.User$studentVerificationsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  referredByUser?: boolean | Prisma.User$referredByUserArgs<ExtArgs>
+}
+export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  referredByUser?: boolean | Prisma.User$referredByUserArgs<ExtArgs>
+}
 
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "User"
@@ -3355,6 +5618,11 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     comments: Prisma.$CommentPayload<ExtArgs>[]
     teamMemberships: Prisma.$TeamMemberPayload<ExtArgs>[]
     apiKeys: Prisma.$ApiKeyPayload<ExtArgs>[]
+    referralRewardsAsReferrer: Prisma.$ReferralRewardPayload<ExtArgs>[]
+    referralRewardsAsReferred: Prisma.$ReferralRewardPayload<ExtArgs>[]
+    referredByUser: Prisma.$UserPayload<ExtArgs> | null
+    referredUsers: Prisma.$UserPayload<ExtArgs>[]
+    studentVerifications: Prisma.$StudentVerificationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -3390,9 +5658,17 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     deletionConfirmToken: string | null
     stripeCustomerId: string | null
     stripeSubscriptionId: string | null
-    subscriptionTier: string | null
-    subscriptionStatus: string | null
+    subscriptionTier: $Enums.SubscriptionTier
+    subscriptionStatus: $Enums.SubscriptionStatus
     subscriptionEndsAt: Date | null
+    pausedUntil: Date | null
+    showPremiumBadge: boolean
+    customAccentColor: string | null
+    referralCode: string | null
+    referredBy: string | null
+    freeMonthsEarned: number
+    isStudent: boolean
+    studentVerifiedUntil: Date | null
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -3796,6 +6072,11 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   comments<T extends Prisma.User$commentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$commentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   teamMemberships<T extends Prisma.User$teamMembershipsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$teamMembershipsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TeamMemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   apiKeys<T extends Prisma.User$apiKeysArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$apiKeysArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApiKeyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  referralRewardsAsReferrer<T extends Prisma.User$referralRewardsAsReferrerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$referralRewardsAsReferrerArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReferralRewardPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  referralRewardsAsReferred<T extends Prisma.User$referralRewardsAsReferredArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$referralRewardsAsReferredArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReferralRewardPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  referredByUser<T extends Prisma.User$referredByUserArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$referredByUserArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  referredUsers<T extends Prisma.User$referredUsersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$referredUsersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  studentVerifications<T extends Prisma.User$studentVerificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$studentVerificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StudentVerificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3858,9 +6139,17 @@ export interface UserFieldRefs {
   readonly deletionConfirmToken: Prisma.FieldRef<"User", 'String'>
   readonly stripeCustomerId: Prisma.FieldRef<"User", 'String'>
   readonly stripeSubscriptionId: Prisma.FieldRef<"User", 'String'>
-  readonly subscriptionTier: Prisma.FieldRef<"User", 'String'>
-  readonly subscriptionStatus: Prisma.FieldRef<"User", 'String'>
+  readonly subscriptionTier: Prisma.FieldRef<"User", 'SubscriptionTier'>
+  readonly subscriptionStatus: Prisma.FieldRef<"User", 'SubscriptionStatus'>
   readonly subscriptionEndsAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly pausedUntil: Prisma.FieldRef<"User", 'DateTime'>
+  readonly showPremiumBadge: Prisma.FieldRef<"User", 'Boolean'>
+  readonly customAccentColor: Prisma.FieldRef<"User", 'String'>
+  readonly referralCode: Prisma.FieldRef<"User", 'String'>
+  readonly referredBy: Prisma.FieldRef<"User", 'String'>
+  readonly freeMonthsEarned: Prisma.FieldRef<"User", 'Int'>
+  readonly isStudent: Prisma.FieldRef<"User", 'Boolean'>
+  readonly studentVerifiedUntil: Prisma.FieldRef<"User", 'DateTime'>
 }
     
 
@@ -4115,6 +6404,10 @@ export type UserCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
    */
   data: Prisma.UserCreateManyInput | Prisma.UserCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -4185,6 +6478,10 @@ export type UserUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
    * Limit how many Users to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -4462,6 +6759,121 @@ export type User$apiKeysArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
   take?: number
   skip?: number
   distinct?: Prisma.ApiKeyScalarFieldEnum | Prisma.ApiKeyScalarFieldEnum[]
+}
+
+/**
+ * User.referralRewardsAsReferrer
+ */
+export type User$referralRewardsAsReferrerArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ReferralReward
+   */
+  select?: Prisma.ReferralRewardSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ReferralReward
+   */
+  omit?: Prisma.ReferralRewardOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ReferralRewardInclude<ExtArgs> | null
+  where?: Prisma.ReferralRewardWhereInput
+  orderBy?: Prisma.ReferralRewardOrderByWithRelationInput | Prisma.ReferralRewardOrderByWithRelationInput[]
+  cursor?: Prisma.ReferralRewardWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ReferralRewardScalarFieldEnum | Prisma.ReferralRewardScalarFieldEnum[]
+}
+
+/**
+ * User.referralRewardsAsReferred
+ */
+export type User$referralRewardsAsReferredArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ReferralReward
+   */
+  select?: Prisma.ReferralRewardSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ReferralReward
+   */
+  omit?: Prisma.ReferralRewardOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ReferralRewardInclude<ExtArgs> | null
+  where?: Prisma.ReferralRewardWhereInput
+  orderBy?: Prisma.ReferralRewardOrderByWithRelationInput | Prisma.ReferralRewardOrderByWithRelationInput[]
+  cursor?: Prisma.ReferralRewardWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ReferralRewardScalarFieldEnum | Prisma.ReferralRewardScalarFieldEnum[]
+}
+
+/**
+ * User.referredByUser
+ */
+export type User$referredByUserArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
+}
+
+/**
+ * User.referredUsers
+ */
+export type User$referredUsersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
+  orderBy?: Prisma.UserOrderByWithRelationInput | Prisma.UserOrderByWithRelationInput[]
+  cursor?: Prisma.UserWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UserScalarFieldEnum | Prisma.UserScalarFieldEnum[]
+}
+
+/**
+ * User.studentVerifications
+ */
+export type User$studentVerificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the StudentVerification
+   */
+  select?: Prisma.StudentVerificationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the StudentVerification
+   */
+  omit?: Prisma.StudentVerificationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StudentVerificationInclude<ExtArgs> | null
+  where?: Prisma.StudentVerificationWhereInput
+  orderBy?: Prisma.StudentVerificationOrderByWithRelationInput | Prisma.StudentVerificationOrderByWithRelationInput[]
+  cursor?: Prisma.StudentVerificationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.StudentVerificationScalarFieldEnum | Prisma.StudentVerificationScalarFieldEnum[]
 }
 
 /**
