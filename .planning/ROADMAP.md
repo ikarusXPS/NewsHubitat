@@ -132,6 +132,18 @@ n**Plans:**
 - [x] 36-04-PLAN.md — Pricing page & UI components (TierCard, SubscriptionBadge, i18n)
 - [ ] 36-05-PLAN.md — Integration testing & human verification (unit tests, E2E, Stripe flow verification)
 
+### Phase 36.1 (INSERTED): Add Subscription Schema Fields
+**Goal**: Backfill subscription/Stripe fields on the User model that Phase 36-01 was marked complete without — currently blocks 36-05 because committed `subscriptionService.ts` references fields the Prisma client doesn't have
+**Depends on**: Phase 36 plans 01-04 (committed code already references these fields)
+**Requirements**: PAY-01 (foundational schema for subscription state)
+**Success Criteria** (what must be TRUE):
+  1. `User` model has `stripeCustomerId`, `stripeSubscriptionId`, `subscriptionTier`, `subscriptionStatus`, `subscriptionEndsAt` fields with appropriate types and nullability
+  2. Unique indexes on `stripeCustomerId` and `stripeSubscriptionId` (both used in `prisma.user.findFirst({ where: { ... } })` calls)
+  3. `pnpm typecheck` passes against `apps/web/server/services/subscriptionService.ts` (Prisma generated client matches usage)
+  4. Migration applied via `prisma db push` to local Postgres without data loss
+  5. No regressions in existing User-model queries (auth, OAuth, gamification)
+**Plans**: To be created via `/gsd-plan-phase 36.1`
+
 ### Phase 37: Horizontal Scaling
 **Goal**: System handles 30k concurrent users through horizontal scaling and connection pooling
 **Depends on**: Phase 36 (subscription tiers defined)
