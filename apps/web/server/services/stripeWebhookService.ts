@@ -178,8 +178,26 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session): Promis
 
 /**
  * Handle subscription updates (status changes, upgrades/downgrades)
+ *
+ * Defensive validation (Shape B, Phase 36.5-01): guard against a Stripe
+ * subscription object that is missing items.data[0].price (can occur when
+ * Stripe sends a partial object on some webhook replays). Without the guard
+ * the downstream `subscription.items.data[0]?.price.id` access in
+ * updateUserSubscription would throw TypeError and surface as an empty log
+ * line because err.message is '' on some Node builds.
  */
 async function handleSubscriptionUpdated(subscription: Stripe.Subscription): Promise<void> {
+  // Guard: ensure subscription items are present before proceeding
+  const priceItem = subscription.items?.data?.[0];
+  if (!priceItem?.price?.id) {
+    logger.warn(
+      `[Webhook] subscription.updated: Missing price on subscription ${subscription.id} — skipping tier update`
+    );
+    // Do not throw: a subscription without a price item is not a retriable error;
+    // returning cleanly lets the idempotency layer mark the event as processed.
+    return;
+  }
+
   const subscriptionService = SubscriptionService.getInstance();
   const userId = await subscriptionService.findUserBySubscriptionId(subscription.id);
 
