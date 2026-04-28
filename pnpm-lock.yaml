@@ -253,6 +253,9 @@ importers:
       sonner:
         specifier: ^2.0.7
         version: 2.0.7(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      stripe:
+        specifier: 22.1.0
+        version: 22.1.0(@types/node@25.6.0)
       tailwind-merge:
         specifier: ^3.5.0
         version: 3.5.0
@@ -271,6 +274,9 @@ importers:
       winston:
         specifier: ^3.19.0
         version: 3.19.0
+      workbox-window:
+        specifier: ^7.4.0
+        version: 7.4.0
       yahoo-finance2:
         specifier: ^3.13.2
         version: 3.14.0
