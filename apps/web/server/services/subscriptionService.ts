@@ -9,6 +9,24 @@ import { CacheService, CACHE_TTL } from './cacheService';
 import { STRIPE_CONFIG, PRICE_TO_TIER, type SubscriptionTier } from '../config/stripe';
 import logger from '../utils/logger';
 
+/**
+ * Thrown when an action requires the user to have a Stripe customer
+ * record but none exists yet (e.g., they never completed checkout).
+ * Routes use `instanceof NoStripeCustomerError` to remap to a 400
+ * with a friendly message instead of leaking the raw error string.
+ *
+ * Replaces the previous fragile `message.includes('No Stripe customer')`
+ * categorization (see WR-04 in 36.3-REVIEW.md): renaming the message
+ * for diagnostics — e.g., adding `userId` — would have silently broken
+ * the categorization, demoting the expected 400 into a leaky 500.
+ */
+export class NoStripeCustomerError extends Error {
+  constructor(userId: string) {
+    super(`No Stripe customer found for user ${userId}`);
+    this.name = 'NoStripeCustomerError';
+  }
+}
+
 export class SubscriptionService {
   private static instance: SubscriptionService;
   private stripe: Stripe | null;
@@ -96,7 +114,7 @@ export class SubscriptionService {
     });
 
     if (!user?.stripeCustomerId) {
-      throw new Error('No Stripe customer found for user');
+      throw new NoStripeCustomerError(userId);
     }
 
     const session = await this.stripe.billingPortal.sessions.create({

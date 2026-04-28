@@ -6,7 +6,7 @@
 import { Router, Request, Response } from 'express';
 import { z } from 'zod';
 import { authMiddleware } from '../services/authService';
-import { SubscriptionService } from '../services/subscriptionService';
+import { SubscriptionService, NoStripeCustomerError } from '../services/subscriptionService';
 import { STRIPE_CONFIG } from '../config/stripe';
 import logger from '../utils/logger';
 
@@ -133,11 +133,10 @@ router.post('/portal', authMiddleware, async (req: AuthRequest, res: Response): 
       data: { url: portalUrl },
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to create portal session';
-
-    // Sentinel: user has no Stripe customer yet -> 400 with friendly text.
-    // (WR-04 may replace this string-match with a typed error class.)
-    if (message.includes('No Stripe customer')) {
+    // Typed sentinel: user has no Stripe customer yet -> 400 with
+    // friendly text (WR-04: replaced fragile message.includes() match
+    // with instanceof check on a dedicated error class).
+    if (err instanceof NoStripeCustomerError) {
       res.status(400).json({
         success: false,
         error: 'No active subscription found',
