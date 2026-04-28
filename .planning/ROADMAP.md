@@ -190,7 +190,7 @@ Plans:
 - [x] 36.3-01-PLAN.md — Relocate 3 webhook/subscription source files from root server/ to apps/web/server/ via git mv (preserves history) — commits 71507b7, 6597dfa, eb42362
 - [x] 36.3-02-PLAN.md — Mount webhook + subscription routes in live apps/web/server/index.ts (diff-only, before express.json for raw body) — commit 18237b9 (+9 lines, 0 deletions; live probes return 400/401 not 404)
 - [x] 36.3-03-PLAN.md — Wholesale delete orphan root trees (server/, prisma/, src/, prisma.config.ts, tsup.config.ts, vite.config.ts, tsconfig.{,app,node}.json) + D-08 verification gate — completed 2026-04-28 (chore 651ce93 deleting 9 paths / 323 files / -79,037 lines + fix a69bbff creating workspace-local apps/web/prisma.config.ts for Prisma 7 datasource resolution; tsconfig.base.json preserved per workspace-extension audit; D-08 gate PASSED — typecheck, 1289/1289 tests, dev:backend pong, dev:frontend 200, prisma validate, prisma db push idempotent)
-- [ ] 36.3-04-PLAN.md — End-to-end verification: stripe trigger 8 events return HTTP 200; ProcessedWebhookEvent rows persisted; idempotency replay PASS
+- [x] 36.3-04-PLAN.md — End-to-end verification: stripe trigger 8 events return HTTP 200; ProcessedWebhookEvent rows persisted; idempotency replay PASS — completed 2026-04-28 (test commit `dbf374d` force-added 36.3-04-trigger-output.log + 36.3-04-db-query.log: 93 [200] forwards / 0 [404] / 0 [401] across 31 distinct event types; 31-row ProcessedWebhookEvent GROUP BY; IDEMPOTENCY: PASS via `stripe events resend evt_1TRB4OD6DRGZELevF4a3YwTG`. 7 of 8 target events triggered directly; customer.subscription.resumed unreachable via stripe trigger CLI — coverage proven structurally + deferred to production-readiness for live-event confirmation)
 - [x] 36.3-05-PLAN.md — Anti-pattern markers (.continue-here.md phase-local + milestone-level) per D-11 and Q-03 — completed 2026-04-28 (commit c81a941; 2 files, +51 insertions; severity:blocking row in markdown-table format; phase-local at .planning/phases/36.3-fix-stripe-webhook-monorepo-path/.continue-here.md + milestone-level at .planning/.continue-here.md per Q-03 discretion)
 
 ### Phase 37: Horizontal Scaling
@@ -297,4 +297,4 @@ Plans:
 ---
 
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-28 — Phase 36.2 complete (4/4 plans: schema additions + depcheck cleanup + db push + audit trail); awaiting `/gsd-verify-phase 36.2`*
+*Last updated: 2026-04-28 — Phase 36.3 complete (5/5 plans: relocate + mount + orphan-sweep + E2E verification + anti-pattern markers); 93 [200] Stripe webhook forwards + IDEMPOTENCY: PASS empirically demonstrated; awaiting `/gsd-verify-phase 36.3` then `/gsd-verify-phase 36.2`*
