@@ -299,7 +299,14 @@ async function handleSubscriptionPaused(subscription: Stripe.Subscription): Prom
   const subscriptionService = SubscriptionService.getInstance();
   const userId = await subscriptionService.findUserBySubscriptionId(subscription.id);
 
-  if (!userId) return;
+  if (!userId) {
+    // WR-05: log + early-return matches handleSubscriptionDeleted /
+    // handleSubscriptionUpdated / handleInvoicePaid. Without the warn,
+    // a broken user-link (Stripe says PAUSED, our DB still ACTIVE) is
+    // invisible to operators.
+    logger.warn(`[Webhook] subscription.paused: No user found for subscription ${subscription.id}`);
+    return;
+  }
 
   await prisma.user.update({
     where: { id: userId },
@@ -322,7 +329,12 @@ async function handleSubscriptionResumed(subscription: Stripe.Subscription): Pro
   const subscriptionService = SubscriptionService.getInstance();
   const userId = await subscriptionService.findUserBySubscriptionId(subscription.id);
 
-  if (!userId) return;
+  if (!userId) {
+    // WR-05: log + early-return for consistency with the rest of the
+    // handlers. See note in handleSubscriptionPaused.
+    logger.warn(`[Webhook] subscription.resumed: No user found for subscription ${subscription.id}`);
+    return;
+  }
 
   await prisma.user.update({
     where: { id: userId },
