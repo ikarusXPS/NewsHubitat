@@ -49,6 +49,7 @@ v1.6 Progress: [██████████████████░░] 91
 | 35 | Infrastructure Foundation | 4 reqs (INFRA-01 partial, PAY-08, PAY-09, PAY-10) | No | **Complete** (5/5 plans) — UAT 5/5 PASS + 35.1 hotfix |
 | 36 | Monetization Core | 7 reqs (PAY-01 to PAY-07) | Yes | **Paused** (4/5 plans, ready to resume 36-05) |
 | 36.1 | Add Subscription Schema Fields (INSERTED) | PAY-01 (foundation) | No | **Complete** (1/1 plans) — verified PASS 5/5 |
+| 36.2 | Close 36-debt — schema models + cleanup (INSERTED) | TBD | No | Awaiting plan |
 | 37 | Horizontal Scaling | 5 reqs (INFRA-01 to INFRA-05) | No | Not started |
 | 38 | Advanced AI Features | 7 reqs (AI-01 to AI-07) | Yes | Not started |
 | 39 | Mobile Apps | 8 reqs (MOB-01 to MOB-08) | Yes | Not started |
@@ -86,6 +87,7 @@ Items acknowledged and carried forward from previous milestone close:
 - 2026-04-27 — Phase 36.1 inserted after Phase 36 (URGENT). Reason: 36-01 closed without writing the User-model migration that 36-02's `subscriptionService.ts` requires. Discovered during /gsd-execute-phase 36 pre-flight. Blocks 36-05 tests.
 - 2026-04-28 — Phase 36.1 complete. 5 nullable subscription fields + 2 unique indexes added to User model; subscriptionService read-path patched with `?? 'FREE'` / `?? 'ACTIVE'` fallbacks (consequence of nullable schema choice). Larger 36-debt (ProcessedWebhookEvent, ReferralReward, Campaign, StudentVerification, Prisma enums) explicitly deferred to a future phase 36.2 — documented in 36.1-01-SUMMARY.md "Known Stubs".
 - 2026-04-28 — Phase 35 UAT executed (5/5 PASS) + Phase 35.1 hotfix inserted inline (commit 484d4da). Test 4 surfaced a Redis-cache stale-revocation bug — `revokeApiKey` updated DB but didn't invalidate the prefix-based auth cache, so revoked keys kept working for up to 5min. Fix: secondary index `apikey:by-id:<keyId>` enables O(1) cache invalidation on revoke. Phase 35 status `human_needed` → `verified`. Also discovered during UAT prep: `workbox-window` + `stripe@22.1.0` were missing from `apps/web/package.json` (committed as `87ba5e4`) — second instance of the "SUMMARY claimed but never written" pattern that produced Phase 36.1.
+- 2026-04-28 — Phase 36.2 inserted after Phase 36.1 (URGENT). Goal: close the remaining 36-debt — `ProcessedWebhookEvent` / `ReferralReward` / `Campaign` / `StudentVerification` models, additional User fields (`pausedUntil`, `showPremiumBadge`, `customAccentColor`, referral + student fields), Prisma `SubscriptionTier` / `SubscriptionStatus` enums, and unused-deps cleanup (`@radix-ui/react-dialog`, `class-variance-authority`, `intl-messageformat`, `pg`, `@types/pg`). Captures the full audit trail of items 36-01-SUMMARY claimed but never wrote. Awaits `/gsd-plan-phase 36.2`.
 
 ## Accumulated Context
 

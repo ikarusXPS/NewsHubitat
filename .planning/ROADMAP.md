@@ -145,6 +145,19 @@ n**Plans:**
 **Plans**: 36.1-01 ✅ — 4 commits (a0df872, f2e5324, 1af3a5a, 3d95c2f) + SUMMARY + VERIFICATION
 **Known Stubs (deferred to a future phase 36.2)**: ProcessedWebhookEvent model, ReferralReward model, Campaign model, StudentVerification model, additional User fields (pausedUntil, showPremiumBadge, customAccentColor, referral fields, student-verification fields), Prisma `SubscriptionTier`/`SubscriptionStatus` enums. All claimed by 36-01-SUMMARY but not delivered; not required to unblock 36-05.
 
+### Phase 36.2 (INSERTED): Close 36-debt — schema models + cleanup
+**Goal**: Close the broader 36-Schuld — backfill the models, fields, and Prisma enums that Phase 36-01 SUMMARY claimed but never wrote to disk; remove unused dependencies surfaced during the depcheck audit (commit `87ba5e4`).
+**Depends on**: Phase 36.1 (subscription schema foundation), Phase 36 plans 01-04 (Stripe service, webhooks, middleware, pricing page)
+**Requirements**: PAY-02..PAY-07 (closure of unmet portions; 36.1 closed PAY-01)
+**Success Criteria** (what must be TRUE):
+  1. Prisma schema contains the 4 missing models: `ProcessedWebhookEvent`, `ReferralReward`, `Campaign`, `StudentVerification` with appropriate fields, indexes, and relations
+  2. `User` model has the additional fields claimed by 36-01-SUMMARY: `pausedUntil`, `showPremiumBadge`, `customAccentColor`, plus referral fields (`referralCode`, `referredBy`, `freeMonthsEarned`) and student-verification fields (`isStudent`, `studentVerifiedUntil`)
+  3. Prisma `SubscriptionTier` and `SubscriptionStatus` enums replace the current `String?` typing (consumer code adjusted to import enums; no breakage)
+  4. `pnpm typecheck` and full unit-test suite pass (no regressions)
+  5. Unused-deps cleanup: `@radix-ui/react-dialog`, `class-variance-authority`, `intl-messageformat`, `pg`, `@types/pg` removed from `apps/web/package.json` (verified via depcheck after removal)
+  6. `36-01-SUMMARY.md` annotated with explicit reference to 36.1 + 36.2 as gap-closure (audit trail)
+**Plans**: To be created via `/gsd-plan-phase 36.2`
+
 ### Phase 37: Horizontal Scaling
 **Goal**: System handles 30k concurrent users through horizontal scaling and connection pooling
 **Depends on**: Phase 36 (subscription tiers defined)
