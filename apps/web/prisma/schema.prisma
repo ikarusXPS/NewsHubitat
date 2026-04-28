@@ -114,13 +114,27 @@ model User {
   deletionRequestedAt  DateTime?
   deletionConfirmToken String?
 
-  // Phase 36 / 36.1: Stripe Subscription Fields (PAY-01)
-  // String types intentional; SubscriptionTier/Status are TS unions in server/config/stripe.ts
-  stripeCustomerId     String?   @unique
-  stripeSubscriptionId String?   @unique
-  subscriptionTier     String? // 'FREE' | 'PREMIUM' | 'ENTERPRISE'
-  subscriptionStatus   String? // 'ACTIVE' | 'PAST_DUE' | 'CANCELED' | 'PAUSED'
-  subscriptionEndsAt   DateTime?
+  // Phase 36 / 36.1 / 36.2: Stripe Subscription Fields (PAY-01..PAY-04)
+  // D-01 (36.2): SubscriptionTier/Status are now Prisma enums (UPPERCASE matches existing literals).
+  stripeCustomerId      String?            @unique
+  stripeSubscriptionId  String?            @unique
+  subscriptionTier      SubscriptionTier   @default(FREE)
+  subscriptionStatus    SubscriptionStatus @default(ACTIVE)
+  subscriptionEndsAt    DateTime?
+  pausedUntil           DateTime?
+
+  // Phase 36.2: Premium perks (PAY-04)
+  showPremiumBadge      Boolean            @default(true)
+  customAccentColor     String?
+
+  // Phase 36.2: Referrals — referredByUser self-relation declared in relations block below
+  referralCode          String?            @unique
+  referredBy            String?
+  freeMonthsEarned      Int                @default(0)
+
+  // Phase 36.2: Student discount
+  isStudent             Boolean            @default(false)
+  studentVerifiedUntil  DateTime?
 
   // Relations for features
   emailSubscription EmailSubscription?
@@ -132,6 +146,15 @@ model User {
 
   // API Keys (Phase 35)
   apiKeys ApiKey[]
+
+  // Phase 36.2: Referral relations (per D-04, D-06)
+  referralRewardsAsReferrer ReferralReward[]      @relation("ReferralRewardReferrer")
+  referralRewardsAsReferred ReferralReward[]      @relation("ReferralRewardReferred")
+  referredByUser            User?                 @relation("UserReferrer", fields: [referredBy], references: [id], onDelete: SetNull)
+  referredUsers             User[]                @relation("UserReferrer")
+
+  // Phase 36.2: Student verification queue (per D-05)
+  studentVerifications      StudentVerification[]
 
   // Indexes for token lookups (D-53)
   @@index([verificationTokenHash])
