@@ -4,14 +4,14 @@ milestone: v1.6
 milestone_name: Infrastructure & Scale
 current_plan: 5
 status: ready
-last_updated: "2026-04-28T07:20:00.000Z"
-last_activity: 2026-04-28 -- Phase 36.1 verified PASS (5/5), unblocks 36-05
+last_updated: "2026-04-28T11:30:00.000Z"
+last_activity: 2026-04-28 -- Phase 36.2 planned (4 plans across 3 waves) — schema additions + depcheck cleanup + audit trail; ready to execute
 progress:
   total_phases: 7
   completed_phases: 2
-  total_plans: 11
+  total_plans: 15
   completed_plans: 10
-  percent: 91
+  percent: 67
 ---
 
 # State: NewsHub
@@ -49,7 +49,8 @@ v1.6 Progress: [██████████████████░░] 91
 | 35 | Infrastructure Foundation | 4 reqs (INFRA-01 partial, PAY-08, PAY-09, PAY-10) | No | **Complete** (5/5 plans) — UAT 5/5 PASS + 35.1 hotfix |
 | 36 | Monetization Core | 7 reqs (PAY-01 to PAY-07) | Yes | **Paused** (4/5 plans, ready to resume 36-05) |
 | 36.1 | Add Subscription Schema Fields (INSERTED) | PAY-01 (foundation) | No | **Complete** (1/1 plans) — verified PASS 5/5 |
-| 36.2 | Close 36-debt — schema models + cleanup (INSERTED) | TBD | No | Awaiting plan |
+| 36.2 | Close 36-debt — schema models + cleanup (INSERTED) | PAY-02..PAY-07 | No | **Ready to execute** (4 plans across 3 waves) |
+| 36.3 | Fix Stripe Webhook Monorepo Path (INSERTED) | PAY-02, PAY-03, PAY-06 | No | Awaiting plan |
 | 37 | Horizontal Scaling | 5 reqs (INFRA-01 to INFRA-05) | No | Not started |
 | 38 | Advanced AI Features | 7 reqs (AI-01 to AI-07) | Yes | Not started |
 | 39 | Mobile Apps | 8 reqs (MOB-01 to MOB-08) | Yes | Not started |
@@ -77,8 +78,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Phase 36.1 executed and verified PASS (5/5 ROADMAP success criteria). Plan-checker flagged one BLOCKER (subscriptionService.ts:152 nullable mismatch) + 3 warnings before execute; all addressed in PLAN.md (Task 1.5 added for read-path patch). Executor delivered 4 atomic commits + SUMMARY; verifier confirmed against live Postgres (`\d "User"` shows 5 columns + 2 unique indexes). 1289/1289 tests pass on main tree, typecheck green.
-**Next step:** `/gsd-execute-phase 36` — resume Phase 36 at plan 05 (subscription integration tests, now unblocked)
+**Last action:** Phase 36.2 planned via `/gsd-plan-phase 36.2` — 4 PLAN.md files generated, plan-checker VERIFICATION PASSED (0 blockers, 2 non-blocking warnings: missing `pnpm build` gate; PAY-05/PAY-07 attribution on Plan 02 is load-balancing). Waves: 1 (parallel: schema + depcheck) → 2 (BLOCKING db push + stripe.ts refactor) → 3 (audit trail with resolved SHAs).
+**Next step:** `/gsd-execute-phase 36.2` — execute the 4 plans. After 36.2 completes: `/gsd-plan-phase 36.3` (Stripe webhook monorepo path fix), then resume `/gsd-execute-phase 36` at plan 05.
 **Resume file:** None
 **Checkpoint:** None
 
@@ -88,6 +89,8 @@ Items acknowledged and carried forward from previous milestone close:
 - 2026-04-28 — Phase 36.1 complete. 5 nullable subscription fields + 2 unique indexes added to User model; subscriptionService read-path patched with `?? 'FREE'` / `?? 'ACTIVE'` fallbacks (consequence of nullable schema choice). Larger 36-debt (ProcessedWebhookEvent, ReferralReward, Campaign, StudentVerification, Prisma enums) explicitly deferred to a future phase 36.2 — documented in 36.1-01-SUMMARY.md "Known Stubs".
 - 2026-04-28 — Phase 35 UAT executed (5/5 PASS) + Phase 35.1 hotfix inserted inline (commit 484d4da). Test 4 surfaced a Redis-cache stale-revocation bug — `revokeApiKey` updated DB but didn't invalidate the prefix-based auth cache, so revoked keys kept working for up to 5min. Fix: secondary index `apikey:by-id:<keyId>` enables O(1) cache invalidation on revoke. Phase 35 status `human_needed` → `verified`. Also discovered during UAT prep: `workbox-window` + `stripe@22.1.0` were missing from `apps/web/package.json` (committed as `87ba5e4`) — second instance of the "SUMMARY claimed but never written" pattern that produced Phase 36.1.
 - 2026-04-28 — Phase 36.2 inserted after Phase 36.1 (URGENT). Goal: close the remaining 36-debt — `ProcessedWebhookEvent` / `ReferralReward` / `Campaign` / `StudentVerification` models, additional User fields (`pausedUntil`, `showPremiumBadge`, `customAccentColor`, referral + student fields), Prisma `SubscriptionTier` / `SubscriptionStatus` enums, and unused-deps cleanup (`@radix-ui/react-dialog`, `class-variance-authority`, `intl-messageformat`, `pg`, `@types/pg`). Captures the full audit trail of items 36-01-SUMMARY claimed but never wrote. Awaits `/gsd-plan-phase 36.2`.
+- 2026-04-28 — Phase 36.3 inserted after Phase 36.2 (URGENT). Discovered while configuring local Stripe CLI webhook forwarding: `stripe listen` forwards events successfully, but the live backend returns 404 on every event because Phase 36-02 (commits `0ec4634`, `a32f285`, `6049d1e` on 2026-04-26) wrote the webhook service, route, and subscription routes — plus mount edits — into root-level `server/` instead of `apps/web/server/`. The orphaned files exist on disk but are never loaded by `pnpm dev:backend` (which runs `apps/web/server/index.ts`). Third instance of "SUMMARY claimed delivered but reality diverged" pattern in milestone 36 (after 36.1, 36.2). Fix: relocate three source files to the monorepo path, mount in the live `index.ts`, remove orphaned root duplicates, verify `stripe trigger` returns 200 end-to-end. Awaits `/gsd-plan-phase 36.3`.
+- 2026-04-28 — Phase 36.2 planned (4 plans, 3 waves) via `/gsd-plan-phase 36.2`. Pattern map produced via `gsd-pattern-mapper` (analogs: TeamMember.user for FK Cascade; Comment.parentComment for self-relation; ApiKeyTier for enum syntax). Plan-checker VERIFICATION PASSED with 0 blockers, 2 non-blocking warnings (no `pnpm build` in verify chain; Plan 02 PAY-05/PAY-07 attribution is load-balancing). Plans: 36.2-01 schema (4 models + 8 User fields + 2 enums + relations); 36.2-02 depcheck cleanup (5 deps); 36.2-03 [BLOCKING] db push + prisma generate + stripe.ts re-export refactor; 36.2-04 audit trail + PRODUCTION-MIGRATION.md.
 
 ## Accumulated Context
 

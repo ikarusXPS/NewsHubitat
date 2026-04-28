@@ -156,7 +156,35 @@ n**Plans:**
   4. `pnpm typecheck` and full unit-test suite pass (no regressions)
   5. Unused-deps cleanup: `@radix-ui/react-dialog`, `class-variance-authority`, `intl-messageformat`, `pg`, `@types/pg` removed from `apps/web/package.json` (verified via depcheck after removal)
   6. `36-01-SUMMARY.md` annotated with explicit reference to 36.1 + 36.2 as gap-closure (audit trail)
-**Plans**: To be created via `/gsd-plan-phase 36.2`
+**Plans** (4 plans, 3 waves):
+
+**Wave 1** *(parallel — disjoint files)*:
+- [ ] 36.2-01-PLAN.md — Schema additions: 4 new models + 8 User fields + 2 enums + back-relations (no db push)
+- [ ] 36.2-02-PLAN.md — Depcheck cleanup: remove 5 unused deps from apps/web/package.json + regenerate lockfile
+
+**Wave 2** *(blocked on Plan 01)*:
+- [ ] 36.2-03-PLAN.md — [BLOCKING] db push + prisma generate + stripe.ts re-export refactor + verify typecheck/tests
+
+**Wave 3** *(blocked on Plans 01-03 — needs commit SHAs for audit trail)*:
+- [ ] 36.2-04-PLAN.md — Audit-trail annotation on 36-01-SUMMARY.md + PRODUCTION-MIGRATION.md handoff
+
+**Cross-cutting constraints:**
+- D-01: Prisma enums use UPPERCASE values (`FREE PREMIUM ENTERPRISE`, `ACTIVE PAST_DUE CANCELED PAUSED`) — appears in Plans 01, 03
+- D-02: Use `prisma db push --accept-data-loss` (dev-only); production migration deferred to PRODUCTION-MIGRATION.md — appears in Plans 03, 04
+- D-10: Schema work and depcheck cleanup live in **separate plans with separate commits** — enforced by Plans 01 and 02 disjoint `files_modified`
+
+### Phase 36.3 (INSERTED): Fix Stripe Webhook Monorepo Path
+**Goal**: Restore Stripe webhook handler and subscription routes to the live monorepo backend — Phase 36-02 committed three source files plus `index.ts` edits to the orphaned root `server/` directory instead of `apps/web/server/`, leaving the running backend with no `/api/webhooks/stripe` route. All Stripe events return 404 in `stripe listen` despite the JSON raw-body parser and webhook secret being in place.
+**Depends on**: Phase 36.1 (subscription schema), Phase 36.2 (provides `ProcessedWebhookEvent` model used by webhook idempotency — required before webhook handler is wired live)
+**Requirements**: PAY-02 (Stripe Checkout), PAY-03 (Customer Portal), PAY-06 (idempotent webhook processing)
+**Success Criteria** (what must be TRUE):
+  1. `apps/web/server/services/stripeWebhookService.ts`, `apps/web/server/routes/webhooks/stripe.ts`, and `apps/web/server/routes/subscriptions.ts` exist with the same logic as the orphaned root copies (idempotency, signature verification, price-ID whitelist preserved)
+  2. Webhook route mounted in `apps/web/server/index.ts` BEFORE `express.json()` so raw body is available for HMAC verification
+  3. Subscription routes (`/api/subscriptions/checkout`, `/portal`, `/status`) mounted after `/api/teams` with `authMiddleware`
+  4. `stripe trigger checkout.session.completed` against the live backend returns HTTP 200 (not 404) for all forwarded events in `stripe listen` output
+  5. Orphaned files at root `server/services/stripeWebhookService.ts`, `server/routes/webhooks/stripe.ts`, `server/routes/subscriptions.ts` removed; root `server/index.ts` reverted or deleted (no longer used by `pnpm dev:backend`)
+  6. `pnpm typecheck && pnpm test:run` exits 0 with no regressions
+**Plans**: To be created via `/gsd-plan-phase 36.3`
 
 ### Phase 37: Horizontal Scaling
 **Goal**: System handles 30k concurrent users through horizontal scaling and connection pooling
