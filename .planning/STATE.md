@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Infrastructure & Scale
 current_plan: 4
-status: in_progress
-last_updated: "2026-04-28T10:33:00Z"
-last_activity: 2026-04-28 -- Phase 36.2 plan 04 complete (audit-trail annotation + PRODUCTION-MIGRATION.md handoff; commit 5cb75f3; phase 36.2 ready for verification — all 6 ROADMAP success criteria satisfied)
+status: verified
+last_updated: "2026-04-28T11:45:00Z"
+last_activity: 2026-04-28 -- Phase 36.2 VERIFIED (gsd-verifier 6/6 PASS — all ROADMAP success criteria satisfied; 4 models + 2 enums + 8 User fields + 5 deps removed + audit trail + PRODUCTION-MIGRATION.md handoff)
 progress:
   total_phases: 7
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 15
-  completed_plans: 14
-  percent: 93
+  completed_plans: 15
+  percent: 100
 ---
 
 # State: NewsHub
@@ -21,15 +21,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-26)
 
 **Core value:** Users can see how the same story is covered by different regional perspectives
-**Current focus:** Phase 36.2 — all plans complete; ready for `/gsd-verify-phase 36.2`
+**Current focus:** Phase 36.2 verified — next `/gsd-plan-phase 36.3` (Stripe webhook monorepo path fix), then resume `/gsd-execute-phase 36` plan 05
 
 ## Current Position
 
-Phase: 36.2 — ALL PLANS COMPLETE (4/4); awaiting verification
+Phase: 36.2 — VERIFIED (4/4 plans; 6/6 ROADMAP success criteria PASS)
 Plan: 4 of 4 complete
-Current Plan: — (next phase action: `/gsd-verify-phase 36.2`)
-Status: Plan 36.2-04 complete (audit-trail annotation appended to 36-01-SUMMARY.md citing all 5 prior SHAs + 36.1 a0df872; PRODUCTION-MIGRATION.md hand-off note created with text->enum cutover SQL; single atomic commit 5cb75f3, 2 files, 146 insertions; original Known Stubs block byte-stable per D-11). All 6 ROADMAP success criteria for Phase 36.2 satisfied — phase ready for verification.
-Last activity: 2026-04-28 -- Phase 36.2 plan 04 complete (audit-trail + production-migration handoff; 1 atomic commit; 0 deviations)
+Current Plan: — (next phase action: `/gsd-plan-phase 36.3`)
+Status: Phase 36.2 verified by gsd-verifier; VERIFICATION.md at `.planning/phases/36.2-close-36-debt-schema-models-cleanup/36.2-VERIFICATION.md`. ProcessedWebhookEvent now in generated client → Phase 36.3 unblocked.
+Last activity: 2026-04-28 -- Phase 36.2 verified (6/6 success criteria; pre-existing build issue documented in deferred-items.md)
 
 ```
 v1.6 Progress: [██████████████████░░] 93% (7 phases, 2 complete, 14/15 plans done)
