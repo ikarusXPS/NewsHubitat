@@ -118,6 +118,26 @@ export type TeamBookmark = Prisma.TeamBookmarkModel
  */
 export type TeamInvite = Prisma.TeamInviteModel
 /**
+ * Model ProcessedWebhookEvent
+ * 
+ */
+export type ProcessedWebhookEvent = Prisma.ProcessedWebhookEventModel
+/**
+ * Model ReferralReward
+ * 
+ */
+export type ReferralReward = Prisma.ReferralRewardModel
+/**
+ * Model Campaign
+ * 
+ */
+export type Campaign = Prisma.CampaignModel
+/**
+ * Model StudentVerification
+ * 
+ */
+export type StudentVerification = Prisma.StudentVerificationModel
+/**
  * Model ApiKey
  * 
  */

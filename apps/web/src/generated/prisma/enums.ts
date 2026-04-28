@@ -23,3 +23,22 @@ export const ApiKeyEnv = {
 } as const
 
 export type ApiKeyEnv = (typeof ApiKeyEnv)[keyof typeof ApiKeyEnv]
+
+
+export const SubscriptionTier = {
+  FREE: 'FREE',
+  PREMIUM: 'PREMIUM',
+  ENTERPRISE: 'ENTERPRISE'
+} as const
+
+export type SubscriptionTier = (typeof SubscriptionTier)[keyof typeof SubscriptionTier]
+
+
+export const SubscriptionStatus = {
+  ACTIVE: 'ACTIVE',
+  PAST_DUE: 'PAST_DUE',
+  CANCELED: 'CANCELED',
+  PAUSED: 'PAUSED'
+} as const
+
+export type SubscriptionStatus = (typeof SubscriptionStatus)[keyof typeof SubscriptionStatus]

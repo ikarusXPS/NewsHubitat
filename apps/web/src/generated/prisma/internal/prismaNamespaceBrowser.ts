@@ -71,6 +71,10 @@ export const ModelName = {
   TeamMember: 'TeamMember',
   TeamBookmark: 'TeamBookmark',
   TeamInvite: 'TeamInvite',
+  ProcessedWebhookEvent: 'ProcessedWebhookEvent',
+  ReferralReward: 'ReferralReward',
+  Campaign: 'Campaign',
+  StudentVerification: 'StudentVerification',
   ApiKey: 'ApiKey'
 } as const
 
@@ -170,7 +174,15 @@ export const UserScalarFieldEnum = {
   stripeSubscriptionId: 'stripeSubscriptionId',
   subscriptionTier: 'subscriptionTier',
   subscriptionStatus: 'subscriptionStatus',
-  subscriptionEndsAt: 'subscriptionEndsAt'
+  subscriptionEndsAt: 'subscriptionEndsAt',
+  pausedUntil: 'pausedUntil',
+  showPremiumBadge: 'showPremiumBadge',
+  customAccentColor: 'customAccentColor',
+  referralCode: 'referralCode',
+  referredBy: 'referredBy',
+  freeMonthsEarned: 'freeMonthsEarned',
+  isStudent: 'isStudent',
+  studentVerifiedUntil: 'studentVerifiedUntil'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -407,6 +419,56 @@ export const TeamInviteScalarFieldEnum = {
 } as const
 
 export type TeamInviteScalarFieldEnum = (typeof TeamInviteScalarFieldEnum)[keyof typeof TeamInviteScalarFieldEnum]
+
+
+export const ProcessedWebhookEventScalarFieldEnum = {
+  id: 'id',
+  eventType: 'eventType',
+  processed: 'processed'
+} as const
+
+export type ProcessedWebhookEventScalarFieldEnum = (typeof ProcessedWebhookEventScalarFieldEnum)[keyof typeof ProcessedWebhookEventScalarFieldEnum]
+
+
+export const ReferralRewardScalarFieldEnum = {
+  id: 'id',
+  referrerId: 'referrerId',
+  referredId: 'referredId',
+  rewardType: 'rewardType',
+  rewardValue: 'rewardValue',
+  appliedAt: 'appliedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type ReferralRewardScalarFieldEnum = (typeof ReferralRewardScalarFieldEnum)[keyof typeof ReferralRewardScalarFieldEnum]
+
+
+export const CampaignScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  discountPct: 'discountPct',
+  maxUses: 'maxUses',
+  usedCount: 'usedCount',
+  startsAt: 'startsAt',
+  endsAt: 'endsAt',
+  isActive: 'isActive',
+  createdAt: 'createdAt'
+} as const
+
+export type CampaignScalarFieldEnum = (typeof CampaignScalarFieldEnum)[keyof typeof CampaignScalarFieldEnum]
+
+
+export const StudentVerificationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  documentUrl: 'documentUrl',
+  status: 'status',
+  reviewedBy: 'reviewedBy',
+  reviewedAt: 'reviewedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type StudentVerificationScalarFieldEnum = (typeof StudentVerificationScalarFieldEnum)[keyof typeof StudentVerificationScalarFieldEnum]
 
 
 export const ApiKeyScalarFieldEnum = {
