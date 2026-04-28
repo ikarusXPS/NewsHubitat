@@ -132,17 +132,18 @@ n**Plans:**
 - [x] 36-04-PLAN.md — Pricing page & UI components (TierCard, SubscriptionBadge, i18n)
 - [ ] 36-05-PLAN.md — Integration testing & human verification (unit tests, E2E, Stripe flow verification)
 
-### Phase 36.1 (INSERTED): Add Subscription Schema Fields
+### Phase 36.1 (INSERTED): Add Subscription Schema Fields — **COMPLETE** (2026-04-28, verified PASS 5/5)
 **Goal**: Backfill subscription/Stripe fields on the User model that Phase 36-01 was marked complete without — currently blocks 36-05 because committed `subscriptionService.ts` references fields the Prisma client doesn't have
 **Depends on**: Phase 36 plans 01-04 (committed code already references these fields)
 **Requirements**: PAY-01 (foundational schema for subscription state)
-**Success Criteria** (what must be TRUE):
-  1. `User` model has `stripeCustomerId`, `stripeSubscriptionId`, `subscriptionTier`, `subscriptionStatus`, `subscriptionEndsAt` fields with appropriate types and nullability
-  2. Unique indexes on `stripeCustomerId` and `stripeSubscriptionId` (both used in `prisma.user.findFirst({ where: { ... } })` calls)
-  3. `pnpm typecheck` passes against `apps/web/server/services/subscriptionService.ts` (Prisma generated client matches usage)
-  4. Migration applied via `prisma db push` to local Postgres without data loss
-  5. No regressions in existing User-model queries (auth, OAuth, gamification)
-**Plans**: To be created via `/gsd-plan-phase 36.1`
+**Success Criteria** (all verified TRUE):
+  1. ✅ `User` model has all 5 subscription fields with correct types and nullability (`schema.prisma:117-123`)
+  2. ✅ Unique indexes on `stripeCustomerId` and `stripeSubscriptionId` (confirmed via psql `\d "User"`)
+  3. ✅ `pnpm typecheck` exits 0 (subscriptionService.ts read path patched with `?? 'FREE'` / `?? 'ACTIVE'` fallbacks)
+  4. ✅ Migration applied via `prisma db push` (5 columns + 2 unique indexes in live Postgres; `--accept-data-loss` used because Prisma 7 warns on unique indexes over nullable columns even when empty — safe in dev)
+  5. ✅ No regressions: 1289/1289 tests pass on main tree (auth/OAuth/team/cleanup services all green)
+**Plans**: 36.1-01 ✅ — 4 commits (a0df872, f2e5324, 1af3a5a, 3d95c2f) + SUMMARY + VERIFICATION
+**Known Stubs (deferred to a future phase 36.2)**: ProcessedWebhookEvent model, ReferralReward model, Campaign model, StudentVerification model, additional User fields (pausedUntil, showPremiumBadge, customAccentColor, referral fields, student-verification fields), Prisma `SubscriptionTier`/`SubscriptionStatus` enums. All claimed by 36-01-SUMMARY but not delivered; not required to unblock 36-05.
 
 ### Phase 37: Horizontal Scaling
 **Goal**: System handles 30k concurrent users through horizontal scaling and connection pooling

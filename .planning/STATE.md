@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Infrastructure & Scale
-current_plan: 1
-status: executing
-last_updated: "2026-04-28T05:00:48.241Z"
-last_activity: 2026-04-28 -- Phase 36.1 execution started
+current_plan: 5
+status: ready
+last_updated: "2026-04-28T07:20:00.000Z"
+last_activity: 2026-04-28 -- Phase 36.1 verified PASS (5/5), unblocks 36-05
 progress:
-  total_phases: 6
-  completed_phases: 1
-  total_plans: 10
-  completed_plans: 9
-  percent: 90
+  total_phases: 7
+  completed_phases: 2
+  total_plans: 11
+  completed_plans: 10
+  percent: 91
 ---
 
 # State: NewsHub
@@ -21,25 +21,25 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-26)
 
 **Core value:** Users can see how the same story is covered by different regional perspectives
-**Current focus:** Phase 36.1 — add-subscription-schema-fields
+**Current focus:** Phase 36 — resume plan 05 (subscription integration tests)
 
 ## Current Position
 
-Phase: 36.1 (add-subscription-schema-fields) — EXECUTING
-Plan: 1 of 1
-Current Plan: 1
-Status: Executing Phase 36.1
-Last activity: 2026-04-28 -- Phase 36.1 execution started
+Phase: 36 — RESUMING (Phase 36.1 complete, unblocks 36-05)
+Plan: 5 of 5
+Current Plan: 5
+Status: Ready to execute Phase 36 plan 05
+Last activity: 2026-04-28 -- Phase 36.1 verified PASS (5/5)
 
 ```
-v1.6 Progress: [██████████████████--] 90% (6 phases, 1 complete, 9/10 plans done)
+v1.6 Progress: [██████████████████░░] 91% (7 phases, 2 complete, 10/11 plans done)
 ```
 
 ## Milestone Progress
 
 **Milestone:** v1.6 - Infrastructure & Scale
 **Goal:** Comprehensive expansion across infrastructure, AI, mobile, monetization, and content
-**Status:** Executing Phase 36.1
+**Status:** Phase 36.1 complete; Phase 36 ready to resume at plan 05
 **Previous:** v1.5 complete 2026-04-26
 
 ### Phase Summary
@@ -47,8 +47,8 @@ v1.6 Progress: [██████████████████--] 90% (6
 | Phase | Name | Requirements | UI | Status |
 |-------|------|--------------|-----|--------|
 | 35 | Infrastructure Foundation | 4 reqs (INFRA-01 partial, PAY-08, PAY-09, PAY-10) | No | **Complete** (5/5 plans) |
-| 36 | Monetization Core | 7 reqs (PAY-01 to PAY-07) | Yes | **Paused** (4/5 plans, blocked on 36.1) |
-| 36.1 | Add Subscription Schema Fields (INSERTED) | PAY-01 (foundation) | No | Awaiting plan |
+| 36 | Monetization Core | 7 reqs (PAY-01 to PAY-07) | Yes | **Paused** (4/5 plans, ready to resume 36-05) |
+| 36.1 | Add Subscription Schema Fields (INSERTED) | PAY-01 (foundation) | No | **Complete** (1/1 plans) — verified PASS 5/5 |
 | 37 | Horizontal Scaling | 5 reqs (INFRA-01 to INFRA-05) | No | Not started |
 | 38 | Advanced AI Features | 7 reqs (AI-01 to AI-07) | Yes | Not started |
 | 39 | Mobile Apps | 8 reqs (MOB-01 to MOB-08) | Yes | Not started |
@@ -56,7 +56,7 @@ v1.6 Progress: [██████████████████--] 90% (6
 
 **Coverage:** 37/37 requirements mapped (100%)
 
-**Next step:** `/gsd-plan-phase 36.1`
+**Next step:** `/gsd-execute-phase 36` — return to plan 36-05 (subscription service integration tests, now unblocked by 36.1)
 
 ## Deferred Items
 
@@ -76,14 +76,15 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Phase 36.1 inserted (URGENT) after discovering committed `subscriptionService.ts` references 5 User-model fields that don't exist in the Prisma schema (`stripeCustomerId`, `stripeSubscriptionId`, `subscriptionTier`, `subscriptionStatus`, `subscriptionEndsAt`). Phase 36-01 was marked complete prematurely without the schema migration.
-**Next step:** `/gsd-plan-phase 36.1` — plan the schema backfill, then return to `/gsd-execute-phase 36` for 36-05
+**Last action:** Phase 36.1 executed and verified PASS (5/5 ROADMAP success criteria). Plan-checker flagged one BLOCKER (subscriptionService.ts:152 nullable mismatch) + 3 warnings before execute; all addressed in PLAN.md (Task 1.5 added for read-path patch). Executor delivered 4 atomic commits + SUMMARY; verifier confirmed against live Postgres (`\d "User"` shows 5 columns + 2 unique indexes). 1289/1289 tests pass on main tree, typecheck green.
+**Next step:** `/gsd-execute-phase 36` — resume Phase 36 at plan 05 (subscription integration tests, now unblocked)
 **Resume file:** None
 **Checkpoint:** None
 
 ### Roadmap Evolution
 
 - 2026-04-27 — Phase 36.1 inserted after Phase 36 (URGENT). Reason: 36-01 closed without writing the User-model migration that 36-02's `subscriptionService.ts` requires. Discovered during /gsd-execute-phase 36 pre-flight. Blocks 36-05 tests.
+- 2026-04-28 — Phase 36.1 complete. 5 nullable subscription fields + 2 unique indexes added to User model; subscriptionService read-path patched with `?? 'FREE'` / `?? 'ACTIVE'` fallbacks (consequence of nullable schema choice). Larger 36-debt (ProcessedWebhookEvent, ReferralReward, Campaign, StudentVerification, Prisma enums) explicitly deferred to a future phase 36.2 — documented in 36.1-01-SUMMARY.md "Known Stubs".
 
 ## Accumulated Context
 
