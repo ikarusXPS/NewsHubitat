@@ -18,6 +18,7 @@ interface User {
   hasPassword?: boolean;
   googleLinked?: boolean;
   githubLinked?: boolean;
+  subscriptionTier: 'FREE' | 'PREMIUM' | 'ENTERPRISE';
 }
 
 interface AuthContextType {
