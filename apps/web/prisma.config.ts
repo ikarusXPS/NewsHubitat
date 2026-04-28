@@ -24,12 +24,25 @@
 import "dotenv/config";
 import { defineConfig } from "prisma/config";
 
+// Fail-fast on missing DATABASE_URL (per golden-principles §2:
+// "Access only via process.env, and throw immediately if not set").
+// Without this guard, Prisma would either fail downstream with a
+// confusing message or — depending on schema defaults — connect to
+// an unintended database. Mirrors the JWT_SECRET guard pattern in
+// apps/web/server/services/authService.ts.
+const databaseUrl = process.env["DATABASE_URL"];
+if (!databaseUrl) {
+  throw new Error(
+    "DATABASE_URL environment variable is required (loaded by dotenv/config above)"
+  );
+}
+
 export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
   },
   datasource: {
-    url: process.env["DATABASE_URL"],
+    url: databaseUrl,
   },
 });
