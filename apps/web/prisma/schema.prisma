@@ -442,6 +442,71 @@ model TeamInvite {
 }
 
 // ============================================================================
+// PHASE 36.2: STRIPE WEBHOOK + REFERRALS + STUDENT DISCOUNT + CAMPAIGNS
+// ============================================================================
+
+// Stripe webhook idempotency record (D-08).
+// `id` is the Stripe event ID (caller-supplied, NOT cuid).
+// Consumer: server/services/stripeWebhookService.ts findUnique({ where: { id: eventId } })
+//           and create({ data: { id: eventId, eventType } }).
+model ProcessedWebhookEvent {
+  id        String   @id
+  eventType String
+  processed DateTime @default(now())
+
+  @@index([processed])
+}
+
+// Referral reward audit trail (D-04). Both FKs Cascade so deleting a user
+// removes their referral history. Two named relations disambiguate referrer vs referred.
+model ReferralReward {
+  id          String    @id @default(cuid())
+  referrer    User      @relation("ReferralRewardReferrer", fields: [referrerId], references: [id], onDelete: Cascade)
+  referrerId  String
+  referred    User      @relation("ReferralRewardReferred", fields: [referredId], references: [id], onDelete: Cascade)
+  referredId  String
+  rewardType  String // free_month, discount
+  rewardValue Int // months or percentage
+  appliedAt   DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([referrerId])
+  @@index([referredId])
+}
+
+// Marketing campaigns (D-07). No User FKs in 36.2; future CampaignUsage join model
+// will track per-user redemption.
+model Campaign {
+  id          String   @id @default(cuid())
+  name        String
+  discountPct Int
+  maxUses     Int? // nullable = unlimited (Claude's discretion)
+  usedCount   Int      @default(0)
+  startsAt    DateTime
+  endsAt      DateTime
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  @@index([isActive, startsAt, endsAt])
+}
+
+// Student discount verification queue (D-05). Cascade so deleting a user
+// removes their verification documents.
+model StudentVerification {
+  id          String    @id @default(cuid())
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  documentUrl String?
+  status      String // pending, approved, rejected
+  reviewedBy  String?
+  reviewedAt  DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([status])
+  @@index([userId])
+}
+
+// ============================================================================
 // PHASE 35: DEVELOPER API KEYS
 // ============================================================================
 
@@ -482,4 +547,18 @@ enum ApiKeyTier {
 enum ApiKeyEnv {
   live // Production keys (nh_live_)
   test // Test/sandbox keys (nh_test_)
+}
+
+// Phase 36.2: Subscription tier and status enums (D-01: UPPERCASE matches existing string literals)
+enum SubscriptionTier {
+  FREE
+  PREMIUM
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  PAUSED
 }
