@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Infrastructure & Scale
-current_plan: complete
-status: ready-for-verify
-last_updated: "2026-04-28T15:00:00Z"
-last_activity: 2026-04-28 -- Phase 36.3 plan 04 complete (Stripe E2E verification, commits dbf374d + metadata) — phase ready for /gsd-verify-phase 36.3
+current_plan: Not started
+status: planning
+last_updated: "2026-04-28T13:40:53.735Z"
+last_activity: 2026-04-28
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 10
-  completed_plans: 13
-  percent: 100
+  completed_plans: 9
+  percent: 90
 ---
 
 # State: NewsHub
@@ -25,11 +25,11 @@ See: .planning/PROJECT.md (updated 2026-04-26)
 
 ## Current Position
 
-Phase: 36.3 (fix-stripe-webhook-monorepo-path) — ALL 5 PLANS COMPLETE — READY FOR VERIFY
+Phase: 37
 Plan: 5 of 5 — all complete (01, 02, 03, 04, 05 ✅)
-Current Plan: complete
+Current Plan: Not started
 Status: Phase 36.3 ready for `/gsd-verify-phase 36.3`
-Last activity: 2026-04-28 -- Phase 36.3 plan 04 complete (Stripe E2E verification: 93 [200] forwards, IDEMPOTENCY: PASS; commits dbf374d artifacts + metadata)
+Last activity: 2026-04-28
 
 ```
 v1.6 Progress: [████████████████████] 100% (7 phases, 2 complete, 17/17 plans done — Phase 36.3 fully complete; awaiting `/gsd-verify-phase 36.3` then resume `/gsd-execute-phase 36` Plan 05)
@@ -39,7 +39,7 @@ v1.6 Progress: [████████████████████] 10
 
 **Milestone:** v1.6 - Infrastructure & Scale
 **Goal:** Comprehensive expansion across infrastructure, AI, mobile, monetization, and content
-**Status:** Executing Phase 36.3
+**Status:** Ready to plan
 **Previous:** v1.5 complete 2026-04-26
 
 ### Phase Summary
