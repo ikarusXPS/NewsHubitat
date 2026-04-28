@@ -191,4 +191,4 @@ This document evolves at phase transitions and milestone boundaries.
 - Gamification and personalization
 
 ---
-*Last updated: 2026-04-28 — Phase 36.3 complete (Stripe webhook monorepo path fix; live `/api/webhooks/stripe` mount restored, 93 [200] forwards + IDEMPOTENCY: PASS empirically demonstrated)*
+*Last updated: 2026-04-28 — Phase 36.5 complete (monetization follow-up: structured webhook error log + 2 integration tests, dropped `User.showPremiumBadge` column with prod-migration queued, Sidebar wired to `<SubscriptionBadge>`; PAY-04 + PAY-06 closed; live UI probe approved)*
