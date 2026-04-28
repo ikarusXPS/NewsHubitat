@@ -148,8 +148,8 @@ export class SubscriptionService {
     }
 
     const result = {
-      tier: user.subscriptionTier as SubscriptionTier,
-      status: user.subscriptionStatus,
+      tier: (user.subscriptionTier ?? 'FREE') as SubscriptionTier,
+      status: user.subscriptionStatus ?? 'ACTIVE',
       endsAt: user.subscriptionEndsAt,
     };
 
