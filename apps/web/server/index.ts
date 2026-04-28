@@ -33,6 +33,8 @@ import bookmarksRoutes from './routes/bookmarks';
 import historyRoutes from './routes/history';
 import commentRoutes from './routes/comments';
 import teamsRoutes from './routes/teams';
+import stripeWebhookRouter from './routes/webhooks/stripe';
+import subscriptionRoutes from './routes/subscriptions';
 import { publicApiRoutes } from './routes/publicApi';
 import { apiKeyRoutes } from './routes/apiKeys';
 import { authLimiter, aiLimiter, newsLimiter } from './middleware/rateLimiter';
@@ -44,6 +46,7 @@ import { serverTimingMiddleware } from './middleware/serverTiming';
 import { etagMiddleware } from './middleware/etagMiddleware';
 import { metricsMiddleware } from './middleware/metricsMiddleware';
 import { queryCounterMiddleware } from './middleware/queryCounter';
+import { authMiddleware } from './services/authService';
 import { NewsAggregator } from './services/newsAggregator';
 import { MetricsService } from './services/metricsService';
 import { WebSocketService } from './services/websocketService';
@@ -105,6 +108,9 @@ app.use(queryCounterMiddleware);
 // Initialize Passport (no session - stateless JWT per D-05)
 app.use(passport.initialize());
 configurePassport();
+
+// Stripe webhook route - MUST be before express.json() for raw body signature verification (Phase 36.3)
+app.use('/api/webhooks/stripe', stripeWebhookRouter);
 
 // JSON parser with raw body preservation for webhook signature verification (Phase 22)
 app.use(express.json({
@@ -168,6 +174,9 @@ app.use('/api/comments', commentRoutes);
 
 // Team routes (Phase 28)
 app.use('/api/teams', teamsRoutes);
+
+// Subscription routes (Phase 36.3 - relocated from orphaned root server/)
+app.use('/api/subscriptions', authMiddleware, subscriptionRoutes);
 
 // API key management routes (Phase 35-04) - for developer self-service
 app.use('/api/keys', apiKeyRoutes);
