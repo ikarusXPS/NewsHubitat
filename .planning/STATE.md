@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Infrastructure & Scale
-current_plan: 3
+current_plan: 4
 status: in_progress
-last_updated: "2026-04-28T10:16:30Z"
-last_activity: 2026-04-28 -- Phase 36.2 plan 03 complete (BLOCKING db push gate: 4 new tables + 2 enums + 8 User columns synced to live Postgres; Prisma client regenerated; stripe.ts re-exports SubscriptionTier/Status from generated client; commits 556694f + 30466e2; typecheck 0, 1289/1289 tests)
+last_updated: "2026-04-28T10:33:00Z"
+last_activity: 2026-04-28 -- Phase 36.2 plan 04 complete (audit-trail annotation + PRODUCTION-MIGRATION.md handoff; commit 5cb75f3; phase 36.2 ready for verification — all 6 ROADMAP success criteria satisfied)
 progress:
   total_phases: 7
   completed_phases: 2
   total_plans: 15
-  completed_plans: 13
-  percent: 87
+  completed_plans: 14
+  percent: 93
 ---
 
 # State: NewsHub
@@ -21,25 +21,25 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-26)
 
 **Core value:** Users can see how the same story is covered by different regional perspectives
-**Current focus:** Phase 36.2 — execute final plan (04 audit trail with all 5 SHAs + PRODUCTION-MIGRATION.md handoff)
+**Current focus:** Phase 36.2 — all plans complete; ready for `/gsd-verify-phase 36.2`
 
 ## Current Position
 
-Phase: 36.2 — IN PROGRESS (plans 01 + 02 + 03 complete; plan 04 next — BLOCKING gate cleared)
-Plan: 3 of 4 complete
-Current Plan: 4 (next to execute, Wave 3 — audit trail annotation on 36-01-SUMMARY.md + PRODUCTION-MIGRATION.md)
-Status: Plan 36.2-03 [BLOCKING gate] cleared (556694f + 30466e2); live Postgres dev DB has all 4 new tables + 2 enums + 8 User columns + non-null subscriptionTier/Status with defaults; generated Prisma client exposes new models; stripe.ts re-exports both enums; typecheck 0, 1289/1289 tests pass
-Last activity: 2026-04-28 -- Phase 36.2 plan 03 complete (BLOCKING db push gate cleared; 2 atomic commits; Rule-3 auto-fix for stale root prisma.config.ts schema mismatch)
+Phase: 36.2 — ALL PLANS COMPLETE (4/4); awaiting verification
+Plan: 4 of 4 complete
+Current Plan: — (next phase action: `/gsd-verify-phase 36.2`)
+Status: Plan 36.2-04 complete (audit-trail annotation appended to 36-01-SUMMARY.md citing all 5 prior SHAs + 36.1 a0df872; PRODUCTION-MIGRATION.md hand-off note created with text->enum cutover SQL; single atomic commit 5cb75f3, 2 files, 146 insertions; original Known Stubs block byte-stable per D-11). All 6 ROADMAP success criteria for Phase 36.2 satisfied — phase ready for verification.
+Last activity: 2026-04-28 -- Phase 36.2 plan 04 complete (audit-trail + production-migration handoff; 1 atomic commit; 0 deviations)
 
 ```
-v1.6 Progress: [█████████████████░░░] 87% (7 phases, 2 complete, 13/15 plans done)
+v1.6 Progress: [██████████████████░░] 93% (7 phases, 2 complete, 14/15 plans done)
 ```
 
 ## Milestone Progress
 
 **Milestone:** v1.6 - Infrastructure & Scale
 **Goal:** Comprehensive expansion across infrastructure, AI, mobile, monetization, and content
-**Status:** Phase 36.2 in progress (3/4 plans complete — only audit trail (Plan 04) left); Phase 36 still paused at plan 05
+**Status:** Phase 36.2 all plans complete (4/4); ready for `/gsd-verify-phase 36.2`. Phase 36 still paused at plan 05.
 **Previous:** v1.5 complete 2026-04-26
 
 ### Phase Summary
@@ -49,7 +49,7 @@ v1.6 Progress: [█████████████████░░░] 87
 | 35 | Infrastructure Foundation | 4 reqs (INFRA-01 partial, PAY-08, PAY-09, PAY-10) | No | **Complete** (5/5 plans) — UAT 5/5 PASS + 35.1 hotfix |
 | 36 | Monetization Core | 7 reqs (PAY-01 to PAY-07) | Yes | **Paused** (4/5 plans, ready to resume 36-05) |
 | 36.1 | Add Subscription Schema Fields (INSERTED) | PAY-01 (foundation) | No | **Complete** (1/1 plans) — verified PASS 5/5 |
-| 36.2 | Close 36-debt — schema models + cleanup (INSERTED) | PAY-02..PAY-07 | No | **In Progress** (3/4 plans — schema + depcheck + db-push/refactor complete; only audit trail left) |
+| 36.2 | Close 36-debt — schema models + cleanup (INSERTED) | PAY-02..PAY-07 | No | **Complete** (4/4 plans — schema + depcheck + db-push/refactor + audit trail; awaiting `/gsd-verify-phase 36.2`) |
 | 36.3 | Fix Stripe Webhook Monorepo Path (INSERTED) | PAY-02, PAY-03, PAY-06 | No | Awaiting plan |
 | 37 | Horizontal Scaling | 5 reqs (INFRA-01 to INFRA-05) | No | Not started |
 | 38 | Advanced AI Features | 7 reqs (AI-01 to AI-07) | Yes | Not started |
@@ -58,7 +58,7 @@ v1.6 Progress: [█████████████████░░░] 87
 
 **Coverage:** 37/37 requirements mapped (100%)
 
-**Next step:** `/gsd-execute-phase 36.2` — execute plan 04 (audit trail with all 5 SHAs from 01-03: 1976489 / 44aa829 / b9e068b / 556694f / 30466e2 + PRODUCTION-MIGRATION.md handoff). After 36.2 completes: resume `/gsd-execute-phase 36` at plan 05.
+**Next step:** `/gsd-verify-phase 36.2` — verify all 6 ROADMAP success criteria are met by the four 36.2 plans. After 36.2 verifies: resume `/gsd-execute-phase 36` at plan 05.
 
 ## Deferred Items
 
@@ -78,8 +78,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Phase 36.2 plan 03 [BLOCKING] executed sequentially on `test-ci-pipeline` — 2 atomic commits. `556694f` (chore) ran `npx prisma db push --accept-data-loss --schema=prisma/schema.prisma` then `npx prisma generate` against live dev Postgres. Result: 25 tables (4 new — Campaign, ProcessedWebhookEvent, ReferralReward, StudentVerification), 4 enum types (2 new — SubscriptionTier FREE/PREMIUM/ENTERPRISE, SubscriptionStatus ACTIVE/PAST_DUE/CANCELED/PAUSED), 8 new User columns, subscriptionTier/Status converted from text? to NOT NULL enum with defaults FREE/ACTIVE; generated client at `apps/web/src/generated/prisma/` regenerated (13 files modified, 4 new model.ts files). `30466e2` (refactor) replaced inline TS union in `apps/web/server/config/stripe.ts` with `export type { SubscriptionTier, SubscriptionStatus } from '../../src/generated/prisma/client'` — single source of truth. Verification gates: `pnpm typecheck` exit 0, `pnpm test:run` 1289/1289 PASS. Idempotency proven (second db push reports 'already in sync'). Rule-3 auto-fix during Task 1: root `prisma.config.ts` schema field resolves relative to config dir (D:\NewsHub) and silently loaded a stale duplicate `D:\NewsHub\prisma\schema.prisma` lacking ApiKey on first attempt — fixed by passing `--schema=prisma/schema.prisma` explicitly (resolves against cwd). One pre-existing build issue deferred: `pnpm build` fails on `vite-plugin-pwa` workbox precache size limit (stats.html 4.3 MB > 2 MiB) — confirmed unrelated to plan 03 changes; tracked in `.planning/phases/36.2-close-36-debt-schema-models-cleanup/deferred-items.md` for a future small fix plan. SUMMARY at `.planning/phases/36.2-close-36-debt-schema-models-cleanup/36.2-03-SUMMARY.md`.
-**Next step:** `/gsd-execute-phase 36.2` continues — plan 04 (audit-trail annotation on `36-01-SUMMARY.md` with the 5 SHAs 1976489 / 44aa829 / b9e068b / 556694f / 30466e2, plus `PRODUCTION-MIGRATION.md` handoff documenting the manual `ALTER COLUMN ... USING text::"SubscriptionTier"` SQL needed for production cutover) is the final Wave-3 plan.
+**Last action:** Phase 36.2 plan 04 executed sequentially on `test-ci-pipeline` — 1 atomic commit `5cb75f3` (docs). Task 1 appended a `## Phase 36 Debt Closure (Audit Trail)` section to the bottom of `.planning/phases/36-monetization-core/36-01-SUMMARY.md` (after the existing Self-Check block, leaving lines 138-140 byte-stable per D-11). The new section opens with `*Added: 2026-04-28 by Phase 36.2*` and contains two tables: a canonical 9-row table mapping each 36.1 Known Stub to its closing phase + 7-char SHA (`a0df872` for the 36.1 5-field foundation; `1976489` / `44aa829` for 36.2 schema work), and a 3-row operational-closure table (`556694f` for db push + client regen, `30466e2` for stripe.ts re-export, `b9e068b` for depcheck cleanup). Closes with `MISSING items remaining: 0.` Task 2 created `.planning/phases/36.2-close-36-debt-schema-models-cleanup/PRODUCTION-MIGRATION.md` (107 lines) documenting the production cutover SQL: `ALTER COLUMN "subscriptionTier" TYPE "SubscriptionTier" USING "subscriptionTier"::text::"SubscriptionTier"` wrapped in `BEGIN;` / `COMMIT;`, with `CREATE TYPE` statements for both enums, 5-step procedure (verify -> create enum -> cast -> apply additive -> verify), pre-requisites (maintenance window / backup / rollback rehearsal / app compat), and explicit Owner: "Production-readiness phase (TBD)". Task 3 staged both files and committed atomically (`docs(36.2-04): close phase 36 debt audit trail + add production migration handoff`). Verification: 2 files in commit, 0 forbidden files (no schema/code/package), original Known Stubs block at lines 138-140 byte-stable (`sed -n '138,140p'` returns the original false claim verbatim). Zero deviations; plan executed exactly as written. SUMMARY at `.planning/phases/36.2-close-36-debt-schema-models-cleanup/36.2-04-SUMMARY.md`.
+**Next step:** `/gsd-verify-phase 36.2` — verify all 6 ROADMAP success criteria for Phase 36.2 are satisfied across the four plan SUMMARYs (01 schema, 02 depcheck, 03 db-push+refactor, 04 audit-trail). After verification PASSes, resume `/gsd-execute-phase 36` at plan 05 (subscription E2E tests).
 **Resume file:** None
 **Checkpoint:** None
 
@@ -94,6 +94,7 @@ Items acknowledged and carried forward from previous milestone close:
 - 2026-04-28 — Phase 36.2 plan 01 complete. Two atomic commits on `test-ci-pipeline`: `1976489` added the PHASE 36.2 schema section (ProcessedWebhookEvent with caller-supplied `id String @id` per D-08, ReferralReward with two named relations both Cascade per D-04, Campaign no-FK per D-07, StudentVerification with Cascade per D-05) plus `enum SubscriptionTier { FREE PREMIUM ENTERPRISE }` and `enum SubscriptionStatus { ACTIVE PAST_DUE CANCELED PAUSED }` (D-01 UPPERCASE). `44aa829` added 8 new User fields (pausedUntil, showPremiumBadge, customAccentColor, referralCode @unique, referredBy, freeMonthsEarned, isStudent, studentVerifiedUntil), tightened subscriptionTier/Status from `String?` to non-null Prisma enums with defaults `@default(FREE)` / `@default(ACTIVE)`, and added 5 back-relations including the `UserReferrer` self-relation with `onDelete: SetNull` per D-06. `cd apps/web && npx prisma validate` exits 0. No deviations; no out-of-scope files touched. db push + prisma generate deferred to Plan 03 per Wave 2 sequencing.
 - 2026-04-28 — Phase 36.2 plan 02 complete. One atomic commit `b9e068b` on `test-ci-pipeline` removed 5 unused deps from `apps/web/package.json` (`@radix-ui/react-dialog`, `class-variance-authority`, `intl-messageformat`, `pg`, `@types/pg`) and regenerated `pnpm-lock.yaml` (-22 lines, 1 net package pruned). Full D-09 5-step verification gate passed: JSON valid, `pnpm install --no-frozen-lockfile` succeeded, `npx depcheck --skip-missing` against `apps/web` showed the 5 target deps gone with no NEW transitive offenders (residual `@newshub/types`/`autoprefixer`/`tailwindcss`/`nodemon` are pre-existing false positives — workspace pkg, PostCSS pipeline, runtime tool), `pnpm typecheck` exit 0, `pnpm test:run` 1289/1289 PASS. D-10 commit isolation enforced — diff includes only `apps/web/package.json` + `pnpm-lock.yaml`. Zero deviations.
 - 2026-04-28 — Phase 36.2 plan 03 [BLOCKING gate] complete. Two atomic commits on `test-ci-pipeline`: `556694f` (chore) synced live dev Postgres to the apps/web Prisma schema via `npx prisma db push --accept-data-loss --schema=prisma/schema.prisma` and regenerated the Prisma client at `apps/web/src/generated/prisma/` (13 files modified, 4 new model files: ProcessedWebhookEvent, ReferralReward, Campaign, StudentVerification). DB now has 25 tables (was 24), 4 enum types (added SubscriptionTier FREE/PREMIUM/ENTERPRISE + SubscriptionStatus ACTIVE/PAST_DUE/CANCELED/PAUSED), 8 new User columns, subscriptionTier/Status converted from `text?` to `NOT NULL` Prisma enums with defaults FREE/ACTIVE. `30466e2` (refactor) replaced inline TS union in `apps/web/server/config/stripe.ts` with `export type { SubscriptionTier, SubscriptionStatus } from '../../src/generated/prisma/client'` — single source of truth per D-03; zero call-site churn (subscriptionService.ts:9 import unchanged, 26 subscription tests still green). Idempotency proven (second `db push` reports 'already in sync'). `pnpm typecheck` exit 0, `pnpm test:run` 1289/1289 PASS. **One Rule-3 auto-fix during Task 1**: first db push attempt loaded stale `D:\NewsHub\prisma\schema.prisma` (a duplicate at the repo root that lacks ApiKey from Phase 35) because the root `prisma.config.ts` `schema:` field resolves relative to the **config file's directory**, not cwd; this dropped the ApiKey table (1 test row). Re-ran with explicit `--schema=prisma/schema.prisma` flag (resolves against cwd, hits the canonical apps/web schema), restored ApiKey, finished idempotently. Stale duplicate root schema flagged for a future tidy-up plan. **One pre-existing issue deferred**: `pnpm build` fails on `vite-plugin-pwa` workbox precache size limit (`dist/stats.html` 4.3 MB > 2 MiB default); confirmed pre-existing by reverting plan-03 changes and reproducing. Documented in `.planning/phases/36.2-close-36-debt-schema-models-cleanup/deferred-items.md`. Plan's own verification gates (typecheck + tests) both pass cleanly.
+- 2026-04-28 — Phase 36.2 plan 04 complete. One atomic commit `5cb75f3` on `test-ci-pipeline` (`docs(36.2-04): close phase 36 debt audit trail + add production migration handoff`). Two artifacts: (1) `.planning/phases/36-monetization-core/36-01-SUMMARY.md` extended with a new `## Phase 36 Debt Closure (Audit Trail)` section appended after the existing Self-Check block; original `## Known Stubs` heading at line 138 and false claim at line 140 (`None - all code is fully implemented and functional.`) preserved byte-stable per D-11 history-preservation. The new section contains two tables — a 9-row canonical table mapping each 36.1 Known Stub to its closing phase + 7-char SHA (`a0df872` for the 36.1 5-field foundation; `1976489` for ProcessedWebhookEvent / ReferralReward / StudentVerification / Campaign + the two enums; `44aa829` for the 8 new User fields + non-null subscription enum tightening + back-relations) and a 3-row operational-closure table (`556694f` db push + client regen, `30466e2` stripe.ts re-export, `b9e068b` depcheck cleanup) — closing with `MISSING items remaining: 0`. (2) `.planning/phases/36.2-close-36-debt-schema-models-cleanup/PRODUCTION-MIGRATION.md` created (107 lines) documenting the manual production cutover SQL (`ALTER COLUMN "subscriptionTier" TYPE "SubscriptionTier" USING "subscriptionTier"::text::"SubscriptionTier"` plus matching for subscriptionStatus, wrapped in `BEGIN;` / `COMMIT;`); 5-step procedure (verify -> create enum -> cast -> apply additive -> verify); pre-requisites (maintenance window, backup, rollback rehearsal, app compatibility); explicit Owner: "Production-readiness phase (TBD)" and Status: "Not executed in 36.2. Dev DB only." Verification: 2 files in commit diff, 0 code/schema/package files. Zero deviations. Phase 36.2 complete (4/4 plans); ready for `/gsd-verify-phase 36.2`.
 
 ## Accumulated Context
 
@@ -298,6 +299,8 @@ v1.6 Architecture Decisions (from research):
 | D-10 manifest-cleanup commit isolation | Phase 36.2-02 | Cleanup commits include ONLY package.json + pnpm-lock.yaml (no schema, source, generated client). Enables independent revert if a transitive consumer surfaces post-merge. |
 | Type re-export from generated Prisma client (`from '../../src/generated/prisma/client'`) | Phase 36.2-03 D-03 | stripe.ts re-exports SubscriptionTier + SubscriptionStatus instead of declaring inline TS unions; single source of truth for enum values, schema-derived. Path uses `/client` (not bare `/prisma`) because Prisma 7 'prisma-client' generator emits no index.ts. |
 | `--schema=prisma/schema.prisma` flag override on `prisma db push` | Phase 36.2-03 | Root `prisma.config.ts` `schema:` field resolves relative to the config file's directory (D:\NewsHub\) not cwd, silently loading a stale duplicate `D:\NewsHub\prisma\schema.prisma`. Explicit `--schema=prisma/schema.prisma` flag resolves against cwd and pins the canonical apps/web schema. Documented for future db-push operations until the stale root duplicate is removed. |
+| Append-only audit-trail format (D-11 history preservation) | Phase 36.2-04 | New `## Phase 36 Debt Closure (Audit Trail)` section appended to bottom of `36-01-SUMMARY.md` AFTER the existing Self-Check block; original `## Known Stubs` heading at line 138 and false claim at line 140 left byte-stable. Format: two tables ("Originally-Claimed Item / Closed By / Commit" + "Operational closures") with 7-char short SHAs per row. Reusable template for future debt-closure cycles — supports partial closure (rows can stay marked MISSING) without losing history. |
+| PRODUCTION-MIGRATION.md hand-off pattern | Phase 36.2-04 | Dev-only `prisma db push --accept-data-loss` paired with a separate `PRODUCTION-MIGRATION.md` note in the phase directory enumerating the manual SQL cutover (`ALTER COLUMN ... TYPE <enum> USING <text>::text::<enum>` wrapped in `BEGIN;`/`COMMIT;`), pre-requisites (maintenance window, backup, rollback rehearsal, app compat), and explicit Owner ("Production-readiness phase TBD"). Reusable template for any future schema-type-change phases that touch enums. |
 
 ## Reports
 
@@ -307,4 +310,4 @@ v1.6 Architecture Decisions (from research):
 
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-28 — Phase 36.2 Plan 03 [BLOCKING gate] complete (db push + prisma generate + stripe.ts re-export; commits 556694f + 30466e2; typecheck 0, 1289/1289 tests; one Rule-3 auto-fix for stale root config schema mismatch; one pre-existing build issue deferred)*
+*Last updated: 2026-04-28 — Phase 36.2 Plan 04 complete (audit-trail annotation on 36-01-SUMMARY.md + PRODUCTION-MIGRATION.md handoff; commit 5cb75f3; 2 docs files; original Known Stubs block byte-stable per D-11; phase 36.2 ALL plans complete, ready for `/gsd-verify-phase 36.2`)*

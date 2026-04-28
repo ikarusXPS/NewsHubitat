@@ -166,7 +166,7 @@ n**Plans:**
 - [x] 36.2-03-PLAN.md — [BLOCKING] db push + prisma generate + stripe.ts re-export refactor + verify typecheck/tests — completed 2026-04-28 (556694f, 30466e2)
 
 **Wave 3** *(blocked on Plans 01-03 — needs commit SHAs for audit trail)*:
-- [ ] 36.2-04-PLAN.md — Audit-trail annotation on 36-01-SUMMARY.md + PRODUCTION-MIGRATION.md handoff
+- [x] 36.2-04-PLAN.md — Audit-trail annotation on 36-01-SUMMARY.md + PRODUCTION-MIGRATION.md handoff — completed 2026-04-28 (5cb75f3)
 
 **Cross-cutting constraints:**
 - D-01: Prisma enums use UPPERCASE values (`FREE PREMIUM ENTERPRISE`, `ACTIVE PAST_DUE CANCELED PAUSED`) — appears in Plans 01, 03
@@ -290,4 +290,4 @@ n**Plans:**
 ---
 
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-26 — Phase 36 Plan 04 complete (Pricing Page UI + i18n translations)*
+*Last updated: 2026-04-28 — Phase 36.2 complete (4/4 plans: schema additions + depcheck cleanup + db push + audit trail); awaiting `/gsd-verify-phase 36.2`*
