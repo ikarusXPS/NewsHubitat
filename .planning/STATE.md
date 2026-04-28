@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Infrastructure & Scale
-current_plan: 1
+current_plan: 2
 status: in_progress
-last_updated: "2026-04-28T09:58:31Z"
-last_activity: 2026-04-28 -- Phase 36.2 plan 01 complete (schema additions: 4 models + 2 enums + 8 User fields + 5 back-relations; commits 1976489, 44aa829)
+last_updated: "2026-04-28T10:05:35Z"
+last_activity: 2026-04-28 -- Phase 36.2 plan 02 complete (depcheck cleanup: 5 unused deps removed from apps/web/package.json + lockfile regenerated; commit b9e068b; 5-step gate passed: typecheck 0, 1289/1289 tests)
 progress:
   total_phases: 7
   completed_phases: 2
   total_plans: 15
-  completed_plans: 11
-  percent: 73
+  completed_plans: 12
+  percent: 80
 ---
 
 # State: NewsHub
@@ -21,18 +21,18 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-26)
 
 **Core value:** Users can see how the same story is covered by different regional perspectives
-**Current focus:** Phase 36.2 — execute remaining 3 plans (02 depcheck, 03 db push + stripe.ts refactor, 04 audit trail)
+**Current focus:** Phase 36.2 — execute remaining 2 plans (03 db push + stripe.ts refactor [BLOCKING], 04 audit trail)
 
 ## Current Position
 
-Phase: 36.2 — IN PROGRESS (plan 01 complete; plan 02 unblocked, plan 03 blocked on plan 01)
-Plan: 1 of 4 complete
-Current Plan: 2 (next to execute, Wave 1 parallel-eligible with plan 01 already done)
-Status: Plan 36.2-01 committed (1976489, 44aa829); schema valid; ready for plan 02
-Last activity: 2026-04-28 -- Phase 36.2 plan 01 complete (4 models + 2 enums + 8 User fields + 5 back-relations)
+Phase: 36.2 — IN PROGRESS (plans 01 + 02 complete; plan 03 next, plan 04 blocked on 03)
+Plan: 2 of 4 complete
+Current Plan: 3 (next to execute, Wave 2 — db push + prisma generate + stripe.ts re-export refactor)
+Status: Plan 36.2-02 committed (b9e068b); manifest+lockfile clean; depcheck baseline clean; ready for plan 03
+Last activity: 2026-04-28 -- Phase 36.2 plan 02 complete (5 unused deps removed + lockfile regenerated; D-09 5-step gate passed)
 
 ```
-v1.6 Progress: [███████████████░░░░░] 73% (7 phases, 2 complete, 11/15 plans done)
+v1.6 Progress: [████████████████░░░░] 80% (7 phases, 2 complete, 12/15 plans done)
 ```
 
 ## Milestone Progress
@@ -49,7 +49,7 @@ v1.6 Progress: [███████████████░░░░░] 73
 | 35 | Infrastructure Foundation | 4 reqs (INFRA-01 partial, PAY-08, PAY-09, PAY-10) | No | **Complete** (5/5 plans) — UAT 5/5 PASS + 35.1 hotfix |
 | 36 | Monetization Core | 7 reqs (PAY-01 to PAY-07) | Yes | **Paused** (4/5 plans, ready to resume 36-05) |
 | 36.1 | Add Subscription Schema Fields (INSERTED) | PAY-01 (foundation) | No | **Complete** (1/1 plans) — verified PASS 5/5 |
-| 36.2 | Close 36-debt — schema models + cleanup (INSERTED) | PAY-02..PAY-07 | No | **In Progress** (1/4 plans — plan 01 schema additions complete) |
+| 36.2 | Close 36-debt — schema models + cleanup (INSERTED) | PAY-02..PAY-07 | No | **In Progress** (2/4 plans — plans 01 schema + 02 depcheck complete) |
 | 36.3 | Fix Stripe Webhook Monorepo Path (INSERTED) | PAY-02, PAY-03, PAY-06 | No | Awaiting plan |
 | 37 | Horizontal Scaling | 5 reqs (INFRA-01 to INFRA-05) | No | Not started |
 | 38 | Advanced AI Features | 7 reqs (AI-01 to AI-07) | Yes | Not started |
@@ -58,7 +58,7 @@ v1.6 Progress: [███████████████░░░░░] 73
 
 **Coverage:** 37/37 requirements mapped (100%)
 
-**Next step:** `/gsd-execute-phase 36.2` — execute plan 02 (depcheck cleanup, Wave 1 parallel) and plans 03 + 04. After 36.2 completes: resume `/gsd-execute-phase 36` at plan 05.
+**Next step:** `/gsd-execute-phase 36.2` — execute plan 03 [BLOCKING] (db push + prisma generate + stripe.ts re-export) and plan 04 (audit trail with SHAs). After 36.2 completes: resume `/gsd-execute-phase 36` at plan 05.
 
 ## Deferred Items
 
@@ -78,8 +78,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Phase 36.2 plan 01 executed sequentially on `test-ci-pipeline` — 2 atomic commits (1976489 added 4 models + 2 enums; 44aa829 added 8 User fields + 5 back-relations + tightened subscriptionTier/Status to non-null Prisma enums). `cd apps/web && npx prisma validate` passed. Models 21→25, enums 2→4. Zero deviations from plan; no out-of-scope files touched. SUMMARY at `.planning/phases/36.2-close-36-debt-schema-models-cleanup/36.2-01-SUMMARY.md`.
-**Next step:** `/gsd-execute-phase 36.2` continues — plan 02 (depcheck: remove 5 deps from apps/web/package.json + regenerate lockfile) is Wave 1 parallel-eligible and now unblocked. Plan 03 [BLOCKING] (db push + prisma generate + stripe.ts re-export) waits for plan 02 to land first per Wave 2. Plan 04 (audit trail with SHAs) is Wave 3.
+**Last action:** Phase 36.2 plan 02 executed sequentially on `test-ci-pipeline` — 1 atomic commit (b9e068b removed 5 unused deps from apps/web/package.json + regenerated pnpm-lock.yaml). D-09 5-step gate passed: manifest edit (JSON valid), `pnpm install --no-frozen-lockfile` (1 net package pruned), depcheck (no NEW transitive offenders), `pnpm typecheck` exit 0, `pnpm test:run` 1289/1289 PASS. D-10 commit isolation enforced (only manifest+lockfile staged). Zero deviations. SUMMARY at `.planning/phases/36.2-close-36-debt-schema-models-cleanup/36.2-02-SUMMARY.md`.
+**Next step:** `/gsd-execute-phase 36.2` continues — plan 03 [BLOCKING] (db push --accept-data-loss + prisma generate + stripe.ts re-export refactor + verify typecheck/tests) is the Wave 2 gate. Plan 04 (audit trail with all SHAs + PRODUCTION-MIGRATION.md handoff) waits for plan 03.
 **Resume file:** None
 **Checkpoint:** None
 
@@ -92,6 +92,7 @@ Items acknowledged and carried forward from previous milestone close:
 - 2026-04-28 — Phase 36.3 inserted after Phase 36.2 (URGENT). Discovered while configuring local Stripe CLI webhook forwarding: `stripe listen` forwards events successfully, but the live backend returns 404 on every event because Phase 36-02 (commits `0ec4634`, `a32f285`, `6049d1e` on 2026-04-26) wrote the webhook service, route, and subscription routes — plus mount edits — into root-level `server/` instead of `apps/web/server/`. The orphaned files exist on disk but are never loaded by `pnpm dev:backend` (which runs `apps/web/server/index.ts`). Third instance of "SUMMARY claimed delivered but reality diverged" pattern in milestone 36 (after 36.1, 36.2). Fix: relocate three source files to the monorepo path, mount in the live `index.ts`, remove orphaned root duplicates, verify `stripe trigger` returns 200 end-to-end. Awaits `/gsd-plan-phase 36.3`.
 - 2026-04-28 — Phase 36.2 planned (4 plans, 3 waves) via `/gsd-plan-phase 36.2`. Pattern map produced via `gsd-pattern-mapper` (analogs: TeamMember.user for FK Cascade; Comment.parentComment for self-relation; ApiKeyTier for enum syntax). Plan-checker VERIFICATION PASSED with 0 blockers, 2 non-blocking warnings (no `pnpm build` in verify chain; Plan 02 PAY-05/PAY-07 attribution is load-balancing). Plans: 36.2-01 schema (4 models + 8 User fields + 2 enums + relations); 36.2-02 depcheck cleanup (5 deps); 36.2-03 [BLOCKING] db push + prisma generate + stripe.ts re-export refactor; 36.2-04 audit trail + PRODUCTION-MIGRATION.md.
 - 2026-04-28 — Phase 36.2 plan 01 complete. Two atomic commits on `test-ci-pipeline`: `1976489` added the PHASE 36.2 schema section (ProcessedWebhookEvent with caller-supplied `id String @id` per D-08, ReferralReward with two named relations both Cascade per D-04, Campaign no-FK per D-07, StudentVerification with Cascade per D-05) plus `enum SubscriptionTier { FREE PREMIUM ENTERPRISE }` and `enum SubscriptionStatus { ACTIVE PAST_DUE CANCELED PAUSED }` (D-01 UPPERCASE). `44aa829` added 8 new User fields (pausedUntil, showPremiumBadge, customAccentColor, referralCode @unique, referredBy, freeMonthsEarned, isStudent, studentVerifiedUntil), tightened subscriptionTier/Status from `String?` to non-null Prisma enums with defaults `@default(FREE)` / `@default(ACTIVE)`, and added 5 back-relations including the `UserReferrer` self-relation with `onDelete: SetNull` per D-06. `cd apps/web && npx prisma validate` exits 0. No deviations; no out-of-scope files touched. db push + prisma generate deferred to Plan 03 per Wave 2 sequencing.
+- 2026-04-28 — Phase 36.2 plan 02 complete. One atomic commit `b9e068b` on `test-ci-pipeline` removed 5 unused deps from `apps/web/package.json` (`@radix-ui/react-dialog`, `class-variance-authority`, `intl-messageformat`, `pg`, `@types/pg`) and regenerated `pnpm-lock.yaml` (-22 lines, 1 net package pruned). Full D-09 5-step verification gate passed: JSON valid, `pnpm install --no-frozen-lockfile` succeeded, `npx depcheck --skip-missing` against `apps/web` showed the 5 target deps gone with no NEW transitive offenders (residual `@newshub/types`/`autoprefixer`/`tailwindcss`/`nodemon` are pre-existing false positives — workspace pkg, PostCSS pipeline, runtime tool), `pnpm typecheck` exit 0, `pnpm test:run` 1289/1289 PASS. D-10 commit isolation enforced — diff includes only `apps/web/package.json` + `pnpm-lock.yaml`. Zero deviations.
 
 ## Accumulated Context
 
@@ -292,6 +293,8 @@ v1.6 Architecture Decisions (from research):
 | `onDelete: SetNull` on UserReferrer self-relation | Phase 36.2-01 D-06 | Audit-graph tolerance: deleting a referrer null-outs the referredBy pointer rather than cascade-deleting referees (deviates from Comment.parentComment NoAction precedent) |
 | ReferralReward both FKs Cascade | Phase 36.2-01 D-04 | Account deletion removes referral history; two named relations (ReferralRewardReferrer, ReferralRewardReferred) disambiguate |
 | Two-commit split for schema-only plan | Phase 36.2-01 | Task 1 structural (models+enums) → Task 2 User glue makes per-commit schema-text history reviewable independent of generated-client diffs |
+| 5-step depcheck verification gate (edit -> install -> depcheck -> typecheck -> test) | Phase 36.2-02 D-09 | Canonical pattern for unused-dep cleanup; all 5 steps must pass before commit. Catches transitive consumers that depcheck alone misses (typecheck) and runtime consumers (tests). |
+| D-10 manifest-cleanup commit isolation | Phase 36.2-02 | Cleanup commits include ONLY package.json + pnpm-lock.yaml (no schema, source, generated client). Enables independent revert if a transitive consumer surfaces post-merge. |
 
 ## Reports
 
@@ -301,4 +304,4 @@ v1.6 Architecture Decisions (from research):
 
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-28 — Phase 36.2 Plan 01 complete (4 new Prisma models + 2 subscription enums + 8 User fields + 5 back-relations; commits 1976489, 44aa829)*
+*Last updated: 2026-04-28 — Phase 36.2 Plan 02 complete (5 unused deps removed from apps/web/package.json + pnpm-lock.yaml regenerated; D-09 5-step gate passed; commit b9e068b)*

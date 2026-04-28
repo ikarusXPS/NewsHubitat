@@ -160,7 +160,7 @@ n**Plans:**
 
 **Wave 1** *(parallel — disjoint files)*:
 - [x] 36.2-01-PLAN.md — Schema additions: 4 new models + 8 User fields + 2 enums + back-relations (no db push) — completed 2026-04-28 (1976489, 44aa829)
-- [ ] 36.2-02-PLAN.md — Depcheck cleanup: remove 5 unused deps from apps/web/package.json + regenerate lockfile
+- [x] 36.2-02-PLAN.md — Depcheck cleanup: remove 5 unused deps from apps/web/package.json + regenerate lockfile — completed 2026-04-28 (b9e068b)
 
 **Wave 2** *(blocked on Plan 01)*:
 - [ ] 36.2-03-PLAN.md — [BLOCKING] db push + prisma generate + stripe.ts re-export refactor + verify typecheck/tests
