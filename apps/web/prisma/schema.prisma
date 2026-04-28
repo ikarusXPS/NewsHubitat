@@ -123,8 +123,7 @@ model User {
   subscriptionEndsAt    DateTime?
   pausedUntil           DateTime?
 
-  // Phase 36.2: Premium perks (PAY-04)
-  showPremiumBadge      Boolean            @default(true)
+  // Phase 36.2: Premium perks (PAY-04) — showPremiumBadge dropped in Phase 36.5 (CONTEXT.md D-01)
   customAccentColor     String?
 
   // Phase 36.2: Referrals — referredByUser self-relation declared in relations block below
