@@ -12,6 +12,22 @@ import logger from '../utils/logger';
 const IDEMPOTENCY_TTL = CACHE_TTL.DAY; // 24 hours per CONTEXT.md
 
 /**
+ * Extract a Stripe object ID from a field that may be either a string ID
+ * or an expanded object (Stripe SDK union type: string | T | null).
+ *
+ * Avoids the `as string` cast trap: if a request was made with
+ * `expand: ['subscription']` (or Stripe ever changes the default
+ * representation), the field is an object and `as string` would coerce
+ * it to "[object Object]" — silently breaking lookups.
+ */
+function extractStripeId(
+  value: string | { id: string } | null | undefined
+): string | null {
+  if (!value) return null;
+  return typeof value === 'string' ? value : value.id;
+}
+
+/**
  * Process webhook event with idempotency check
  *
  * Uses an "insert-first, run-handler-second" pattern so the unique
@@ -133,11 +149,15 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session): Promis
     return;
   }
 
-  const subscriptionId = session.subscription as string;
-  const customerId = session.customer as string;
+  const subscriptionId = extractStripeId(session.subscription);
+  const customerId = extractStripeId(session.customer);
 
   if (!subscriptionId) {
     logger.error('[Webhook] checkout.session.completed: No subscription ID');
+    return;
+  }
+  if (!customerId) {
+    logger.error('[Webhook] checkout.session.completed: No customer ID');
     return;
   }
 
@@ -163,9 +183,14 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription): Pro
   const subscriptionService = SubscriptionService.getInstance();
   const userId = await subscriptionService.findUserBySubscriptionId(subscription.id);
 
+  const customerId = extractStripeId(subscription.customer);
+  if (!customerId) {
+    logger.warn(`[Webhook] subscription.updated: No customer ID on subscription ${subscription.id}`);
+    return;
+  }
+
   if (!userId) {
     // Try to find by customer ID
-    const customerId = subscription.customer as string;
     const userByCustomer = await subscriptionService.findUserByCustomerId(customerId);
 
     if (!userByCustomer) {
@@ -177,11 +202,7 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription): Pro
     return;
   }
 
-  await subscriptionService.updateUserSubscription(
-    userId,
-    subscription,
-    subscription.customer as string
-  );
+  await subscriptionService.updateUserSubscription(userId, subscription, customerId);
 }
 
 /**
@@ -206,7 +227,14 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription): Pro
  * Handle successful invoice payment (subscription renewal)
  */
 async function handleInvoicePaid(invoice: Stripe.Invoice): Promise<void> {
-  const subscriptionId = invoice.subscription as string;
+  // Stripe SDK v22 dropped `subscription` from Invoice's TypeScript types
+  // (deprecated in newer API versions, but Stripe still sends it on the
+  // 2024-12-18.acacia wire payload our webhook is configured for).
+  // Cast through `unknown` so the runtime access stays explicit.
+  const rawSubscription = (invoice as unknown as {
+    subscription?: string | Stripe.Subscription | null;
+  }).subscription;
+  const subscriptionId = extractStripeId(rawSubscription);
   if (!subscriptionId) return;
 
   const subscriptionService = SubscriptionService.getInstance();
@@ -235,7 +263,11 @@ async function handleInvoicePaid(invoice: Stripe.Invoice): Promise<void> {
  * Per CONTEXT.md: 7-day grace period, set to PAST_DUE
  */
 async function handlePaymentFailed(invoice: Stripe.Invoice): Promise<void> {
-  const subscriptionId = invoice.subscription as string;
+  // See note in handleInvoicePaid about the SDK-dropped subscription field.
+  const rawSubscription = (invoice as unknown as {
+    subscription?: string | Stripe.Subscription | null;
+  }).subscription;
+  const subscriptionId = extractStripeId(rawSubscription);
   if (!subscriptionId) return;
 
   const subscriptionService = SubscriptionService.getInstance();
