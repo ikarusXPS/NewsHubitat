@@ -191,7 +191,7 @@ Plans:
 - [x] 36.3-02-PLAN.md — Mount webhook + subscription routes in live apps/web/server/index.ts (diff-only, before express.json for raw body) — commit 18237b9 (+9 lines, 0 deletions; live probes return 400/401 not 404)
 - [x] 36.3-03-PLAN.md — Wholesale delete orphan root trees (server/, prisma/, src/, prisma.config.ts, tsup.config.ts, vite.config.ts, tsconfig.{,app,node}.json) + D-08 verification gate — completed 2026-04-28 (chore 651ce93 deleting 9 paths / 323 files / -79,037 lines + fix a69bbff creating workspace-local apps/web/prisma.config.ts for Prisma 7 datasource resolution; tsconfig.base.json preserved per workspace-extension audit; D-08 gate PASSED — typecheck, 1289/1289 tests, dev:backend pong, dev:frontend 200, prisma validate, prisma db push idempotent)
 - [ ] 36.3-04-PLAN.md — End-to-end verification: stripe trigger 8 events return HTTP 200; ProcessedWebhookEvent rows persisted; idempotency replay PASS
-- [ ] 36.3-05-PLAN.md — Anti-pattern markers (.continue-here.md phase-local + milestone-level) per D-11 and Q-03
+- [x] 36.3-05-PLAN.md — Anti-pattern markers (.continue-here.md phase-local + milestone-level) per D-11 and Q-03 — completed 2026-04-28 (commit c81a941; 2 files, +51 insertions; severity:blocking row in markdown-table format; phase-local at .planning/phases/36.3-fix-stripe-webhook-monorepo-path/.continue-here.md + milestone-level at .planning/.continue-here.md per Q-03 discretion)
 
 ### Phase 37: Horizontal Scaling
 **Goal**: System handles 30k concurrent users through horizontal scaling and connection pooling
