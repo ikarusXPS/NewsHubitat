@@ -231,8 +231,8 @@ Plans:
 **Plans**: 4 plans across 3 waves
 
 **Wave 1** *(parallel — disjoint files; Plans 01 + 02 touch different subsystems)*
-- [ ] 36.5-01-PLAN.md — Bug A: TDD webhook integration test + structured error log + `handleSubscriptionUpdated` root-cause fix — `apps/web/server/services/stripeWebhookService.test.ts` (new), `stripeWebhookService.ts`, `routes/webhooks/stripe.ts` — closes PAY-06 + criteria #1, #2
-- [ ] 36.5-02-PLAN.md — Bug B schema: drop `showPremiumBadge` column + `[BLOCKING]` `cd apps/web && npx prisma db push --accept-data-loss && npx prisma generate` — `apps/web/prisma/schema.prisma` — closes part of PAY-04 + criterion #3
+- [x] 36.5-01-PLAN.md — Bug A: TDD webhook integration test + structured error log + `handleSubscriptionUpdated` root-cause fix — `apps/web/server/services/stripeWebhookService.test.ts` (new), `stripeWebhookService.ts`, `routes/webhooks/stripe.ts` — closes PAY-06 + criteria #1, #2
+- [x] 36.5-02-PLAN.md — Bug B schema: drop `showPremiumBadge` column + `[BLOCKING]` `cd apps/web && npx prisma db push --accept-data-loss && npx prisma generate` — `apps/web/prisma/schema.prisma` — closes part of PAY-04 + criterion #3
 
 **Wave 2** *(blocked on Wave 1 — depends on Plan 02's regenerated Prisma client for typecheck)*
 - [ ] 36.5-03-PLAN.md — Bug B UI: widen AuthContext `User` interface with `subscriptionTier` + replace hard-coded "Premium" in `Sidebar.tsx:287-303` with `<SubscriptionBadge tier={user?.subscriptionTier ?? 'FREE'} />` — `AuthContext.tsx`, `Sidebar.tsx` — closes part of PAY-04 + criterion #4
