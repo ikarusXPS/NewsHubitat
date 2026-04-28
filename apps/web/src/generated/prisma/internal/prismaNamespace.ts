@@ -2399,7 +2399,6 @@ export const UserScalarFieldEnum = {
   subscriptionStatus: 'subscriptionStatus',
   subscriptionEndsAt: 'subscriptionEndsAt',
   pausedUntil: 'pausedUntil',
-  showPremiumBadge: 'showPremiumBadge',
   customAccentColor: 'customAccentColor',
   referralCode: 'referralCode',
   referredBy: 'referredBy',
