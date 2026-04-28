@@ -4,8 +4,8 @@ milestone: v1.6
 milestone_name: Infrastructure & Scale
 current_plan: null
 status: phase_36_complete_pending_verifier
-last_updated: "2026-04-28T17:57:00.000Z"
-last_activity: 2026-04-28 -- Phase 36-05 complete (1304/1304 tests green; human-verify checkpoint approved); Phase 36 has all 5 plans complete; ready for /gsd-verify-phase 36
+last_updated: "2026-04-28T19:50:00.000Z"
+last_activity: 2026-04-28 -- Phase 36-05 complete with 4 hotfixes (commits bd7b6e5 + c5553f9). Live human-verify Step 1-10 PASSED end-to-end with ikarus.nbg@gmail.com on Stripe test sandbox; PREMIUM tier verified at DB + API + rate-limit-bypass levels. Surfaced 4 defects all fixed inline; 2 follow-up bugs documented (showPremiumBadge UI flag + customer.subscription.created handler empty error). 1304/1304 tests still green.
 progress:
   total_phases: 6
   completed_phases: 2
@@ -26,10 +26,10 @@ See: .planning/PROJECT.md (updated 2026-04-26)
 ## Current Position
 
 Phase: 36 (monetization-core) — ALL 5 PLANS COMPLETE; awaiting /gsd-verify-phase 36
-Plan: 5 of 5 (Plan 05 closed via human-verify "approved" + 1304/1304 test green)
+Plan: 5 of 5 (Plan 05 closed via live full-checklist human-verify on Stripe test sandbox + 4 hotfix commits + 1304/1304 tests green)
 Current Plan: — (none in flight)
-Status: Phase 36 complete pending verifier; queued: /gsd-verify-phase 36 → /gsd-verify-phase 36.4 (already passed) / 36.3 / 36.2
-Last activity: 2026-04-28 -- Phase 36-05 complete (1304/1304 tests green; human-verify checkpoint approved); milestone-36 monetization end-to-end ready for verifier
+Status: Phase 36 complete pending verifier; queued: /gsd-verify-phase 36 → /gsd-verify-phase 36.4 (already passed but D-09 probes had false-positive — see Defect 4 below) / 36.3 / 36.2
+Last activity: 2026-04-28 -- Phase 36-05 surfaced 4 real defects during live human-verify (all FIXED in bd7b6e5 + c5553f9): (1) customer_creation invalid for stripe subscription mode; (2) Toast z-index hidden behind header; (3) subscriptionService.invalidateCache only evicted user:subscription: key not user:tier: — same class as 35.1 hotfix; (4) /api/ai missing authMiddleware before aiTierLimiter — entire tier-bypass code path was dead until now; means 36.4-04 D-09 probe had a false-positive on FREE-tier gating (was passing by accident via IP-keying). 2 follow-up bugs documented for tracking: customer.subscription.created handler empty error; showPremiumBadge flag decoupled from subscriptionTier.
 
 ```
 v1.6 Progress: [████████████████████] (8 phases incl. 36.4 complete; Phase 36 closed by user-approved human-verify on Plan 05; verifier still owed for 36, 36.3, 36.2 before milestone close)
@@ -70,6 +70,9 @@ Items acknowledged and carried forward from previous milestone close:
 | verification | Phase 03 human verification | human_needed |
 | uat | Phase 06 UAT tests | blocked |
 | checkpoint | Phase 22-03 SMTP verification | deferred_to_production |
+| bug-followup | Phase 36-05 — `customer.subscription.created` webhook handler emits empty error (idempotency rollback works; net behaviour correct because checkout.session.completed already updates User; but masks a latent bug). Diagnose handler logic. | pending_36.5 |
+| bug-followup | Phase 36-05 — `showPremiumBadge` boolean flag stored independently of `subscriptionTier`. Sidebar shows PREMIUM badge for FREE users. Recommend deriving flag from real tier or deprecating. | pending_36.5 |
+| audit | Phase 36.4-04 D-09 probes had false-positive on FREE 11th /api/ai/ask 429 (was IP-keyed not tier-keyed). Re-run D-09 probes against the corrected middleware chain (`authMiddleware` → `aiTierLimiter`). | pending_36.6 |
 
 **Note:** These are environmental/operational items, not code defects:
 
