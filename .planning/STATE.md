@@ -5,7 +5,7 @@ milestone_name: Infrastructure & Scale
 current_plan: null
 status: phase_36_complete_pending_verifier
 last_updated: "2026-04-28T19:50:00.000Z"
-last_activity: 2026-04-28 -- Phase 36-05 complete with 4 hotfixes (commits bd7b6e5 + c5553f9). Live human-verify Step 1-10 PASSED end-to-end with ikarus.nbg@gmail.com on Stripe test sandbox; PREMIUM tier verified at DB + API + rate-limit-bypass levels. Surfaced 4 defects all fixed inline; 2 follow-up bugs documented (showPremiumBadge UI flag + customer.subscription.created handler empty error). 1304/1304 tests still green.
+last_activity: 2026-04-28 -- Phase 36-05 complete with 4 hotfixes (commits bd7b6e5 + c5553f9). Live human-verify Step 1-10 PASSED end-to-end with ikarus.nbg@gmail.com on Stripe test sandbox; PREMIUM tier verified at DB + API + rate-limit-bypass levels. Surfaced 4 defects all fixed inline. Phase 36.5 inserted to address the 2 documented follow-up bugs (showPremiumBadge UI flag + customer.subscription.created handler empty error); awaiting /gsd-plan-phase 36.5. 1304/1304 tests still green.
 progress:
   total_phases: 6
   completed_phases: 2
@@ -51,7 +51,8 @@ v1.6 Progress: [████████████████████] (8
 | 36.1 | Add Subscription Schema Fields (INSERTED) | PAY-01 (foundation) | No | **Complete** (1/1 plans) — verified PASS 5/5 |
 | 36.2 | Close 36-debt — schema models + cleanup (INSERTED) | PAY-02..PAY-07 | No | **Complete** (4/4 plans — schema + depcheck + db-push/refactor + audit trail; awaiting `/gsd-verify-phase 36.2`) |
 | 36.3 | Fix Stripe Webhook Monorepo Path (INSERTED) | PAY-02, PAY-03, PAY-06 | No | **Complete** (5/5 plans — awaiting `/gsd-verify-phase 36.3`) |
-| 36.4 | Relocate Plan-03/04 monetization artifacts (INSERTED) | PAY-01, PAY-02, PAY-04..PAY-07 | Yes | **Complete** (4/4 plans — verified PASS 10/10 ROADMAP criteria; D-09 probes PASS; D-10 audit = 0) |
+| 36.4 | Relocate Plan-03/04 monetization artifacts (INSERTED) | PAY-01, PAY-02, PAY-04..PAY-07 | Yes | **Complete** (4/4 plans — verified PASS 10/10 ROADMAP criteria; D-09 probes PASS but had a false-positive — see 36.5; D-10 audit = 0) |
+| 36.5 | Fix monetization follow-up bugs (INSERTED) | PAY-04, PAY-06 | Partial | Not planned (FU-1 customer.subscription.created handler empty error + FU-2 showPremiumBadge flag decoupled from subscriptionTier; awaiting `/gsd-plan-phase 36.5`) |
 | 37 | Horizontal Scaling | 5 reqs (INFRA-01 to INFRA-05) | No | Not started |
 | 38 | Advanced AI Features | 7 reqs (AI-01 to AI-07) | Yes | Not started |
 | 39 | Mobile Apps | 8 reqs (MOB-01 to MOB-08) | Yes | Not started |
@@ -70,8 +71,8 @@ Items acknowledged and carried forward from previous milestone close:
 | verification | Phase 03 human verification | human_needed |
 | uat | Phase 06 UAT tests | blocked |
 | checkpoint | Phase 22-03 SMTP verification | deferred_to_production |
-| bug-followup | Phase 36-05 — `customer.subscription.created` webhook handler emits empty error (idempotency rollback works; net behaviour correct because checkout.session.completed already updates User; but masks a latent bug). Diagnose handler logic. | pending_36.5 |
-| bug-followup | Phase 36-05 — `showPremiumBadge` boolean flag stored independently of `subscriptionTier`. Sidebar shows PREMIUM badge for FREE users. Recommend deriving flag from real tier or deprecating. | pending_36.5 |
+| bug-followup | Phase 36-05 — `customer.subscription.created` webhook handler emits empty error (idempotency rollback works; net behaviour correct because checkout.session.completed already updates User; but masks a latent bug). Diagnose handler logic. | scoped_into_36.5 |
+| bug-followup | Phase 36-05 — `showPremiumBadge` boolean flag stored independently of `subscriptionTier`. Sidebar shows PREMIUM badge for FREE users. Recommend deriving flag from real tier or deprecating. | scoped_into_36.5 |
 | audit | Phase 36.4-04 D-09 probes had false-positive on FREE 11th /api/ai/ask 429 (was IP-keyed not tier-keyed). Re-run D-09 probes against the corrected middleware chain (`authMiddleware` → `aiTierLimiter`). | pending_36.6 |
 
 **Note:** These are environmental/operational items, not code defects:
@@ -94,6 +95,7 @@ Items acknowledged and carried forward from previous milestone close:
 
 ### Roadmap Evolution
 
+- 2026-04-28 — Phase 36.5 inserted after Phase 36.4 (FOLLOW-UP). Goal: close two non-blocking defects surfaced by Plan 36-05 live human-verify but deferred to keep Plan 05 closure scope clean. (FU-1) `customer.subscription.created` webhook handler emits empty error log line on event replay; idempotency rollback works correctly so net behaviour is correct, but the silent error masks a latent bug. (FU-2) `showPremiumBadge` is stored as a standalone boolean on User decoupled from `subscriptionTier`; sidebar tier badge fires from this vanity flag rather than real tier — observed during 36-05 live verify (IKARUSXPS sidebar showed PREMIUM while DB had FREE). NOT part of 36-05 scope: the broader "re-run 36.4-04 D-09 probes against the corrected `authMiddleware → aiTierLimiter` middleware chain" audit is queued separately as a candidate for 36.6. Awaits `/gsd-plan-phase 36.5`.
 - 2026-04-27 — Phase 36.1 inserted after Phase 36 (URGENT). Reason: 36-01 closed without writing the User-model migration that 36-02's `subscriptionService.ts` requires. Discovered during /gsd-execute-phase 36 pre-flight. Blocks 36-05 tests.
 - 2026-04-28 — Phase 36.1 complete. 5 nullable subscription fields + 2 unique indexes added to User model; subscriptionService read-path patched with `?? 'FREE'` / `?? 'ACTIVE'` fallbacks (consequence of nullable schema choice). Larger 36-debt (ProcessedWebhookEvent, ReferralReward, Campaign, StudentVerification, Prisma enums) explicitly deferred to a future phase 36.2 — documented in 36.1-01-SUMMARY.md "Known Stubs".
 - 2026-04-28 — Phase 35 UAT executed (5/5 PASS) + Phase 35.1 hotfix inserted inline (commit 484d4da). Test 4 surfaced a Redis-cache stale-revocation bug — `revokeApiKey` updated DB but didn't invalidate the prefix-based auth cache, so revoked keys kept working for up to 5min. Fix: secondary index `apikey:by-id:<keyId>` enables O(1) cache invalidation on revoke. Phase 35 status `human_needed` → `verified`. Also discovered during UAT prep: `workbox-window` + `stripe@22.1.0` were missing from `apps/web/package.json` (committed as `87ba5e4`) — second instance of the "SUMMARY claimed but never written" pattern that produced Phase 36.1.

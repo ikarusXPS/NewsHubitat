@@ -216,6 +216,20 @@ Plans:
 - [x] 36.4-03-PLAN.md — Recover Pricing page + SubscriptionSuccess + routes + i18n (en/de/fr) — Wave 2 — completed 2026-04-28 (commits 3db923d, a36b6b5, 6a0580e; /pricing + /subscription/success routes wired in App.tsx; DE/EN/FR pricing.json populated; i18n.ts 'fr' added; Zustand language union widened)
 - [x] 36.4-04-PLAN.md — Verification gate: requireTier unit tests + manual D-09 probes + D-10 anti-pattern audit — Wave 3 — completed 2026-04-28 (commits 35395d2, 90c4677; 15 new requireTier tests → 1304/1304 full suite; D-09 probes all PASS; D-10 audit = 0 forbidden-root files)
 
+### Phase 36.5 (INSERTED): Fix monetization follow-up bugs from Plan 36-05 human-verify
+**Goal**: Close two latent defects surfaced during Plan 36-05's live human-verify checkpoint that did not block end-to-end (PREMIUM) functionality but degrade observability and produce inconsistent UI state. Discovered 2026-04-28 after the four critical defects (commits `bd7b6e5` + `c5553f9`) were already fixed; deferred to a follow-up phase to keep 36-05's closure scope clean.
+**Depends on**: Phase 36 (Plan 05 closure committed at `4f0b4d2`), Phase 36.4 (`requireTier`/`attachUserTier` middleware available for use), Phase 36.2 (subscription enums + ProcessedWebhookEvent model)
+**Requirements**: PAY-06 (idempotent webhook — silent handler errors hide partial-failure cases that PAY-06 acceptance assumes are observable), PAY-04 (feature gating — `showPremiumBadge` UI flag must reflect real tier so Premium-only affordances render correctly)
+**Success Criteria** (what must be TRUE):
+  1. `customer.subscription.created` webhook handler in `apps/web/server/services/stripeWebhookService.ts` no longer emits empty error log lines on `stripe events resend` of a previously-handled event. Either (a) the handler successfully no-ops when `checkout.session.completed` already populated the User row, or (b) the error has a meaningful message and structured stack so operators can diagnose silent failures
+  2. The handler's behaviour is covered by an integration test (vitest with prisma mock) that simulates: (i) checkout.session.completed processed first → User row updated → customer.subscription.created arrives second → handler completes cleanly with no error log, (ii) customer.subscription.created arrives in isolation (no prior checkout) → User row updated as expected
+  3. `showPremiumBadge` is no longer stored as a standalone boolean on the User model. Either (a) the column is dropped (preferred, removes drift) and the badge UI reads `user.subscriptionTier === 'PREMIUM'` directly, or (b) the column is kept but a server-side invariant (Prisma middleware or service layer) keeps it synced with `subscriptionTier` on every `User.update` and a one-time migration backfills it from current `subscriptionTier`
+  4. The sidebar / header tier-badge component reads from the chosen source-of-truth (per criterion 3) and renders only when the user's actual subscription tier is PREMIUM or ENTERPRISE. Verified: `ikarus.nbg@gmail.com` showing PREMIUM (real tier from 36-05 sandbox purchase) shows the badge; a freshly-seeded FREE user shows no badge even after manual `UPDATE User SET "showPremiumBadge" = true`
+  5. Existing 1304 vitest tests still pass with no regressions (`pnpm test:run` exits 0)
+  6. No new files written under root `server/`, `prisma/`, `src/`, or `e2e/` (anti-pattern guard from `.planning/.continue-here.md`)
+  7. SUMMARY.md per plan + Phase-level VERIFICATION.md created
+**Plans**: TBD (run `/gsd-plan-phase 36.5`)
+
 ### Phase 37: Horizontal Scaling
 **Goal**: System handles 30k concurrent users through horizontal scaling and connection pooling
 **Depends on**: Phase 36 (subscription tiers defined)
