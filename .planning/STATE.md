@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Infrastructure & Scale
-current_plan: null
-status: phase_36_complete_pending_verifier
-last_updated: "2026-04-28T20:15:00.000Z"
-last_activity: 2026-04-28 -- Phase 36.5 PLANNED via /gsd-plan-phase 36.5. 4 plans across 3 waves, plan-checker VERIFICATION PASSED on iteration 1 (all 10 dimensions clean; PAY-04 covered by 02/03/04, PAY-06 covered by 01/04). Plans: 36.5-01 (TDD Bug A — webhook integration test + structured error log + handler fix, wave 1), 36.5-02 (Bug B schema — drop showPremiumBadge column + [BLOCKING] prisma db push --accept-data-loss && prisma generate, wave 1), 36.5-03 (Bug B UI — widen AuthContext User with subscriptionTier + replace hardcoded "Premium" in Sidebar.tsx with SubscriptionBadge component reuse, wave 2 depends on 02), 36.5-04 (verification gate + checkpoint:human-verify visual probe, wave 3 depends on 01/02/03, autonomous=false). CONTEXT.md captures locked decisions D-01 (drop column option a) through D-08 (>= 1305 tests). Awaits /gsd-execute-phase 36.5.
+current_plan: 1
+status: executing
+last_updated: "2026-04-28T20:15:57.002Z"
+last_activity: 2026-04-28 -- Phase 36.5 execution started
 progress:
   total_phases: 6
   completed_phases: 2
-  total_plans: 14
-  completed_plans: 14
+  total_plans: 10
+  completed_plans: 10
   percent: 100
 ---
 
@@ -21,15 +21,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-26)
 
 **Core value:** Users can see how the same story is covered by different regional perspectives
-**Current focus:** Phase 36-05 (resume human-verify checkpoint, paused 2026-04-28 / now unblocked by 36.4)
+**Current focus:** Phase 36.5 — fix-monetization-followup-bugs
 
 ## Current Position
 
-Phase: 36 (monetization-core) — ALL 5 PLANS COMPLETE; awaiting /gsd-verify-phase 36
-Plan: 5 of 5 (Plan 05 closed via live full-checklist human-verify on Stripe test sandbox + 4 hotfix commits + 1304/1304 tests green)
-Current Plan: — (none in flight)
-Status: Phase 36 complete pending verifier; queued: /gsd-verify-phase 36 → /gsd-verify-phase 36.4 (already passed but D-09 probes had false-positive — see Defect 4 below) / 36.3 / 36.2
-Last activity: 2026-04-28 -- Phase 36-05 surfaced 4 real defects during live human-verify (all FIXED in bd7b6e5 + c5553f9): (1) customer_creation invalid for stripe subscription mode; (2) Toast z-index hidden behind header; (3) subscriptionService.invalidateCache only evicted user:subscription: key not user:tier: — same class as 35.1 hotfix; (4) /api/ai missing authMiddleware before aiTierLimiter — entire tier-bypass code path was dead until now; means 36.4-04 D-09 probe had a false-positive on FREE-tier gating (was passing by accident via IP-keying). 2 follow-up bugs documented for tracking: customer.subscription.created handler empty error; showPremiumBadge flag decoupled from subscriptionTier.
+Phase: 36.5 (fix-monetization-followup-bugs) — EXECUTING
+Plan: 1 of 4
+Current Plan: 1
+Status: Executing Phase 36.5
+Last activity: 2026-04-28 -- Phase 36.5 execution started
 
 ```
 v1.6 Progress: [████████████████████] (8 phases incl. 36.4 complete; Phase 36 closed by user-approved human-verify on Plan 05; verifier still owed for 36, 36.3, 36.2 before milestone close)
@@ -39,7 +39,7 @@ v1.6 Progress: [████████████████████] (8
 
 **Milestone:** v1.6 - Infrastructure & Scale
 **Goal:** Comprehensive expansion across infrastructure, AI, mobile, monetization, and content
-**Status:** Phase 36 complete (5/5 plans); awaiting phase verifier on 36, 36.2, 36.3
+**Status:** Executing Phase 36.5
 **Previous:** v1.5 complete 2026-04-26
 
 ### Phase Summary
