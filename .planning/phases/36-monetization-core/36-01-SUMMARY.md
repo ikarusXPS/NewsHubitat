@@ -154,3 +154,42 @@ None - no new security surface introduced beyond what was documented in the plan
 
 ---
 *Completed: 2026-04-26T15:46:00Z*
+
+## Phase 36 Debt Closure (Audit Trail)
+
+*Added: 2026-04-28 by Phase 36.2*
+
+The Phase 36-01 SUMMARY (above, lines 138-140) originally claimed `Known Stubs: None - all code is fully implemented and functional.` This claim was incorrect. The remediation cycle ran across two follow-up phases:
+
+- **Phase 36.1** (verified PASS 2026-04-28) closed the 5 Stripe subscription fields on User that `subscriptionService.ts` directly required to compile.
+- **Phase 36.2** (this phase) closes the broader debt — the 4 missing models, 8 additional User fields, 2 Prisma enums, the `stripe.ts` re-export refactor, and the depcheck cleanup.
+
+The canonical Known Stubs list lives in `.planning/phases/36.1-add-subscription-schema-fields/36.1-01-SUMMARY.md` lines 138-156. Each row below maps to that table.
+
+| Originally-Claimed Item | Closed By | Commit |
+|--------------------------|-----------|--------|
+| 5 Stripe subscription fields on User (stripeCustomerId, stripeSubscriptionId, subscriptionTier, subscriptionStatus, subscriptionEndsAt) | Phase 36.1 | `a0df872` |
+| SubscriptionTier / SubscriptionStatus enums (replacing String?) | Phase 36.2 | `1976489`, `44aa829` |
+| ProcessedWebhookEvent model | Phase 36.2 | `1976489` |
+| pausedUntil, showPremiumBadge, customAccentColor on User | Phase 36.2 | `44aa829` |
+| referralCode, referredBy, freeMonthsEarned on User | Phase 36.2 | `44aa829` |
+| ReferralReward model (with named relations to User) | Phase 36.2 | `1976489` |
+| isStudent, studentVerifiedUntil on User | Phase 36.2 | `44aa829` |
+| StudentVerification model (with User FK + Cascade) | Phase 36.2 | `1976489` |
+| Campaign model (no FKs, future CampaignUsage join model deferred) | Phase 36.2 | `1976489` |
+
+### Operational closures (not in the original Stubs table)
+
+| Item | Closed By | Commit |
+|------|-----------|--------|
+| Dev DB sync + Prisma client regeneration with all new models/enums | Phase 36.2 (Plan 03) | `556694f` |
+| `stripe.ts`: TS union replaced with Prisma enum re-export (D-03) | Phase 36.2 (Plan 03) | `30466e2` |
+| Depcheck cleanup: 5 unused deps removed from apps/web/package.json | Phase 36.2 (Plan 02) | `b9e068b` |
+
+### Status after 36.2
+
+**MISSING items remaining: 0.** All rows in the canonical Known Stubs table are closed. Future debt cycles can re-use this section's format and add new rows for any items they fail to close.
+
+### Production migration handoff
+
+A production cutover note is documented in `.planning/phases/36.2-close-36-debt-schema-models-cleanup/PRODUCTION-MIGRATION.md`. The dev-only `prisma db push --accept-data-loss` used by 36.2 is NOT safe for production where existing rows may hold non-null `text` values for the two enum-converted columns. The note provides the SQL template (`ALTER COLUMN ... TYPE ... USING ::text::enum`) for the production-readiness phase to execute under a maintenance window.
