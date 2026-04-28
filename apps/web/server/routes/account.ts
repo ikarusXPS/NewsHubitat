@@ -2,6 +2,9 @@ import { Router, Request, Response } from 'express';
 import { z } from 'zod';
 import { prisma } from '../db/prisma';
 import { authMiddleware, AuthService } from '../services/authService';
+import { attachUserTier, TierRequest } from '../middleware/requireTier';
+import { TIER_LIMITS, SubscriptionTier } from '../config/stripe';
+
 export const accountRoutes = Router();
 
 interface AuthRequest extends Request {
@@ -73,9 +76,37 @@ accountRoutes.post('/cancel-deletion', authMiddleware, async (req: AuthRequest, 
   res.json({ success: true, message: 'Deletion cancelled' });
 });
 
-// Export user data per D-71, D-72
-accountRoutes.get('/export', authMiddleware, async (req: AuthRequest, res: Response) => {
+/**
+ * GET /api/account/export
+ * Export user data in JSON or CSV format
+ * Per CONTEXT.md: FREE = none, PREMIUM = json/csv, ENTERPRISE = json/csv/pdf
+ */
+accountRoutes.get('/export', authMiddleware, attachUserTier, async (req: TierRequest, res: Response) => {
+  const tier = (req.userTier || 'FREE') as SubscriptionTier;
+  const allowedFormats = TIER_LIMITS[tier].dataExport;
+
+  // Check if export is allowed for this tier
+  if (!allowedFormats || allowedFormats === false) {
+    res.status(403).json({
+      success: false,
+      error: 'Data export requires Premium subscription',
+      upgradeUrl: '/pricing',
+    });
+    return;
+  }
+
   const format = (req.query.format as string) || 'json';
+
+  // Validate format is allowed for tier
+  if (!allowedFormats.includes(format as 'json' | 'csv' | 'pdf')) {
+    res.status(400).json({
+      success: false,
+      error: `Format '${format}' not available for your subscription tier`,
+      allowedFormats,
+    });
+    return;
+  }
+
   const userId = req.user!.userId;
 
   const user = await prisma.user.findUnique({
