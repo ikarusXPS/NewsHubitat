@@ -163,7 +163,7 @@ n**Plans:**
 - [x] 36.2-02-PLAN.md — Depcheck cleanup: remove 5 unused deps from apps/web/package.json + regenerate lockfile — completed 2026-04-28 (b9e068b)
 
 **Wave 2** *(blocked on Plan 01)*:
-- [ ] 36.2-03-PLAN.md — [BLOCKING] db push + prisma generate + stripe.ts re-export refactor + verify typecheck/tests
+- [x] 36.2-03-PLAN.md — [BLOCKING] db push + prisma generate + stripe.ts re-export refactor + verify typecheck/tests — completed 2026-04-28 (556694f, 30466e2)
 
 **Wave 3** *(blocked on Plans 01-03 — needs commit SHAs for audit trail)*:
 - [ ] 36.2-04-PLAN.md — Audit-trail annotation on 36-01-SUMMARY.md + PRODUCTION-MIGRATION.md handoff
