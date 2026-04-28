@@ -70,9 +70,14 @@ router.post(
       res.status(200).json({ received: true });
     } catch (err) {
       logger.error('[Webhook] Processing error:', err);
-      // Return 200 to prevent Stripe retries for processing errors
-      // (we've already recorded the event in idempotency store)
-      res.status(200).json({ received: true, warning: 'Processing error logged' });
+      // Return 500 so Stripe retries with exponential backoff (up to 3 days).
+      // Pairs with the idempotency lock-release in
+      // processWebhookIdempotently: when the handler throws, the
+      // ProcessedWebhookEvent row is deleted, so the retry actually
+      // re-runs the handler instead of being blocked as a duplicate.
+      // Returning 200 here would silently drop unprocessed events
+      // (Stripe stops retrying, our DB never recorded the mutation).
+      res.status(500).json({ error: 'Processing failed, will retry' });
     }
   }
 );
