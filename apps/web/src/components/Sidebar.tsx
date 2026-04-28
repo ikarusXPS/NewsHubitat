@@ -22,6 +22,7 @@ import {
 import { cn } from '../lib/utils';
 import { useAuth } from '../contexts/AuthContext';
 import { NavLinkPrefetch } from './NavLinkPrefetch';
+import { SubscriptionBadge } from './subscription/SubscriptionBadge';
 
 function formatTimeAgo(timestamp: number): string {
   const diffMs = Date.now() - timestamp;
@@ -290,9 +291,7 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
             <span className="text-[10px] font-mono text-gray-600 uppercase tracking-wider">
               v2.0.0
             </span>
-            <span className="text-[10px] font-mono text-[#00f0ff]/50 uppercase tracking-wider">
-              Premium
-            </span>
+            <SubscriptionBadge tier={user?.subscriptionTier ?? 'FREE'} size="sm" />
           </div>
           <NavLink
             to="/privacy"
