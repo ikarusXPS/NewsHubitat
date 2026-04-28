@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Infrastructure & Scale
-current_plan: "— (next phase action: `/gsd-plan-phase 36.3`)"
+current_plan: 2
 status: executing
-last_updated: "2026-04-28T11:38:19.024Z"
-last_activity: 2026-04-28 -- Phase 36.3 planning complete
+last_updated: "2026-04-28T11:47:45Z"
+last_activity: 2026-04-28 -- Phase 36.3 plan 01 complete (3 git mv commits 71507b7/6597dfa/eb42362)
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 10
-  completed_plans: 9
-  percent: 90
+  completed_plans: 10
+  percent: 91
 ---
 
 # State: NewsHub
@@ -21,15 +21,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-26)
 
 **Core value:** Users can see how the same story is covered by different regional perspectives
-**Current focus:** Phase 36.3 context captured (CONTEXT.md committed, 11 locked decisions); next `/gsd-plan-phase 36.3`
+**Current focus:** Phase 36.3 — fix-stripe-webhook-monorepo-path
 
 ## Current Position
 
-Phase: 36.2 — VERIFIED (4/4 plans; 6/6 ROADMAP success criteria PASS)
-Plan: 4 of 4 complete
-Current Plan: — (next phase action: `/gsd-plan-phase 36.3`)
-Status: Ready to execute
-Last activity: 2026-04-28 -- Phase 36.3 planning complete
+Phase: 36.3 (fix-stripe-webhook-monorepo-path) — EXECUTING
+Plan: 2 of 5 (plan 01 complete)
+Current Plan: 2
+Status: Executing Phase 36.3
+Last activity: 2026-04-28 -- Phase 36.3 plan 01 complete (3 git mv commits 71507b7/6597dfa/eb42362)
 
 ```
 v1.6 Progress: [██████████████████░░] 93% (7 phases, 2 complete, 14/15 plans done)
@@ -39,7 +39,7 @@ v1.6 Progress: [██████████████████░░] 93
 
 **Milestone:** v1.6 - Infrastructure & Scale
 **Goal:** Comprehensive expansion across infrastructure, AI, mobile, monetization, and content
-**Status:** Ready to execute
+**Status:** Executing Phase 36.3
 **Previous:** v1.5 complete 2026-04-26
 
 ### Phase Summary
@@ -78,8 +78,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Context
 
-**Last action:** Phase 36.2 plan 04 executed sequentially on `test-ci-pipeline` — 1 atomic commit `5cb75f3` (docs). Task 1 appended a `## Phase 36 Debt Closure (Audit Trail)` section to the bottom of `.planning/phases/36-monetization-core/36-01-SUMMARY.md` (after the existing Self-Check block, leaving lines 138-140 byte-stable per D-11). The new section opens with `*Added: 2026-04-28 by Phase 36.2*` and contains two tables: a canonical 9-row table mapping each 36.1 Known Stub to its closing phase + 7-char SHA (`a0df872` for the 36.1 5-field foundation; `1976489` / `44aa829` for 36.2 schema work), and a 3-row operational-closure table (`556694f` for db push + client regen, `30466e2` for stripe.ts re-export, `b9e068b` for depcheck cleanup). Closes with `MISSING items remaining: 0.` Task 2 created `.planning/phases/36.2-close-36-debt-schema-models-cleanup/PRODUCTION-MIGRATION.md` (107 lines) documenting the production cutover SQL: `ALTER COLUMN "subscriptionTier" TYPE "SubscriptionTier" USING "subscriptionTier"::text::"SubscriptionTier"` wrapped in `BEGIN;` / `COMMIT;`, with `CREATE TYPE` statements for both enums, 5-step procedure (verify -> create enum -> cast -> apply additive -> verify), pre-requisites (maintenance window / backup / rollback rehearsal / app compat), and explicit Owner: "Production-readiness phase (TBD)". Task 3 staged both files and committed atomically (`docs(36.2-04): close phase 36 debt audit trail + add production migration handoff`). Verification: 2 files in commit, 0 forbidden files (no schema/code/package), original Known Stubs block at lines 138-140 byte-stable (`sed -n '138,140p'` returns the original false claim verbatim). Zero deviations; plan executed exactly as written. SUMMARY at `.planning/phases/36.2-close-36-debt-schema-models-cleanup/36.2-04-SUMMARY.md`.
-**Next step:** `/gsd-verify-phase 36.2` — verify all 6 ROADMAP success criteria for Phase 36.2 are satisfied across the four plan SUMMARYs (01 schema, 02 depcheck, 03 db-push+refactor, 04 audit-trail). After verification PASSes, resume `/gsd-execute-phase 36` at plan 05 (subscription E2E tests).
+**Last action:** Phase 36.3 plan 01 executed sequentially on `test-ci-pipeline` — three atomic `refactor(36.3-01)` commits (`71507b7`, `6597dfa`, `eb42362`), each `1 file changed, 0 insertions(+), 0 deletions(-)` with `rename ... (100%)` proving byte-stable per D-02. Task 1 created the previously absent `apps/web/server/routes/webhooks/` directory (L-01 mitigation — `git mv` cannot create intermediate dest dirs) then `git mv server/services/stripeWebhookService.ts apps/web/server/services/stripeWebhookService.ts`. Task 2 `git mv server/routes/subscriptions.ts apps/web/server/routes/subscriptions.ts` (no `mkdir` needed — apps/web/server/routes/ already populated with teams.ts/comments.ts/etc.). Task 3 `git mv server/routes/webhooks/stripe.ts apps/web/server/routes/webhooks/stripe.ts` into the dir created in Task 1, then full verification: `pnpm typecheck` exit 0, `pnpm test:run` 1289/1289 PASS (matches Phase 36.2 baseline). `git log --follow` confirms history continuity for all three files: stripeWebhookService.ts traces back to `0ec4634` (Phase 36-02), routes/subscriptions.ts to `6049d1e`, routes/webhooks/stripe.ts to `a32f285`. All three orphan source paths now gone (`ls` exit 2). L-02 known redundancy preserved: per-route `authMiddleware` (lines 49, 112, 153) NOT removed from subscriptions.ts (D-02 forbids edits) — will overlap with Plan 02 mount-level guard as deliberate defense-in-depth. Zero deviations. SUMMARY at `.planning/phases/36.3-fix-stripe-webhook-monorepo-path/36.3-01-SUMMARY.md`.
+**Next step:** `/gsd-execute-phase 36.3` continues at plan 02 — diff-only edits to `apps/web/server/index.ts`: 2 import lines after line 35 (`import teamsRoutes`), webhook mount at line 108 BEFORE `express.json()` at line 110 (per D-04, raw body required for HMAC), subscription mount between lines 170-172 with `app.use('/api/subscriptions', authMiddleware, subscriptionRoutes)` (per D-05). Plan 01 has unblocked these imports — both target files now resolve at the canonical apps/web/server/ paths.
 **Resume file:** None
 **Checkpoint:** None
 
@@ -95,6 +95,7 @@ Items acknowledged and carried forward from previous milestone close:
 - 2026-04-28 — Phase 36.2 plan 02 complete. One atomic commit `b9e068b` on `test-ci-pipeline` removed 5 unused deps from `apps/web/package.json` (`@radix-ui/react-dialog`, `class-variance-authority`, `intl-messageformat`, `pg`, `@types/pg`) and regenerated `pnpm-lock.yaml` (-22 lines, 1 net package pruned). Full D-09 5-step verification gate passed: JSON valid, `pnpm install --no-frozen-lockfile` succeeded, `npx depcheck --skip-missing` against `apps/web` showed the 5 target deps gone with no NEW transitive offenders (residual `@newshub/types`/`autoprefixer`/`tailwindcss`/`nodemon` are pre-existing false positives — workspace pkg, PostCSS pipeline, runtime tool), `pnpm typecheck` exit 0, `pnpm test:run` 1289/1289 PASS. D-10 commit isolation enforced — diff includes only `apps/web/package.json` + `pnpm-lock.yaml`. Zero deviations.
 - 2026-04-28 — Phase 36.2 plan 03 [BLOCKING gate] complete. Two atomic commits on `test-ci-pipeline`: `556694f` (chore) synced live dev Postgres to the apps/web Prisma schema via `npx prisma db push --accept-data-loss --schema=prisma/schema.prisma` and regenerated the Prisma client at `apps/web/src/generated/prisma/` (13 files modified, 4 new model files: ProcessedWebhookEvent, ReferralReward, Campaign, StudentVerification). DB now has 25 tables (was 24), 4 enum types (added SubscriptionTier FREE/PREMIUM/ENTERPRISE + SubscriptionStatus ACTIVE/PAST_DUE/CANCELED/PAUSED), 8 new User columns, subscriptionTier/Status converted from `text?` to `NOT NULL` Prisma enums with defaults FREE/ACTIVE. `30466e2` (refactor) replaced inline TS union in `apps/web/server/config/stripe.ts` with `export type { SubscriptionTier, SubscriptionStatus } from '../../src/generated/prisma/client'` — single source of truth per D-03; zero call-site churn (subscriptionService.ts:9 import unchanged, 26 subscription tests still green). Idempotency proven (second `db push` reports 'already in sync'). `pnpm typecheck` exit 0, `pnpm test:run` 1289/1289 PASS. **One Rule-3 auto-fix during Task 1**: first db push attempt loaded stale `D:\NewsHub\prisma\schema.prisma` (a duplicate at the repo root that lacks ApiKey from Phase 35) because the root `prisma.config.ts` `schema:` field resolves relative to the **config file's directory**, not cwd; this dropped the ApiKey table (1 test row). Re-ran with explicit `--schema=prisma/schema.prisma` flag (resolves against cwd, hits the canonical apps/web schema), restored ApiKey, finished idempotently. Stale duplicate root schema flagged for a future tidy-up plan. **One pre-existing issue deferred**: `pnpm build` fails on `vite-plugin-pwa` workbox precache size limit (`dist/stats.html` 4.3 MB > 2 MiB default); confirmed pre-existing by reverting plan-03 changes and reproducing. Documented in `.planning/phases/36.2-close-36-debt-schema-models-cleanup/deferred-items.md`. Plan's own verification gates (typecheck + tests) both pass cleanly.
 - 2026-04-28 — Phase 36.2 plan 04 complete. One atomic commit `5cb75f3` on `test-ci-pipeline` (`docs(36.2-04): close phase 36 debt audit trail + add production migration handoff`). Two artifacts: (1) `.planning/phases/36-monetization-core/36-01-SUMMARY.md` extended with a new `## Phase 36 Debt Closure (Audit Trail)` section appended after the existing Self-Check block; original `## Known Stubs` heading at line 138 and false claim at line 140 (`None - all code is fully implemented and functional.`) preserved byte-stable per D-11 history-preservation. The new section contains two tables — a 9-row canonical table mapping each 36.1 Known Stub to its closing phase + 7-char SHA (`a0df872` for the 36.1 5-field foundation; `1976489` for ProcessedWebhookEvent / ReferralReward / StudentVerification / Campaign + the two enums; `44aa829` for the 8 new User fields + non-null subscription enum tightening + back-relations) and a 3-row operational-closure table (`556694f` db push + client regen, `30466e2` stripe.ts re-export, `b9e068b` depcheck cleanup) — closing with `MISSING items remaining: 0`. (2) `.planning/phases/36.2-close-36-debt-schema-models-cleanup/PRODUCTION-MIGRATION.md` created (107 lines) documenting the manual production cutover SQL (`ALTER COLUMN "subscriptionTier" TYPE "SubscriptionTier" USING "subscriptionTier"::text::"SubscriptionTier"` plus matching for subscriptionStatus, wrapped in `BEGIN;` / `COMMIT;`); 5-step procedure (verify -> create enum -> cast -> apply additive -> verify); pre-requisites (maintenance window, backup, rollback rehearsal, app compatibility); explicit Owner: "Production-readiness phase (TBD)" and Status: "Not executed in 36.2. Dev DB only." Verification: 2 files in commit diff, 0 code/schema/package files. Zero deviations. Phase 36.2 complete (4/4 plans); ready for `/gsd-verify-phase 36.2`.
+- 2026-04-28 — Phase 36.3 plan 01 complete. Three atomic `refactor(36.3-01)` commits on `test-ci-pipeline`: `71507b7` (relocate `server/services/stripeWebhookService.ts` -> `apps/web/server/services/`), `6597dfa` (relocate `server/routes/subscriptions.ts` -> `apps/web/server/routes/`), `eb42362` (relocate `server/routes/webhooks/stripe.ts` -> `apps/web/server/routes/webhooks/` after creating that dir via `mkdir -p` in Task 1 per L-01 mitigation). Each commit shows `rename ... (100%)` similarity — byte-stable per D-02; per-task atomic commits per D-01. `git log --follow` traces every relocated file back to its Phase 36-02 origin (stripeWebhookService.ts -> `0ec4634`, subscriptions.ts -> `6049d1e`, webhooks/stripe.ts -> `a32f285`) — full git history preserved through the rename, so security-audit `git log --follow` on HMAC-verification logic still continuous. `pnpm typecheck` exits 0 after each move (relative imports under apps/web/server/ mirror the orphan layout, no edit needed). Final `pnpm test:run` 1289/1289 PASS — exact match to Phase 36.2 baseline, zero regression. L-02 known redundancy (per-route `authMiddleware` at subscriptions.ts:49/112/153) preserved untouched — will overlap with Plan 02's mount-level `app.use('/api/subscriptions', authMiddleware, ...)` as deliberate defense-in-depth, flagged for future cleanup. Plan 02 (mount routes) and Plan 03 (orphan sweep) both unblocked. Zero deviations; plan executed exactly as written. Duration 2m9s. SUMMARY at `.planning/phases/36.3-fix-stripe-webhook-monorepo-path/36.3-01-SUMMARY.md`.
 
 ## Accumulated Context
 
@@ -310,4 +311,4 @@ v1.6 Architecture Decisions (from research):
 
 ---
 *State initialized: 2026-04-18*
-*Last updated: 2026-04-28 — Phase 36.2 Plan 04 complete (audit-trail annotation on 36-01-SUMMARY.md + PRODUCTION-MIGRATION.md handoff; commit 5cb75f3; 2 docs files; original Known Stubs block byte-stable per D-11; phase 36.2 ALL plans complete, ready for `/gsd-verify-phase 36.2`)*
+*Last updated: 2026-04-28 — Phase 36.3 Plan 01 complete (3 atomic git mv commits 71507b7/6597dfa/eb42362; full git history preserved; typecheck + 1289 tests green; zero deviations; Plan 02 mount routes ready)*

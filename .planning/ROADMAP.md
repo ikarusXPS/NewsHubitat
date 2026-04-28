@@ -187,7 +187,7 @@ n**Plans:**
 **Plans**: 5 plans
 
 Plans:
-- [ ] 36.3-01-PLAN.md — Relocate 3 webhook/subscription source files from root server/ to apps/web/server/ via git mv (preserves history)
+- [x] 36.3-01-PLAN.md — Relocate 3 webhook/subscription source files from root server/ to apps/web/server/ via git mv (preserves history) — commits 71507b7, 6597dfa, eb42362
 - [ ] 36.3-02-PLAN.md — Mount webhook + subscription routes in live apps/web/server/index.ts (diff-only, before express.json for raw body)
 - [ ] 36.3-03-PLAN.md — Wholesale delete orphan root trees (server/, prisma/, src/, prisma.config.ts, tsup.config.ts, vite.config.ts, tsconfig.{,app,node}.json) + D-08 verification gate
 - [ ] 36.3-04-PLAN.md — End-to-end verification: stripe trigger 8 events return HTTP 200; ProcessedWebhookEvent rows persisted; idempotency replay PASS
