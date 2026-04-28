@@ -96,5 +96,15 @@
       "body": "This will remove your comment from the discussion. Replies will remain visible.",
       "confirm": "Delete"
     }
+  },
+  "upgrade": {
+    "required": "{{tier}} subscription required",
+    "clickToUnlock": "Click to upgrade",
+    "unlockFeature": "Upgrade to unlock {{feature}}"
+  },
+  "ai": {
+    "dailyQueries": "Daily AI Queries",
+    "remaining": "remaining",
+    "upgradeCta": "Upgrade for unlimited queries"
   }
 }

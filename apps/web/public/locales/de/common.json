@@ -96,5 +96,15 @@
       "body": "Dies entfernt deinen Kommentar aus der Diskussion. Antworten bleiben sichtbar.",
       "confirm": "Löschen"
     }
+  },
+  "upgrade": {
+    "required": "{{tier}}-Abonnement erforderlich",
+    "clickToUnlock": "Klicke zum Upgraden",
+    "unlockFeature": "Upgrade um {{feature}} freizuschalten"
+  },
+  "ai": {
+    "dailyQueries": "Tägliche KI-Anfragen",
+    "remaining": "verbleibend",
+    "upgradeCta": "Upgrade für unbegrenzte Anfragen"
   }
 }
