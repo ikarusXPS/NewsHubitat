@@ -69,6 +69,11 @@ export type UserMinAggregateOutputType = {
   isHistoryPaused: boolean | null
   deletionRequestedAt: Date | null
   deletionConfirmToken: string | null
+  stripeCustomerId: string | null
+  stripeSubscriptionId: string | null
+  subscriptionTier: string | null
+  subscriptionStatus: string | null
+  subscriptionEndsAt: Date | null
 }
 
 export type UserMaxAggregateOutputType = {
@@ -102,6 +107,11 @@ export type UserMaxAggregateOutputType = {
   isHistoryPaused: boolean | null
   deletionRequestedAt: Date | null
   deletionConfirmToken: string | null
+  stripeCustomerId: string | null
+  stripeSubscriptionId: string | null
+  subscriptionTier: string | null
+  subscriptionStatus: string | null
+  subscriptionEndsAt: Date | null
 }
 
 export type UserCountAggregateOutputType = {
@@ -136,6 +146,11 @@ export type UserCountAggregateOutputType = {
   isHistoryPaused: number
   deletionRequestedAt: number
   deletionConfirmToken: number
+  stripeCustomerId: number
+  stripeSubscriptionId: number
+  subscriptionTier: number
+  subscriptionStatus: number
+  subscriptionEndsAt: number
   _all: number
 }
 
@@ -183,6 +198,11 @@ export type UserMinAggregateInputType = {
   isHistoryPaused?: true
   deletionRequestedAt?: true
   deletionConfirmToken?: true
+  stripeCustomerId?: true
+  stripeSubscriptionId?: true
+  subscriptionTier?: true
+  subscriptionStatus?: true
+  subscriptionEndsAt?: true
 }
 
 export type UserMaxAggregateInputType = {
@@ -216,6 +236,11 @@ export type UserMaxAggregateInputType = {
   isHistoryPaused?: true
   deletionRequestedAt?: true
   deletionConfirmToken?: true
+  stripeCustomerId?: true
+  stripeSubscriptionId?: true
+  subscriptionTier?: true
+  subscriptionStatus?: true
+  subscriptionEndsAt?: true
 }
 
 export type UserCountAggregateInputType = {
@@ -250,6 +275,11 @@ export type UserCountAggregateInputType = {
   isHistoryPaused?: true
   deletionRequestedAt?: true
   deletionConfirmToken?: true
+  stripeCustomerId?: true
+  stripeSubscriptionId?: true
+  subscriptionTier?: true
+  subscriptionStatus?: true
+  subscriptionEndsAt?: true
   _all?: true
 }
 
@@ -371,6 +401,11 @@ export type UserGroupByOutputType = {
   isHistoryPaused: boolean
   deletionRequestedAt: Date | null
   deletionConfirmToken: string | null
+  stripeCustomerId: string | null
+  stripeSubscriptionId: string | null
+  subscriptionTier: string | null
+  subscriptionStatus: string | null
+  subscriptionEndsAt: Date | null
   _count: UserCountAggregateOutputType | null
   _avg: UserAvgAggregateOutputType | null
   _sum: UserSumAggregateOutputType | null
@@ -428,6 +463,11 @@ export type UserWhereInput = {
   isHistoryPaused?: Prisma.BoolFilter<"User"> | boolean
   deletionRequestedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   deletionConfirmToken?: Prisma.StringNullableFilter<"User"> | string | null
+  stripeCustomerId?: Prisma.StringNullableFilter<"User"> | string | null
+  stripeSubscriptionId?: Prisma.StringNullableFilter<"User"> | string | null
+  subscriptionTier?: Prisma.StringNullableFilter<"User"> | string | null
+  subscriptionStatus?: Prisma.StringNullableFilter<"User"> | string | null
+  subscriptionEndsAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   bookmarks?: Prisma.BookmarkListRelationFilter
   readingHistory?: Prisma.ReadingHistoryListRelationFilter
   emailSubscription?: Prisma.XOR<Prisma.EmailSubscriptionNullableScalarRelationFilter, Prisma.EmailSubscriptionWhereInput> | null
@@ -471,6 +511,11 @@ export type UserOrderByWithRelationInput = {
   isHistoryPaused?: Prisma.SortOrder
   deletionRequestedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   deletionConfirmToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  stripeCustomerId?: Prisma.SortOrderInput | Prisma.SortOrder
+  stripeSubscriptionId?: Prisma.SortOrderInput | Prisma.SortOrder
+  subscriptionTier?: Prisma.SortOrderInput | Prisma.SortOrder
+  subscriptionStatus?: Prisma.SortOrderInput | Prisma.SortOrder
+  subscriptionEndsAt?: Prisma.SortOrderInput | Prisma.SortOrder
   bookmarks?: Prisma.BookmarkOrderByRelationAggregateInput
   readingHistory?: Prisma.ReadingHistoryOrderByRelationAggregateInput
   emailSubscription?: Prisma.EmailSubscriptionOrderByWithRelationInput
@@ -487,6 +532,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   email?: string
   googleIdHash?: string
   githubIdHash?: string
+  stripeCustomerId?: string
+  stripeSubscriptionId?: string
   AND?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
@@ -517,6 +564,9 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   isHistoryPaused?: Prisma.BoolFilter<"User"> | boolean
   deletionRequestedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   deletionConfirmToken?: Prisma.StringNullableFilter<"User"> | string | null
+  subscriptionTier?: Prisma.StringNullableFilter<"User"> | string | null
+  subscriptionStatus?: Prisma.StringNullableFilter<"User"> | string | null
+  subscriptionEndsAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   bookmarks?: Prisma.BookmarkListRelationFilter
   readingHistory?: Prisma.ReadingHistoryListRelationFilter
   emailSubscription?: Prisma.XOR<Prisma.EmailSubscriptionNullableScalarRelationFilter, Prisma.EmailSubscriptionWhereInput> | null
@@ -526,7 +576,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   comments?: Prisma.CommentListRelationFilter
   teamMemberships?: Prisma.TeamMemberListRelationFilter
   apiKeys?: Prisma.ApiKeyListRelationFilter
-}, "id" | "email" | "googleIdHash" | "githubIdHash">
+}, "id" | "email" | "googleIdHash" | "githubIdHash" | "stripeCustomerId" | "stripeSubscriptionId">
 
 export type UserOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -560,6 +610,11 @@ export type UserOrderByWithAggregationInput = {
   isHistoryPaused?: Prisma.SortOrder
   deletionRequestedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   deletionConfirmToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  stripeCustomerId?: Prisma.SortOrderInput | Prisma.SortOrder
+  stripeSubscriptionId?: Prisma.SortOrderInput | Prisma.SortOrder
+  subscriptionTier?: Prisma.SortOrderInput | Prisma.SortOrder
+  subscriptionStatus?: Prisma.SortOrderInput | Prisma.SortOrder
+  subscriptionEndsAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _avg?: Prisma.UserAvgOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
@@ -602,6 +657,11 @@ export type UserScalarWhereWithAggregatesInput = {
   isHistoryPaused?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   deletionRequestedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   deletionConfirmToken?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  stripeCustomerId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  stripeSubscriptionId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  subscriptionTier?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  subscriptionStatus?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  subscriptionEndsAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
 }
 
 export type UserCreateInput = {
@@ -636,6 +696,11 @@ export type UserCreateInput = {
   isHistoryPaused?: boolean
   deletionRequestedAt?: Date | string | null
   deletionConfirmToken?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  subscriptionTier?: string | null
+  subscriptionStatus?: string | null
+  subscriptionEndsAt?: Date | string | null
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   readingHistory?: Prisma.ReadingHistoryCreateNestedManyWithoutUserInput
   emailSubscription?: Prisma.EmailSubscriptionCreateNestedOneWithoutUserInput
@@ -679,6 +744,11 @@ export type UserUncheckedCreateInput = {
   isHistoryPaused?: boolean
   deletionRequestedAt?: Date | string | null
   deletionConfirmToken?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  subscriptionTier?: string | null
+  subscriptionStatus?: string | null
+  subscriptionEndsAt?: Date | string | null
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   readingHistory?: Prisma.ReadingHistoryUncheckedCreateNestedManyWithoutUserInput
   emailSubscription?: Prisma.EmailSubscriptionUncheckedCreateNestedOneWithoutUserInput
@@ -722,6 +792,11 @@ export type UserUpdateInput = {
   isHistoryPaused?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   readingHistory?: Prisma.ReadingHistoryUpdateManyWithoutUserNestedInput
   emailSubscription?: Prisma.EmailSubscriptionUpdateOneWithoutUserNestedInput
@@ -765,6 +840,11 @@ export type UserUncheckedUpdateInput = {
   isHistoryPaused?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   readingHistory?: Prisma.ReadingHistoryUncheckedUpdateManyWithoutUserNestedInput
   emailSubscription?: Prisma.EmailSubscriptionUncheckedUpdateOneWithoutUserNestedInput
@@ -808,6 +888,11 @@ export type UserCreateManyInput = {
   isHistoryPaused?: boolean
   deletionRequestedAt?: Date | string | null
   deletionConfirmToken?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  subscriptionTier?: string | null
+  subscriptionStatus?: string | null
+  subscriptionEndsAt?: Date | string | null
 }
 
 export type UserUpdateManyMutationInput = {
@@ -842,6 +927,11 @@ export type UserUpdateManyMutationInput = {
   isHistoryPaused?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type UserUncheckedUpdateManyInput = {
@@ -876,6 +966,11 @@ export type UserUncheckedUpdateManyInput = {
   isHistoryPaused?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type UserCountOrderByAggregateInput = {
@@ -910,6 +1005,11 @@ export type UserCountOrderByAggregateInput = {
   isHistoryPaused?: Prisma.SortOrder
   deletionRequestedAt?: Prisma.SortOrder
   deletionConfirmToken?: Prisma.SortOrder
+  stripeCustomerId?: Prisma.SortOrder
+  stripeSubscriptionId?: Prisma.SortOrder
+  subscriptionTier?: Prisma.SortOrder
+  subscriptionStatus?: Prisma.SortOrder
+  subscriptionEndsAt?: Prisma.SortOrder
 }
 
 export type UserAvgOrderByAggregateInput = {
@@ -949,6 +1049,11 @@ export type UserMaxOrderByAggregateInput = {
   isHistoryPaused?: Prisma.SortOrder
   deletionRequestedAt?: Prisma.SortOrder
   deletionConfirmToken?: Prisma.SortOrder
+  stripeCustomerId?: Prisma.SortOrder
+  stripeSubscriptionId?: Prisma.SortOrder
+  subscriptionTier?: Prisma.SortOrder
+  subscriptionStatus?: Prisma.SortOrder
+  subscriptionEndsAt?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
@@ -982,6 +1087,11 @@ export type UserMinOrderByAggregateInput = {
   isHistoryPaused?: Prisma.SortOrder
   deletionRequestedAt?: Prisma.SortOrder
   deletionConfirmToken?: Prisma.SortOrder
+  stripeCustomerId?: Prisma.SortOrder
+  stripeSubscriptionId?: Prisma.SortOrder
+  subscriptionTier?: Prisma.SortOrder
+  subscriptionStatus?: Prisma.SortOrder
+  subscriptionEndsAt?: Prisma.SortOrder
 }
 
 export type UserSumOrderByAggregateInput = {
@@ -1153,6 +1263,11 @@ export type UserCreateWithoutBookmarksInput = {
   isHistoryPaused?: boolean
   deletionRequestedAt?: Date | string | null
   deletionConfirmToken?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  subscriptionTier?: string | null
+  subscriptionStatus?: string | null
+  subscriptionEndsAt?: Date | string | null
   readingHistory?: Prisma.ReadingHistoryCreateNestedManyWithoutUserInput
   emailSubscription?: Prisma.EmailSubscriptionCreateNestedOneWithoutUserInput
   emailDigests?: Prisma.EmailDigestCreateNestedManyWithoutUserInput
@@ -1195,6 +1310,11 @@ export type UserUncheckedCreateWithoutBookmarksInput = {
   isHistoryPaused?: boolean
   deletionRequestedAt?: Date | string | null
   deletionConfirmToken?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  subscriptionTier?: string | null
+  subscriptionStatus?: string | null
+  subscriptionEndsAt?: Date | string | null
   readingHistory?: Prisma.ReadingHistoryUncheckedCreateNestedManyWithoutUserInput
   emailSubscription?: Prisma.EmailSubscriptionUncheckedCreateNestedOneWithoutUserInput
   emailDigests?: Prisma.EmailDigestUncheckedCreateNestedManyWithoutUserInput
@@ -1253,6 +1373,11 @@ export type UserUpdateWithoutBookmarksInput = {
   isHistoryPaused?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   readingHistory?: Prisma.ReadingHistoryUpdateManyWithoutUserNestedInput
   emailSubscription?: Prisma.EmailSubscriptionUpdateOneWithoutUserNestedInput
   emailDigests?: Prisma.EmailDigestUpdateManyWithoutUserNestedInput
@@ -1295,6 +1420,11 @@ export type UserUncheckedUpdateWithoutBookmarksInput = {
   isHistoryPaused?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   readingHistory?: Prisma.ReadingHistoryUncheckedUpdateManyWithoutUserNestedInput
   emailSubscription?: Prisma.EmailSubscriptionUncheckedUpdateOneWithoutUserNestedInput
   emailDigests?: Prisma.EmailDigestUncheckedUpdateManyWithoutUserNestedInput
@@ -1337,6 +1467,11 @@ export type UserCreateWithoutReadingHistoryInput = {
   isHistoryPaused?: boolean
   deletionRequestedAt?: Date | string | null
   deletionConfirmToken?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  subscriptionTier?: string | null
+  subscriptionStatus?: string | null
+  subscriptionEndsAt?: Date | string | null
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   emailSubscription?: Prisma.EmailSubscriptionCreateNestedOneWithoutUserInput
   emailDigests?: Prisma.EmailDigestCreateNestedManyWithoutUserInput
@@ -1379,6 +1514,11 @@ export type UserUncheckedCreateWithoutReadingHistoryInput = {
   isHistoryPaused?: boolean
   deletionRequestedAt?: Date | string | null
   deletionConfirmToken?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  subscriptionTier?: string | null
+  subscriptionStatus?: string | null
+  subscriptionEndsAt?: Date | string | null
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   emailSubscription?: Prisma.EmailSubscriptionUncheckedCreateNestedOneWithoutUserInput
   emailDigests?: Prisma.EmailDigestUncheckedCreateNestedManyWithoutUserInput
@@ -1437,6 +1577,11 @@ export type UserUpdateWithoutReadingHistoryInput = {
   isHistoryPaused?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   emailSubscription?: Prisma.EmailSubscriptionUpdateOneWithoutUserNestedInput
   emailDigests?: Prisma.EmailDigestUpdateManyWithoutUserNestedInput
@@ -1479,6 +1624,11 @@ export type UserUncheckedUpdateWithoutReadingHistoryInput = {
   isHistoryPaused?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   emailSubscription?: Prisma.EmailSubscriptionUncheckedUpdateOneWithoutUserNestedInput
   emailDigests?: Prisma.EmailDigestUncheckedUpdateManyWithoutUserNestedInput
@@ -1521,6 +1671,11 @@ export type UserCreateWithoutEmailSubscriptionInput = {
   isHistoryPaused?: boolean
   deletionRequestedAt?: Date | string | null
   deletionConfirmToken?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  subscriptionTier?: string | null
+  subscriptionStatus?: string | null
+  subscriptionEndsAt?: Date | string | null
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   readingHistory?: Prisma.ReadingHistoryCreateNestedManyWithoutUserInput
   emailDigests?: Prisma.EmailDigestCreateNestedManyWithoutUserInput
@@ -1563,6 +1718,11 @@ export type UserUncheckedCreateWithoutEmailSubscriptionInput = {
   isHistoryPaused?: boolean
   deletionRequestedAt?: Date | string | null
   deletionConfirmToken?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  subscriptionTier?: string | null
+  subscriptionStatus?: string | null
+  subscriptionEndsAt?: Date | string | null
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   readingHistory?: Prisma.ReadingHistoryUncheckedCreateNestedManyWithoutUserInput
   emailDigests?: Prisma.EmailDigestUncheckedCreateNestedManyWithoutUserInput
@@ -1621,6 +1781,11 @@ export type UserUpdateWithoutEmailSubscriptionInput = {
   isHistoryPaused?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   readingHistory?: Prisma.ReadingHistoryUpdateManyWithoutUserNestedInput
   emailDigests?: Prisma.EmailDigestUpdateManyWithoutUserNestedInput
@@ -1663,6 +1828,11 @@ export type UserUncheckedUpdateWithoutEmailSubscriptionInput = {
   isHistoryPaused?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   readingHistory?: Prisma.ReadingHistoryUncheckedUpdateManyWithoutUserNestedInput
   emailDigests?: Prisma.EmailDigestUncheckedUpdateManyWithoutUserNestedInput
@@ -1705,6 +1875,11 @@ export type UserCreateWithoutEmailDigestsInput = {
   isHistoryPaused?: boolean
   deletionRequestedAt?: Date | string | null
   deletionConfirmToken?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  subscriptionTier?: string | null
+  subscriptionStatus?: string | null
+  subscriptionEndsAt?: Date | string | null
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   readingHistory?: Prisma.ReadingHistoryCreateNestedManyWithoutUserInput
   emailSubscription?: Prisma.EmailSubscriptionCreateNestedOneWithoutUserInput
@@ -1747,6 +1922,11 @@ export type UserUncheckedCreateWithoutEmailDigestsInput = {
   isHistoryPaused?: boolean
   deletionRequestedAt?: Date | string | null
   deletionConfirmToken?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  subscriptionTier?: string | null
+  subscriptionStatus?: string | null
+  subscriptionEndsAt?: Date | string | null
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   readingHistory?: Prisma.ReadingHistoryUncheckedCreateNestedManyWithoutUserInput
   emailSubscription?: Prisma.EmailSubscriptionUncheckedCreateNestedOneWithoutUserInput
@@ -1805,6 +1985,11 @@ export type UserUpdateWithoutEmailDigestsInput = {
   isHistoryPaused?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   readingHistory?: Prisma.ReadingHistoryUpdateManyWithoutUserNestedInput
   emailSubscription?: Prisma.EmailSubscriptionUpdateOneWithoutUserNestedInput
@@ -1847,6 +2032,11 @@ export type UserUncheckedUpdateWithoutEmailDigestsInput = {
   isHistoryPaused?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   readingHistory?: Prisma.ReadingHistoryUncheckedUpdateManyWithoutUserNestedInput
   emailSubscription?: Prisma.EmailSubscriptionUncheckedUpdateOneWithoutUserNestedInput
@@ -1889,6 +2079,11 @@ export type UserCreateWithoutUserPersonasInput = {
   isHistoryPaused?: boolean
   deletionRequestedAt?: Date | string | null
   deletionConfirmToken?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  subscriptionTier?: string | null
+  subscriptionStatus?: string | null
+  subscriptionEndsAt?: Date | string | null
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   readingHistory?: Prisma.ReadingHistoryCreateNestedManyWithoutUserInput
   emailSubscription?: Prisma.EmailSubscriptionCreateNestedOneWithoutUserInput
@@ -1931,6 +2126,11 @@ export type UserUncheckedCreateWithoutUserPersonasInput = {
   isHistoryPaused?: boolean
   deletionRequestedAt?: Date | string | null
   deletionConfirmToken?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  subscriptionTier?: string | null
+  subscriptionStatus?: string | null
+  subscriptionEndsAt?: Date | string | null
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   readingHistory?: Prisma.ReadingHistoryUncheckedCreateNestedManyWithoutUserInput
   emailSubscription?: Prisma.EmailSubscriptionUncheckedCreateNestedOneWithoutUserInput
@@ -1989,6 +2189,11 @@ export type UserUpdateWithoutUserPersonasInput = {
   isHistoryPaused?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   readingHistory?: Prisma.ReadingHistoryUpdateManyWithoutUserNestedInput
   emailSubscription?: Prisma.EmailSubscriptionUpdateOneWithoutUserNestedInput
@@ -2031,6 +2236,11 @@ export type UserUncheckedUpdateWithoutUserPersonasInput = {
   isHistoryPaused?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   readingHistory?: Prisma.ReadingHistoryUncheckedUpdateManyWithoutUserNestedInput
   emailSubscription?: Prisma.EmailSubscriptionUncheckedUpdateOneWithoutUserNestedInput
@@ -2073,6 +2283,11 @@ export type UserCreateWithoutBadgesInput = {
   isHistoryPaused?: boolean
   deletionRequestedAt?: Date | string | null
   deletionConfirmToken?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  subscriptionTier?: string | null
+  subscriptionStatus?: string | null
+  subscriptionEndsAt?: Date | string | null
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   readingHistory?: Prisma.ReadingHistoryCreateNestedManyWithoutUserInput
   emailSubscription?: Prisma.EmailSubscriptionCreateNestedOneWithoutUserInput
@@ -2115,6 +2330,11 @@ export type UserUncheckedCreateWithoutBadgesInput = {
   isHistoryPaused?: boolean
   deletionRequestedAt?: Date | string | null
   deletionConfirmToken?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  subscriptionTier?: string | null
+  subscriptionStatus?: string | null
+  subscriptionEndsAt?: Date | string | null
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   readingHistory?: Prisma.ReadingHistoryUncheckedCreateNestedManyWithoutUserInput
   emailSubscription?: Prisma.EmailSubscriptionUncheckedCreateNestedOneWithoutUserInput
@@ -2173,6 +2393,11 @@ export type UserUpdateWithoutBadgesInput = {
   isHistoryPaused?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   readingHistory?: Prisma.ReadingHistoryUpdateManyWithoutUserNestedInput
   emailSubscription?: Prisma.EmailSubscriptionUpdateOneWithoutUserNestedInput
@@ -2215,6 +2440,11 @@ export type UserUncheckedUpdateWithoutBadgesInput = {
   isHistoryPaused?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   readingHistory?: Prisma.ReadingHistoryUncheckedUpdateManyWithoutUserNestedInput
   emailSubscription?: Prisma.EmailSubscriptionUncheckedUpdateOneWithoutUserNestedInput
@@ -2257,6 +2487,11 @@ export type UserCreateWithoutCommentsInput = {
   isHistoryPaused?: boolean
   deletionRequestedAt?: Date | string | null
   deletionConfirmToken?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  subscriptionTier?: string | null
+  subscriptionStatus?: string | null
+  subscriptionEndsAt?: Date | string | null
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   readingHistory?: Prisma.ReadingHistoryCreateNestedManyWithoutUserInput
   emailSubscription?: Prisma.EmailSubscriptionCreateNestedOneWithoutUserInput
@@ -2299,6 +2534,11 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   isHistoryPaused?: boolean
   deletionRequestedAt?: Date | string | null
   deletionConfirmToken?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  subscriptionTier?: string | null
+  subscriptionStatus?: string | null
+  subscriptionEndsAt?: Date | string | null
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   readingHistory?: Prisma.ReadingHistoryUncheckedCreateNestedManyWithoutUserInput
   emailSubscription?: Prisma.EmailSubscriptionUncheckedCreateNestedOneWithoutUserInput
@@ -2357,6 +2597,11 @@ export type UserUpdateWithoutCommentsInput = {
   isHistoryPaused?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   readingHistory?: Prisma.ReadingHistoryUpdateManyWithoutUserNestedInput
   emailSubscription?: Prisma.EmailSubscriptionUpdateOneWithoutUserNestedInput
@@ -2399,6 +2644,11 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   isHistoryPaused?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   readingHistory?: Prisma.ReadingHistoryUncheckedUpdateManyWithoutUserNestedInput
   emailSubscription?: Prisma.EmailSubscriptionUncheckedUpdateOneWithoutUserNestedInput
@@ -2441,6 +2691,11 @@ export type UserCreateWithoutTeamMembershipsInput = {
   isHistoryPaused?: boolean
   deletionRequestedAt?: Date | string | null
   deletionConfirmToken?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  subscriptionTier?: string | null
+  subscriptionStatus?: string | null
+  subscriptionEndsAt?: Date | string | null
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   readingHistory?: Prisma.ReadingHistoryCreateNestedManyWithoutUserInput
   emailSubscription?: Prisma.EmailSubscriptionCreateNestedOneWithoutUserInput
@@ -2483,6 +2738,11 @@ export type UserUncheckedCreateWithoutTeamMembershipsInput = {
   isHistoryPaused?: boolean
   deletionRequestedAt?: Date | string | null
   deletionConfirmToken?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  subscriptionTier?: string | null
+  subscriptionStatus?: string | null
+  subscriptionEndsAt?: Date | string | null
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   readingHistory?: Prisma.ReadingHistoryUncheckedCreateNestedManyWithoutUserInput
   emailSubscription?: Prisma.EmailSubscriptionUncheckedCreateNestedOneWithoutUserInput
@@ -2541,6 +2801,11 @@ export type UserUpdateWithoutTeamMembershipsInput = {
   isHistoryPaused?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   readingHistory?: Prisma.ReadingHistoryUpdateManyWithoutUserNestedInput
   emailSubscription?: Prisma.EmailSubscriptionUpdateOneWithoutUserNestedInput
@@ -2583,6 +2848,11 @@ export type UserUncheckedUpdateWithoutTeamMembershipsInput = {
   isHistoryPaused?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   readingHistory?: Prisma.ReadingHistoryUncheckedUpdateManyWithoutUserNestedInput
   emailSubscription?: Prisma.EmailSubscriptionUncheckedUpdateOneWithoutUserNestedInput
@@ -2625,6 +2895,11 @@ export type UserCreateWithoutApiKeysInput = {
   isHistoryPaused?: boolean
   deletionRequestedAt?: Date | string | null
   deletionConfirmToken?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  subscriptionTier?: string | null
+  subscriptionStatus?: string | null
+  subscriptionEndsAt?: Date | string | null
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   readingHistory?: Prisma.ReadingHistoryCreateNestedManyWithoutUserInput
   emailSubscription?: Prisma.EmailSubscriptionCreateNestedOneWithoutUserInput
@@ -2667,6 +2942,11 @@ export type UserUncheckedCreateWithoutApiKeysInput = {
   isHistoryPaused?: boolean
   deletionRequestedAt?: Date | string | null
   deletionConfirmToken?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  subscriptionTier?: string | null
+  subscriptionStatus?: string | null
+  subscriptionEndsAt?: Date | string | null
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   readingHistory?: Prisma.ReadingHistoryUncheckedCreateNestedManyWithoutUserInput
   emailSubscription?: Prisma.EmailSubscriptionUncheckedCreateNestedOneWithoutUserInput
@@ -2725,6 +3005,11 @@ export type UserUpdateWithoutApiKeysInput = {
   isHistoryPaused?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   readingHistory?: Prisma.ReadingHistoryUpdateManyWithoutUserNestedInput
   emailSubscription?: Prisma.EmailSubscriptionUpdateOneWithoutUserNestedInput
@@ -2767,6 +3052,11 @@ export type UserUncheckedUpdateWithoutApiKeysInput = {
   isHistoryPaused?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   readingHistory?: Prisma.ReadingHistoryUncheckedUpdateManyWithoutUserNestedInput
   emailSubscription?: Prisma.EmailSubscriptionUncheckedUpdateOneWithoutUserNestedInput
@@ -2903,6 +3193,11 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   isHistoryPaused?: boolean
   deletionRequestedAt?: boolean
   deletionConfirmToken?: boolean
+  stripeCustomerId?: boolean
+  stripeSubscriptionId?: boolean
+  subscriptionTier?: boolean
+  subscriptionStatus?: boolean
+  subscriptionEndsAt?: boolean
   bookmarks?: boolean | Prisma.User$bookmarksArgs<ExtArgs>
   readingHistory?: boolean | Prisma.User$readingHistoryArgs<ExtArgs>
   emailSubscription?: boolean | Prisma.User$emailSubscriptionArgs<ExtArgs>
@@ -2947,6 +3242,11 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   isHistoryPaused?: boolean
   deletionRequestedAt?: boolean
   deletionConfirmToken?: boolean
+  stripeCustomerId?: boolean
+  stripeSubscriptionId?: boolean
+  subscriptionTier?: boolean
+  subscriptionStatus?: boolean
+  subscriptionEndsAt?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -2981,6 +3281,11 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   isHistoryPaused?: boolean
   deletionRequestedAt?: boolean
   deletionConfirmToken?: boolean
+  stripeCustomerId?: boolean
+  stripeSubscriptionId?: boolean
+  subscriptionTier?: boolean
+  subscriptionStatus?: boolean
+  subscriptionEndsAt?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
@@ -3015,9 +3320,14 @@ export type UserSelectScalar = {
   isHistoryPaused?: boolean
   deletionRequestedAt?: boolean
   deletionConfirmToken?: boolean
+  stripeCustomerId?: boolean
+  stripeSubscriptionId?: boolean
+  subscriptionTier?: boolean
+  subscriptionStatus?: boolean
+  subscriptionEndsAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "passwordHash" | "name" | "createdAt" | "preferences" | "emailVerified" | "verificationTokenHash" | "verificationTokenExpiry" | "verificationSendCount" | "lastVerificationSentAt" | "resetTokenHash" | "resetTokenExpiry" | "resetSendCount" | "lastResetSentAt" | "tokenVersion" | "googleIdHash" | "githubIdHash" | "hasPassword" | "emailBounced" | "emailBouncedAt" | "emailOptOut" | "emailOptOutAt" | "updatedAt" | "avatarUrl" | "selectedPresetAvatar" | "featuredBadgeId" | "showOnLeaderboard" | "isHistoryPaused" | "deletionRequestedAt" | "deletionConfirmToken", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "passwordHash" | "name" | "createdAt" | "preferences" | "emailVerified" | "verificationTokenHash" | "verificationTokenExpiry" | "verificationSendCount" | "lastVerificationSentAt" | "resetTokenHash" | "resetTokenExpiry" | "resetSendCount" | "lastResetSentAt" | "tokenVersion" | "googleIdHash" | "githubIdHash" | "hasPassword" | "emailBounced" | "emailBouncedAt" | "emailOptOut" | "emailOptOutAt" | "updatedAt" | "avatarUrl" | "selectedPresetAvatar" | "featuredBadgeId" | "showOnLeaderboard" | "isHistoryPaused" | "deletionRequestedAt" | "deletionConfirmToken" | "stripeCustomerId" | "stripeSubscriptionId" | "subscriptionTier" | "subscriptionStatus" | "subscriptionEndsAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   bookmarks?: boolean | Prisma.User$bookmarksArgs<ExtArgs>
   readingHistory?: boolean | Prisma.User$readingHistoryArgs<ExtArgs>
@@ -3078,6 +3388,11 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     isHistoryPaused: boolean
     deletionRequestedAt: Date | null
     deletionConfirmToken: string | null
+    stripeCustomerId: string | null
+    stripeSubscriptionId: string | null
+    subscriptionTier: string | null
+    subscriptionStatus: string | null
+    subscriptionEndsAt: Date | null
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -3541,6 +3856,11 @@ export interface UserFieldRefs {
   readonly isHistoryPaused: Prisma.FieldRef<"User", 'Boolean'>
   readonly deletionRequestedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly deletionConfirmToken: Prisma.FieldRef<"User", 'String'>
+  readonly stripeCustomerId: Prisma.FieldRef<"User", 'String'>
+  readonly stripeSubscriptionId: Prisma.FieldRef<"User", 'String'>
+  readonly subscriptionTier: Prisma.FieldRef<"User", 'String'>
+  readonly subscriptionStatus: Prisma.FieldRef<"User", 'String'>
+  readonly subscriptionEndsAt: Prisma.FieldRef<"User", 'DateTime'>
 }
     
 
