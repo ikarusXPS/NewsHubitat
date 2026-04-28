@@ -8,6 +8,7 @@ import { z } from 'zod';
 import { authMiddleware } from '../services/authService';
 import { SubscriptionService } from '../services/subscriptionService';
 import { STRIPE_CONFIG } from '../config/stripe';
+import logger from '../utils/logger';
 
 interface AuthRequest extends Request {
   user?: { userId: string; email: string };
@@ -97,10 +98,15 @@ router.post('/checkout', authMiddleware, async (req: AuthRequest, res: Response)
       data: { url: checkoutUrl },
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to create checkout session';
+    // Log full error server-side; return generic message to client
+    // (per security checklist: no internal error text in API responses).
+    logger.error('[subscriptions.checkout] failed', {
+      userId: req.user?.userId,
+      err: err instanceof Error ? { message: err.message, stack: err.stack } : err,
+    });
     res.status(500).json({
       success: false,
-      error: message,
+      error: 'Failed to create checkout session',
     });
   }
 });
@@ -131,6 +137,8 @@ router.post('/portal', authMiddleware, async (req: AuthRequest, res: Response): 
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Failed to create portal session';
 
+    // Sentinel: user has no Stripe customer yet -> 400 with friendly text.
+    // (WR-04 may replace this string-match with a typed error class.)
     if (message.includes('No Stripe customer')) {
       res.status(400).json({
         success: false,
@@ -139,9 +147,14 @@ router.post('/portal', authMiddleware, async (req: AuthRequest, res: Response): 
       return;
     }
 
+    // Generic 500 — log full error, return generic message (CR-03).
+    logger.error('[subscriptions.portal] failed', {
+      userId: req.user?.userId,
+      err: err instanceof Error ? { message: err.message, stack: err.stack } : err,
+    });
     res.status(500).json({
       success: false,
-      error: message,
+      error: 'Failed to create portal session',
     });
   }
 });
@@ -166,10 +179,14 @@ router.get('/status', authMiddleware, async (req: AuthRequest, res: Response): P
       },
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to get subscription status';
+    // Log full error server-side; return generic message to client (CR-03).
+    logger.error('[subscriptions.status] failed', {
+      userId: req.user?.userId,
+      err: err instanceof Error ? { message: err.message, stack: err.stack } : err,
+    });
     res.status(500).json({
       success: false,
-      error: message,
+      error: 'Failed to get subscription status',
     });
   }
 });
