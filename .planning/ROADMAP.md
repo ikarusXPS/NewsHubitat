@@ -228,7 +228,22 @@ Plans:
   5. Existing 1304 vitest tests still pass with no regressions (`pnpm test:run` exits 0)
   6. No new files written under root `server/`, `prisma/`, `src/`, or `e2e/` (anti-pattern guard from `.planning/.continue-here.md`)
   7. SUMMARY.md per plan + Phase-level VERIFICATION.md created
-**Plans**: TBD (run `/gsd-plan-phase 36.5`)
+**Plans**: 4 plans across 3 waves
+
+**Wave 1** *(parallel — disjoint files; Plans 01 + 02 touch different subsystems)*
+- [ ] 36.5-01-PLAN.md — Bug A: TDD webhook integration test + structured error log + `handleSubscriptionUpdated` root-cause fix — `apps/web/server/services/stripeWebhookService.test.ts` (new), `stripeWebhookService.ts`, `routes/webhooks/stripe.ts` — closes PAY-06 + criteria #1, #2
+- [ ] 36.5-02-PLAN.md — Bug B schema: drop `showPremiumBadge` column + `[BLOCKING]` `cd apps/web && npx prisma db push --accept-data-loss && npx prisma generate` — `apps/web/prisma/schema.prisma` — closes part of PAY-04 + criterion #3
+
+**Wave 2** *(blocked on Wave 1 — depends on Plan 02's regenerated Prisma client for typecheck)*
+- [ ] 36.5-03-PLAN.md — Bug B UI: widen AuthContext `User` interface with `subscriptionTier` + replace hard-coded "Premium" in `Sidebar.tsx:287-303` with `<SubscriptionBadge tier={user?.subscriptionTier ?? 'FREE'} />` — `AuthContext.tsx`, `Sidebar.tsx` — closes part of PAY-04 + criterion #4
+
+**Wave 3** *(blocked on Wave 2; `autonomous: false` — human-verify visual probe required)*
+- [ ] 36.5-04-PLAN.md — Verification gate: 7-criterion evidence matrix + anti-pattern guard scan + `pnpm test:run` ≥ 1305 + checkpoint:human-verify (FREE shows no badge / PREMIUM shows badge / `stripe events resend` produces structured error log not empty) + write `36.5-VERIFICATION.md` — closes PAY-04, PAY-06 + criteria #5, #6, #7
+
+**Cross-cutting constraints** *(must_haves shared across 2+ plans)*
+- D-01 LOCKED: drop the `showPremiumBadge` column (NOT keep with sync invariant) — anchored in 02; verified in 04
+- D-06 LOCKED: zero `files_modified` entries under root `server/`, `prisma/`, `src/`, `e2e/` — applies to all plans; audited in 04
+- D-08 LOCKED: `pnpm test:run` exits 0 with ≥ 1305 tests passing (was 1304 baseline + ≥ 1 new integration test from Plan 01) — verified in 03 and 04
 
 ### Phase 37: Horizontal Scaling
 **Goal**: System handles 30k concurrent users through horizontal scaling and connection pooling

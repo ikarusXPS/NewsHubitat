@@ -4,8 +4,8 @@ milestone: v1.6
 milestone_name: Infrastructure & Scale
 current_plan: null
 status: phase_36_complete_pending_verifier
-last_updated: "2026-04-28T19:50:00.000Z"
-last_activity: 2026-04-28 -- Phase 36-05 complete with 4 hotfixes (commits bd7b6e5 + c5553f9). Live human-verify Step 1-10 PASSED end-to-end with ikarus.nbg@gmail.com on Stripe test sandbox; PREMIUM tier verified at DB + API + rate-limit-bypass levels. Surfaced 4 defects all fixed inline. Phase 36.5 inserted to address the 2 documented follow-up bugs (showPremiumBadge UI flag + customer.subscription.created handler empty error); awaiting /gsd-plan-phase 36.5. 1304/1304 tests still green.
+last_updated: "2026-04-28T20:15:00.000Z"
+last_activity: 2026-04-28 -- Phase 36.5 PLANNED via /gsd-plan-phase 36.5. 4 plans across 3 waves, plan-checker VERIFICATION PASSED on iteration 1 (all 10 dimensions clean; PAY-04 covered by 02/03/04, PAY-06 covered by 01/04). Plans: 36.5-01 (TDD Bug A — webhook integration test + structured error log + handler fix, wave 1), 36.5-02 (Bug B schema — drop showPremiumBadge column + [BLOCKING] prisma db push --accept-data-loss && prisma generate, wave 1), 36.5-03 (Bug B UI — widen AuthContext User with subscriptionTier + replace hardcoded "Premium" in Sidebar.tsx with SubscriptionBadge component reuse, wave 2 depends on 02), 36.5-04 (verification gate + checkpoint:human-verify visual probe, wave 3 depends on 01/02/03, autonomous=false). CONTEXT.md captures locked decisions D-01 (drop column option a) through D-08 (>= 1305 tests). Awaits /gsd-execute-phase 36.5.
 progress:
   total_phases: 6
   completed_phases: 2
@@ -52,7 +52,7 @@ v1.6 Progress: [████████████████████] (8
 | 36.2 | Close 36-debt — schema models + cleanup (INSERTED) | PAY-02..PAY-07 | No | **Complete** (4/4 plans — schema + depcheck + db-push/refactor + audit trail; awaiting `/gsd-verify-phase 36.2`) |
 | 36.3 | Fix Stripe Webhook Monorepo Path (INSERTED) | PAY-02, PAY-03, PAY-06 | No | **Complete** (5/5 plans — awaiting `/gsd-verify-phase 36.3`) |
 | 36.4 | Relocate Plan-03/04 monetization artifacts (INSERTED) | PAY-01, PAY-02, PAY-04..PAY-07 | Yes | **Complete** (4/4 plans — verified PASS 10/10 ROADMAP criteria; D-09 probes PASS but had a false-positive — see 36.5; D-10 audit = 0) |
-| 36.5 | Fix monetization follow-up bugs (INSERTED) | PAY-04, PAY-06 | Partial | Not planned (FU-1 customer.subscription.created handler empty error + FU-2 showPremiumBadge flag decoupled from subscriptionTier; awaiting `/gsd-plan-phase 36.5`) |
+| 36.5 | Fix monetization follow-up bugs (INSERTED) | PAY-04, PAY-06 | Partial | **Planned** (4/4 plans, 3 waves; plan-checker PASSED 10/10; awaiting `/gsd-execute-phase 36.5`) |
 | 37 | Horizontal Scaling | 5 reqs (INFRA-01 to INFRA-05) | No | Not started |
 | 38 | Advanced AI Features | 7 reqs (AI-01 to AI-07) | Yes | Not started |
 | 39 | Mobile Apps | 8 reqs (MOB-01 to MOB-08) | Yes | Not started |
