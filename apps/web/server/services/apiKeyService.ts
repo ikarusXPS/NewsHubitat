@@ -12,6 +12,7 @@ import { customAlphabet } from 'nanoid';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { prisma } from '../db/prisma';
+import { CacheService } from './cacheService';
 
 // Generate URL-safe random string (24 chars, alphanumeric)
 const nanoid = customAlphabet('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', 24);
@@ -253,6 +254,18 @@ export class ApiKeyService {
         revokedReason: reason,
       },
     });
+
+    // Phase 35.1 hotfix: invalidate cache so revocation takes effect immediately
+    // (previously a 5-min stale-cache window let revoked keys keep working)
+    const cacheService = CacheService.getInstance();
+    if (cacheService.isAvailable()) {
+      const secondaryKey = `apikey:by-id:${keyId}`;
+      const cacheKey = await cacheService.get<string>(secondaryKey);
+      if (cacheKey) {
+        await cacheService.del(cacheKey);
+      }
+      await cacheService.del(secondaryKey);
+    }
   }
 
   /**

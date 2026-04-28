@@ -85,6 +85,8 @@ export async function apiKeyAuth(
         // Cache for 5 minutes (T-35-10: cache only metadata, not full key)
         if (cacheService.isAvailable()) {
           await cacheService.set(cacheKey, keyData, KEY_CACHE_TTL);
+          // Secondary index: keyId -> cacheKey, enables O(1) cache invalidation on revoke (Phase 35.1 hotfix)
+          await cacheService.set(`apikey:by-id:${keyData.keyId}`, cacheKey, KEY_CACHE_TTL);
         }
         logger.debug(`API key validated and cached: ${key.substring(0, 15)}...`);
       }
