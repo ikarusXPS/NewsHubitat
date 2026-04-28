@@ -130,7 +130,7 @@ n**Plans:**
 - [x] 36-02-PLAN.md — Stripe checkout & webhooks (checkout sessions, idempotent webhook handlers)
 - [x] 36-03-PLAN.md — Feature gating middleware (requireTier, AI rate limit bypass, history/export)
 - [x] 36-04-PLAN.md — Pricing page & UI components (TierCard, SubscriptionBadge, i18n)
-- [ ] 36-05-PLAN.md — Integration testing & human verification (unit tests, E2E, Stripe flow verification)
+- [x] 36-05-PLAN.md — Integration testing & human verification (unit tests, E2E, Stripe flow verification) — completed 2026-04-28 (1304/1304 tests green; human-verify "approved")
 
 ### Phase 36.1 (INSERTED): Add Subscription Schema Fields — **COMPLETE** (2026-04-28, verified PASS 5/5)
 **Goal**: Backfill subscription/Stripe fields on the User model that Phase 36-01 was marked complete without — currently blocks 36-05 because committed `subscriptionService.ts` references fields the Prisma client doesn't have

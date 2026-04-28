@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Infrastructure & Scale
-current_plan: 5
-status: phase_complete_resume_36
-last_updated: "2026-04-28T16:30:00.000Z"
-last_activity: 2026-04-28 -- Phase 36.4 complete (4/4 plans verified PASS; 10/10 ROADMAP criteria; D-09 probes PASS; D-10 audit = 0); Phase 36-05 human-verify unblocked
+current_plan: null
+status: phase_36_complete_pending_verifier
+last_updated: "2026-04-28T17:57:00.000Z"
+last_activity: 2026-04-28 -- Phase 36-05 complete (1304/1304 tests green; human-verify checkpoint approved); Phase 36 has all 5 plans complete; ready for /gsd-verify-phase 36
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 14
-  completed_plans: 13
-  percent: 92
+  completed_plans: 14
+  percent: 100
 ---
 
 # State: NewsHub
@@ -25,21 +25,21 @@ See: .planning/PROJECT.md (updated 2026-04-26)
 
 ## Current Position
 
-Phase: 36.4 (relocate-plan-03-04-monetization-artifacts) — COMPLETE (verified PASS)
-Plan: 4 of 4 (all verified)
-Current Plan: 5 (in Phase 36 — resume human-verify checkpoint)
-Status: Phase 36.4 complete; Phase 36-05 human-verify ready to resume
-Last activity: 2026-04-28 -- Phase 36.4 complete (4/4 plans, 10/10 success criteria, 6/6 PAY reqs); D-09 probes all PASS; anti-pattern guardrail = 0
+Phase: 36 (monetization-core) — ALL 5 PLANS COMPLETE; awaiting /gsd-verify-phase 36
+Plan: 5 of 5 (Plan 05 closed via human-verify "approved" + 1304/1304 test green)
+Current Plan: — (none in flight)
+Status: Phase 36 complete pending verifier; queued: /gsd-verify-phase 36 → /gsd-verify-phase 36.4 (already passed) / 36.3 / 36.2
+Last activity: 2026-04-28 -- Phase 36-05 complete (1304/1304 tests green; human-verify checkpoint approved); milestone-36 monetization end-to-end ready for verifier
 
 ```
-v1.6 Progress: [████████████████░░░░] (8 phases incl. 36.4, 2 complete, 17/? plans done — Phase 36.3 complete (5/5); Phase 36-05 human-verify exposed Plan 03 + Plan 04 wrong-path debt → 36.4 inserted to recover middleware + UI from history; resume Plan 05 only after 36.4 closes)
+v1.6 Progress: [████████████████████] (8 phases incl. 36.4 complete; Phase 36 closed by user-approved human-verify on Plan 05; verifier still owed for 36, 36.3, 36.2 before milestone close)
 ```
 
 ## Milestone Progress
 
 **Milestone:** v1.6 - Infrastructure & Scale
 **Goal:** Comprehensive expansion across infrastructure, AI, mobile, monetization, and content
-**Status:** Executing Phase 36.4
+**Status:** Phase 36 complete (5/5 plans); awaiting phase verifier on 36, 36.2, 36.3
 **Previous:** v1.5 complete 2026-04-26
 
 ### Phase Summary
@@ -47,7 +47,7 @@ v1.6 Progress: [████████████████░░░░] (8
 | Phase | Name | Requirements | UI | Status |
 |-------|------|--------------|-----|--------|
 | 35 | Infrastructure Foundation | 4 reqs (INFRA-01 partial, PAY-08, PAY-09, PAY-10) | No | **Complete** (5/5 plans) — UAT 5/5 PASS + 35.1 hotfix |
-| 36 | Monetization Core | 7 reqs (PAY-01 to PAY-07) | Yes | **Paused** (4/5 plans, ready to resume 36-05) |
+| 36 | Monetization Core | 7 reqs (PAY-01 to PAY-07) | Yes | **Complete** (5/5 plans; Plan 05 closed via human-verify "approved" 2026-04-28; awaiting `/gsd-verify-phase 36`) |
 | 36.1 | Add Subscription Schema Fields (INSERTED) | PAY-01 (foundation) | No | **Complete** (1/1 plans) — verified PASS 5/5 |
 | 36.2 | Close 36-debt — schema models + cleanup (INSERTED) | PAY-02..PAY-07 | No | **Complete** (4/4 plans — schema + depcheck + db-push/refactor + audit trail; awaiting `/gsd-verify-phase 36.2`) |
 | 36.3 | Fix Stripe Webhook Monorepo Path (INSERTED) | PAY-02, PAY-03, PAY-06 | No | **Complete** (5/5 plans — awaiting `/gsd-verify-phase 36.3`) |
