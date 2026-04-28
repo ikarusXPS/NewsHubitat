@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Infrastructure & Scale
-current_plan: 4
-status: verified
-last_updated: "2026-04-28T11:45:00Z"
-last_activity: 2026-04-28 -- Phase 36.3 context captured (D-01..D-11 locked: git mv 3 files + diff-only mount in live index.ts + wholesale orphan sweep [server/, prisma/, src/, tsup.config.ts, prisma.config.ts] + 8-event stripe trigger verify + .continue-here anti-pattern)
+current_plan: "— (next phase action: `/gsd-plan-phase 36.3`)"
+status: executing
+last_updated: "2026-04-28T11:38:19.024Z"
+last_activity: 2026-04-28 -- Phase 36.3 planning complete
 progress:
-  total_phases: 7
-  completed_phases: 3
-  total_plans: 15
-  completed_plans: 15
-  percent: 100
+  total_phases: 6
+  completed_phases: 1
+  total_plans: 10
+  completed_plans: 9
+  percent: 90
 ---
 
 # State: NewsHub
@@ -28,8 +28,8 @@ See: .planning/PROJECT.md (updated 2026-04-26)
 Phase: 36.2 — VERIFIED (4/4 plans; 6/6 ROADMAP success criteria PASS)
 Plan: 4 of 4 complete
 Current Plan: — (next phase action: `/gsd-plan-phase 36.3`)
-Status: Phase 36.2 verified by gsd-verifier; VERIFICATION.md at `.planning/phases/36.2-close-36-debt-schema-models-cleanup/36.2-VERIFICATION.md`. ProcessedWebhookEvent now in generated client → Phase 36.3 unblocked.
-Last activity: 2026-04-28 -- Phase 36.2 verified (6/6 success criteria; pre-existing build issue documented in deferred-items.md)
+Status: Ready to execute
+Last activity: 2026-04-28 -- Phase 36.3 planning complete
 
 ```
 v1.6 Progress: [██████████████████░░] 93% (7 phases, 2 complete, 14/15 plans done)
@@ -39,7 +39,7 @@ v1.6 Progress: [██████████████████░░] 93
 
 **Milestone:** v1.6 - Infrastructure & Scale
 **Goal:** Comprehensive expansion across infrastructure, AI, mobile, monetization, and content
-**Status:** Phase 36.2 all plans complete (4/4); ready for `/gsd-verify-phase 36.2`. Phase 36 still paused at plan 05.
+**Status:** Ready to execute
 **Previous:** v1.5 complete 2026-04-26
 
 ### Phase Summary
