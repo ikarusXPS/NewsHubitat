@@ -69,7 +69,14 @@ router.post(
       await handleStripeWebhook(event);
       res.status(200).json({ received: true });
     } catch (err) {
-      logger.error('[Webhook] Processing error:', err);
+      logger.error(`[Webhook] Processing error: ${JSON.stringify({
+        message: err instanceof Error ? err.message || '<empty>' : String(err),
+        name: err instanceof Error ? err.name : typeof err,
+        stack: err instanceof Error ? err.stack : undefined,
+        code: (err as { code?: string })?.code,
+        eventId: event.id,
+        eventType: event.type,
+      })}`);
       // Return 500 so Stripe retries with exponential backoff (up to 3 days).
       // Pairs with the idempotency lock-release in
       // processWebhookIdempotently: when the handler throws, the
