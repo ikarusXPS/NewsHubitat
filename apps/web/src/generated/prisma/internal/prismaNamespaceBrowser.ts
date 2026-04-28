@@ -165,7 +165,12 @@ export const UserScalarFieldEnum = {
   showOnLeaderboard: 'showOnLeaderboard',
   isHistoryPaused: 'isHistoryPaused',
   deletionRequestedAt: 'deletionRequestedAt',
-  deletionConfirmToken: 'deletionConfirmToken'
+  deletionConfirmToken: 'deletionConfirmToken',
+  stripeCustomerId: 'stripeCustomerId',
+  stripeSubscriptionId: 'stripeSubscriptionId',
+  subscriptionTier: 'subscriptionTier',
+  subscriptionStatus: 'subscriptionStatus',
+  subscriptionEndsAt: 'subscriptionEndsAt'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
