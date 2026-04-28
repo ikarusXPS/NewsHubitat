@@ -235,7 +235,7 @@ Plans:
 - [x] 36.5-02-PLAN.md — Bug B schema: drop `showPremiumBadge` column + `[BLOCKING]` `cd apps/web && npx prisma db push --accept-data-loss && npx prisma generate` — `apps/web/prisma/schema.prisma` — closes part of PAY-04 + criterion #3
 
 **Wave 2** *(blocked on Wave 1 — depends on Plan 02's regenerated Prisma client for typecheck)*
-- [ ] 36.5-03-PLAN.md — Bug B UI: widen AuthContext `User` interface with `subscriptionTier` + replace hard-coded "Premium" in `Sidebar.tsx:287-303` with `<SubscriptionBadge tier={user?.subscriptionTier ?? 'FREE'} />` — `AuthContext.tsx`, `Sidebar.tsx` — closes part of PAY-04 + criterion #4
+- [x] 36.5-03-PLAN.md — Bug B UI: widen AuthContext `User` interface with `subscriptionTier` + replace hard-coded "Premium" in `Sidebar.tsx:287-303` with `<SubscriptionBadge tier={user?.subscriptionTier ?? 'FREE'} />` — `AuthContext.tsx`, `Sidebar.tsx` — closes part of PAY-04 + criterion #4
 
 **Wave 3** *(blocked on Wave 2; `autonomous: false` — human-verify visual probe required)*
 - [ ] 36.5-04-PLAN.md — Verification gate: 7-criterion evidence matrix + anti-pattern guard scan + `pnpm test:run` ≥ 1305 + checkpoint:human-verify (FREE shows no badge / PREMIUM shows badge / `stripe events resend` produces structured error log not empty) + write `36.5-VERIFICATION.md` — closes PAY-04, PAY-06 + criteria #5, #6, #7
