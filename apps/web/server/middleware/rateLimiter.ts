@@ -6,8 +6,9 @@
 import { rateLimit, type RateLimitRequestHandler, type Options } from 'express-rate-limit';
 import { RedisStore, type RedisReply } from 'rate-limit-redis';
 import type { Request } from 'express';
-import { CacheService } from '../services/cacheService';
+import { CacheService, CACHE_TTL } from '../services/cacheService';
 import { RATE_LIMITS, type RateLimitTier } from '../config/rateLimits';
+import { prisma } from '../db/prisma';
 import logger from '../utils/logger';
 
 // Extended request type with optional user from auth middleware
@@ -105,6 +106,72 @@ export const authLimiter = createLimiter('auth');
 export const aiLimiter = createLimiter('ai');
 export const newsLimiter = createLimiter('news');
 export const commentLimiter = createLimiter('comment');
+
+/**
+ * Tier-aware AI rate limiter (Phase 36)
+ * FREE: 10 requests/day (per TIER_LIMITS)
+ * PREMIUM/ENTERPRISE: Unlimited (skip rate limiting)
+ */
+export const aiTierLimiter = (() => {
+  const cacheService = CacheService.getInstance();
+  const redisClient = cacheService.getClient();
+
+  let store: RedisStore | undefined;
+  if (redisClient) {
+    store = new RedisStore({
+      sendCommand: (command: string, ...args: string[]) =>
+        redisClient.call(command, ...args) as Promise<RedisReply>,
+      prefix: 'rl:ai-tier:',
+    });
+  }
+
+  return rateLimit({
+    windowMs: 24 * 60 * 60 * 1000, // 24 hours for daily limit
+    max: 10, // FREE tier limit per CONTEXT.md
+    standardHeaders: true,
+    legacyHeaders: false,
+    keyGenerator: (req: Request) => {
+      const authReq = req as AuthenticatedRequest;
+      return authReq.user?.userId || req.ip || 'anonymous';
+    },
+    skip: async (req: Request) => {
+      // Skip rate limiting if Redis unavailable (graceful degradation)
+      if (!cacheService.isAvailable()) {
+        logger.debug('AI tier rate limiting skipped: Redis unavailable');
+        return true;
+      }
+
+      // Skip rate limiting for Premium/Enterprise users
+      const authReq = req as AuthenticatedRequest;
+      if (!authReq.user?.userId) return false;
+
+      const cacheKey = `user:tier:${authReq.user.userId}`;
+
+      let tier = await cacheService.get<string>(cacheKey);
+      if (!tier) {
+        const user = await prisma.user.findUnique({
+          where: { id: authReq.user.userId },
+          select: { subscriptionTier: true },
+        });
+        tier = user?.subscriptionTier || 'FREE';
+        // Cache tier for 5 minutes
+        await cacheService.set(cacheKey, tier, CACHE_TTL.MEDIUM);
+      }
+
+      // Skip rate limiting for Premium and Enterprise
+      return tier === 'PREMIUM' || tier === 'ENTERPRISE';
+    },
+    handler: (_req, res) => {
+      res.status(429).json({
+        success: false,
+        error: 'Daily AI query limit reached (10/day for free tier)',
+        upgradeUrl: '/pricing',
+        limit: 10,
+      });
+    },
+    store,
+  });
+})();
 
 /**
  * Team invite rate limiter - 10 invites per hour per team per user

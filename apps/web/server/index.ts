@@ -37,7 +37,7 @@ import stripeWebhookRouter from './routes/webhooks/stripe';
 import subscriptionRoutes from './routes/subscriptions';
 import { publicApiRoutes } from './routes/publicApi';
 import { apiKeyRoutes } from './routes/apiKeys';
-import { authLimiter, aiLimiter, newsLimiter } from './middleware/rateLimiter';
+import { authLimiter, aiTierLimiter, newsLimiter } from './middleware/rateLimiter';
 import { apiKeyAuth } from './middleware/apiKeyAuth';
 import { createApiKeyLimiter } from './middleware/apiKeyRateLimiter';
 import { isBot, generateOGHtml } from './middleware/botDetection';
@@ -147,9 +147,9 @@ app.use('/api/auth', authRoutes);
 // OAuth routes (Google, GitHub) - uses same /api/auth prefix
 app.use('/api/auth', oauthRoutes);
 
-// AI endpoints - moderate (10 req/min per user) - D-05
-app.use('/api/ai', aiLimiter, aiRoutes);
-app.use('/api/analysis', aiLimiter, analysisRoutes);
+// AI endpoints - tier-aware (FREE: 10/day; PREMIUM/ENTERPRISE: unlimited) - Phase 36.4 D-01/D-02
+app.use('/api/ai', aiTierLimiter, aiRoutes);
+app.use('/api/analysis', aiTierLimiter, analysisRoutes);
 
 // News/Events endpoints - relaxed (100 req/min per IP) - D-05
 app.use('/api/news', newsLimiter, newsRoutes);
