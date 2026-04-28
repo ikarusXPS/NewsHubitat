@@ -43,9 +43,6 @@ importers:
       '@prisma/client':
         specifier: ^7.7.0
         version: 7.7.0(prisma@7.7.0(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(better-sqlite3@12.9.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@6.0.3))(typescript@6.0.3)
-      '@radix-ui/react-dialog':
-        specifier: ^1.1.15
-        version: 1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@scalar/api-reference-react':
         specifier: ^0.9.27
         version: 0.9.27(@vue/compiler-sfc@3.5.33)(axios@1.15.0)(react@19.2.5)(tailwindcss@4.2.2)(typescript@6.0.3)
@@ -97,9 +94,6 @@ importers:
       cheerio:
         specifier: ^1.2.0
         version: 1.2.0
-      class-variance-authority:
-        specifier: ^0.7.1
-        version: 0.7.1
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -148,9 +142,6 @@ importers:
       i18next-icu:
         specifier: ^2.4.3
         version: 2.4.3(intl-messageformat@11.2.2)
-      intl-messageformat:
-        specifier: ^11.2.1
-        version: 11.2.2
       ioredis:
         specifier: ^5.10.1
         version: 5.10.1
@@ -187,9 +178,6 @@ importers:
       passport-google-oauth20:
         specifier: ^2.0.0
         version: 2.0.0
-      pg:
-        specifier: ^8.20.0
-        version: 8.20.0
       prisma:
         specifier: ^7.7.0
         version: 7.7.0(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(better-sqlite3@12.9.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@6.0.3)
@@ -341,9 +329,6 @@ importers:
       '@types/passport-google-oauth20':
         specifier: ^2.0.17
         version: 2.0.17
-      '@types/pg':
-        specifier: ^8.20.0
-        version: 8.20.0
       '@types/react':
         specifier: ^19.2.7
         version: 19.2.14
@@ -3593,9 +3578,6 @@ packages:
 
   cjs-module-lexer@2.2.0:
     resolution: {integrity: sha512-4bHTS2YuzUvtoLjdy+98ykbNB5jS0+07EvFNXerqZQJ89F7DI6ET7OQo/HJuW6K0aVsKA9hj9/RVb2kQVOrPDQ==}
-
-  class-variance-authority@0.7.1:
-    resolution: {integrity: sha512-Ka+9Trutv7G8M6WT6SeiRWz792K5qEqIGEGzXKhAE6xOWAY6pPH8U+9IY3oCMv6kqTmLsv7Xh/2w2RigkePMsg==}
 
   cliui@8.0.1:
     resolution: {integrity: sha512-BSeNnyus75C4//NQ9gQt1/csTXyo/8Sb+afLAkzAptFuMsod9HFokGNudZpi/oQV73hnVK+sR+5PVRMd+Dr7YQ==}
@@ -11515,10 +11497,6 @@ snapshots:
   citty@0.2.2: {}
 
   cjs-module-lexer@2.2.0: {}
-
-  class-variance-authority@0.7.1:
-    dependencies:
-      clsx: 2.1.1
 
   cliui@8.0.1:
     dependencies:
