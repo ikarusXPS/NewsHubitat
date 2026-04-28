@@ -191,4 +191,4 @@ This document evolves at phase transitions and milestone boundaries.
 - Gamification and personalization
 
 ---
-*Last updated: 2026-04-26 after v1.6 milestone started*
+*Last updated: 2026-04-28 — Phase 36.3 complete (Stripe webhook monorepo path fix; live `/api/webhooks/stripe` mount restored, 93 [200] forwards + IDEMPOTENCY: PASS empirically demonstrated)*
