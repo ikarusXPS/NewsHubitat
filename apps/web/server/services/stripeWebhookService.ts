@@ -13,7 +13,22 @@ const IDEMPOTENCY_TTL = CACHE_TTL.DAY; // 24 hours per CONTEXT.md
 
 /**
  * Process webhook event with idempotency check
- * Uses Redis first (fast path), DB backup for durability
+ *
+ * Uses an "insert-first, run-handler-second" pattern so the unique
+ * constraint on ProcessedWebhookEvent.id acts as the cross-process
+ * lock against Stripe's at-least-once delivery (concurrent retries).
+ *
+ * Dual-storage semantics (Phase 36.2):
+ *  - Redis is the fast-path cache for "already processed" lookups.
+ *  - DB row is the durable source of truth + the lock holder.
+ *
+ * Failure model:
+ *  - Insert P2002 (duplicate) -> another delivery already claimed
+ *    this event. Re-cache and return duplicate.
+ *  - Handler throws AFTER successful insert -> delete the row so
+ *    Stripe's retry can re-process. Without the delete, the event
+ *    would be poisoned (marked processed, never replayed) while the
+ *    side-effect was never applied.
  */
 export async function processWebhookIdempotently(
   eventId: string,
@@ -23,37 +38,47 @@ export async function processWebhookIdempotently(
   const cacheService = CacheService.getInstance();
   const cacheKey = `webhook:stripe:${eventId}`;
 
-  // 1. Check Redis first (fast path)
+  // Fast path: Redis hit means definitely processed.
   const cached = await cacheService.get<boolean>(cacheKey);
   if (cached) {
     logger.info(`[Webhook] Event ${eventId} already processed (Redis)`);
     return { processed: false, duplicate: true };
   }
 
-  // 2. Check DB backup (Redis may have evicted)
-  const dbRecord = await prisma.processedWebhookEvent.findUnique({
-    where: { id: eventId },
-  });
-  if (dbRecord) {
-    // Re-cache in Redis
-    await cacheService.set(cacheKey, true, IDEMPOTENCY_TTL);
-    logger.info(`[Webhook] Event ${eventId} already processed (DB)`);
-    return { processed: false, duplicate: true };
+  // Acquire the lock by inserting the row. Unique-PK enforces
+  // mutual exclusion across concurrent deliveries.
+  try {
+    await prisma.processedWebhookEvent.create({
+      data: { id: eventId, eventType },
+    });
+  } catch (err) {
+    // P2002 = unique constraint violation = another process already
+    // claimed this event. Refresh the cache and return duplicate.
+    if ((err as { code?: string }).code === 'P2002') {
+      await cacheService.set(cacheKey, true, IDEMPOTENCY_TTL);
+      logger.info(`[Webhook] Event ${eventId} already processed (DB lock)`);
+      return { processed: false, duplicate: true };
+    }
+    throw err;
   }
 
-  // 3. Process the event
-  await handler();
-
-  // 4. Mark as processed in both Redis and DB
-  await Promise.all([
-    cacheService.set(cacheKey, true, IDEMPOTENCY_TTL),
-    prisma.processedWebhookEvent.create({
-      data: { id: eventId, eventType },
-    }),
-  ]);
-
-  logger.info(`[Webhook] Processed event ${eventId} (${eventType})`);
-  return { processed: true, duplicate: false };
+  // We hold the lock. Run the handler.
+  try {
+    await handler();
+    await cacheService.set(cacheKey, true, IDEMPOTENCY_TTL);
+    logger.info(`[Webhook] Processed event ${eventId} (${eventType})`);
+    return { processed: true, duplicate: false };
+  } catch (err) {
+    // Handler failed AFTER we claimed the lock. Release the row so
+    // Stripe's retry can re-process. (Otherwise the event is poisoned
+    // and never replays.)
+    await prisma.processedWebhookEvent
+      .delete({ where: { id: eventId } })
+      .catch(() => {
+        /* best effort — DB may already be unreachable */
+      });
+    throw err;
+  }
 }
 
 /**
