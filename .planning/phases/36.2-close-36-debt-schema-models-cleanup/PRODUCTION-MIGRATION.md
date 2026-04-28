@@ -105,3 +105,38 @@ Phase 36.2 is dev-only schema work. Production migration choreography (maintenan
 *Created: 2026-04-28 by Phase 36.2*
 *Phase: 36.2-close-36-debt-schema-models-cleanup*
 *References: 36.2-CONTEXT.md D-02 specifies dev-only scope; 36.2-PATTERNS.md lines 501-558 specifies the tone and SQL template.*
+
+---
+
+## Phase 36.5 Addition: Drop showPremiumBadge Column
+
+**Status:** Not executed in 36.5 for production. Dev DB only (applied 2026-04-28 via `prisma db push --accept-data-loss`).
+**Owner of execution:** Production-readiness phase (TBD).
+**Drafted:** 2026-04-28 by Phase 36.5.
+
+### What 36.5 Did (Dev Only)
+
+Dropped `User.showPremiumBadge Boolean @default(true)` from the Prisma schema (Plan 02). The column was a dead vanity flag — `@default(true)` caused every user (including FREE tier users) to show "Premium" badge. No server code read or wrote it. Source-of-truth becomes `User.subscriptionTier` directly (D-01).
+
+On the dev DB, 103 non-null rows were affected (all had value `true` from the default). All rows were destroyed — this is intentional and lossless since no application code depended on the value.
+
+### What Production Requires
+
+One SQL statement inside a migration (or applied manually before `prisma migrate deploy`):
+
+```sql
+ALTER TABLE "User" DROP COLUMN "showPremiumBadge";
+```
+
+This is a destructive DDL operation (takes a brief lock on the User table). If any production code (in a legacy deployment) reads `showPremiumBadge`, it will fail after this migration. Verify no consumers exist before applying.
+
+### Pre-Requisites
+
+1. Confirm zero references to `showPremiumBadge` in deployed application code (`grep -r showPremiumBadge apps/web/src apps/web/server` must return 0 non-generated hits).
+2. Brief maintenance window recommended (column drop takes exclusive lock on User table momentarily).
+3. No rollback SQL — column drop is irreversible. Take a backup before applying.
+
+---
+
+*Phase 36.5 addition: 2026-04-28 by Phase 36.5-fix-monetization-followup-bugs*
+*References: 36.5-CONTEXT.md D-01 (locked decision: drop column, no sync invariant, no backfill)*
