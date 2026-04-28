@@ -77,7 +77,6 @@ export type UserMinAggregateOutputType = {
   subscriptionStatus: $Enums.SubscriptionStatus | null
   subscriptionEndsAt: Date | null
   pausedUntil: Date | null
-  showPremiumBadge: boolean | null
   customAccentColor: string | null
   referralCode: string | null
   referredBy: string | null
@@ -123,7 +122,6 @@ export type UserMaxAggregateOutputType = {
   subscriptionStatus: $Enums.SubscriptionStatus | null
   subscriptionEndsAt: Date | null
   pausedUntil: Date | null
-  showPremiumBadge: boolean | null
   customAccentColor: string | null
   referralCode: string | null
   referredBy: string | null
@@ -170,7 +168,6 @@ export type UserCountAggregateOutputType = {
   subscriptionStatus: number
   subscriptionEndsAt: number
   pausedUntil: number
-  showPremiumBadge: number
   customAccentColor: number
   referralCode: number
   referredBy: number
@@ -232,7 +229,6 @@ export type UserMinAggregateInputType = {
   subscriptionStatus?: true
   subscriptionEndsAt?: true
   pausedUntil?: true
-  showPremiumBadge?: true
   customAccentColor?: true
   referralCode?: true
   referredBy?: true
@@ -278,7 +274,6 @@ export type UserMaxAggregateInputType = {
   subscriptionStatus?: true
   subscriptionEndsAt?: true
   pausedUntil?: true
-  showPremiumBadge?: true
   customAccentColor?: true
   referralCode?: true
   referredBy?: true
@@ -325,7 +320,6 @@ export type UserCountAggregateInputType = {
   subscriptionStatus?: true
   subscriptionEndsAt?: true
   pausedUntil?: true
-  showPremiumBadge?: true
   customAccentColor?: true
   referralCode?: true
   referredBy?: true
@@ -459,7 +453,6 @@ export type UserGroupByOutputType = {
   subscriptionStatus: $Enums.SubscriptionStatus
   subscriptionEndsAt: Date | null
   pausedUntil: Date | null
-  showPremiumBadge: boolean
   customAccentColor: string | null
   referralCode: string | null
   referredBy: string | null
@@ -529,7 +522,6 @@ export type UserWhereInput = {
   subscriptionStatus?: Prisma.EnumSubscriptionStatusFilter<"User"> | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   pausedUntil?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
-  showPremiumBadge?: Prisma.BoolFilter<"User"> | boolean
   customAccentColor?: Prisma.StringNullableFilter<"User"> | string | null
   referralCode?: Prisma.StringNullableFilter<"User"> | string | null
   referredBy?: Prisma.StringNullableFilter<"User"> | string | null
@@ -590,7 +582,6 @@ export type UserOrderByWithRelationInput = {
   subscriptionStatus?: Prisma.SortOrder
   subscriptionEndsAt?: Prisma.SortOrderInput | Prisma.SortOrder
   pausedUntil?: Prisma.SortOrderInput | Prisma.SortOrder
-  showPremiumBadge?: Prisma.SortOrder
   customAccentColor?: Prisma.SortOrderInput | Prisma.SortOrder
   referralCode?: Prisma.SortOrderInput | Prisma.SortOrder
   referredBy?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -655,7 +646,6 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   subscriptionStatus?: Prisma.EnumSubscriptionStatusFilter<"User"> | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   pausedUntil?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
-  showPremiumBadge?: Prisma.BoolFilter<"User"> | boolean
   customAccentColor?: Prisma.StringNullableFilter<"User"> | string | null
   referredBy?: Prisma.StringNullableFilter<"User"> | string | null
   freeMonthsEarned?: Prisma.IntFilter<"User"> | number
@@ -715,7 +705,6 @@ export type UserOrderByWithAggregationInput = {
   subscriptionStatus?: Prisma.SortOrder
   subscriptionEndsAt?: Prisma.SortOrderInput | Prisma.SortOrder
   pausedUntil?: Prisma.SortOrderInput | Prisma.SortOrder
-  showPremiumBadge?: Prisma.SortOrder
   customAccentColor?: Prisma.SortOrderInput | Prisma.SortOrder
   referralCode?: Prisma.SortOrderInput | Prisma.SortOrder
   referredBy?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -770,7 +759,6 @@ export type UserScalarWhereWithAggregatesInput = {
   subscriptionStatus?: Prisma.EnumSubscriptionStatusWithAggregatesFilter<"User"> | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   pausedUntil?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
-  showPremiumBadge?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   customAccentColor?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   referralCode?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   referredBy?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
@@ -817,7 +805,6 @@ export type UserCreateInput = {
   subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
   pausedUntil?: Date | string | null
-  showPremiumBadge?: boolean
   customAccentColor?: string | null
   referralCode?: string | null
   freeMonthsEarned?: number
@@ -877,7 +864,6 @@ export type UserUncheckedCreateInput = {
   subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
   pausedUntil?: Date | string | null
-  showPremiumBadge?: boolean
   customAccentColor?: string | null
   referralCode?: string | null
   referredBy?: string | null
@@ -937,7 +923,6 @@ export type UserUpdateInput = {
   subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
   customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
@@ -997,7 +982,6 @@ export type UserUncheckedUpdateInput = {
   subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
   customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referredBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1057,7 +1041,6 @@ export type UserCreateManyInput = {
   subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
   pausedUntil?: Date | string | null
-  showPremiumBadge?: boolean
   customAccentColor?: string | null
   referralCode?: string | null
   referredBy?: string | null
@@ -1104,7 +1087,6 @@ export type UserUpdateManyMutationInput = {
   subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
   customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1150,7 +1132,6 @@ export type UserUncheckedUpdateManyInput = {
   subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
   customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referredBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1212,7 +1193,6 @@ export type UserCountOrderByAggregateInput = {
   subscriptionStatus?: Prisma.SortOrder
   subscriptionEndsAt?: Prisma.SortOrder
   pausedUntil?: Prisma.SortOrder
-  showPremiumBadge?: Prisma.SortOrder
   customAccentColor?: Prisma.SortOrder
   referralCode?: Prisma.SortOrder
   referredBy?: Prisma.SortOrder
@@ -1265,7 +1245,6 @@ export type UserMaxOrderByAggregateInput = {
   subscriptionStatus?: Prisma.SortOrder
   subscriptionEndsAt?: Prisma.SortOrder
   pausedUntil?: Prisma.SortOrder
-  showPremiumBadge?: Prisma.SortOrder
   customAccentColor?: Prisma.SortOrder
   referralCode?: Prisma.SortOrder
   referredBy?: Prisma.SortOrder
@@ -1311,7 +1290,6 @@ export type UserMinOrderByAggregateInput = {
   subscriptionStatus?: Prisma.SortOrder
   subscriptionEndsAt?: Prisma.SortOrder
   pausedUntil?: Prisma.SortOrder
-  showPremiumBadge?: Prisma.SortOrder
   customAccentColor?: Prisma.SortOrder
   referralCode?: Prisma.SortOrder
   referredBy?: Prisma.SortOrder
@@ -1604,7 +1582,6 @@ export type UserCreateWithoutReferredUsersInput = {
   subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
   pausedUntil?: Date | string | null
-  showPremiumBadge?: boolean
   customAccentColor?: string | null
   referralCode?: string | null
   freeMonthsEarned?: number
@@ -1663,7 +1640,6 @@ export type UserUncheckedCreateWithoutReferredUsersInput = {
   subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
   pausedUntil?: Date | string | null
-  showPremiumBadge?: boolean
   customAccentColor?: string | null
   referralCode?: string | null
   referredBy?: string | null
@@ -1727,7 +1703,6 @@ export type UserCreateWithoutReferredByUserInput = {
   subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
   pausedUntil?: Date | string | null
-  showPremiumBadge?: boolean
   customAccentColor?: string | null
   referralCode?: string | null
   freeMonthsEarned?: number
@@ -1786,7 +1761,6 @@ export type UserUncheckedCreateWithoutReferredByUserInput = {
   subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
   pausedUntil?: Date | string | null
-  showPremiumBadge?: boolean
   customAccentColor?: string | null
   referralCode?: string | null
   freeMonthsEarned?: number
@@ -1866,7 +1840,6 @@ export type UserUpdateWithoutReferredUsersInput = {
   subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
   customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1925,7 +1898,6 @@ export type UserUncheckedUpdateWithoutReferredUsersInput = {
   subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
   customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referredBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2003,7 +1975,6 @@ export type UserScalarWhereInput = {
   subscriptionStatus?: Prisma.EnumSubscriptionStatusFilter<"User"> | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   pausedUntil?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
-  showPremiumBadge?: Prisma.BoolFilter<"User"> | boolean
   customAccentColor?: Prisma.StringNullableFilter<"User"> | string | null
   referralCode?: Prisma.StringNullableFilter<"User"> | string | null
   referredBy?: Prisma.StringNullableFilter<"User"> | string | null
@@ -2050,7 +2021,6 @@ export type UserCreateWithoutBookmarksInput = {
   subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
   pausedUntil?: Date | string | null
-  showPremiumBadge?: boolean
   customAccentColor?: string | null
   referralCode?: string | null
   freeMonthsEarned?: number
@@ -2109,7 +2079,6 @@ export type UserUncheckedCreateWithoutBookmarksInput = {
   subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
   pausedUntil?: Date | string | null
-  showPremiumBadge?: boolean
   customAccentColor?: string | null
   referralCode?: string | null
   referredBy?: string | null
@@ -2184,7 +2153,6 @@ export type UserUpdateWithoutBookmarksInput = {
   subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
   customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2243,7 +2211,6 @@ export type UserUncheckedUpdateWithoutBookmarksInput = {
   subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
   customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referredBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2302,7 +2269,6 @@ export type UserCreateWithoutReadingHistoryInput = {
   subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
   pausedUntil?: Date | string | null
-  showPremiumBadge?: boolean
   customAccentColor?: string | null
   referralCode?: string | null
   freeMonthsEarned?: number
@@ -2361,7 +2327,6 @@ export type UserUncheckedCreateWithoutReadingHistoryInput = {
   subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
   pausedUntil?: Date | string | null
-  showPremiumBadge?: boolean
   customAccentColor?: string | null
   referralCode?: string | null
   referredBy?: string | null
@@ -2436,7 +2401,6 @@ export type UserUpdateWithoutReadingHistoryInput = {
   subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
   customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2495,7 +2459,6 @@ export type UserUncheckedUpdateWithoutReadingHistoryInput = {
   subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
   customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referredBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2554,7 +2517,6 @@ export type UserCreateWithoutEmailSubscriptionInput = {
   subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
   pausedUntil?: Date | string | null
-  showPremiumBadge?: boolean
   customAccentColor?: string | null
   referralCode?: string | null
   freeMonthsEarned?: number
@@ -2613,7 +2575,6 @@ export type UserUncheckedCreateWithoutEmailSubscriptionInput = {
   subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
   pausedUntil?: Date | string | null
-  showPremiumBadge?: boolean
   customAccentColor?: string | null
   referralCode?: string | null
   referredBy?: string | null
@@ -2688,7 +2649,6 @@ export type UserUpdateWithoutEmailSubscriptionInput = {
   subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
   customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2747,7 +2707,6 @@ export type UserUncheckedUpdateWithoutEmailSubscriptionInput = {
   subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
   customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referredBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2806,7 +2765,6 @@ export type UserCreateWithoutEmailDigestsInput = {
   subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
   pausedUntil?: Date | string | null
-  showPremiumBadge?: boolean
   customAccentColor?: string | null
   referralCode?: string | null
   freeMonthsEarned?: number
@@ -2865,7 +2823,6 @@ export type UserUncheckedCreateWithoutEmailDigestsInput = {
   subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
   pausedUntil?: Date | string | null
-  showPremiumBadge?: boolean
   customAccentColor?: string | null
   referralCode?: string | null
   referredBy?: string | null
@@ -2940,7 +2897,6 @@ export type UserUpdateWithoutEmailDigestsInput = {
   subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
   customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2999,7 +2955,6 @@ export type UserUncheckedUpdateWithoutEmailDigestsInput = {
   subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
   customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referredBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3058,7 +3013,6 @@ export type UserCreateWithoutUserPersonasInput = {
   subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
   pausedUntil?: Date | string | null
-  showPremiumBadge?: boolean
   customAccentColor?: string | null
   referralCode?: string | null
   freeMonthsEarned?: number
@@ -3117,7 +3071,6 @@ export type UserUncheckedCreateWithoutUserPersonasInput = {
   subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
   pausedUntil?: Date | string | null
-  showPremiumBadge?: boolean
   customAccentColor?: string | null
   referralCode?: string | null
   referredBy?: string | null
@@ -3192,7 +3145,6 @@ export type UserUpdateWithoutUserPersonasInput = {
   subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
   customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3251,7 +3203,6 @@ export type UserUncheckedUpdateWithoutUserPersonasInput = {
   subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
   customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referredBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3310,7 +3261,6 @@ export type UserCreateWithoutBadgesInput = {
   subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
   pausedUntil?: Date | string | null
-  showPremiumBadge?: boolean
   customAccentColor?: string | null
   referralCode?: string | null
   freeMonthsEarned?: number
@@ -3369,7 +3319,6 @@ export type UserUncheckedCreateWithoutBadgesInput = {
   subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
   pausedUntil?: Date | string | null
-  showPremiumBadge?: boolean
   customAccentColor?: string | null
   referralCode?: string | null
   referredBy?: string | null
@@ -3444,7 +3393,6 @@ export type UserUpdateWithoutBadgesInput = {
   subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
   customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3503,7 +3451,6 @@ export type UserUncheckedUpdateWithoutBadgesInput = {
   subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
   customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referredBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3562,7 +3509,6 @@ export type UserCreateWithoutCommentsInput = {
   subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
   pausedUntil?: Date | string | null
-  showPremiumBadge?: boolean
   customAccentColor?: string | null
   referralCode?: string | null
   freeMonthsEarned?: number
@@ -3621,7 +3567,6 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
   pausedUntil?: Date | string | null
-  showPremiumBadge?: boolean
   customAccentColor?: string | null
   referralCode?: string | null
   referredBy?: string | null
@@ -3696,7 +3641,6 @@ export type UserUpdateWithoutCommentsInput = {
   subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
   customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3755,7 +3699,6 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
   customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referredBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3814,7 +3757,6 @@ export type UserCreateWithoutTeamMembershipsInput = {
   subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
   pausedUntil?: Date | string | null
-  showPremiumBadge?: boolean
   customAccentColor?: string | null
   referralCode?: string | null
   freeMonthsEarned?: number
@@ -3873,7 +3815,6 @@ export type UserUncheckedCreateWithoutTeamMembershipsInput = {
   subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
   pausedUntil?: Date | string | null
-  showPremiumBadge?: boolean
   customAccentColor?: string | null
   referralCode?: string | null
   referredBy?: string | null
@@ -3948,7 +3889,6 @@ export type UserUpdateWithoutTeamMembershipsInput = {
   subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
   customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
@@ -4007,7 +3947,6 @@ export type UserUncheckedUpdateWithoutTeamMembershipsInput = {
   subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
   customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referredBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4066,7 +4005,6 @@ export type UserCreateWithoutReferralRewardsAsReferrerInput = {
   subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
   pausedUntil?: Date | string | null
-  showPremiumBadge?: boolean
   customAccentColor?: string | null
   referralCode?: string | null
   freeMonthsEarned?: number
@@ -4125,7 +4063,6 @@ export type UserUncheckedCreateWithoutReferralRewardsAsReferrerInput = {
   subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
   pausedUntil?: Date | string | null
-  showPremiumBadge?: boolean
   customAccentColor?: string | null
   referralCode?: string | null
   referredBy?: string | null
@@ -4189,7 +4126,6 @@ export type UserCreateWithoutReferralRewardsAsReferredInput = {
   subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
   pausedUntil?: Date | string | null
-  showPremiumBadge?: boolean
   customAccentColor?: string | null
   referralCode?: string | null
   freeMonthsEarned?: number
@@ -4248,7 +4184,6 @@ export type UserUncheckedCreateWithoutReferralRewardsAsReferredInput = {
   subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
   pausedUntil?: Date | string | null
-  showPremiumBadge?: boolean
   customAccentColor?: string | null
   referralCode?: string | null
   referredBy?: string | null
@@ -4323,7 +4258,6 @@ export type UserUpdateWithoutReferralRewardsAsReferrerInput = {
   subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
   customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
@@ -4382,7 +4316,6 @@ export type UserUncheckedUpdateWithoutReferralRewardsAsReferrerInput = {
   subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
   customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referredBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4452,7 +4385,6 @@ export type UserUpdateWithoutReferralRewardsAsReferredInput = {
   subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
   customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
@@ -4511,7 +4443,6 @@ export type UserUncheckedUpdateWithoutReferralRewardsAsReferredInput = {
   subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
   customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referredBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4570,7 +4501,6 @@ export type UserCreateWithoutStudentVerificationsInput = {
   subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
   pausedUntil?: Date | string | null
-  showPremiumBadge?: boolean
   customAccentColor?: string | null
   referralCode?: string | null
   freeMonthsEarned?: number
@@ -4629,7 +4559,6 @@ export type UserUncheckedCreateWithoutStudentVerificationsInput = {
   subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
   pausedUntil?: Date | string | null
-  showPremiumBadge?: boolean
   customAccentColor?: string | null
   referralCode?: string | null
   referredBy?: string | null
@@ -4704,7 +4633,6 @@ export type UserUpdateWithoutStudentVerificationsInput = {
   subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
   customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
@@ -4763,7 +4691,6 @@ export type UserUncheckedUpdateWithoutStudentVerificationsInput = {
   subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
   customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referredBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4822,7 +4749,6 @@ export type UserCreateWithoutApiKeysInput = {
   subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
   pausedUntil?: Date | string | null
-  showPremiumBadge?: boolean
   customAccentColor?: string | null
   referralCode?: string | null
   freeMonthsEarned?: number
@@ -4881,7 +4807,6 @@ export type UserUncheckedCreateWithoutApiKeysInput = {
   subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
   pausedUntil?: Date | string | null
-  showPremiumBadge?: boolean
   customAccentColor?: string | null
   referralCode?: string | null
   referredBy?: string | null
@@ -4956,7 +4881,6 @@ export type UserUpdateWithoutApiKeysInput = {
   subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
   customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
@@ -5015,7 +4939,6 @@ export type UserUncheckedUpdateWithoutApiKeysInput = {
   subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
   customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referredBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5074,7 +4997,6 @@ export type UserCreateManyReferredByUserInput = {
   subscriptionStatus?: $Enums.SubscriptionStatus
   subscriptionEndsAt?: Date | string | null
   pausedUntil?: Date | string | null
-  showPremiumBadge?: boolean
   customAccentColor?: string | null
   referralCode?: string | null
   freeMonthsEarned?: number
@@ -5120,7 +5042,6 @@ export type UserUpdateWithoutReferredByUserInput = {
   subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
   customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
@@ -5179,7 +5100,6 @@ export type UserUncheckedUpdateWithoutReferredByUserInput = {
   subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
   customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
@@ -5238,7 +5158,6 @@ export type UserUncheckedUpdateManyWithoutReferredByUserInput = {
   subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
   subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  showPremiumBadge?: Prisma.BoolFieldUpdateOperationsInput | boolean
   customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
@@ -5414,7 +5333,6 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   subscriptionStatus?: boolean
   subscriptionEndsAt?: boolean
   pausedUntil?: boolean
-  showPremiumBadge?: boolean
   customAccentColor?: boolean
   referralCode?: boolean
   referredBy?: boolean
@@ -5476,7 +5394,6 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   subscriptionStatus?: boolean
   subscriptionEndsAt?: boolean
   pausedUntil?: boolean
-  showPremiumBadge?: boolean
   customAccentColor?: boolean
   referralCode?: boolean
   referredBy?: boolean
@@ -5524,7 +5441,6 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   subscriptionStatus?: boolean
   subscriptionEndsAt?: boolean
   pausedUntil?: boolean
-  showPremiumBadge?: boolean
   customAccentColor?: boolean
   referralCode?: boolean
   referredBy?: boolean
@@ -5572,7 +5488,6 @@ export type UserSelectScalar = {
   subscriptionStatus?: boolean
   subscriptionEndsAt?: boolean
   pausedUntil?: boolean
-  showPremiumBadge?: boolean
   customAccentColor?: boolean
   referralCode?: boolean
   referredBy?: boolean
@@ -5581,7 +5496,7 @@ export type UserSelectScalar = {
   studentVerifiedUntil?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "passwordHash" | "name" | "createdAt" | "preferences" | "emailVerified" | "verificationTokenHash" | "verificationTokenExpiry" | "verificationSendCount" | "lastVerificationSentAt" | "resetTokenHash" | "resetTokenExpiry" | "resetSendCount" | "lastResetSentAt" | "tokenVersion" | "googleIdHash" | "githubIdHash" | "hasPassword" | "emailBounced" | "emailBouncedAt" | "emailOptOut" | "emailOptOutAt" | "updatedAt" | "avatarUrl" | "selectedPresetAvatar" | "featuredBadgeId" | "showOnLeaderboard" | "isHistoryPaused" | "deletionRequestedAt" | "deletionConfirmToken" | "stripeCustomerId" | "stripeSubscriptionId" | "subscriptionTier" | "subscriptionStatus" | "subscriptionEndsAt" | "pausedUntil" | "showPremiumBadge" | "customAccentColor" | "referralCode" | "referredBy" | "freeMonthsEarned" | "isStudent" | "studentVerifiedUntil", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "passwordHash" | "name" | "createdAt" | "preferences" | "emailVerified" | "verificationTokenHash" | "verificationTokenExpiry" | "verificationSendCount" | "lastVerificationSentAt" | "resetTokenHash" | "resetTokenExpiry" | "resetSendCount" | "lastResetSentAt" | "tokenVersion" | "googleIdHash" | "githubIdHash" | "hasPassword" | "emailBounced" | "emailBouncedAt" | "emailOptOut" | "emailOptOutAt" | "updatedAt" | "avatarUrl" | "selectedPresetAvatar" | "featuredBadgeId" | "showOnLeaderboard" | "isHistoryPaused" | "deletionRequestedAt" | "deletionConfirmToken" | "stripeCustomerId" | "stripeSubscriptionId" | "subscriptionTier" | "subscriptionStatus" | "subscriptionEndsAt" | "pausedUntil" | "customAccentColor" | "referralCode" | "referredBy" | "freeMonthsEarned" | "isStudent" | "studentVerifiedUntil", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   bookmarks?: boolean | Prisma.User$bookmarksArgs<ExtArgs>
   readingHistory?: boolean | Prisma.User$readingHistoryArgs<ExtArgs>
@@ -5662,7 +5577,6 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     subscriptionStatus: $Enums.SubscriptionStatus
     subscriptionEndsAt: Date | null
     pausedUntil: Date | null
-    showPremiumBadge: boolean
     customAccentColor: string | null
     referralCode: string | null
     referredBy: string | null
@@ -6143,7 +6057,6 @@ export interface UserFieldRefs {
   readonly subscriptionStatus: Prisma.FieldRef<"User", 'SubscriptionStatus'>
   readonly subscriptionEndsAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly pausedUntil: Prisma.FieldRef<"User", 'DateTime'>
-  readonly showPremiumBadge: Prisma.FieldRef<"User", 'Boolean'>
   readonly customAccentColor: Prisma.FieldRef<"User", 'String'>
   readonly referralCode: Prisma.FieldRef<"User", 'String'>
   readonly referredBy: Prisma.FieldRef<"User", 'String'>
