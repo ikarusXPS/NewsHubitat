@@ -5,7 +5,7 @@ milestone_name: Infrastructure & Scale
 current_plan: 4
 status: verified
 last_updated: "2026-04-28T11:45:00Z"
-last_activity: 2026-04-28 -- Phase 36.2 VERIFIED (gsd-verifier 6/6 PASS — all ROADMAP success criteria satisfied; 4 models + 2 enums + 8 User fields + 5 deps removed + audit trail + PRODUCTION-MIGRATION.md handoff)
+last_activity: 2026-04-28 -- Phase 36.3 context captured (D-01..D-11 locked: git mv 3 files + diff-only mount in live index.ts + wholesale orphan sweep [server/, prisma/, src/, tsup.config.ts, prisma.config.ts] + 8-event stripe trigger verify + .continue-here anti-pattern)
 progress:
   total_phases: 7
   completed_phases: 3
@@ -21,7 +21,7 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-26)
 
 **Core value:** Users can see how the same story is covered by different regional perspectives
-**Current focus:** Phase 36.2 verified — next `/gsd-plan-phase 36.3` (Stripe webhook monorepo path fix), then resume `/gsd-execute-phase 36` plan 05
+**Current focus:** Phase 36.3 context captured (CONTEXT.md committed, 11 locked decisions); next `/gsd-plan-phase 36.3`
 
 ## Current Position
 
