@@ -1,7 +1,8 @@
 ---
 phase: 35-infrastructure-foundation
 verified: 2026-04-26T10:15:00Z
-status: human_needed
+human_verified: 2026-04-28T08:55:00Z
+status: verified
 score: 5/5 must-haves verified
 overrides_applied: 0
 human_verification:
@@ -138,5 +139,41 @@ No gaps found. All 5 roadmap success criteria are met by verified artifacts:
 
 ---
 
-_Verified: 2026-04-26T10:15:00Z_
-_Verifier: Claude (gsd-verifier)_
+## Human Verification Results (2026-04-28)
+
+All 5 human-verification items above were tested live against a running dev stack
+(`pnpm dev` + `docker compose up -d postgres redis`). Full UAT trace in `35-UAT.md`.
+
+| # | Test | Result |
+|---|------|--------|
+| 1 | API Key Creation via UI | ✅ Pass — `nh_live_phM1Py..._586E` rendered with copy button |
+| 2 | Public API Authentication | ✅ Pass — HTTP 200, 5 articles, valid `meta` envelope |
+| 3 | Rate Limiting Enforcement | ✅ Pass — 10×200 + 1×429 with `Retry-After: 60`, IETF RFC 9239 headers |
+| 4 | API Key Revocation | ✅ Pass after Phase 35.1 hotfix (see below) |
+| 5 | Scalar Documentation Rendering | ✅ Pass — interactive docs, try-it-out works, dark theme + cyan accent |
+
+### Phase 35.1 Hotfix (UAT-discovered)
+
+**Bug:** Test 4 initially failed because `apiKeyService.revokeApiKey` updated the DB
+(`revokedAt` timestamp) but did NOT invalidate the Redis cache that `apiKeyAuth`
+middleware uses (5-minute TTL on `apikey:<first-15-chars-of-plaintext>`). Result:
+revoked keys kept working for up to 5 minutes — UI feedback misleading, security
+gap minor but real.
+
+**Fix (commit `484d4da`):**
+- `apiKeyAuth.ts`: on cache-miss validation write, also write a secondary index
+  `apikey:by-id:<keyId>` → `cacheKey` (so the keyId can find the prefix-based cache entry)
+- `apiKeyService.ts revokeApiKey`: after `prisma.apiKey.update`, look up the
+  secondary index, delete primary + secondary cache entries
+
+**Re-test:** HTTP 401 with body `{"success":false,"error":"Invalid or revoked API key"}` —
+exactly as specified. ✅
+
+### Status Transition
+
+`human_needed` → **`verified`** (2026-04-28T08:55:00Z, by ikarusXPS via /gsd-verify-work 35)
+
+---
+
+_Initial verification: 2026-04-26T10:15:00Z (Claude / gsd-verifier)_
+_Human verification: 2026-04-28T08:55:00Z (5/5 PASS, +1 hotfix Phase 35.1)_

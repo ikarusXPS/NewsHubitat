@@ -46,7 +46,7 @@ v1.6 Progress: [██████████████████░░] 91
 
 | Phase | Name | Requirements | UI | Status |
 |-------|------|--------------|-----|--------|
-| 35 | Infrastructure Foundation | 4 reqs (INFRA-01 partial, PAY-08, PAY-09, PAY-10) | No | **Complete** (5/5 plans) |
+| 35 | Infrastructure Foundation | 4 reqs (INFRA-01 partial, PAY-08, PAY-09, PAY-10) | No | **Complete** (5/5 plans) — UAT 5/5 PASS + 35.1 hotfix |
 | 36 | Monetization Core | 7 reqs (PAY-01 to PAY-07) | Yes | **Paused** (4/5 plans, ready to resume 36-05) |
 | 36.1 | Add Subscription Schema Fields (INSERTED) | PAY-01 (foundation) | No | **Complete** (1/1 plans) — verified PASS 5/5 |
 | 37 | Horizontal Scaling | 5 reqs (INFRA-01 to INFRA-05) | No | Not started |
@@ -85,6 +85,7 @@ Items acknowledged and carried forward from previous milestone close:
 
 - 2026-04-27 — Phase 36.1 inserted after Phase 36 (URGENT). Reason: 36-01 closed without writing the User-model migration that 36-02's `subscriptionService.ts` requires. Discovered during /gsd-execute-phase 36 pre-flight. Blocks 36-05 tests.
 - 2026-04-28 — Phase 36.1 complete. 5 nullable subscription fields + 2 unique indexes added to User model; subscriptionService read-path patched with `?? 'FREE'` / `?? 'ACTIVE'` fallbacks (consequence of nullable schema choice). Larger 36-debt (ProcessedWebhookEvent, ReferralReward, Campaign, StudentVerification, Prisma enums) explicitly deferred to a future phase 36.2 — documented in 36.1-01-SUMMARY.md "Known Stubs".
+- 2026-04-28 — Phase 35 UAT executed (5/5 PASS) + Phase 35.1 hotfix inserted inline (commit 484d4da). Test 4 surfaced a Redis-cache stale-revocation bug — `revokeApiKey` updated DB but didn't invalidate the prefix-based auth cache, so revoked keys kept working for up to 5min. Fix: secondary index `apikey:by-id:<keyId>` enables O(1) cache invalidation on revoke. Phase 35 status `human_needed` → `verified`. Also discovered during UAT prep: `workbox-window` + `stripe@22.1.0` were missing from `apps/web/package.json` (committed as `87ba5e4`) — second instance of the "SUMMARY claimed but never written" pattern that produced Phase 36.1.
 
 ## Accumulated Context
 
