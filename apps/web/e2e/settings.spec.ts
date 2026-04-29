@@ -53,31 +53,27 @@ test.describe('Settings Page (Authenticated)', () => {
     await expect(darkModeBtn).toBeEnabled();
   });
 
-  test('should display language toggle buttons', async ({ page }) => {
-    // Deutsch button - use exact match to avoid matching "Deutschland"
+  // Language switcher was moved out of Settings into the header (LanguageSwitcher
+  // component, opened via dropdown). These tests target the old settings-page
+  // toggle buttons that no longer exist (see Settings.tsx D-04 comment).
+  test.skip('should display language toggle buttons', async ({ page }) => {
     const deutschBtn = page.getByRole('button', { name: 'Deutsch', exact: true });
     await expect(deutschBtn).toBeVisible();
-
-    // English button
     const englishBtn = page.getByRole('button', { name: 'English', exact: true });
     await expect(englishBtn).toBeVisible();
   });
 
-  test('should toggle language to English', async ({ page }) => {
+  test.skip('should toggle language to English', async ({ page }) => {
     const englishBtn = page.getByRole('button', { name: 'English', exact: true });
     await englishBtn.click();
     await page.waitForTimeout(300);
-
-    // Button should show active state
     await expect(englishBtn).toHaveClass(/border-blue-500/);
   });
 
-  test('should toggle language to Deutsch', async ({ page }) => {
+  test.skip('should toggle language to Deutsch', async ({ page }) => {
     const deutschBtn = page.getByRole('button', { name: 'Deutsch', exact: true });
     await deutschBtn.click();
     await page.waitForTimeout(300);
-
-    // Button should show active state
     await expect(deutschBtn).toHaveClass(/border-blue-500/);
   });
 
