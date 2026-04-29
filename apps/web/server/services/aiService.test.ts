@@ -88,6 +88,33 @@ vi.mock('./newsReadService', () => ({
   getArticles: vi.fn().mockResolvedValue({ articles: [], total: 0 }),
 }));
 
+// Phase 38: aiService now imports factCheckReadService + translationService +
+// prisma for fact-check support — mock to prevent prisma init chain.
+vi.mock('./factCheckReadService', () => ({
+  searchClaimEvidence: vi.fn().mockResolvedValue([]),
+  mergeAndDedup: vi.fn().mockReturnValue([]),
+}));
+
+vi.mock('./translationService', () => ({
+  TranslationService: {
+    getInstance: () => ({
+      translate: vi.fn().mockImplementation(async (text: string) => ({
+        text,
+        provider: 'deepl',
+        cached: false,
+        quality: 0.9,
+      })),
+    }),
+  },
+}));
+
+vi.mock('../db/prisma', () => ({
+  prisma: {
+    newsArticle: { findMany: vi.fn().mockResolvedValue([]) },
+    factCheck: { create: vi.fn() },
+  },
+}));
+
 // Import after mocks
 import { AIService } from './aiService';
 

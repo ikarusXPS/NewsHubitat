@@ -85,6 +85,31 @@ vi.mock('./newsReadService', () => ({
   getArticles: vi.fn().mockResolvedValue({ articles: [], total: 0 }),
 }));
 
+vi.mock('./factCheckReadService', () => ({
+  searchClaimEvidence: vi.fn().mockResolvedValue([]),
+  mergeAndDedup: vi.fn().mockReturnValue([]),
+}));
+
+vi.mock('./translationService', () => ({
+  TranslationService: {
+    getInstance: () => ({
+      translate: vi.fn().mockImplementation(async (text: string) => ({
+        text,
+        provider: 'deepl',
+        cached: false,
+        quality: 0.9,
+      })),
+    }),
+  },
+}));
+
+vi.mock('../db/prisma', () => ({
+  prisma: {
+    newsArticle: { findMany: vi.fn().mockResolvedValue([]) },
+    factCheck: { create: vi.fn() },
+  },
+}));
+
 // Use a known source id from the real config; "ap" (Associated Press) has reliability=9, political=0
 import { AIService, safeParseJson } from './aiService';
 
