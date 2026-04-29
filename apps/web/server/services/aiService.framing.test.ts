@@ -84,6 +84,31 @@ vi.mock('./newsReadService', () => ({
   getArticles: mockGetArticles,
 }));
 
+vi.mock('./factCheckReadService', () => ({
+  searchClaimEvidence: vi.fn().mockResolvedValue([]),
+  mergeAndDedup: vi.fn().mockReturnValue([]),
+}));
+
+vi.mock('./translationService', () => ({
+  TranslationService: {
+    getInstance: () => ({
+      translate: vi.fn().mockImplementation(async (text: string) => ({
+        text,
+        provider: 'deepl',
+        cached: false,
+        quality: 0.9,
+      })),
+    }),
+  },
+}));
+
+vi.mock('../db/prisma', () => ({
+  prisma: {
+    newsArticle: { findMany: vi.fn().mockResolvedValue([]) },
+    factCheck: { create: vi.fn() },
+  },
+}));
+
 import { AIService } from './aiService';
 
 function makeArticle(id: string, region: PerspectiveRegion, title: string): NewsArticle {
