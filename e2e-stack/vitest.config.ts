@@ -6,21 +6,20 @@
 //   - loads setup files that mock the DB (we want a real test stack)
 //   - testTimeout: 10s (ws connection + 5s wait can take longer cold)
 //
-// Invoked via `node apps/web/node_modules/vitest/dist/cli.js --config e2e-stack/vitest.config.ts`
-// from a working directory inside apps/web/, so that imports like
-// `vitest/config` resolve via apps/web's node_modules.
+// We export a plain object instead of using `defineConfig` from 'vitest/config'
+// because this directory has no node_modules — Node would resolve 'vitest/config'
+// relative to the config file's location and fail. Vitest accepts a plain object
+// just as well.
 
-import { defineConfig } from 'vitest/config';
-
-export default defineConfig({
+export default {
   test: {
-    environment: 'node',
+    environment: 'node' as const,
     globals: false,
     include: ['ws-fanout.test.ts'],
     exclude: ['node_modules'],
     testTimeout: 30000,
     hookTimeout: 30000,
-    pool: 'forks',
+    pool: 'forks' as const,
     // No setupFiles — the stack itself is the fixture.
   },
-});
+};
