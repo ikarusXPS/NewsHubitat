@@ -1,7 +1,7 @@
 <!-- generated-by: gsd-doc-writer -->
 # Development Guide
 
-This guide covers local development setup, build commands, code quality tools, and contribution workflows for NewsHub.
+This guide covers local development setup, daily commands, debugging, and contribution workflows for NewsHub. NewsHub is a **pnpm monorepo** — use `pnpm` for every command. Do not use `npm`.
 
 ## Local Setup
 
@@ -9,29 +9,48 @@ This guide covers local development setup, build commands, code quality tools, a
 
 Before starting, ensure you have:
 
-- **Node.js >= 22** (check `package.json` engines field)
-- **npm** (comes with Node.js)
-- **Docker** (for PostgreSQL and Redis containers)
-- **Git** (for version control)
+- **Node.js 18+** (Node 22 recommended; the repo's `package.json` pins TypeScript and devDeps that target modern Node)
+- **pnpm** (install via `npm install -g pnpm` or `corepack enable && corepack prepare pnpm@latest --activate`)
+- **Docker** + **Docker Compose** (for PostgreSQL and Redis containers)
+- **Git**
+- **Stripe CLI** (optional — only needed for local Stripe webhook testing)
+- **k6** (optional — only needed for `pnpm load:smoke` / `pnpm load:full`; install: https://k6.io/docs/getting-started/installation/)
+
+### Repository Layout
+
+```
+NewsHub/
+├── apps/
+│   └── web/                    # Frontend (Vite/React) + Backend (Express)
+│       ├── src/                # React app
+│       ├── server/             # Express API
+│       ├── prisma/             # Schema + seed scripts
+│       ├── e2e/                # Playwright tests
+│       └── src/generated/prisma/   # Auto-generated Prisma client (DO NOT EDIT)
+├── packages/
+│   └── types/                  # Shared types (@newshub/types)
+├── pnpm-workspace.yaml
+└── package.json                # Root scripts proxy to apps/web via pnpm --filter
+```
+
+The root `package.json` exposes thin wrapper scripts that forward to the `@newshub/web` workspace via `pnpm --filter`. Run all dev commands from the repository root.
 
 ### Initial Setup
 
-1. **Fork and clone the repository**
+1. **Clone the repository**
 
 ```bash
-git clone https://github.com/ikarusXPS/NewsHubitat.git
-cd NewsHubitat
+git clone https://github.com/ikarusXPS/NewsHub.git
+cd NewsHub
 ```
 
-2. **Install dependencies**
+2. **Install dependencies** (installs every workspace)
 
 ```bash
-npm install
+pnpm install
 ```
 
 3. **Configure environment variables**
-
-Copy the example environment file and configure required values:
 
 ```bash
 cp .env.example .env
@@ -39,11 +58,11 @@ cp .env.example .env
 
 Edit `.env` and set at minimum:
 
-- `JWT_SECRET` - Generate with `openssl rand -base64 32`
+- `JWT_SECRET` — minimum 32 characters; generate with `openssl rand -base64 32`
 - At least one AI provider key (`OPENROUTER_API_KEY`, `GEMINI_API_KEY`, or `ANTHROPIC_API_KEY`)
-- Database and Redis URLs (defaults work for local Docker setup)
+- `DATABASE_URL` and `REDIS_URL` (defaults work for the local Docker setup)
 
-See [CONFIGURATION.md](CONFIGURATION.md) for full environment variable documentation.
+See [CONFIGURATION.md](CONFIGURATION.md) for the full environment variable reference.
 
 4. **Start PostgreSQL and Redis**
 
@@ -51,257 +70,379 @@ See [CONFIGURATION.md](CONFIGURATION.md) for full environment variable documenta
 docker compose up -d postgres redis
 ```
 
-5. **Generate Prisma client and sync database schema**
+5. **Generate the Prisma client and sync the schema**
 
 ```bash
+cd apps/web
 npx prisma generate
 npx prisma db push
+cd ../..
 ```
 
-6. **Seed initial data (optional)**
+6. **Seed initial data**
 
 ```bash
-npm run seed
+pnpm seed
 ```
 
-7. **Start development servers**
+This runs the badge and persona seed scripts. To seed individually:
 
 ```bash
-npm run dev
+pnpm seed:badges        # Gamification badges only
+pnpm seed:personas      # AI personas only
+pnpm seed:load-test     # Pre-create 100 verified test users (loadtest1-100@example.com)
 ```
 
-This starts both frontend (port 5173) and backend (port 3001) concurrently.
+7. **Start the development servers**
 
-## Build Commands
+```bash
+pnpm dev
+```
 
-All available npm scripts from `package.json`:
+This launches both servers concurrently:
+
+- Frontend: Vite dev server on **http://localhost:5173**
+- Backend: Express via `tsx watch` on **http://localhost:3001**
+
+Vite proxies `/api/*` from 5173 to 3001 (see `apps/web/vite.config.ts`), so you can hit the frontend URL and use real API calls in the browser without CORS workarounds.
+
+## Daily Development Commands
+
+All commands run from the repository root.
+
+### Dev Servers
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Start both frontend and backend development servers concurrently |
-| `npm run dev:frontend` | Start only frontend dev server (Vite, port 5173) |
-| `npm run dev:backend` | Start only backend dev server (tsx watch mode, port 3001) |
-| `npm run build` | Build both frontend and backend for production |
-| `npm run build:frontend` | Build frontend only (Vite production build) |
-| `npm run build:server` | Build backend only (tsup) |
-| `npm run start` | Start production server (runs built backend) |
-| `npm run lint` | Run ESLint on all TypeScript files |
-| `npm run typecheck` | Run TypeScript compiler type checking (no emit) |
-| `npm run preview` | Preview frontend production build locally |
-| `npm run test` | Run Vitest unit tests in watch mode |
-| `npm run test:run` | Run unit tests once (CI mode) |
-| `npm run test:watch` | Run unit tests in watch mode (explicit) |
-| `npm run test:coverage` | Run unit tests with coverage report (80% threshold enforced) |
-| `npm run test:ui` | Run Vitest with interactive UI |
-| `npm run test:e2e` | Run Playwright E2E tests (headless) |
-| `npm run test:e2e:ui` | Run Playwright tests with interactive UI mode |
-| `npm run test:e2e:headed` | Run Playwright tests with browser visible |
-| `npm run screenshots` | Generate screenshots using Playwright |
-| `npm run seed` | Run all seed scripts (badges + personas) |
-| `npm run seed:badges` | Seed gamification badges only |
-| `npm run seed:personas` | Seed AI personas only |
-| `npm run seed:load-test` | Seed load test users for performance testing |
-| `npm run load:smoke` | Run k6 smoke test |
-| `npm run load:full` | Run k6 full load test |
-| `npm run validate:ci` | Validate GitHub Actions workflow syntax |
+| `pnpm dev` | Start frontend (5173) + backend (3001) concurrently |
+| `pnpm dev:frontend` | Frontend only (Vite, port 5173) |
+| `pnpm dev:backend` | Backend only (`tsx watch`, port 3001) |
+
+### Build & Verify
+
+Run before committing:
+
+```bash
+pnpm typecheck && pnpm test:run && pnpm build
+```
+
+| Command | Description |
+|---------|-------------|
+| `pnpm build` | Build every workspace (frontend → `vite build`, backend → `tsup`) |
+| `pnpm typecheck` | TypeScript validation across all workspaces (`tsc --noEmit`) |
+| `pnpm lint` | ESLint across all workspaces |
+
+### Testing
+
+| Command | Description |
+|---------|-------------|
+| `pnpm test` | Vitest in watch mode |
+| `pnpm test:run` | Vitest single-run (CI mode) |
+| `pnpm test:coverage` | Coverage report — fails if below thresholds |
+| `pnpm test:e2e` | Playwright headless |
+| `pnpm test:e2e:headed` | Playwright with browser visible |
+| `pnpm test:e2e:ui` | Playwright interactive UI |
+
+**Coverage thresholds** (`apps/web/vitest.config.ts`): statements 80%, functions 80%, lines 80%, **branches 75%** (temporarily lowered from 80% — backfill TODO is tracked in the config file).
+
+**Run a single test file:**
+
+```bash
+pnpm test -- apps/web/src/lib/utils.test.ts        # Unit test by path
+pnpm test -- -t "mapCentering"                     # Tests matching a pattern
+cd apps/web && npx playwright test e2e/auth.spec.ts   # Single E2E spec
+```
+
+### Database
+
+Run from `apps/web/`:
+
+```bash
+cd apps/web
+npx prisma generate     # Regenerate the typed client (run after schema changes)
+npx prisma db push      # Sync schema to the database (no migration files)
+npx prisma studio       # Database GUI on localhost:5555
+```
+
+### OpenAPI Spec
+
+The OpenAPI document is code-first — Zod schemas in `apps/web/server/openapi/schemas.ts` are the single source of truth.
+
+```bash
+cd apps/web && pnpm openapi:generate
+```
+
+Output: `apps/web/public/openapi.json`. The Scalar docs UI is served at `/api-docs`.
+
+### Seed Data
+
+| Command | Description |
+|---------|-------------|
+| `pnpm seed` | All seed scripts (badges + personas) |
+| `pnpm seed:badges` | Gamification badges |
+| `pnpm seed:personas` | AI personas |
+| `pnpm seed:load-test` | 100 verified test users for load tests |
+
+### Load Testing
+
+```bash
+pnpm load:smoke        # k6 smoke scenario
+pnpm load:full         # k6 full load scenario
+```
+
+For staging runs, use the manual `workflow_dispatch` on `.github/workflows/load-test.yml` (requires `STAGING_URL`; never runs against production).
+
+### CI Validation
+
+```bash
+pnpm validate:ci       # Validate .github/workflows/ci.yml syntax via action-validator
+```
+
+## Project Structure
+
+| Path | Purpose |
+|------|---------|
+| `apps/web/src/` | React frontend (pages, components, hooks, store) |
+| `apps/web/server/` | Express backend (routes, services, middleware) |
+| `apps/web/prisma/` | Prisma schema and seed scripts |
+| `apps/web/e2e/` | Playwright E2E tests |
+| `apps/web/src/generated/prisma/` | **Auto-generated Prisma client — do not edit** |
+| `packages/types/` | Shared TypeScript types published as `@newshub/types` |
+
+Import shared types from the workspace package:
+
+```typescript
+import type { PerspectiveRegion, NewsArticle, ApiResponse } from '@newshub/types';
+```
+
+## Tooling Notes
+
+- **Frontend:** Vite 8 on port 5173. The dev server proxies `/api/*` to the backend on 3001.
+- **Backend:** Express 5 (ES modules, TypeScript) launched via `tsx watch` for hot reload.
+- **Playwright projects** (`apps/web/playwright.config.ts`):
+  - `setup` — runs `*.setup.ts`, creates the auth state file
+  - `chromium` — unauthenticated tests
+  - `chromium-auth` — authenticated tests using `playwright/.auth/user.json` as `storageState`; depends on `setup`
+- **Vitest coverage:** 80% statements/functions/lines, 75% branches (see `apps/web/vitest.config.ts`).
+- **Bundle budget:** 250KB warning threshold (CI annotation, non-blocking).
+- **Sentry source maps:** uploaded during CI builds via `@sentry/vite-plugin`; release tag is `newshub@${{ github.sha }}`.
 
 ## Code Style
 
 ### ESLint
 
-**Configuration**: `eslint.config.js` (flat config format)
+**Configuration:** `apps/web/eslint.config.js` (flat config).
 
-**Plugins**:
-- `@eslint/js` - JavaScript recommended rules
-- `typescript-eslint` - TypeScript support
-- `eslint-plugin-react-hooks` - React Hooks linting
-- `eslint-plugin-react-refresh` - React Fast Refresh validation
+**Plugins in use:**
+- `@eslint/js` — JavaScript recommended rules
+- `typescript-eslint` — TypeScript support
+- `eslint-plugin-react-hooks`
+- `eslint-plugin-react-refresh`
 
-**Custom Rules**:
-- Unused variables starting with underscore (`_`) are allowed
-- Test files (`*.test.ts`, `*.spec.ts`) allow `any` types for mocks
+**Conventions:**
+- Unused identifiers prefixed with `_` are allowed
+- Test files (`*.test.ts`, `*.spec.ts`) may use `any` for mocks
 
-**Run linting**:
+**Run:**
 
 ```bash
-npm run lint
+pnpm lint
 ```
 
 ESLint is enforced in CI via the `lint` job in `.github/workflows/ci.yml`.
 
 ### TypeScript
 
-**Configuration**: `tsconfig.json`
-
-**Type checking** (no code emission, validation only):
+**Configuration:** `apps/web/tsconfig.json` (strict mode enabled).
 
 ```bash
-npm run typecheck
+pnpm typecheck
 ```
 
-TypeScript strict mode is enabled. Type checking is enforced in CI via the `typecheck` job.
+Type checking is enforced in CI via the `typecheck` job.
 
-### No Prettier Configuration
+### Formatter
 
-The project does not currently use Prettier or any other code formatter. Code style is enforced through ESLint rules only.
+There is no Prettier or `.editorconfig` configuration. Style is enforced through ESLint rules only.
 
-### No .editorconfig
+## Code Conventions
 
-The project does not have an `.editorconfig` file. Rely on ESLint for style consistency.
+### Query-Key Synchronization (CRITICAL)
+
+Components that share the same data **must** use identical TanStack Query `queryKey` values. For example, `Monitor.tsx` and `EventMap.tsx` both use:
+
+```typescript
+queryKey: ['geo-events']
+staleTime: 60_000
+refetchInterval: 2 * 60_000
+```
+
+Mismatched keys cause duplicate fetches and stale UI.
+
+### Multi-Provider AI Fallback
+
+The AI service uses a fallback chain (configured in `apps/web/server/services/aiService.ts`):
+
+1. **OpenRouter** (free tier) — primary
+2. **Gemini** (free tier, 1500 req/day) — secondary
+3. **Anthropic** — premium fallback
+4. Keyword-based analysis — final fallback
+
+Translation uses an analogous chain: DeepL → Google → LibreTranslate → Claude.
+
+### Graceful Degradation in `useQuery`
+
+Always handle errors so a single failing endpoint cannot break the page:
+
+```typescript
+const { data, error } = useQuery({ queryKey: ['data'], queryFn: fetchData, retry: 1 });
+if (error) return null;
+```
+
+### Class Composition
+
+Use the `cn()` helper from `apps/web/src/lib/utils.ts` instead of string concatenation:
+
+```typescript
+import { cn } from '../lib/utils';
+className={cn('base-class', isActive && 'active-class', variant)}
+```
+
+### Singleton Services
+
+Backend services use the `getInstance()` singleton pattern. Do not instantiate them directly — call `MyService.getInstance()`.
+
+### Generated Code
+
+Files under `apps/web/src/generated/prisma/` are produced by `npx prisma generate`. Treat them as build artifacts: never edit them by hand and never commit edits.
 
 ## Branch Conventions
 
-- **Main branch**: `master` (deploy target for staging and production)
-- **Branch naming**: No documented convention found. Use descriptive names (e.g., `feat/add-bookmarks`, `fix/auth-bug`, `refactor/cleanup-services`)
+- **Default branch:** `master` (deployment target for staging and production)
+- **Branch naming:** No formal convention is documented. Use descriptive prefixes such as `feat/...`, `fix/...`, `refactor/...`, `docs/...`.
 
 ## PR Process
 
-### Before Submitting a PR
+### Before Submitting
 
-1. **Run the validation pipeline locally**:
-
-```bash
-npm run typecheck && npm run test:run && npm run build
-```
-
-This ensures lint, type checking, tests, and build succeed before pushing.
-
-2. **Ensure all tests pass**:
+1. Run the full local pipeline:
 
 ```bash
-npm run test:coverage
+pnpm typecheck && pnpm test:run && pnpm build
 ```
 
-Coverage must meet the 80% threshold configured in `vitest.config.ts`.
+2. Ensure coverage still passes:
 
-3. **Write or update tests** for new features or bug fixes. The project uses TDD (Test-Driven Development) as a core principle.
+```bash
+pnpm test:coverage
+```
 
-### Submitting the PR
+3. Add or update tests for new features and bug fixes (TDD is a project principle — see the global `golden-principles.md`).
 
-1. Push your branch to the remote repository
-2. Open a pull request against the `master` branch
-3. CI will automatically run:
-   - Lint check
-   - Type checking
-   - Unit tests with coverage (80% threshold)
-   - Docker image build
-   - E2E tests (Playwright)
+### Submitting
 
-All CI jobs must pass before merge.
+1. Push your branch to the remote
+2. Open a pull request against `master`
+3. CI runs automatically on every push and PR
+
+### CI Workflow (`.github/workflows/ci.yml`)
+
+1. **Lint** — ESLint
+2. **Type Check** — `tsc --noEmit`
+3. **Unit Tests** — Vitest with the configured coverage thresholds (Postgres + Redis services)
+4. **Build** — Docker image (pushed to `ghcr.io` on `master` only)
+5. **E2E Tests** — Playwright (depends on build)
+6. **Deploy Staging** — `master` only
+7. **Lighthouse CI** — runs after deploy-staging on `master` only; 90+ required for Performance / Accessibility / Best Practices / SEO; Core Web Vitals tracked warn-only
+8. **Deploy Production** — after staging succeeds
+
+All required jobs must pass before merge.
 
 ### PR Review Checklist
 
-Reviewers look for:
-
-- [ ] Code follows ESLint rules
-- [ ] TypeScript type checking passes
-- [ ] Unit test coverage meets 80% threshold
-- [ ] E2E tests cover critical user flows (if applicable)
-- [ ] No hardcoded secrets or API keys
-- [ ] Environment variables used for configuration
-- [ ] Build succeeds without errors
-- [ ] Docker image builds successfully (on `master` branch)
-
-### CI Workflow
-
-The GitHub Actions workflow (`.github/workflows/ci.yml`) runs on all pull requests and pushes to `master`:
-
-1. **Lint** - ESLint validation
-2. **Type Check** - TypeScript type validation
-3. **Unit Tests** - Vitest with 80% coverage threshold (PostgreSQL + Redis services)
-4. **Build** - Docker image build (pushed to `ghcr.io` on `master` branch only)
-5. **E2E Tests** - Playwright end-to-end tests (depends on build)
-6. **Deploy Staging** - Deploy to staging environment (on `master` branch only)
-7. **Deploy Production** - Deploy to production environment (after staging succeeds)
+- [ ] ESLint passes (`pnpm lint`)
+- [ ] Typecheck passes (`pnpm typecheck`)
+- [ ] Coverage thresholds met (`pnpm test:coverage`)
+- [ ] E2E tests cover any new critical user flow
+- [ ] No hardcoded secrets — all configuration through environment variables
+- [ ] Build succeeds (`pnpm build`)
+- [ ] Generated Prisma client is **not** edited by hand
 
 ## Database Development
 
 ### Prisma Workflow
 
-1. **Edit schema**: Modify `prisma/schema.prisma`
-2. **Generate client**: `npx prisma generate`
-3. **Sync to database**: `npx prisma db push`
-4. **Open database GUI**: `npx prisma studio` (opens on `localhost:5555`)
+1. Edit `apps/web/prisma/schema.prisma`
+2. `cd apps/web && npx prisma generate`
+3. `npx prisma db push` (no migration files; schema is pushed directly)
+4. `npx prisma studio` to inspect data on localhost:5555
 
-### Generated Client Location
-
-Prisma generates the client to `src/generated/prisma/`. **Do not edit files in this directory** - they are auto-generated.
-
-### Database Reset (Development Only)
+### Reset the Local Database
 
 ```bash
 docker compose down -v
-docker compose up -d postgres
-npx prisma db push
-npm run seed
+docker compose up -d postgres redis
+cd apps/web && npx prisma db push && cd ../..
+pnpm seed
 ```
 
-This destroys all data and recreates the database from scratch.
+This destroys all data and rebuilds the schema from scratch.
 
 ## Docker Development
 
-### Local Docker Stack
+### Local Stack
 
 ```bash
 docker compose up -d
 ```
 
-This starts:
-- **app** - NewsHub application container
-- **postgres** - PostgreSQL database
-- **redis** - Redis cache
-- **prometheus** - Metrics scraping
-- **grafana** - Dashboards (localhost:3000, admin/admin)
-- **alertmanager** - Alert routing
+Services:
 
-### Rebuild After Code Changes
+- **app** — NewsHub application container
+- **postgres** — PostgreSQL
+- **redis** — Redis
+- **prometheus** — Metrics scraping (localhost:9090)
+- **grafana** — Dashboards (localhost:3000, admin/admin)
+- **alertmanager** — Alert routing
+
+### Rebuild and Logs
 
 ```bash
 docker compose build app
 docker compose up -d
-```
-
-### View Logs
-
-```bash
 docker compose logs -f app
+docker compose ps          # Health status
 ```
-
-### Check Service Health
-
-```bash
-docker compose ps
-```
-
-All services should show `healthy` or `running` status.
 
 ## Common Development Tasks
 
-### Adding a New API Endpoint
+### Add a New API Endpoint
 
-1. Create route handler in `server/routes/`
-2. Add route to `server/index.ts`
-3. Write unit tests in `server/routes/*.test.ts`
-4. Update `CLAUDE.md` API endpoints table
-5. Run `npm run typecheck && npm run test:run`
+1. Add a route handler in `apps/web/server/routes/`
+2. Register it in `apps/web/server/index.ts`
+3. Add Zod schemas to `apps/web/server/openapi/schemas.ts` (powers both runtime validation and the OpenAPI spec)
+4. Write unit tests in `apps/web/server/routes/*.test.ts`
+5. Regenerate the OpenAPI spec: `cd apps/web && pnpm openapi:generate`
+6. Update the API table in `CLAUDE.md`
+7. `pnpm typecheck && pnpm test:run`
 
-### Adding a New React Component
+### Add a React Component
 
-1. Create component in `src/components/`
-2. Write component tests in `src/components/*.test.tsx`
-3. Import and use in page component
-4. Run `npm run typecheck && npm run test:coverage`
+1. Create the component in `apps/web/src/components/`
+2. Write tests in `apps/web/src/components/*.test.tsx`
+3. Import and use in the relevant page
+4. `pnpm typecheck && pnpm test:coverage`
 
-### Adding a New News Source
+### Add a News Source
 
-Edit `server/config/sources.ts`:
+Edit `apps/web/server/config/sources.ts`:
 
 ```typescript
 {
   id: 'source-id',
   name: 'Source Name',
   country: 'XX',
-  region: 'usa',  // One of 13 supported regions
+  region: 'usa',  // One of 13 PerspectiveRegion values
   language: 'en',
   bias: { political: 0, reliability: 8, ownership: 'private' },
   apiEndpoint: 'https://example.com/rss.xml',
@@ -309,79 +450,79 @@ Edit `server/config/sources.ts`:
 }
 ```
 
-Restart backend to load new source.
+Restart the backend to load the new source.
 
-### Updating Database Schema
+### Update the Database Schema
 
-1. Edit `prisma/schema.prisma`
-2. Run `npx prisma generate`
-3. Run `npx prisma db push`
-4. Update seed scripts if needed (`prisma/seed*.ts`)
-5. Run `npm run seed`
+1. Edit `apps/web/prisma/schema.prisma`
+2. `cd apps/web && npx prisma generate`
+3. `npx prisma db push`
+4. Update seed scripts (`apps/web/prisma/seed*.ts`) if needed
+5. `pnpm seed`
 
 ## Debugging
 
-### Backend Debugging
-
-Use `tsx watch` for hot reload during development:
+### Backend
 
 ```bash
-npm run dev:backend
+pnpm dev:backend
 ```
 
-Logs appear in terminal. Add `console.log` statements for quick debugging (remove before committing).
+Logs print to the terminal. Dev-only diagnostics are gated by `NODE_ENV !== 'production'`:
 
-### Frontend Debugging
+- **Slow query warning:** any DB query > 100ms is logged
+- **N+1 detection:** warnings emitted when a single request issues > 5 queries (uses `AsyncLocalStorage` request scope via the `queryCounter` middleware)
+
+### Frontend
 
 ```bash
-npm run dev:frontend
+pnpm dev:frontend
 ```
 
 Open browser DevTools. React Query DevTools are available in development mode.
 
-### E2E Test Debugging
+### E2E Tests
 
 ```bash
-npx playwright test --debug
+cd apps/web
+
+npx playwright test --debug              # Step-through inspector
+npx playwright test --ui                 # Interactive UI
+npx playwright show-report               # Open the last HTML report
+npx playwright test e2e/auth.spec.ts     # Single spec
 ```
 
-Opens Playwright Inspector with step-through debugging.
+The `setup` project creates `playwright/.auth/user.json`, which `chromium-auth` consumes via `storageState`. If authenticated tests fail unexpectedly, delete that file and let the setup project recreate it.
 
-Interactive UI mode:
+### Stripe Webhooks (optional)
+
+The Stripe webhook route must be registered **before** `express.json()` to preserve the raw body for HMAC verification. To test webhooks locally:
 
 ```bash
-npm run test:e2e:ui
+stripe listen --forward-to http://localhost:3001/api/webhooks/stripe
 ```
 
-View last test report:
-
-```bash
-npx playwright show-report
-```
+Set `STRIPE_WEBHOOK_SECRET` in `.env` to the value the CLI prints.
 
 ## Performance Testing
 
-### k6 Load Tests
-
 ```bash
-npm run load:smoke    # Smoke test (1 VU, 30s)
-npm run load:full     # Full load test (50 VUs, 5min)
+pnpm load:smoke    # Smoke scenario
+pnpm load:full     # Full load scenario
 ```
 
-Requires k6 CLI installed: `https://k6.io/docs/getting-started/installation/`
+Requires k6 (https://k6.io/docs/getting-started/installation/). For staging runs use the `load-test.yml` GitHub Actions workflow.
 
 ## Security Best Practices
 
-1. **Never commit secrets** - Use `.env` for all API keys and sensitive values
-2. **Validate all user input** - Use Zod schemas in API routes
-3. **Use parameterized queries** - Prisma handles this automatically
-4. **Review before commit** - Run `npm run typecheck && npm run test:run && npm run build`
-
-See the project's global coding principles in `C:\Users\krsat\.claude\rules\security.md` for comprehensive security guidelines.
+1. **Never commit secrets.** Use `.env` for all keys. The repo's `.env.example` lists every variable.
+2. **Validate all input** with Zod schemas at API boundaries.
+3. **Parameterized queries only** — Prisma handles this automatically.
+4. **Run the full pipeline before pushing:** `pnpm typecheck && pnpm test:run && pnpm build`.
 
 ## Next Steps
 
-- See [TESTING.md](TESTING.md) for detailed testing strategies
-- See [CONFIGURATION.md](CONFIGURATION.md) for environment variable reference
-- See [ARCHITECTURE.md](ARCHITECTURE.md) for system design overview
-- See `CLAUDE.md` for comprehensive project documentation
+- [TESTING.md](TESTING.md) — testing strategy and conventions
+- [CONFIGURATION.md](CONFIGURATION.md) — environment variable reference
+- [ARCHITECTURE.md](ARCHITECTURE.md) — system design
+- `CLAUDE.md` (project root) — comprehensive project context for agents
