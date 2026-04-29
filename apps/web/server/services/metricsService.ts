@@ -25,6 +25,13 @@ export class MetricsService {
   public dbPoolIdle: Gauge<string>;
   public dbPoolWaiting: Gauge<string>;
 
+  // Prisma pool metrics (DB-04 - Phase 37) — naming aligns with PgBouncer exporter
+  // sibling gauges (pgbouncer_pools_*) so Grafana dashboards can correlate client-pool
+  // (prisma_pool_*) with backend-pool (pgbouncer_pools_*) saturation side-by-side.
+  public prismaPoolTotal: Gauge<string>;
+  public prismaPoolIdle: Gauge<string>;
+  public prismaPoolWaiting: Gauge<string>;
+
   // Email metrics (D-11, D-12 - Phase 22)
   public emailSentTotal: Counter<string>;
   public emailDeliveredTotal: Counter<string>;
@@ -107,6 +114,26 @@ export class MetricsService {
       registers: [this.registry],
     });
 
+    // Prisma pool metrics (DB-04 - Phase 37): canonical names exposed alongside
+    // legacy db_pool_* gauges. Plan 04 wires Grafana dashboards to these names.
+    this.prismaPoolTotal = new Gauge({
+      name: 'prisma_pool_total',
+      help: 'Prisma client pool total connections (DB-04)',
+      registers: [this.registry],
+    });
+
+    this.prismaPoolIdle = new Gauge({
+      name: 'prisma_pool_idle',
+      help: 'Prisma client pool idle connections',
+      registers: [this.registry],
+    });
+
+    this.prismaPoolWaiting = new Gauge({
+      name: 'prisma_pool_waiting',
+      help: 'Prisma client pool requests waiting for a connection',
+      registers: [this.registry],
+    });
+
     // Email counters (D-11 - Phase 22)
     this.emailSentTotal = new Counter({
       name: 'email_sent_total',
@@ -183,12 +210,22 @@ export class MetricsService {
   }
 
   /**
-   * Update database pool metrics (D-14 - Phase 34)
+   * Update database pool metrics (D-14 - Phase 34, DB-04 - Phase 37)
+   *
+   * Writes to both legacy db_pool_* gauges and canonical prisma_pool_* gauges.
+   * Phase 37 introduced the prisma_pool_* names so dashboards can pair Prisma
+   * client-pool stats with PgBouncer backend-pool stats (pgbouncer_pools_*).
    */
   updatePoolMetrics(stats: { totalCount: number; idleCount: number; waitingCount: number }): void {
+    // Legacy gauges (Phase 34 — kept for existing Grafana panels)
     this.dbPoolTotal.set(stats.totalCount);
     this.dbPoolIdle.set(stats.idleCount);
     this.dbPoolWaiting.set(stats.waitingCount);
+
+    // Canonical Prisma pool gauges (DB-04, Phase 37)
+    this.prismaPoolTotal.set(stats.totalCount);
+    this.prismaPoolIdle.set(stats.idleCount);
+    this.prismaPoolWaiting.set(stats.waitingCount);
   }
 
   /**
