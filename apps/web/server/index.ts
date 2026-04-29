@@ -47,18 +47,26 @@ import { etagMiddleware } from './middleware/etagMiddleware';
 import { metricsMiddleware } from './middleware/metricsMiddleware';
 import { queryCounterMiddleware } from './middleware/queryCounter';
 import { authMiddleware } from './services/authService';
-import { NewsAggregator } from './services/newsAggregator';
 import { MetricsService } from './services/metricsService';
 import { WebSocketService } from './services/websocketService';
 import { CacheService } from './services/cacheService';
 import { AIService } from './services/aiService';
 import { CleanupService } from './services/cleanupService';
+import { runBootLifecycle } from './bootLifecycle';
 import { prisma, getPoolStats } from './db/prisma';
 import { logDbHealthCheck } from './utils/dbLogger';
 
 const app = express();
 const httpServer = createServer(app);
 const PORT = process.env.PORT || 3001;
+
+// Phase 37 Plan 02 (JOB-01): boot-mode env gating
+// RUN_HTTP=true (default) — this replica accepts HTTP/WebSocket traffic
+// RUN_JOBS=true — this replica owns RSS aggregation, cleanup, email digests, worker emitter
+// Single-replica dev defaults to BOTH true (preserves existing behavior).
+// Multi-replica prod: web replicas RUN_JOBS=false, RUN_HTTP=true; worker RUN_JOBS=true, RUN_HTTP=false.
+const RUN_JOBS = process.env.RUN_JOBS !== 'false'; // default true
+const RUN_HTTP = process.env.RUN_HTTP !== 'false'; // default true
 
 // Initialize services
 const wsService = WebSocketService.getInstance();
@@ -128,11 +136,11 @@ app.use((req, _res, next) => {
   next();
 });
 
-// Initialize news aggregator
-const newsAggregator = NewsAggregator.getInstance();
-
-// Make aggregator available to routes
-app.locals.newsAggregator = newsAggregator;
+// Phase 37 Plan 02 (Pitfall 7 / T-37-05): NewsAggregator no longer attached
+// to req.app.locals (the legacy "newsAggregator" key is removed). Web
+// replicas (RUN_JOBS=false) do not construct NewsAggregator. The worker
+// constructs it inside runBootLifecycle below. Read paths use
+// newsReadService (Prisma + Redis cache).
 
 // Routes with rate limiting (D-05)
 
@@ -351,10 +359,19 @@ app.get('/api/health', async (_req, res) => {
 
   const cacheStats = await cacheService.getStats();
 
+  // Phase 37 Plan 02: web replicas don't hold in-memory NewsAggregator state.
+  // Count articles via Prisma; tolerate failures (health is liveness signal).
+  let articlesCount = 0;
+  try {
+    articlesCount = await prisma.newsArticle.count();
+  } catch {
+    articlesCount = -1;
+  }
+
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
-    articlesCount: newsAggregator.getArticleCount(),
+    articlesCount,
     services: {
       database: {
         available: true,  // Detailed check at /api/health/db
@@ -462,30 +479,6 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
   });
 });
 
-httpServer.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-  console.log('WebSocket server ready');
-  console.log('Starting news aggregation...');
-  newsAggregator.startAggregation().catch((err) => {
-    console.error('Aggregation error:', err);
-  });
-
-  // Start cleanup service for unverified account management (D-18)
-  const cleanupService = CleanupService.getInstance();
-  cleanupService.start();
-
-  // Update metrics periodically (D-14 - Phase 34: add pool metrics)
-  setInterval(() => {
-    metricsService.setWebSocketConnections(wsService.getClientCount());
-
-    // Pool metrics (D-14 - Phase 34)
-    const poolStats = getPoolStats();
-    if (poolStats) {
-      metricsService.updatePoolMetrics(poolStats);
-    }
-  }, 10000);
-});
-
 httpServer.on('error', (error: NodeJS.ErrnoException) => {
   if (error.code === 'EADDRINUSE') {
     console.error(`Port ${PORT} is already in use`);
@@ -493,6 +486,35 @@ httpServer.on('error', (error: NodeJS.ErrnoException) => {
     console.error('Server error:', error);
   }
   process.exit(1);
+});
+
+// Drive the boot lifecycle from env vars (Phase 37 Plan 02 / JOB-01).
+// runBootLifecycle is exported from ./bootLifecycle so the boot-mode unit
+// tests can drive each branch (web / worker / single-replica) with mocked
+// side-effect modules. Tests bypass this top-level invocation by importing
+// the helper module directly.
+//
+// The runHttp branch needs the http server + listening callback (logging +
+// pool-metrics interval) which only make sense in the entrypoint, so we
+// pass them via the optional onListening callback.
+void runBootLifecycle({
+  runHttp: RUN_HTTP,
+  runJobs: RUN_JOBS,
+  httpServer,
+  port: PORT,
+  onListening: () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+    console.log('WebSocket server ready');
+
+    // Update metrics periodically (D-14 - Phase 34: add pool metrics)
+    setInterval(() => {
+      metricsService.setWebSocketConnections(wsService.getClientCount());
+      const poolStats = getPoolStats();
+      if (poolStats) {
+        metricsService.updatePoolMetrics(poolStats);
+      }
+    }, 10000);
+  },
 });
 
 // Graceful shutdown

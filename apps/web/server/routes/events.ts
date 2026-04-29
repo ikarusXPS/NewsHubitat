@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import type { NewsAggregator } from '../services/newsAggregator';
+import * as newsReadService from '../services/newsReadService';
 import { EventsService } from '../services/eventsService';
 import { NEWS_SOURCES } from '../config/sources';
 import type { PerspectiveRegion, TimelineEvent, EventCategory, EventSeverity } from '../../src/types';
@@ -50,12 +50,11 @@ function calculateConfidence(event: TimelineEvent): number {
 }
 
 // Get timeline events extracted from articles
-eventsRoutes.get('/', (req: Request, res: Response) => {
-  const aggregator = req.app.locals.newsAggregator as NewsAggregator;
+eventsRoutes.get('/', async (req: Request, res: Response) => {
   const category = req.query.category as string | undefined;
   const limit = parseInt(req.query.limit as string) || 30;
 
-  const { articles } = aggregator.getArticles({ limit: 500 });
+  const { articles } = await newsReadService.getArticles({ limit: 500 });
   let events = eventsService.extractEventsFromArticles(articles);
 
   // Filter by category if specified
@@ -87,9 +86,8 @@ eventsRoutes.get('/', (req: Request, res: Response) => {
 });
 
 // Get geo-located events (for map visualization)
-eventsRoutes.get('/geo', (req: Request, res: Response) => {
-  const aggregator = req.app.locals.newsAggregator as NewsAggregator;
-  const { articles } = aggregator.getArticles({ limit: 500 });
+eventsRoutes.get('/geo', async (req: Request, res: Response) => {
+  const { articles } = await newsReadService.getArticles({ limit: 500 });
   const allEvents = eventsService.extractEventsFromArticles(articles);
 
   // Filter to only events with location data
@@ -125,9 +123,8 @@ eventsRoutes.get('/geo', (req: Request, res: Response) => {
 });
 
 // Get events summary/stats
-eventsRoutes.get('/stats/summary', (req: Request, res: Response) => {
-  const aggregator = req.app.locals.newsAggregator as NewsAggregator;
-  const { articles } = aggregator.getArticles({ limit: 500 });
+eventsRoutes.get('/stats/summary', async (req: Request, res: Response) => {
+  const { articles } = await newsReadService.getArticles({ limit: 500 });
   const events = eventsService.extractEventsFromArticles(articles);
 
   // Group by date
@@ -222,15 +219,14 @@ eventsRoutes.get('/historical', (req: Request, res: Response) => {
 });
 
 // Get timeline with both historical and current events
-eventsRoutes.get('/timeline', (req: Request, res: Response) => {
-  const aggregator = req.app.locals.newsAggregator as NewsAggregator;
+eventsRoutes.get('/timeline', async (req: Request, res: Response) => {
   const startDate = req.query.start ? new Date(req.query.start as string) : null;
   const endDate = req.query.end ? new Date(req.query.end as string) : null;
   const includeHistorical = req.query.historical !== 'false'; // Include by default
   const limit = parseInt(req.query.limit as string) || 50;
 
   // Get current events from articles
-  const { articles } = aggregator.getArticles({ limit: 500 });
+  const { articles } = await newsReadService.getArticles({ limit: 500 });
   let currentEvents = eventsService.extractEventsFromArticles(articles);
 
   // Get historical events
@@ -274,9 +270,8 @@ eventsRoutes.get('/timeline', (req: Request, res: Response) => {
 
 // Get a specific event by ID
 // NOTE: This route MUST be last because /:id will match any path
-eventsRoutes.get('/:id', (req: Request, res: Response) => {
-  const aggregator = req.app.locals.newsAggregator as NewsAggregator;
-  const { articles } = aggregator.getArticles({ limit: 500 });
+eventsRoutes.get('/:id', async (req: Request, res: Response) => {
+  const { articles } = await newsReadService.getArticles({ limit: 500 });
   const events = eventsService.extractEventsFromArticles(articles);
 
   const event = events.find((e) => e.id === req.params.id);
@@ -289,10 +284,10 @@ eventsRoutes.get('/:id', (req: Request, res: Response) => {
     return;
   }
 
-  // Get related articles
-  const relatedArticles = event.relatedArticles
-    .map((id) => aggregator.getArticleById(id))
-    .filter(Boolean);
+  // Get related articles (parallel cached lookups)
+  const relatedArticles = (
+    await Promise.all(event.relatedArticles.map((id) => newsReadService.getArticleById(id)))
+  ).filter(Boolean);
 
   // Cache for 5 minutes - individual event with related articles
   res.set('Cache-Control', 'public, max-age=300');

@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import type { NewsAggregator } from '../services/newsAggregator';
+import * as newsReadService from '../services/newsReadService';
 import { AIService } from '../services/aiService';
 
 export const analysisRoutes = Router();
@@ -8,10 +8,9 @@ const aiService = AIService.getInstance();
 
 // Get article clusters with optional AI summaries
 analysisRoutes.get('/clusters', async (req: Request, res: Response) => {
-  const aggregator = req.app.locals.newsAggregator as NewsAggregator;
   const includeSummaries = req.query.summaries === 'true';
 
-  const { articles } = aggregator.getArticles({ limit: 200 });
+  const { articles } = await newsReadService.getArticles({ limit: 200 });
   const clusters = aiService.clusterArticles(articles);
 
   if (!includeSummaries) {
@@ -74,7 +73,6 @@ analysisRoutes.get('/clusters', async (req: Request, res: Response) => {
 
 // Generate summary for a specific topic
 analysisRoutes.post('/summarize', async (req: Request, res: Response) => {
-  const aggregator = req.app.locals.newsAggregator as NewsAggregator;
   const { topic } = req.body;
 
   if (!topic) {
@@ -86,7 +84,7 @@ analysisRoutes.post('/summarize', async (req: Request, res: Response) => {
   }
 
   // Search for articles with this topic
-  const { articles } = aggregator.getArticles({ search: topic, limit: 50 });
+  const { articles } = await newsReadService.getArticles({ search: topic, limit: 50 });
 
   if (articles.length < 2) {
     res.status(404).json({
@@ -115,10 +113,9 @@ analysisRoutes.post('/summarize', async (req: Request, res: Response) => {
 
 // Get framing comparison
 analysisRoutes.get('/framing', async (req: Request, res: Response) => {
-  const aggregator = req.app.locals.newsAggregator as NewsAggregator;
   const topic = req.query.topic as string | undefined;
 
-  const { articles } = aggregator.getArticles({
+  const { articles } = await newsReadService.getArticles({
     search: topic,
     limit: 100,
   });
@@ -169,9 +166,8 @@ analysisRoutes.get('/framing', async (req: Request, res: Response) => {
 });
 
 // Coverage gap detection
-analysisRoutes.get('/coverage-gaps', (req: Request, res: Response) => {
-  const aggregator = req.app.locals.newsAggregator as NewsAggregator;
-  const { articles } = aggregator.getArticles({ limit: 500 });
+analysisRoutes.get('/coverage-gaps', async (req: Request, res: Response) => {
+  const { articles } = await newsReadService.getArticles({ limit: 500 });
 
   // All possible perspectives
   const allPerspectives = [
