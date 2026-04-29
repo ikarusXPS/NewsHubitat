@@ -25,7 +25,7 @@ export default defineConfig({
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
-      testIgnore: ['**/profile.spec.ts', '**/settings.spec.ts', '**/history.spec.ts', '**/factcheck.spec.ts'],
+      testIgnore: ['**/profile.spec.ts', '**/settings.spec.ts', '**/history.spec.ts'],
     },
 
     // Authenticated tests (depend on setup)
@@ -35,7 +35,7 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         storageState: 'playwright/.auth/user.json',
       },
-      testMatch: ['**/profile.spec.ts', '**/settings.spec.ts', '**/history.spec.ts', '**/comments.spec.ts', '**/teams.spec.ts', '**/factcheck.spec.ts'],
+      testMatch: ['**/profile.spec.ts', '**/settings.spec.ts', '**/history.spec.ts', '**/comments.spec.ts', '**/teams.spec.ts'],
       dependencies: ['setup'],
     },
   ],
