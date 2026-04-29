@@ -46,6 +46,13 @@ COPY --from=deps /app/packages/types/node_modules ./packages/types/node_modules
 # Copy source (after .dockerignore trim — context should be small)
 COPY . .
 
+# Build-time stub DATABASE_URL — prisma.config.ts has a fail-fast guard
+# that throws if DATABASE_URL is unset, and `prisma generate` loads the
+# config file even though it never opens a real connection. The runtime
+# image uses the real DATABASE_URL injected via env vars (docker compose /
+# Swarm secrets), which overrides this stub.
+ENV DATABASE_URL=postgresql://build-stub:stub@localhost:5432/stub
+
 # Generate Prisma client against apps/web/prisma/schema.prisma → apps/web/src/generated/prisma
 RUN pnpm --filter @newshub/web exec prisma generate
 
@@ -107,8 +114,12 @@ COPY --from=builder --chown=nodejs:nodejs /app/apps/web/server/instrument.mjs ./
 # resolves to a real file rather than dangling (defensive).
 COPY --from=builder --chown=nodejs:nodejs /app/packages/types/index.ts ./packages/types/index.ts
 
-# Regenerate Prisma client for the runtime platform (linux-musl on Alpine)
-RUN pnpm --filter @newshub/web exec prisma generate
+# NOTE: We do NOT re-run `prisma generate` here. Builder and runner
+# stages both use node:22-alpine3.19 — same kernel, same musl libc,
+# same Prisma engine binary. The client copied from /app/apps/web/src/generated
+# is platform-compatible. Skipping the regenerate avoids the build-time
+# DATABASE_URL requirement from prisma.config.ts and shaves seconds off
+# the build.
 
 # Logs directory for winston
 RUN mkdir -p logs && chown nodejs:nodejs logs
