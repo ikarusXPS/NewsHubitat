@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import OpenAI from 'openai';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { z } from 'zod';
+import * as crypto from 'crypto';
 import type { NewsArticle, PerspectiveRegion, Sentiment } from '../../src/types';
 import logger from '../utils/logger';
 import { hashString } from '../utils/hash';
@@ -13,7 +14,9 @@ import {
   bucketConfidence,
 } from './credibilityService';
 import { buildCredibilityPrompt } from '../prompts/credibilityPrompt';
+import { buildFramingPrompt } from '../prompts/framingPrompt';
 import { NEWS_SOURCES } from '../config/sources';
+import * as newsReadService from './newsReadService';
 
 /**
  * Defensive JSON-extract from LLM responses. Free OpenRouter / Gemma models
@@ -65,6 +68,48 @@ const credibilityLlmSchema = z.object({
   }),
   methodologyMd: z.string().min(1),
 });
+
+export interface FramingPerspective {
+  narrative: string;
+  omissions: string[];
+  vocabulary: string[];
+  evidenceQuotes: string[];
+}
+
+export interface FramingAnalysis {
+  topic: string;
+  locale: Locale;
+  perspectives: Partial<Record<PerspectiveRegion, FramingPerspective>>;
+  aiGenerated: boolean;
+}
+
+const framingLlmSchema = z.object({
+  perspectives: z.record(
+    z.string(),
+    z.object({
+      narrative: z.string(),
+      omissions: z.array(z.string()).max(5),
+      vocabulary: z.array(z.string()).max(10),
+      evidenceQuotes: z.array(z.string()).max(5),
+    }),
+  ),
+});
+
+const VALID_PERSPECTIVE_REGIONS: PerspectiveRegion[] = [
+  'usa',
+  'europa',
+  'deutschland',
+  'nahost',
+  'tuerkei',
+  'russland',
+  'china',
+  'asien',
+  'afrika',
+  'lateinamerika',
+  'ozeanien',
+  'kanada',
+  'alternative',
+];
 
 interface ClusterSummary {
   topic: string;
@@ -777,6 +822,92 @@ Response format: ["topic1", "topic2", ...]`;
     const de = `${sourceName} hat eine abgeleitete Glaubwürdigkeitsbewertung von ${score}/100 basierend auf der kuratierten Zuverlässigkeit und dem politischen Bias-Profil. KI-attribuierte Unterdimensionen sind nicht verfügbar; angezeigte Werte basieren ausschließlich auf der deterministischen Bewertung. Diese Werte sind KI-attribuierte Schätzungen basierend auf dem Reputationsprofil der Quelle, keine gemessenen Signale dieser Plattform. Überprüfen Sie mit Primärquellen für wichtige Entscheidungen.`;
     const fr = `${sourceName} a une note de crédibilité dérivée de ${score}/100 basée sur sa fiabilité curated et son profil de biais politique. Les sous-dimensions attribuées par IA sont indisponibles; les valeurs affichées reflètent uniquement le score déterministe. Ces valeurs sont des estimations attribuées par IA basées sur le profil de réputation de la source, pas des signaux mesurés sur cette plateforme. Vérifiez avec des sources primaires pour toute décision importante.`;
     return locale === 'de' ? de : locale === 'fr' ? fr : en;
+  }
+
+  // ===========================================================================
+  // Phase 38 — Framing analysis (Plan 38-02 Task 6)
+  //
+  // Replaces the heuristic generateComparison with an LLM-driven framing
+  // analyzer. Fetches recent articles for the topic, groups by region (cap 3
+  // per region), passes through buildFramingPrompt + callWithFallback, and
+  // filters output keys against the 13 valid PerspectiveRegion values.
+  //
+  // Cache key: ai:framing:<sha256(topic).slice(0,16)>:<locale> (D-18).
+  // Falls back gracefully when articles=[], LLM null, or JSON malformed.
+  //
+  // Per CONTEXT.md D-14 + D-17.
+  // ===========================================================================
+
+  async generateFramingAnalysis(topic: string, locale: Locale): Promise<FramingAnalysis> {
+    const topicHash = crypto
+      .createHash('sha256')
+      .update(topic.toLowerCase().trim())
+      .digest('hex')
+      .slice(0, 16);
+
+    return this.cacheService.getOrSet(
+      CacheKeys.framing(topicHash, locale),
+      () => this.computeFraming(topic, locale),
+      CACHE_TTL.DAY,
+    );
+  }
+
+  private async computeFraming(topic: string, locale: Locale): Promise<FramingAnalysis> {
+    const articles = await this.fetchArticlesForTopic(topic);
+
+    if (articles.length === 0) {
+      return { topic, locale, perspectives: {}, aiGenerated: false };
+    }
+
+    // Group by region (cap 3 per region for prompt budget).
+    const articlesByRegion = new Map<PerspectiveRegion, NewsArticle[]>();
+    for (const a of articles) {
+      const region = a.perspective;
+      const arr = articlesByRegion.get(region) ?? [];
+      if (arr.length < 3) arr.push(a);
+      articlesByRegion.set(region, arr);
+    }
+
+    const prompt = buildFramingPrompt({ topic, articlesByRegion, locale });
+
+    let responseText: string | null = null;
+    try {
+      responseText = await this.callWithFallback(prompt);
+    } catch (err) {
+      logger.error('aiService.computeFraming callWithFallback failed:', err);
+      responseText = null;
+    }
+
+    if (!responseText) {
+      return { topic, locale, perspectives: {}, aiGenerated: false };
+    }
+
+    const parsed = safeParseJson(responseText, framingLlmSchema);
+    if (!parsed) {
+      return { topic, locale, perspectives: {}, aiGenerated: false };
+    }
+
+    // Filter out unknown region keys; the LLM was instructed to use only the
+    // 13 valid PerspectiveRegion values, but defensive filtering protects
+    // against drift.
+    const perspectives: Partial<Record<PerspectiveRegion, FramingPerspective>> = {};
+    for (const [region, body] of Object.entries(parsed.perspectives)) {
+      if (VALID_PERSPECTIVE_REGIONS.includes(region as PerspectiveRegion)) {
+        perspectives[region as PerspectiveRegion] = body;
+      }
+    }
+
+    return { topic, locale, perspectives, aiGenerated: true };
+  }
+
+  private async fetchArticlesForTopic(topic: string): Promise<NewsArticle[]> {
+    try {
+      const result = await newsReadService.getArticles({ search: topic, limit: 50 });
+      return result.articles ?? [];
+    } catch (err) {
+      logger.error('aiService.fetchArticlesForTopic failed:', err);
+      return [];
+    }
   }
 
 }
