@@ -45,9 +45,11 @@ export function Header({ onMenuClick }: HeaderProps) {
 
   return (
     <>
-      <header className="header-cyber flex h-14 items-center justify-between px-6 relative z-20">
-        {/* Left: Search + Status */}
-        <div className="flex items-center gap-4">
+      <header className="header-cyber flex h-14 items-center gap-4 px-4 md:px-6 relative z-20">
+        {/* Left: Search + Status. flex-1 + min-w-0 lets the search column shrink
+            when the right-side controls need space (was overflowing at 1280px with
+            sidebar open — clipping the Sign In button). */}
+        <div className="flex flex-1 min-w-0 items-center gap-4">
           {/* Hamburger Menu - Mobile Only */}
           <button
             onClick={onMenuClick}
@@ -116,14 +118,15 @@ export function Header({ onMenuClick }: HeaderProps) {
             </div>
           )}
 
-          {/* Desktop Search */}
+          {/* Desktop Search — shrinks within the available column so right-side
+              controls always fit on the same row. */}
           <form
             onSubmit={(e) => {
               e.preventDefault();
               // Search is already live-filtering via setSearchQuery
               // This ensures Enter doesn't reload the page
             }}
-            className="relative hidden md:block w-80"
+            className="relative hidden md:block flex-1 min-w-0 max-w-80"
           >
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#00f0ff]/50" />
             <input
@@ -171,8 +174,9 @@ export function Header({ onMenuClick }: HeaderProps) {
           </div>
         </div>
 
-        {/* Right: Controls */}
-        <div className="flex items-center gap-3">
+        {/* Right: Controls. flex-shrink-0 keeps these always visible — search
+            column shrinks first when space is tight. */}
+        <div className="flex shrink-0 items-center gap-3">
           {/* Desktop controls - hidden on mobile (D-20) */}
           <div className="hidden md:flex items-center gap-3">
             {/* Feed Manager */}

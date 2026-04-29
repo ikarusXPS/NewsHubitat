@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Globe2, ArrowRight, ArrowLeft, Check } from 'lucide-react';
+import { Globe2, ArrowRight, ArrowLeft, Check, X } from 'lucide-react';
 import { useAppStore } from '../store';
 import { RegionSelector } from './RegionSelector';
 import { TopicSelector } from './TopicSelector';
@@ -77,7 +77,17 @@ export function FocusOnboarding() {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-sm flex items-center justify-center p-4">
+    // z-[90] keeps onboarding below ConsentBanner (z-[100]) — GDPR consent must be addressable first.
+    <div className="fixed inset-0 z-[90] bg-slate-950/95 backdrop-blur-sm flex items-center justify-center p-4">
+      {/* Dismiss / skip onboarding so users can reach the app (Sign In, browse) without setup. */}
+      <button
+        onClick={setOnboardingComplete}
+        aria-label="Skip onboarding"
+        className="fixed top-4 right-4 z-10 p-2 rounded-md border border-slate-700 bg-slate-900/80 text-slate-400 hover:text-white hover:border-slate-500 transition-colors"
+        style={{ top: 'max(1rem, var(--safe-area-top))' }}
+      >
+        <X className="w-5 h-5" />
+      </button>
       <AnimatePresence mode="wait">
         {step === 'welcome' && (
           <motion.div

@@ -120,7 +120,8 @@ body {
   background: linear-gradient(90deg, transparent, var(--color-cyber-blue), transparent);
   opacity: 0.3;
   animation: scan-line 4s linear infinite;
-  z-index: 1000;
+  /* Decorative; must sit below modals (AuthModal z-50, FocusOnboarding/ConsentBanner z-[100]) */
+  z-index: 0;
   pointer-events: none;
 }
 

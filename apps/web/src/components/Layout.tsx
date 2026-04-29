@@ -9,6 +9,7 @@ import { BreakingNewsTicker } from './BreakingNewsTicker';
 import { KeyboardShortcutsHelp } from './KeyboardShortcutsHelp';
 import { InstallPromptBanner } from './InstallPromptBanner';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
+import { useIsMobile } from '../hooks/useMediaQuery';
 import { BottomNav } from './mobile/BottomNav';
 import { MobileDrawer } from './mobile/MobileDrawer';
 
@@ -18,7 +19,10 @@ interface LayoutProps {
 
 export function Layout({ children }: LayoutProps) {
   const mainRef = useRef<HTMLElement>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const isMobile = useIsMobile();
+  // Sidebar/drawer open state. Desktop opens by default (persistent rail);
+  // mobile starts closed so the drawer doesn't cover content on first paint.
+  const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
   const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
 
   // Keyboard shortcuts handlers
@@ -57,15 +61,13 @@ export function Layout({ children }: LayoutProps) {
       {/* Reading Progress */}
       <ReadingProgressBar containerRef={mainRef} />
 
-      {/* Desktop Sidebar - hidden on mobile */}
-      <div className="hidden md:block">
-        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      </div>
-
-      {/* Mobile Drawer - visible on mobile only */}
-      <div className="md:hidden">
+      {/* Single navigation tree: only one mounts per breakpoint to avoid
+          duplicated links in the DOM (which broke strict-mode E2E locators). */}
+      {isMobile ? (
         <MobileDrawer isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      </div>
+      ) : (
+        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      )}
 
       {/* Main Content Area */}
       <div className="flex flex-1 flex-col overflow-hidden relative z-10">
@@ -92,13 +94,10 @@ export function Layout({ children }: LayoutProps) {
         </main>
       </div>
 
-      {/* Command Palette - desktop only (D-22) */}
-      <div className="hidden md:block">
-        <CommandPalette />
-      </div>
-
-      {/* Bottom Nav - mobile only */}
-      <BottomNav />
+      {/* CommandPalette is desktop-only (D-22); BottomNav is mobile-only.
+          Mounted conditionally so they don't both contribute hidden DOM nodes
+          to E2E locator results (homeLinks, etc.). */}
+      {isMobile ? <BottomNav /> : <CommandPalette />}
 
       {/* Keyboard Shortcuts Help */}
       <KeyboardShortcutsHelp
