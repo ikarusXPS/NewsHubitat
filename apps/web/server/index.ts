@@ -375,7 +375,7 @@ app.get('/api/health', async (_req, res) => {
 
   // Phase 37 Plan 02: web replicas don't hold in-memory NewsAggregator state.
   // Count articles via Prisma; tolerate failures (health is liveness signal).
-  let articlesCount = 0;
+  let articlesCount: number;
   try {
     articlesCount = await prisma.newsArticle.count();
   } catch {

@@ -15,8 +15,11 @@ export function SubscriptionSuccess() {
   const [searchParams] = useSearchParams();
   const { token } = useAuth();
 
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
+  const [verificationStatus, setVerificationStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const sessionId = searchParams.get('session_id');
+  // Derive: when sessionId is missing there's nothing to verify, so the page is in error state
+  // without needing a synchronous setState in the effect (react-hooks/set-state-in-effect).
+  const status = sessionId ? verificationStatus : 'error';
 
   // Refresh user data to get updated subscription tier
   const refreshUser = useCallback(async () => {
@@ -34,24 +37,20 @@ export function SubscriptionSuccess() {
   }, [token]);
 
   useEffect(() => {
-    // Refresh user data to get updated subscription tier
+    if (!sessionId) return;
+
     const verifySubscription = async () => {
       try {
         await refreshUser();
-        setStatus('success');
+        setVerificationStatus('success');
 
-        // Redirect to dashboard after 3 seconds
         setTimeout(() => navigate('/'), 3000);
       } catch {
-        setStatus('error');
+        setVerificationStatus('error');
       }
     };
 
-    if (sessionId) {
-      verifySubscription();
-    } else {
-      setStatus('error');
-    }
+    verifySubscription();
   }, [sessionId, refreshUser, navigate]);
 
   if (status === 'loading') {
