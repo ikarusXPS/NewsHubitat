@@ -5,7 +5,7 @@ test.describe.skip('Community Page', () => {
 
   test.beforeEach(async ({ page }) => {
     await page.goto('/community');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     // Wait for any heading to be visible
     await page.locator('h1, h2, [class*="gradient-text"]').first().waitFor({ state: 'visible', timeout: 30000 });
   });

@@ -57,7 +57,7 @@ test.describe('Navigation', () => {
     await page.click('a[href="/settings"]');
     await expect(page).toHaveURL('/settings');
     // Settings page loads - heading may vary based on auth state
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('should highlight active navigation item', async ({ page }) => {

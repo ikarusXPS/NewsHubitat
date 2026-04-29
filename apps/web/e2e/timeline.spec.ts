@@ -5,7 +5,7 @@ test.describe.skip('Timeline', () => {
 
   test.beforeEach(async ({ page }) => {
     await page.goto('/timeline');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.locator('h1').waitFor({ state: 'visible', timeout: 30000 });
   });
 
