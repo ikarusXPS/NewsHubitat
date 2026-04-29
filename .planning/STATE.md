@@ -53,7 +53,7 @@ v1.6 Progress: [████████████████████] (8
 | 36.3 | Fix Stripe Webhook Monorepo Path (INSERTED) | PAY-02, PAY-03, PAY-06 | No | **Complete** (5/5 plans — awaiting `/gsd-verify-phase 36.3`) |
 | 36.4 | Relocate Plan-03/04 monetization artifacts (INSERTED) | PAY-01, PAY-02, PAY-04..PAY-07 | Yes | **Complete** (4/4 plans — verified PASS 10/10 ROADMAP criteria; D-09 probes PASS but had a false-positive — see 36.5; D-10 audit = 0) |
 | 36.5 | Fix monetization follow-up bugs (INSERTED) | PAY-04, PAY-06 | Partial | **Planned** (4/4 plans, 3 waves; plan-checker PASSED 10/10; awaiting `/gsd-execute-phase 36.5`) |
-| 37 | Horizontal Scaling | 5 reqs (INFRA-01 to INFRA-05) | No | Not started |
+| 37 | Horizontal Scaling | 5 reqs (INFRA-01 to INFRA-05) | No | **Complete** (7/7 plans on `test-ci-pipeline` — Wave 1+2+3 verified via typecheck + 1317 tests; 37-06 WS-04 runtime verification deferred to 37.1, blocked by pre-existing broken root Dockerfile per .planning/todos/pending/37-06-fanout-test-dockerfile-rewrite.md) |
 | 38 | Advanced AI Features | 7 reqs (AI-01 to AI-07) | Yes | Not started |
 | 39 | Mobile Apps | 8 reqs (MOB-01 to MOB-08) | Yes | Not started |
 | 40 | Content Expansion | 7 reqs (CONT-01 to CONT-07) | Yes | Not started |
@@ -74,6 +74,7 @@ Items acknowledged and carried forward from previous milestone close:
 | bug-followup | Phase 36-05 — `customer.subscription.created` webhook handler emits empty error (idempotency rollback works; net behaviour correct because checkout.session.completed already updates User; but masks a latent bug). Diagnose handler logic. | scoped_into_36.5 |
 | bug-followup | Phase 36-05 — `showPremiumBadge` boolean flag stored independently of `subscriptionTier`. Sidebar shows PREMIUM badge for FREE users. Recommend deriving flag from real tier or deprecating. | scoped_into_36.5 |
 | audit | Phase 36.4-04 D-09 probes had false-positive on FREE 11th /api/ai/ask 429 (was IP-keyed not tier-keyed). Re-run D-09 probes against the corrected middleware chain (`authMiddleware` → `aiTierLimiter`). | pending_36.6 |
+| infra-debt | Phase 37-06 WS-04 cross-replica fanout test — runtime verification blocked by pre-existing broken root Dockerfile (`npm ci` against pnpm monorepo state; `stripe@22.1.0` missing from npm lockfile; `src/generated`/`prisma/` paths predate apps/web/ split). Static test artifacts (e2e-stack/) all in place. Fix Dockerfile + re-run `bash e2e-stack/run-fanout-test.sh` in 37.1. | scoped_into_37.1 |
 
 **Note:** These are environmental/operational items, not code defects:
 

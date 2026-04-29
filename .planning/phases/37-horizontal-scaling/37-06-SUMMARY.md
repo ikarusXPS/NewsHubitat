@@ -63,7 +63,10 @@ requirements-completed:
   pending_full_phase: [INFRA-01]  # closes once full phase verifier signs off
 
 # Metrics
-duration: ~7min (plan execution); human-verify gate pending
+duration: ~7min (plan execution); human-verify gate deferred (blocked by broken root Dockerfile — see .planning/todos/pending/37-06-fanout-test-dockerfile-rewrite.md)
+verification_status: deferred_to_dockerfile_fix
+verification_attempted: 2026-04-29
+verification_blocker: "root Dockerfile uses npm ci against pnpm-monorepo state — stripe@22.1.0 missing from npm lockfile, src/generated and prisma/ paths predate apps/web/ split. Pre-existing infra debt unrelated to phase 37 logic."
 completed: 2026-04-29 (artifacts); WS-04 verification PENDING human run
 ---
 
