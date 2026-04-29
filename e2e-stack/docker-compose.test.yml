@@ -37,14 +37,19 @@ services:
   traefik:
     image: traefik:v3.3
     command:
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
+      # File provider — read routing config from a static YAML file.
+      # See traefik-dynamic.yml for the routes/services definition.
+      # We chose file provider over docker provider because Docker Desktop
+      # on Windows + WSL2 backend produces "Error response from daemon: """
+      # when Traefik tries to read container labels via the docker socket.
+      - "--providers.file.filename=/etc/traefik/dynamic.yml"
+      - "--providers.file.watch=false"
       - "--entrypoints.web.address=:80"
       - "--api.dashboard=false"
     ports:
       - "8000:80"
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik-dynamic.yml:/etc/traefik/dynamic.yml:ro
     depends_on:
       postgres:
         condition: service_healthy
