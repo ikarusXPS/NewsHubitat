@@ -47,13 +47,12 @@ import { etagMiddleware } from './middleware/etagMiddleware';
 import { metricsMiddleware } from './middleware/metricsMiddleware';
 import { queryCounterMiddleware } from './middleware/queryCounter';
 import { authMiddleware } from './services/authService';
-import { NewsAggregator } from './services/newsAggregator';
 import { MetricsService } from './services/metricsService';
 import { WebSocketService } from './services/websocketService';
 import { CacheService } from './services/cacheService';
 import { AIService } from './services/aiService';
 import { CleanupService } from './services/cleanupService';
-import { initWorkerEmitter } from './jobs/workerEmitter';
+import { runBootLifecycle } from './bootLifecycle';
 import { prisma, getPoolStats } from './db/prisma';
 import { logDbHealthCheck } from './utils/dbLogger';
 
@@ -489,61 +488,34 @@ httpServer.on('error', (error: NodeJS.ErrnoException) => {
   process.exit(1);
 });
 
-/**
- * Phase 37 Plan 02 (JOB-01) — boot-mode dispatcher.
- *
- * Exported so the boot-mode unit tests can drive each branch with explicit
- * args (the tests mock NewsAggregator/CleanupService/workerEmitter and
- * verify the right side-effects fire for web vs worker vs single-replica).
- *
- * Ordering invariant (Assumption A8): when runJobs is true,
- * initWorkerEmitter() MUST run BEFORE NewsAggregator.startAggregation() so
- * the first cross-replica broadcast has a live Redis Pub/Sub channel.
- */
-export async function runBootLifecycle(opts: {
-  runHttp: boolean;
-  runJobs: boolean;
-}): Promise<void> {
-  if (opts.runHttp) {
-    httpServer.listen(PORT, () => {
-      console.log(`Server running on http://localhost:${PORT}`);
-      console.log('WebSocket server ready');
+// Drive the boot lifecycle from env vars (Phase 37 Plan 02 / JOB-01).
+// runBootLifecycle is exported from ./bootLifecycle so the boot-mode unit
+// tests can drive each branch (web / worker / single-replica) with mocked
+// side-effect modules. Tests bypass this top-level invocation by importing
+// the helper module directly.
+//
+// The runHttp branch needs the http server + listening callback (logging +
+// pool-metrics interval) which only make sense in the entrypoint, so we
+// pass them via the optional onListening callback.
+void runBootLifecycle({
+  runHttp: RUN_HTTP,
+  runJobs: RUN_JOBS,
+  httpServer,
+  port: PORT,
+  onListening: () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+    console.log('WebSocket server ready');
 
-      // Update metrics periodically (D-14 - Phase 34: add pool metrics)
-      setInterval(() => {
-        metricsService.setWebSocketConnections(wsService.getClientCount());
-
-        // Pool metrics (D-14 - Phase 34)
-        const poolStats = getPoolStats();
-        if (poolStats) {
-          metricsService.updatePoolMetrics(poolStats);
-        }
-      }, 10000);
-    });
-  }
-
-  if (opts.runJobs) {
-    console.log('RUN_JOBS=true — starting schedulers and worker emitter');
-
-    // JOB-03: init worker emitter BEFORE startAggregation so first emit has
-    // a live Redis Pub/Sub channel (Assumption A8 ordering).
-    initWorkerEmitter();
-
-    const newsAggregator = NewsAggregator.getInstance();
-    newsAggregator.startAggregation().catch((err) => {
-      console.error('Aggregation error:', err);
-    });
-
-    // Start cleanup service for unverified account management (D-18)
-    const cleanupService = CleanupService.getInstance();
-    cleanupService.start();
-  }
-}
-
-// Drive the boot lifecycle from env vars (CLI / docker entrypoint).
-// Tests import runBootLifecycle directly and bypass this top-level call
-// via vitest's vi.mock infrastructure on the side-effect modules.
-void runBootLifecycle({ runHttp: RUN_HTTP, runJobs: RUN_JOBS });
+    // Update metrics periodically (D-14 - Phase 34: add pool metrics)
+    setInterval(() => {
+      metricsService.setWebSocketConnections(wsService.getClientCount());
+      const poolStats = getPoolStats();
+      if (poolStats) {
+        metricsService.updatePoolMetrics(poolStats);
+      }
+    }, 10000);
+  },
+});
 
 // Graceful shutdown
 const shutdown = async () => {
