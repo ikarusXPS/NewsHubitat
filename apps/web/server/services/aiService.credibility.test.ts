@@ -79,6 +79,12 @@ vi.mock('./cacheService', async () => {
   };
 });
 
+// Phase 38: aiService now imports newsReadService for framing — mock to prevent
+// the prisma module-load chain from breaking this test file.
+vi.mock('./newsReadService', () => ({
+  getArticles: vi.fn().mockResolvedValue({ articles: [], total: 0 }),
+}));
+
 // Use a known source id from the real config; "ap" (Associated Press) has reliability=9, political=0
 import { AIService, safeParseJson } from './aiService';
 

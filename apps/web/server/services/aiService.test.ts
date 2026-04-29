@@ -75,7 +75,17 @@ vi.mock('./cacheService', () => ({
   CacheKeys: {
     aiSummary: (key: string) => `ai:summary:${key}`,
     aiTopics: (hash: string) => `ai:topics:${hash}`,
+    credibility: (sourceId: string, locale: string) => `ai:credibility:${sourceId}:${locale}`,
+    framing: (topicHash: string, locale: string) => `ai:framing:${topicHash}:${locale}`,
+    factCheck: (claimHash: string) => `ai:factcheck:${claimHash}`,
   },
+  CACHE_TTL: { DAY: 86400 },
+}));
+
+// Phase 38: aiService now imports newsReadService for framing — mock it here
+// to prevent the prisma module-load chain from breaking pre-existing tests.
+vi.mock('./newsReadService', () => ({
+  getArticles: vi.fn().mockResolvedValue({ articles: [], total: 0 }),
 }));
 
 // Import after mocks
