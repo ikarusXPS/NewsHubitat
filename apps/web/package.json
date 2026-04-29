@@ -34,6 +34,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",
     "@asteasolutions/zod-to-openapi": "8.5.0",
+    "@godaddy/terminus": "^4.12.1",
     "@google/generative-ai": "^0.24.1",
     "@newshub/types": "workspace:*",
     "@prisma/adapter-pg": "^7.7.0",
