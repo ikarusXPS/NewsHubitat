@@ -59,14 +59,18 @@ echo "==> Running ws-fanout vitest spec"
 # We pass --config explicitly to use e2e-stack/vitest.config.ts (a
 # minimal node-environment config) instead of apps/web/vitest.config.ts
 # (which uses jsdom + DB mocks and would break the real-stack test).
+#
+# Use absolute paths because vitest resolves --config relative to --root,
+# which would otherwise compound to a wrong path on Windows / Git Bash.
+REPO_ROOT="$(pwd)"
 set +e
 (
   cd apps/web && \
   WS_FANOUT_URL=http://localhost:8000 \
   node node_modules/vitest/dist/cli.js \
     run \
-    --config ../../e2e-stack/vitest.config.ts \
-    --root ../../e2e-stack \
+    --config "$REPO_ROOT/e2e-stack/vitest.config.ts" \
+    --root "$REPO_ROOT/e2e-stack" \
     --no-coverage \
     --reporter=verbose
 )
