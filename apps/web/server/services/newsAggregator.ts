@@ -10,6 +10,14 @@ import { prisma } from '../db/prisma';
 import logger from '../utils/logger';
 import { hashString } from '../utils/hash';
 import { chunk } from '../utils/array';
+// Phase 37 Plan 02 (JOB-03): worker process emits cross-replica broadcasts
+// via Socket.IO Emitter bound to the same Redis Pub/Sub channels as the
+// adapter on web replicas. Worker has no HTTP server / no `io` instance,
+// so it CANNOT use WebSocketService.broadcast* directly.
+import {
+  emitNewArticle,
+  emitBreakingNews,
+} from '../jobs/workerEmitter';
 
 const parser = new Parser({
   timeout: 10000,
@@ -244,6 +252,13 @@ export class NewsAggregator {
             // Ensure source exists before saving article (prevents P2003 foreign key error)
             await this.ensureSourceExists(article.source);
 
+            // Detect insert vs update so we only fan out on new content
+            const existing = await prisma.newsArticle.findUnique({
+              where: { url: article.url },
+              select: { id: true },
+            });
+            const isNew = !existing;
+
             // Use URL as unique key to prevent duplicates from different providers
             // (e.g., mediastack-abc123 vs newsapi-abc123 for same article URL)
             await prisma.newsArticle.upsert({
@@ -265,6 +280,17 @@ export class NewsAggregator {
               },
               create: this.toPrismaArticle(article),
             });
+
+            // JOB-03: cross-replica fanout via worker Socket.IO Emitter
+            // (T-37-06: cache invalidation lives inside emitNewArticle in
+            // Plan 01's full workerEmitter implementation).
+            if (isNew) {
+              emitNewArticle(article);
+              // Breaking news heuristic: critical-severity sentiment
+              if (article.sentiment === 'negative' && article.sentimentScore <= -0.7) {
+                emitBreakingNews(article);
+              }
+            }
           } catch (err) {
             logger.error(`Failed to save article ${article.id}:`, err);
           }
