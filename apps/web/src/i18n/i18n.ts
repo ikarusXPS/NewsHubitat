@@ -13,7 +13,7 @@ i18n
   .init({
     fallbackLng: 'en',         // D-08: English fallback
     supportedLngs: ['de', 'en', 'fr'],
-    ns: ['common', 'share', 'teams', 'pricing'],   // Default namespace + share + teams + pricing (Phase 36.4)
+    ns: ['common', 'share', 'teams', 'pricing', 'factcheck', 'credibility'],   // + factcheck + credibility (Phase 38)
     defaultNS: 'common',
 
     backend: {
