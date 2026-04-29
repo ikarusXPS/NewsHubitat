@@ -9,9 +9,12 @@ if (!connectionString) {
 
 const adapter = new PrismaPg({
   connectionString,
-  max: 10,                        // D-02: Pool size = 10 connections
+  max: 20,                        // Phase 37 / DB-03: 4 web replicas × 20 = 80 client conns into PgBouncer (MAX_CLIENT_CONN=200)
   connectionTimeoutMillis: 5_000, // D-04: Connection timeout = 5 seconds
   idleTimeoutMillis: 300_000,     // D-06: Idle timeout = 5 minutes
+  // Note: Prisma 7 + @prisma/adapter-pg recognizes ?pgbouncer=true in connectionString
+  // and disables prepared-statement caching automatically (DB-01, Pitfall 1).
+  // No explicit code branch needed here — set the flag in DATABASE_URL.
 });
 
 // D-09: Gate logging on NODE_ENV !== 'production'
