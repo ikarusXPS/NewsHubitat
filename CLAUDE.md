@@ -19,6 +19,10 @@ This repo is driven by the GSD planning system. Read these before resuming work:
 
 When picking up a phase, read its `PLAN.md` plus the relevant Decisions rows in `STATE.md`. Don't duplicate decisions into new docs — append to STATE.md.
 
+### Doc workflow
+
+Docs in `docs/` and root (`README.md`, `CONTRIBUTING.md`) carry a `<!-- generated-by: gsd-doc-writer -->` marker and are managed by the `gsd-doc-writer` agent. To refresh, spawn one agent per doc with `mode: update` — don't hand-edit unless you also update CLAUDE.md (the source of truth the agent reads from).
+
 ## Monorepo Structure
 
 This is a pnpm monorepo with workspace packages:
@@ -52,10 +56,10 @@ pnpm typecheck && pnpm test:run && pnpm build
 pnpm typecheck            # TypeScript validation (all packages)
 pnpm lint                 # ESLint validation (all packages)
 
-# Unit Testing (Vitest) - 80% coverage enforced
+# Unit Testing (Vitest) - 80% coverage (branches at 75% per waiver in vitest.config.ts)
 pnpm test                 # Run unit tests (watch mode)
 pnpm test:run             # Run tests once (CI mode)
-pnpm test:coverage        # Coverage report (fails below 80%)
+pnpm test:coverage        # Coverage report (fails below threshold)
 
 # E2E Testing (Playwright)
 pnpm test:e2e             # Playwright headless
@@ -108,7 +112,7 @@ docker compose logs -f app
 - **Real-time**: Socket.io
 - **AI**: Multi-provider fallback (OpenRouter → Gemini → Anthropic)
 - **Translation**: Multi-provider chain (DeepL → Google → LibreTranslate → Claude)
-- **Testing**: Vitest (unit, 80% coverage) + Playwright (E2E)
+- **Testing**: Vitest (unit, 80% coverage; **branches at 75% — TODO waiver in `vitest.config.ts`**) + Playwright (E2E)
 - **Monitoring**: Prometheus + Grafana + Alertmanager; Sentry for errors
 
 ## Architecture
@@ -246,6 +250,7 @@ External developers consume `apps/web/server/routes/publicApi.ts`, gated by API 
 - **Spec source:** Code-first via `@asteasolutions/zod-to-openapi` — Zod schemas in `server/openapi/schemas.ts` are the single source of truth for runtime validation AND API docs
 - **Docs UI:** Scalar at `/api-docs`; spec served from `/openapi.json`
 - **Cache:** Validated keys cached 5 min in Redis (only first 15 chars stored as identifier for security)
+- **Schema/contract gotcha:** `/api/v1/public/news` hand-maps top-level `sourceId` from `source.id` in the route handler. The read service returns only the nested `source` object; OpenAPI requires both. New public-API endpoints surfacing articles must replicate this mapping or fail the schema contract.
 
 ## Subscription Tiers (Stripe)
 
@@ -277,8 +282,9 @@ Tiered access enforced via middleware. Tiers: `FREE` / `PREMIUM` / `ENTERPRISE`.
 - **`.github/workflows/load-test.yml`** — k6 load tests via `workflow_dispatch` against `STAGING_URL` (manual trigger; never runs on production)
 - **Validate locally:** `pnpm validate:ci` (uses `action-validator`)
 - **Sentry:** `@sentry/vite-plugin` uploads source maps during CI build; release tag `newshub@${{ github.sha }}`; environment set per deploy job (staging vs production)
-- **Bundle budget:** 250KB warning threshold (CI annotation, non-blocking)
+- **Bundle budget:** 250KB warning threshold (CI annotation, non-blocking). The PR-vs-base size compare uses `continue-on-error: true` because the action fails on stale-lockfile master — TODO to tighten once stabilized.
 - **Artifacts:** Lighthouse reports retained 30 days; load-test JSON+HTML retained 30 days
+- **Branch protection on `master`:** requires checks `Lint`, `Type Check`, `Unit Tests`, `Build Docker Image`, `E2E Tests` (display names, not job IDs); `strict: true`, admin-enforced. The `production` environment requires reviewer approval (`ikarusXPS`) and restricts deploys to protected branches.
 
 ## Performance Budgets
 
@@ -314,6 +320,35 @@ cd apps/web && npx playwright test --debug     # Step-through debugger
 cd apps/web && npx playwright test --ui        # Interactive UI
 cd apps/web && npx playwright show-report      # View last report
 ```
+
+### E2E Conventions (learned the hard way)
+
+- Use `page.waitForLoadState('domcontentloaded')`, NOT `networkidle` — Socket.io polling never lets the network idle, every test times out
+- Use `127.0.0.1`, NOT `localhost`, for backend API calls — Node 18+ resolves `localhost` to IPv6 `::1` first, Express on `0.0.0.0` doesn't always bind there
+- `page.request.*` does NOT auto-attach the JWT from localStorage like the browser fetch interceptor does. For authenticated API tests, read the token via `page.evaluate(() => localStorage.getItem('newshub-auth-token'))` and pass `Authorization: Bearer ${token}` manually
+- For test files sharing module-scope state (e.g. `publicApi.spec.ts` shares `testApiKey` across describes), add `test.describe.configure({ mode: 'serial' })` at file top — `fullyParallel: true` otherwise splits describes across workers and shared variables are undefined for worker N>0
+- `apps/web/e2e/fixtures.ts` mocks AI/analysis/geo-events endpoints + bypasses FocusOnboarding (`hasCompletedOnboarding: true`) and ConsentBanner (`newshub-consent`) via init script. Free-tier AI quota is ~10 calls before errors cascade through any test that hits the dashboard, bookmarks, or analysis page.
+- `auth.setup.ts` polls `/api/health` (IPv4) for up to 30s before registering — Playwright's `webServer` waits for frontend (5173) but not backend (3001), so registration would otherwise hit ECONNREFUSED on first run
+
+### Currently-skipped E2E tests
+
+| Test | Reason |
+|---|---|
+| `settings.spec.ts` × 3 (Deutsch/English buttons) | UI moved to header LanguageSwitcher (D-04); tests target dead code |
+| `analysis.spec.ts` × 2 (compare modal open/close) | Button consistently misses 10s visibility budget under 4-worker parallel CI load |
+| `publicApi.spec.ts` Cache Headers + Revocation | Self-skip when 3-key-per-user cap (D-10) is hit; covered by upstream auth tests |
+
+### Z-index ladder
+
+Stacking order matters — onboarding overlays at high z used to cover login buttons:
+
+| Layer | z-index |
+|---|---|
+| scan-line CSS effect | `z-0` (was z-1000 — caused click-through bug) |
+| Header | `z-20` |
+| AuthModal / Compare modal | `z-50` |
+| FocusOnboarding | `z-[90]` |
+| ConsentBanner | `z-[100]` |
 
 ## UI Design System
 
