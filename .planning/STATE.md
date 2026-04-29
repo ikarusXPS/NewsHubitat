@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Infrastructure & Scale
-current_plan: 38-01 (FactCheck schema + tsvector FTS migration)
-status: planned
-last_updated: "2026-04-29T11:40:00.000Z"
-last_activity: 2026-04-29 -- Phase 38 (Advanced AI Features) planned. 6 plans across 5 waves committed; plan-checker PASSED on revision iteration 2 (2 BLOCKERs fixed: 38-02 wave-shift to depends_on [38-01], 38-RESEARCH §"Open Questions (RESOLVED)" markers). Coverage gates: 7/7 AI requirements + 19/19 D-XX decisions.
+current_plan: phase 38 complete; next is Phase 39 (Mobile Apps)
+status: phase_complete
+last_updated: "2026-04-29T22:00:00.000Z"
+last_activity: 2026-04-29 -- Phase 38 (Advanced AI Features) COMPLETE. All 6 plans across 5 waves executed; VERIFICATION.md status=passed (6/6 ROADMAP success criteria + 7/7 AI-XX requirements + 19/19 D-XX decisions, 0 anti-pattern violations). Live Redis TTL probes confirm AI-07 (24h ± jitter); E2E factcheck.spec.ts 5/5 green; full unit suite 1412/1412 pass; typecheck clean.
 progress:
   total_phases: 6
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 23
-  completed_plans: 17
-  percent: 74
+  completed_plans: 23
+  percent: 100
 ---
 
 # State: NewsHub
@@ -21,15 +21,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-26)
 
 **Core value:** Users can see how the same story is covered by different regional perspectives
-**Current focus:** Phase 38 — advanced-ai-features (planned, awaiting `/gsd-execute-phase 38`)
+**Current focus:** Phase 38 — advanced-ai-features COMPLETE 2026-04-29; next is Phase 39 (Mobile Apps)
 
 ## Current Position
 
-Phase: 38
-Plan: 1 of 6
-Current Plan: 38-01 (FactCheck schema + tsvector FTS migration; [BLOCKING] schema push gate)
-Status: Ready to execute
-Last activity: 2026-04-29 -- Phase 38 planning complete. 6 plans across 5 waves: Wave 1 (38-01 schema), Wave 2 (38-02 services depends_on 38-01), Wave 3 (38-03 routes + 38-04 i18n parallel), Wave 4 (38-05 frontend), Wave 5 (38-06 verification). Plan-checker PASSED iteration 2; all gates pass (7/7 AI-XX requirements, 19/19 D-XX decisions, no forbidden-root paths). Critical research finding: CONTEXT.md D-11 wrong about existing GIN indexes — Plan 38-01 hand-writes the missing tsvector + GIN migration on NewsArticle.title || content.
+Phase: 38 (complete)
+Plan: 6 of 6 (all complete)
+Current Plan: n/a — phase 38 closed
+Status: Phase complete, awaiting next-phase kickoff
+Last activity: 2026-04-29 -- Phase 38 (Advanced AI Features) COMPLETE. All 6 plans executed across 5 waves (Wave 1 schema → Wave 2 services → Wave 3 routes+i18n parallel → Wave 4 UI → Wave 5 verification). VERIFICATION.md status=passed: 6/6 ROADMAP success criteria, 7/7 AI-01..AI-07 requirements, 19/19 D-XX locked decisions, 0 anti-pattern violations. Live probes: Redis TTLs 80-89k seconds (AI-07 24h ± jitter confirmed), cache replay returns cached: True, FactCheck audit row count = 2 after one cache hit (D-16), 3 security rejection paths (Zod min-length + injection markers) all return 400, FREE-tier 11+ calls return 429 + upgradeUrl /pricing. E2E factcheck.spec.ts 5/5 green. Full unit suite 1412/1412 pass; typecheck clean across both packages. Wave 1 schema deviation: NewsArticle.searchTsv mapped to Postgres column search_tsv (snake_case) — raw queries must use search_tsv. Wave 4 deviation: react-markdown not in deps, fell back to whitespace-pre-wrap rendering for fact-check output.
 
 ## Maintenance Log
 
@@ -59,7 +59,7 @@ E2E pass rate **67 → 143** (+76 tests) over **11 commits on master** (`e9d4098
 - **`can_admins_bypass: true`** on production environment — needs UI flip in Settings → Environments → production (not exposed via API).
 
 ```
-v1.6 Progress: [████████████████████] (8 phases incl. 36.4 complete; Phase 36 closed by user-approved human-verify on Plan 05; verifier still owed for 36, 36.3, 36.2 before milestone close)
+v1.6 Progress: [████████████████████] (9 phases incl. 38 complete; Phase 36 closed by user-approved human-verify on Plan 05; verifier still owed for 36, 36.3, 36.2 before milestone close; Phase 39 Mobile Apps + Phase 40 Content Expansion remain)
 ```
 
 ## Milestone Progress
@@ -82,7 +82,7 @@ v1.6 Progress: [████████████████████] (8
 | 36.5 | Fix monetization follow-up bugs (INSERTED) | PAY-04, PAY-06 | Partial | **Planned** (4/4 plans, 3 waves; plan-checker PASSED 10/10; awaiting `/gsd-execute-phase 36.5`) |
 | 37 | Horizontal Scaling | 5 reqs (INFRA-01 to INFRA-05) | No | **Complete** (7/7 plans on `test-ci-pipeline`; WS-04 cross-replica fanout VERIFIED 2026-04-29 via 37.1, log at .planning/phases/37.1-fix-dockerfile-monorepo/37.1-WS04-VERIFICATION-LOG.md, commit 11558a6) |
 | 37.1 | Fix root Dockerfile for pnpm monorepo + close WS-04 (INSERTED) | INFRA-04, DEPLOY-01 | No | **Verified** (Dockerfile rewritten for pnpm monorepo; WS-04 fanout test passes in 564ms on Docker Desktop + WSL2; closure log committed) |
-| 38 | Advanced AI Features | 7 reqs (AI-01 to AI-07) | Yes | Not started |
+| 38 | Advanced AI Features | 7 reqs (AI-01 to AI-07) | Yes | **Complete** (6/6 plans; VERIFICATION.md status=passed 2026-04-29; 6/6 ROADMAP criteria + 7/7 AI-XX + 19/19 D-XX + 0 violations; 1412/1412 unit + 5/5 E2E green) |
 | 39 | Mobile Apps | 8 reqs (MOB-01 to MOB-08) | Yes | Not started |
 | 40 | Content Expansion | 7 reqs (CONT-01 to CONT-07) | Yes | Not started |
 

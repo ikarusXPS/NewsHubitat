@@ -90,7 +90,7 @@
 - [ ] **Phase 36: Monetization Core** - Stripe integration and subscription tiers
 - [x] **Phase 37: Horizontal Scaling** - Docker Swarm and connection pooling (completed 2026-04-29; 5/5 must-haves SATISFIED static; runtime items in 37-HUMAN-UAT.md; Dockerfile rewrite deferred to 37.1)
 - [ ] **Phase 37.1 (INSERTED): Fix root Dockerfile for pnpm monorepo + close WS-04** — Rewrite Dockerfile that predates the phase-35 monorepo migration; re-run e2e-stack/run-fanout-test.sh to close WS-04 cross-replica fanout gate
-- [ ] **Phase 38: Advanced AI Features** - Credibility scoring, bias detection, fact-checking
+- [x] **Phase 38: Advanced AI Features** - Credibility scoring, bias detection, fact-checking (completed 2026-04-29)
 - [ ] **Phase 39: Mobile Apps** - Capacitor wrapper and app store deployment
 - [ ] **Phase 40: Content Expansion** - Video, podcast, and source expansion
 
@@ -305,7 +305,7 @@ Plans:
 - [x] 38-03-PLAN.md — Routes + Zod OpenAPI: POST /api/ai/fact-check + GET /api/ai/source-credibility/:id + rewritten GET /api/analysis/framing + BearerAuth + openapi:generate (Wave 3, depends_on [38-01, 38-02])
 - [x] 38-04-PLAN.md — i18n locale files: factcheck.json + credibility.json for DE/EN/FR + i18n.ts namespace registration (Wave 3, depends_on [] — co-scheduled with 38-03 for unified review)
 - [x] 38-05-PLAN.md — Frontend UI: 6 new components (CredibilityPill, BiasBadge, VerdictPill, FactCheckButton, FactCheckDrawer, CitationCard, CredibilityDrawer) + 2 hooks + FramingComparison rewrite + NewsCard/SourceRow/Article integration (Wave 4, depends_on [38-01, 38-02, 38-03, 38-04])
-- [ ] 38-06-PLAN.md — Verification gate: Playwright E2E factcheck.spec.ts + Redis TTL probes + 38-VERIFICATION.md evidence matrix (Wave 5, depends_on [38-01..38-05])
+- [x] 38-06-PLAN.md — Verification gate: Playwright E2E factcheck.spec.ts + Redis TTL probes + 38-VERIFICATION.md evidence matrix (Wave 5, depends_on [38-01..38-05])
 
 ### Phase 39: Mobile Apps
 **Goal**: Users can install native iOS and Android apps from app stores with push notifications
