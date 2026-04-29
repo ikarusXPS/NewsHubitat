@@ -6,7 +6,7 @@ const isCI = !!process.env.CI;
 test.describe('Event Map', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/events');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('should load the Event Map page', async ({ page }) => {

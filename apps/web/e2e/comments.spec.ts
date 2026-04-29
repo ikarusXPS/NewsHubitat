@@ -10,7 +10,7 @@ test.describe('Comments System', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to dashboard first
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Click first article to open article detail view
     // Articles are displayed as cards - look for the article link
@@ -28,7 +28,7 @@ test.describe('Comments System', () => {
 
     // Wait for article page or detail view to load
     await page.waitForURL(/.*article.*/);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('authenticated user can post a comment', async ({ page }) => {
@@ -184,7 +184,7 @@ test.describe('Comments System', () => {
 
     // Navigate to article page again after clearing auth
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Click first article
     const firstArticle = page.locator('[data-testid="article-card"], .article-card, a[href^="/article/"]').first();
@@ -196,7 +196,7 @@ test.describe('Comments System', () => {
     }
 
     await page.waitForURL(/.*article.*/);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Scroll to comment section
     await page.locator('text=Comments').scrollIntoViewIfNeeded();

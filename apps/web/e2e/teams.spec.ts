@@ -29,7 +29,7 @@ test.describe('Team Collaboration', () => {
 
     test('TeamSwitcher is visible in header for authenticated users', async ({ page }) => {
       await page.goto('/');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // TeamSwitcher should be in the desktop header (hidden on mobile)
       // Look for the Teams button or My Teams text
@@ -47,7 +47,7 @@ test.describe('Team Collaboration', () => {
 
     test('can open create team modal from dashboard', async ({ page }) => {
       await page.goto('/');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Try to find team switcher and open create modal
       const teamSwitcher = page.locator('button:has-text("Teams"), button:has-text("My Teams")').first();
@@ -76,7 +76,7 @@ test.describe('Team Collaboration', () => {
 
     test('team name validation rejects short names', async ({ page }) => {
       await page.goto('/');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       const teamSwitcher = page.locator('button:has-text("Teams"), button:has-text("My Teams")').first();
 
@@ -109,7 +109,7 @@ test.describe('Team Collaboration', () => {
       // This test verifies the BookmarkButton component behavior
       // First navigate to a page with articles
       await page.goto('/');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Look for a bookmark button with chevron (indicates team dropdown)
       const bookmarkWithChevron = page.locator('button:has(svg.lucide-bookmark):has(svg.lucide-chevron-down)');
@@ -123,7 +123,7 @@ test.describe('Team Collaboration', () => {
 
     test('can navigate to profile page', async ({ page }) => {
       await page.goto('/profile');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Profile page should load
       const profileContent = page.locator('text=/profile|profil/i');
@@ -137,7 +137,7 @@ test.describe('Team Collaboration', () => {
     test('team dashboard shows bookmarks and members tabs', async ({ page }) => {
       // Navigate to profile or teams list first
       await page.goto('/');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Try to find and click on a team
       const teamSwitcher = page.locator('button:has-text("Teams"), button:has-text("My Teams")').first();
@@ -151,7 +151,7 @@ test.describe('Team Collaboration', () => {
 
         if (await teamItem.isVisible()) {
           await teamItem.click();
-          await page.waitForLoadState('networkidle');
+          await page.waitForLoadState('domcontentloaded');
 
           // Should now be on team dashboard
           // Look for tabs
@@ -171,7 +171,7 @@ test.describe('Team Collaboration', () => {
 
     test('members tab shows at least one member (owner)', async ({ page }) => {
       await page.goto('/');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       const teamSwitcher = page.locator('button:has-text("Teams"), button:has-text("My Teams")').first();
 
@@ -183,7 +183,7 @@ test.describe('Team Collaboration', () => {
 
         if (await teamItem.isVisible()) {
           await teamItem.click();
-          await page.waitForLoadState('networkidle');
+          await page.waitForLoadState('domcontentloaded');
 
           // Click members tab
           const membersTab = page.locator('button:has-text("Members"), button:has-text("Mitglieder")');
@@ -209,7 +209,7 @@ test.describe('Team Collaboration', () => {
     test('invalid invite token shows error', async ({ page }) => {
       // Navigate to an invalid invite URL
       await page.goto('/team/invite/invalid-token-12345');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Wait for error state or redirect
       await page.waitForTimeout(1000);

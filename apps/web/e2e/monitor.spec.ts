@@ -5,7 +5,7 @@ const isCI = !!process.env.CI;
 test.describe('Monitor Page', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/monitor');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('should load the Monitor page', async ({ page }) => {
