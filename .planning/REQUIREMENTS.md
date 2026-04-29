@@ -70,13 +70,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INFRA-03 | Phase 37 | Pending |
 | INFRA-04 | Phase 37 | Pending |
 | INFRA-05 | Phase 37 | Pending |
-| AI-01 | Phase 38 | Pending |
-| AI-02 | Phase 38 | Pending |
-| AI-03 | Phase 38 | Pending |
-| AI-04 | Phase 38 | Pending |
-| AI-05 | Phase 38 | Pending |
-| AI-06 | Phase 38 | Pending |
-| AI-07 | Phase 38 | Pending |
+| AI-01 | Phase 38 | Verified (2026-04-29) |
+| AI-02 | Phase 38 | Verified (2026-04-29) |
+| AI-03 | Phase 38 | Verified (2026-04-29) |
+| AI-04 | Phase 38 | Verified (2026-04-29) |
+| AI-05 | Phase 38 | Verified (2026-04-29) |
+| AI-06 | Phase 38 | Verified (2026-04-29) |
+| AI-07 | Phase 38 | Verified (2026-04-29) |
 | MOB-01 | Phase 39 | Pending |
 | MOB-02 | Phase 39 | Pending |
 | MOB-03 | Phase 39 | Pending |

@@ -61,7 +61,13 @@ Users can see how the same story is covered by different regional perspectives �
 
 ### Active
 
-<!-- v1.6: Infrastructure & Scale -->
+<!-- v1.6: Infrastructure & Scale (Phase 38 closed 2026-04-29) -->
+
+- ✓ Source credibility scoring on a 0–100 scale with deterministic provenance — Phase 38 (AI-01, AI-02, AI-03)
+- ✓ Bias detection (political left/center/right) with methodology explanation — Phase 38 (AI-02)
+- ✓ Per-region framing analysis (replaces legacy heuristic) — Phase 38 (AI-04)
+- ✓ Claim fact-checking with confidence + Postgres-FTS-backed citations — Phase 38 (AI-05, AI-06)
+- ✓ Redis-cached AI responses with 24h ± jitter TTL — Phase 38 (AI-07)
 
 (See REQUIREMENTS.md for detailed requirements)
 
@@ -191,4 +197,4 @@ This document evolves at phase transitions and milestone boundaries.
 - Gamification and personalization
 
 ---
-*Last updated: 2026-04-28 — Phase 36.5 complete (monetization follow-up: structured webhook error log + 2 integration tests, dropped `User.showPremiumBadge` column with prod-migration queued, Sidebar wired to `<SubscriptionBadge>`; PAY-04 + PAY-06 closed; live UI probe approved)*
+*Last updated: 2026-04-29 — Phase 38 (Advanced AI Features) complete: AI-01..AI-07 verified PASS via 38-VERIFICATION.md, 6/6 ROADMAP success criteria, 19/19 D-XX locked decisions, 33-row evidence matrix with live Redis TTL + cache-replay + security-rejection probes; 1412/1412 unit + 5/5 E2E green; typecheck clean.*
