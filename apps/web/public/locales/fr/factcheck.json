@@ -1,0 +1,30 @@
+{
+  "verdicts": {
+    "true": "Vrai",
+    "mostly-true": "Plutôt vrai",
+    "mixed": "Mitigé",
+    "unverified": "Non vérifié",
+    "false": "Faux"
+  },
+  "button": {
+    "label": "Vérifier",
+    "loading": "Vérification en cours..."
+  },
+  "drawer": {
+    "title": "Résultat de la vérification",
+    "methodology": "Méthodologie",
+    "citations": "Sources citées",
+    "close": "Fermer",
+    "noCitations": "Aucune source disponible."
+  },
+  "error": {
+    "tooShort": "Sélectionnez au moins 10 caractères",
+    "tooLong": "Sélectionnez au maximum 500 caractères",
+    "rateLimit": "Limite IA quotidienne atteinte. Passez Premium pour des vérifications illimitées.",
+    "rejected": "L'affirmation contient des motifs interdits",
+    "generic": "Impossible de finaliser la vérification. Veuillez réessayer."
+  },
+  "unverified": {
+    "explanation": "Le corpus ne contenait pas assez de preuves pour vérifier cette affirmation."
+  }
+}
