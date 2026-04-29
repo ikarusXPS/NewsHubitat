@@ -36,6 +36,13 @@ let authToken: string;
 let testApiKey: string;
 let testApiKeyId: string;
 
+// Force serial execution: tests share module-scope state (`authToken`, `testApiKey`,
+// `testApiKeyId`) populated by an earlier test. With the project-wide
+// `fullyParallel: true` setting, describe blocks would split across 4 workers and
+// the shared variables would be undefined in worker N>0, causing every dependent
+// test to 401.
+test.describe.configure({ mode: 'serial' });
+
 test.describe('Public API', () => {
   test.beforeAll(async ({ request }) => {
     // Register test user (idempotent - skip if exists)
