@@ -32,10 +32,23 @@ const CONNECT_TIMEOUT_MS = 10_000;
  * param means Traefik treats this as a brand-new session and issues its own
  * nh_sticky cookie; the next forceNew call gets a different cookie value, so
  * round-robin steers it to the OTHER replica.
+ *
+ * transports: ['websocket'] only — NOT polling. Reason: socket.io-client v4
+ * in Node.js does NOT manage cookies across requests (browsers do, Node
+ * doesn't). With sticky-session load-balancing in front of socket.io
+ * polling, the initial GET handshake gets a sid + nh_sticky cookie from
+ * Traefik, but the follow-up POST goes WITHOUT the cookie, gets routed
+ * randomly, and lands on a replica that doesn't know the sid → "xhr post
+ * error". WebSocket sidesteps this because it's a single TCP connection:
+ * sticky pinning happens once at upgrade time and the same socket stays
+ * pinned for its lifetime. Production browsers don't have this problem
+ * (they manage cookies natively). The Redis-adapter fanout proof is
+ * transport-agnostic anyway — the adapter operates on Socket.IO message
+ * pub/sub, not engine.io transport.
  */
 async function connectClient(label: string): Promise<Socket> {
   const sock = ioClient(TRAEFIK_URL, {
-    transports: ['polling', 'websocket'],
+    transports: ['websocket'],
     forceNew: true,
     autoConnect: true,
     // Cache-busting query param ensures Traefik doesn't reuse a session.
