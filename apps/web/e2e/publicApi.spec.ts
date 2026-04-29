@@ -395,9 +395,33 @@ test.describe('Public API', () => {
   });
 
   test.describe('Cache Headers', () => {
+    // testApiKey accumulates ~9 req across upstream describe blocks; the free
+    // tier limit is 10 req/min, so reusing it here trips 429 mid-suite.
+    // Mint a fresh key dedicated to this describe block.
+    let cacheTestApiKey: string;
+    let cacheTestApiKeyId: string;
+
+    test.beforeAll(async ({ request }) => {
+      const create = await request.post('http://127.0.0.1:3001/api/keys', {
+        headers: { Authorization: `Bearer ${authToken}` },
+        data: { name: 'Cache Headers Test Key', tier: 'free', environment: 'live' },
+      });
+      const data = await create.json();
+      cacheTestApiKey = data.data.key;
+      cacheTestApiKeyId = data.data.keyData.id;
+    });
+
+    test.afterAll(async ({ request }) => {
+      if (cacheTestApiKeyId) {
+        await request.delete(`http://127.0.0.1:3001/api/keys/${cacheTestApiKeyId}`, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
+      }
+    });
+
     test('should set Cache-Control headers on news list', async ({ request }) => {
       const response = await request.get('http://127.0.0.1:3001/api/v1/public/news', {
-        headers: { 'X-API-Key': testApiKey },
+        headers: { 'X-API-Key': cacheTestApiKey },
       });
 
       expect(response.status()).toBe(200);
@@ -406,7 +430,7 @@ test.describe('Public API', () => {
 
     test('should set Cache-Control headers on single article', async ({ request }) => {
       const listResponse = await request.get('http://127.0.0.1:3001/api/v1/public/news?limit=1', {
-        headers: { 'X-API-Key': testApiKey },
+        headers: { 'X-API-Key': cacheTestApiKey },
       });
       const listData = await listResponse.json();
 
@@ -416,7 +440,7 @@ test.describe('Public API', () => {
       }
 
       const response = await request.get(`http://127.0.0.1:3001/api/v1/public/news/${listData.data[0].id}`, {
-        headers: { 'X-API-Key': testApiKey },
+        headers: { 'X-API-Key': cacheTestApiKey },
       });
 
       expect(response.status()).toBe(200);
@@ -425,7 +449,7 @@ test.describe('Public API', () => {
 
     test('should set Cache-Control headers on events', async ({ request }) => {
       const response = await request.get('http://127.0.0.1:3001/api/v1/public/events', {
-        headers: { 'X-API-Key': testApiKey },
+        headers: { 'X-API-Key': cacheTestApiKey },
       });
 
       expect(response.status()).toBe(200);
@@ -434,7 +458,7 @@ test.describe('Public API', () => {
 
     test('should set Cache-Control headers on sentiment', async ({ request }) => {
       const response = await request.get('http://127.0.0.1:3001/api/v1/public/sentiment', {
-        headers: { 'X-API-Key': testApiKey },
+        headers: { 'X-API-Key': cacheTestApiKey },
       });
 
       expect(response.status()).toBe(200);
