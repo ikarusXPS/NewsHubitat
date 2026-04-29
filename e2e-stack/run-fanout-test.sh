@@ -62,6 +62,9 @@ echo "==> Running ws-fanout vitest spec"
 #
 # Use absolute paths because vitest resolves --config relative to --root,
 # which would otherwise compound to a wrong path on Windows / Git Bash.
+# We do NOT pass the test file as a positional argument — vitest treats
+# positionals as filters against discovered files. Discovery happens via
+# the `include` glob in vitest.config.ts which points at e2e-stack/*.test.ts.
 REPO_ROOT="$(pwd)"
 set +e
 (
@@ -71,7 +74,6 @@ set +e
     run \
     --config "$REPO_ROOT/e2e-stack/vitest.config.ts" \
     --root "$REPO_ROOT/apps/web" \
-    "$REPO_ROOT/e2e-stack/ws-fanout.test.ts" \
     --no-coverage \
     --reporter=verbose
 )
