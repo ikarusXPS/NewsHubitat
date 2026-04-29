@@ -2,7 +2,9 @@ import { useQuery } from '@tanstack/react-query';
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, Search, Frame, TrendingUp, Clock, ChevronRight } from 'lucide-react';
-import { cn } from '../lib/utils';
+import { useTranslation } from 'react-i18next';
+import { cn, getRegionColor } from '../lib/utils';
+import { useAppStore } from '../store';
 import type { PerspectiveRegion } from '../types';
 
 // Common search suggestions
@@ -25,26 +27,29 @@ const SUGGESTED_TOPICS = [
   'USA',
 ];
 
+/**
+ * Phase 38 D-14 LOCKED: structured per-region framing produced by
+ * AIService.generateFramingAnalysis. The legacy heuristic shape (region
+ * counts + per-region sentiment scores) is gone — the new shape carries
+ * narrative / omissions / vocabulary / evidence quotes per region.
+ */
+interface FramingPerspective {
+  narrative: string;
+  omissions: string[];
+  vocabulary: string[];
+  evidenceQuotes: string[];
+}
+
 interface FramingData {
   topic: string;
-  regions: Record<string, { count: number; avgSentiment: number }>;
-  framing?: Record<PerspectiveRegion, string>;
-  bias?: Record<PerspectiveRegion, number>;
+  locale: string;
+  perspectives: Partial<Record<PerspectiveRegion, FramingPerspective>>;
   aiGenerated: boolean;
 }
 
 interface ApiResponse {
   success: boolean;
   data: FramingData;
-}
-
-async function fetchFraming(topic?: string): Promise<ApiResponse> {
-  const url = topic
-    ? `/api/analysis/framing?topic=${encodeURIComponent(topic)}`
-    : '/api/analysis/framing';
-  const response = await fetch(url);
-  if (!response.ok) throw new Error('Failed to fetch framing data');
-  return response.json();
 }
 
 const REGION_LABELS: Record<PerspectiveRegion, string> = {
@@ -63,23 +68,10 @@ const REGION_LABELS: Record<PerspectiveRegion, string> = {
   alternative: 'Alternative',
 };
 
-const REGION_COLORS: Record<PerspectiveRegion, string> = {
-  usa: '#3b82f6',
-  europa: '#8b5cf6',
-  deutschland: '#000000',
-  nahost: '#22c55e',
-  tuerkei: '#ef4444',
-  russland: '#dc2626',
-  china: '#eab308',
-  asien: '#06b6d4',
-  afrika: '#84cc16',
-  lateinamerika: '#f59e0b',
-  ozeanien: '#14b8a6',
-  kanada: '#ef4444',
-  alternative: '#06b6d4',
-};
-
 export function FramingComparison() {
+  const { t } = useTranslation('credibility');
+  const language = useAppStore((s) => s.language);
+
   const [topic, setTopic] = useState('');
   const [searchTopic, setSearchTopic] = useState<string | undefined>();
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -87,18 +79,26 @@ export function FramingComparison() {
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['framing', searchTopic],
-    queryFn: () => fetchFraming(searchTopic),
-    staleTime: 5 * 60 * 1000,
+  const { data, isLoading, error } = useQuery<FramingData>({
+    queryKey: ['framing', topic, language],
+    queryFn: async () => {
+      const r = await fetch(
+        `/api/analysis/framing?topic=${encodeURIComponent(searchTopic ?? '')}&locale=${encodeURIComponent(language)}`
+      );
+      if (!r.ok) throw new Error('Framing fetch failed');
+      const body: ApiResponse = await r.json();
+      return body.data;
+    },
+    enabled: !!searchTopic && searchTopic.trim().length >= 2,
+    staleTime: 24 * 60 * 60 * 1000, // matches server cache TTL per D-17
   });
 
   // Filter suggestions based on input
   const filteredSuggestions = useMemo(() => {
     if (!topic) return SUGGESTED_TOPICS.slice(0, 6);
     const lower = topic.toLowerCase();
-    return SUGGESTED_TOPICS.filter(s =>
-      s.toLowerCase().includes(lower) && s.toLowerCase() !== lower
+    return SUGGESTED_TOPICS.filter(
+      (s) => s.toLowerCase().includes(lower) && s.toLowerCase() !== lower
     ).slice(0, 6);
   }, [topic]);
 
@@ -120,9 +120,8 @@ export function FramingComparison() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (topic) {
-      // Add to recent searches
-      setRecentSearches(prev => {
-        const updated = [topic, ...prev.filter(s => s !== topic)].slice(0, 5);
+      setRecentSearches((prev) => {
+        const updated = [topic, ...prev.filter((s) => s !== topic)].slice(0, 5);
         return updated;
       });
     }
@@ -134,22 +133,10 @@ export function FramingComparison() {
     setTopic(suggestion);
     setSearchTopic(suggestion);
     setShowSuggestions(false);
-    // Add to recent searches
-    setRecentSearches(prev => {
-      const updated = [suggestion, ...prev.filter(s => s !== suggestion)].slice(0, 5);
+    setRecentSearches((prev) => {
+      const updated = [suggestion, ...prev.filter((s) => s !== suggestion)].slice(0, 5);
       return updated;
     });
-  };
-
-  const getSentimentLabel = (score: number): { label: string; color: string } => {
-    if (score < -0.3) return { label: 'Negativ', color: 'text-[#ff0044]' };
-    if (score > 0.3) return { label: 'Positiv', color: 'text-[#00ff88]' };
-    return { label: 'Neutral', color: 'text-gray-400' };
-  };
-
-  const getSentimentBarPosition = (score: number): number => {
-    // Convert score (-1 to 1) to percentage (0 to 100)
-    return ((score + 1) / 2) * 100;
   };
 
   return (
@@ -257,86 +244,94 @@ export function FramingComparison() {
         </div>
       )}
 
-      {data?.data && !isLoading && (
+      {data && !isLoading && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <p className="text-xs font-mono text-gray-400">
-              Thema: <span className="text-[#00f0ff]">{data.data.topic}</span>
+              Thema: <span className="text-[#00f0ff]">{data.topic}</span>
             </p>
-            {data.data.aiGenerated && (
-              <span className="rounded-md bg-[#bf00ff]/20 px-2 py-0.5 text-[10px] font-mono text-[#bf00ff] border border-[#bf00ff]/30">
-                KI-analysiert
+            {data.aiGenerated && (
+              <span className="text-[10px] uppercase tracking-wide bg-[#00f0ff]/10 text-[#00f0ff] px-2 py-0.5 rounded">
+                {t('framing.aiGenerated')}
               </span>
             )}
           </div>
 
-          {/* Sentiment Scale Legend */}
-          <div className="mb-2">
-            <div className="flex justify-between text-[10px] font-mono text-gray-500 mb-1">
-              <span className="text-[#ff0044]">Negativ</span>
-              <span className="text-gray-400">Neutral</span>
-              <span className="text-[#00ff88]">Positiv</span>
-            </div>
-            <div className="h-1.5 rounded-full bg-gradient-to-r from-[#ff0044] via-gray-500 to-[#00ff88]" />
-          </div>
-
-          {/* Region Sentiment Bars */}
-          <div className="space-y-3">
-            {Object.entries(data.data.regions).map(([region, stats]) => {
-              const sentiment = getSentimentLabel(stats.avgSentiment);
-              const position = getSentimentBarPosition(stats.avgSentiment);
-
+          {/* Per-region structured framing grid (D-14) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Object.entries(data.perspectives).map(([region, p]) => {
+              if (!p) return null;
               return (
-                <div key={region} className="space-y-1">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="h-2 w-2 rounded-full"
-                        style={{
-                          backgroundColor: REGION_COLORS[region as PerspectiveRegion] || '#6b7280',
-                          boxShadow: `0 0 6px ${REGION_COLORS[region as PerspectiveRegion] || '#6b7280'}`,
-                        }}
-                      />
-                      <span className="text-xs font-mono text-white">
-                        {REGION_LABELS[region as PerspectiveRegion] || region}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className={cn('text-[10px] font-mono', sentiment.color)}>
-                        {sentiment.label}
-                      </span>
-                      <span className="text-[10px] font-mono text-gray-500">
-                        {stats.count} Artikel
-                      </span>
-                    </div>
-                  </div>
+                <div key={region} className="glass-panel rounded-xl p-4 space-y-3">
+                  <h3 className="signal-label flex items-center gap-2">
+                    <span
+                      className={cn(
+                        'rounded px-2 py-0.5 text-[10px] font-mono text-white',
+                        getRegionColor(region)
+                      )}
+                    >
+                      {REGION_LABELS[region as PerspectiveRegion] || region.toUpperCase()}
+                    </span>
+                  </h3>
 
-                  {/* Sentiment Position Indicator */}
-                  <div className="relative h-4 rounded-md bg-[#0a0e1a] border border-gray-700/50">
-                    <div
-                      className="absolute top-1/2 h-3 w-3 -translate-y-1/2 -translate-x-1/2 rounded-full border-2 border-white"
-                      style={{
-                        left: `${Math.max(5, Math.min(95, position))}%`,
-                        backgroundColor: REGION_COLORS[region as PerspectiveRegion] || '#6b7280',
-                        boxShadow: `0 0 8px ${REGION_COLORS[region as PerspectiveRegion] || '#6b7280'}`,
-                      }}
-                    />
-                  </div>
+                  <section>
+                    <h4 className="text-[10px] text-gray-400 uppercase tracking-wide">
+                      {t('framing.section.narrative')}
+                    </h4>
+                    <p className="text-xs text-gray-200">{p.narrative}</p>
+                  </section>
 
-                  {/* AI-generated framing description */}
-                  {data.data.framing?.[region as PerspectiveRegion] && (
-                    <p className="text-[10px] font-mono text-gray-400 pl-4 border-l-2 border-[#00f0ff]/20 ml-1">
-                      {data.data.framing[region as PerspectiveRegion]}
-                    </p>
-                  )}
+                  {p.omissions.length > 0 ? (
+                    <section>
+                      <h4 className="text-[10px] text-gray-400 uppercase tracking-wide">
+                        {t('framing.section.omissions')}
+                      </h4>
+                      <ul className="text-xs text-gray-300 list-disc list-inside space-y-0.5">
+                        {p.omissions.map((o, i) => (
+                          <li key={i}>{o}</li>
+                        ))}
+                      </ul>
+                    </section>
+                  ) : null}
+
+                  {p.vocabulary.length > 0 ? (
+                    <section>
+                      <h4 className="text-[10px] text-gray-400 uppercase tracking-wide">
+                        {t('framing.section.vocabulary')}
+                      </h4>
+                      <div className="flex flex-wrap gap-1">
+                        {p.vocabulary.map((v, i) => (
+                          <span
+                            key={i}
+                            className="text-[10px] font-mono bg-gray-800 text-gray-300 px-1.5 py-0.5 rounded"
+                          >
+                            {v}
+                          </span>
+                        ))}
+                      </div>
+                    </section>
+                  ) : null}
+
+                  {p.evidenceQuotes.length > 0 ? (
+                    <section>
+                      <h4 className="text-[10px] text-gray-400 uppercase tracking-wide">
+                        {t('framing.section.evidenceQuotes')}
+                      </h4>
+                      <ul className="text-xs text-gray-400 italic space-y-0.5">
+                        {p.evidenceQuotes.map((q, i) => (
+                          <li key={i}>&ldquo;{q}&rdquo;</li>
+                        ))}
+                      </ul>
+                    </section>
+                  ) : null}
                 </div>
               );
             })}
           </div>
 
-          {Object.keys(data.data.regions).length === 0 && (
-            <p className="py-4 text-center text-sm font-mono text-gray-500">
-              Keine Daten fur dieses Thema gefunden.
+          {Object.keys(data.perspectives).length === 0 && (
+            <p className="py-4 text-center text-xs font-mono text-gray-500 italic">
+              {t('framing.noData')}
             </p>
           )}
         </div>
