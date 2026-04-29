@@ -5,6 +5,8 @@
 
 import { Server as HttpServer } from 'http';
 import { Server, Socket } from 'socket.io';
+import { createAdapter } from '@socket.io/redis-adapter';
+import Redis from 'ioredis';
 import logger from '../utils/logger';
 import type { NewsArticle, GeoEvent } from '../../src/types';
 import { CacheService, CacheKeys } from './cacheService';
@@ -117,6 +119,9 @@ export class WebSocketService {
   private static instance: WebSocketService;
   private io: Server<ClientToServerEvents, ServerToClientEvents, Record<string, never>, SocketData> | null = null;
   private connectedClients = new Map<string, Socket>();
+  // WS-01: Redis adapter clients for cross-replica fanout
+  private pubClient: Redis | null = null;
+  private subClient: Redis | null = null;
 
   private constructor() {}
 
@@ -141,8 +146,23 @@ export class WebSocketService {
       pingInterval: 25000,
     });
 
+    // WS-01: Redis adapter for cross-replica fanout
+    // CRITICAL: pubClient and subClient MUST be separate ioredis instances.
+    // The subscriber enters "subscribed mode" that blocks regular commands —
+    // reusing CacheService.getClient() would lock out rate-limit-redis.
+    // Do NOT pass `keyPrefix` — Pub/Sub channels are not prefix-rewritten;
+    // adapter uses its own `socket.io#` channel namespace (WS-03).
+    const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+    const pubClient = new Redis(redisUrl);
+    const subClient = pubClient.duplicate();
+    this.io.adapter(createAdapter(pubClient, subClient));
+
+    // Track for shutdown (used by Plan 05 terminus drain)
+    this.pubClient = pubClient;
+    this.subClient = subClient;
+
     this.setupEventHandlers();
-    logger.info('✓ WebSocket server initialized');
+    logger.info('✓ WebSocket server initialized with Redis adapter');
   }
 
   private setupEventHandlers(): void {
@@ -498,6 +518,16 @@ export class WebSocketService {
       this.io = null;
       this.connectedClients.clear();
       logger.info('WebSocket server shut down');
+    }
+
+    // WS-01: Close Redis adapter pub/sub clients
+    if (this.pubClient) {
+      await this.pubClient.quit();
+      this.pubClient = null;
+    }
+    if (this.subClient) {
+      await this.subClient.quit();
+      this.subClient = null;
     }
   }
 }

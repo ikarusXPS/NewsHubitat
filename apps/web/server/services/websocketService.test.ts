@@ -48,11 +48,24 @@ const createMockSocket = (id: string = 'socket-1'): MockSocket => {
 };
 
 // Create mock for Socket.IO Server - must be defined before vi.mock since it uses vi.hoisted
-const { mockIo, mockRooms, mockServerConstructor } = vi.hoisted(() => {
+const { mockIo, mockRooms, mockServerConstructor, mockRedisInstance, mockRedisConstructor, mockCreateAdapter } = vi.hoisted(() => {
   const mockRooms = new Map([
     ['region:western', new Set(['socket-1'])],
     ['topic:military', new Set(['socket-2'])],
   ]);
+
+  // Phase 37 / WS-01: Redis adapter mock
+  // initialize() now constructs new Redis(...) and pubClient.duplicate(), then
+  // calls io.adapter(createAdapter(pub, sub)) — mock all three.
+  const mockRedisInstance: Record<string, unknown> = {
+    duplicate: vi.fn(function (this: unknown) { return this; }),
+    quit: vi.fn().mockResolvedValue(undefined),
+    on: vi.fn(),
+  };
+  const mockRedisConstructor = vi.fn(function () {
+    return mockRedisInstance;
+  });
+  const mockCreateAdapter = vi.fn(() => vi.fn());
 
   // Note: connectionHandler will be set in the mock's on() method
   const mockIo = {
@@ -64,6 +77,7 @@ const { mockIo, mockRooms, mockServerConstructor } = vi.hoisted(() => {
     }),
     emit: vi.fn(),
     to: vi.fn().mockReturnThis(),
+    adapter: vi.fn(),     // Phase 37: io.adapter(createAdapter(pub, sub))
     sockets: {
       adapter: {
         rooms: mockRooms,
@@ -76,11 +90,19 @@ const { mockIo, mockRooms, mockServerConstructor } = vi.hoisted(() => {
     return mockIo;
   });
 
-  return { mockIo, mockRooms, mockServerConstructor };
+  return { mockIo, mockRooms, mockServerConstructor, mockRedisInstance, mockRedisConstructor, mockCreateAdapter };
 });
 
 vi.mock('socket.io', () => ({
   Server: mockServerConstructor,
+}));
+
+vi.mock('ioredis', () => ({
+  default: mockRedisConstructor,
+}));
+
+vi.mock('@socket.io/redis-adapter', () => ({
+  createAdapter: mockCreateAdapter,
 }));
 
 vi.mock('../utils/logger', () => ({
