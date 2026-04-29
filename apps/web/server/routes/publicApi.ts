@@ -89,7 +89,9 @@ publicApiRoutes.get('/news', async (req: ApiKeyRequest, res: Response) => {
 
     res.json({
       success: true,
-      data: articles,
+      // Add top-level sourceId per the NewsArticle OpenAPI contract; the read
+      // service returns the nested source object only.
+      data: articles.map((a) => ({ ...a, sourceId: a.source?.id })),
       meta: {
         total,
         page,

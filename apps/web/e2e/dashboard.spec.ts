@@ -124,14 +124,12 @@ test.describe('Dashboard Page', () => {
   });
 
   test('should display glass panels', async ({ page }) => {
-    // Wait for page to load
-    await page.waitForTimeout(1000);
+    // Wait for the first glass-panel to render (NewsFeed shows a spinner while
+    // /api/news loads, with no glass-panel in the DOM during that window).
+    // 15s covers cold-start fetch in CI with seeded DB warming up.
+    await page.locator('.glass-panel').first().waitFor({ state: 'visible', timeout: 15000 });
 
-    // Check for glass-panel class (used throughout NewsFeed)
-    const glassPanels = page.locator('.glass-panel');
-    const panelCount = await glassPanels.count();
-
-    // Should have at least one glass panel visible
+    const panelCount = await page.locator('.glass-panel').count();
     expect(panelCount).toBeGreaterThan(0);
   });
 
