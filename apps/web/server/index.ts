@@ -51,8 +51,8 @@ import { MetricsService } from './services/metricsService';
 import { WebSocketService } from './services/websocketService';
 import { CacheService } from './services/cacheService';
 import { AIService } from './services/aiService';
-import { CleanupService } from './services/cleanupService';
 import { runBootLifecycle } from './bootLifecycle';
+import { registerShutdown } from './middleware/shutdown';
 import { prisma, getPoolStats } from './db/prisma';
 import { logDbHealthCheck } from './utils/dbLogger';
 
@@ -517,27 +517,16 @@ void runBootLifecycle({
   },
 });
 
-// Graceful shutdown
-const shutdown = async () => {
-  console.log('\nShutting down gracefully...');
-
-  // Shutdown services
-  await wsService.shutdown();
-  await cacheService.shutdown();
-  aiService.shutdown();
-  CleanupService.getInstance().stop();
-
-  httpServer.close(() => {
-    console.log('Server closed');
-    process.exit(0);
-  });
-
-  // Force close after 10s
-  setTimeout(() => {
-    console.error('Forced shutdown');
-    process.exit(1);
-  }, 10000);
-};
-
-process.on('SIGTERM', shutdown);
-process.on('SIGINT', shutdown);
+// Phase 37 Plan 05 (DEPLOY-04, DEPLOY-05): graceful shutdown via @godaddy/terminus.
+// Replaces the inline SIGTERM/SIGINT handler that previously lived here.
+// /api/ready is now managed by terminus.healthChecks (returns 503 once
+// isShuttingDown=true so Traefik stops routing within ~10s); /api/health
+// stays as the standalone liveness probe (process is up).
+//
+// Only register on RUN_HTTP replicas — the worker process has no httpServer
+// listening and no /api/ready endpoint to gate. Terminus mounts handlers on
+// the httpServer object directly; calling it before httpServer.listen()
+// completes is safe because terminus only intercepts incoming requests.
+if (RUN_HTTP) {
+  registerShutdown(httpServer);
+}
