@@ -27,6 +27,7 @@
     "seed:load-test": "pnpm --filter @newshub/web seed:load-test",
     "load:smoke": "pnpm --filter @newshub/web load:smoke",
     "load:full": "pnpm --filter @newshub/web load:full",
+    "test:fanout": "bash e2e-stack/run-fanout-test.sh",
     "validate:ci": "npx --yes action-validator .github/workflows/ci.yml"
   },
   "devDependencies": {
