@@ -47,10 +47,16 @@ services:
     environment:
       DATABASE_URL: "postgresql://newshub:test@postgres:5432/newshub?schema=public"
       DIRECT_URL: "postgresql://newshub:test@postgres:5432/newshub?schema=public"
+      # Avoid corepack interactive download prompt (no TTY in compose up -d).
+      COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
+    # Call prisma directly via node_modules/.bin to bypass corepack/pnpm
+    # entirely — this avoids the interactive download prompt and the
+    # version-resolution roundtrip on every container start.
+    # --accept-data-loss is safe here: postgres is empty on every test run.
     command:
       - "sh"
       - "-c"
-      - "cd /app/apps/web && pnpm exec prisma db push --skip-generate --accept-data-loss"
+      - "cd /app/apps/web && ./node_modules/.bin/prisma db push --accept-data-loss"
     depends_on:
       postgres:
         condition: service_healthy
