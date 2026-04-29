@@ -124,6 +124,15 @@ COPY --from=builder --chown=nodejs:nodejs /app/packages/types/index.ts ./package
 # Logs directory for winston
 RUN mkdir -p logs && chown nodejs:nodejs logs
 
+# Hand ownership of /app to nodejs so Prisma 7 can lazy-load its engine
+# binaries into /app/node_modules/.pnpm/@prisma+engines@*/... at runtime
+# (Prisma writes to its own node_modules dir on first invocation if engines
+# are missing — pnpm 10 skips @prisma/engines' postinstall script by default
+# as a security feature, so the binaries aren't pre-staged). Without this,
+# `prisma db push` and `prisma migrate deploy` fail with EACCES under the
+# non-root nodejs user.
+RUN chown -R nodejs:nodejs /app
+
 USER nodejs
 
 EXPOSE 3001
