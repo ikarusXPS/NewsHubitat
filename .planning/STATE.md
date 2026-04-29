@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Infrastructure & Scale
-current_plan: Not started
+current_plan: 37.1-01 (Dockerfile rewrite for pnpm monorepo)
 status: executing
-last_updated: "2026-04-29T06:30:00.000Z"
-last_activity: 2026-04-29 -- Phase 37.1 planned (Dockerfile rewrite + WS-04 close-out, 2 plans across 2 waves)
+last_updated: "2026-04-29T10:39:56.419Z"
+last_activity: 2026-04-29 -- Phase 37.1 WS-04 cross-replica fanout VERIFIED (commit 11558a6, test 564ms, log at .planning/phases/37.1-fix-dockerfile-monorepo/37.1-WS04-VERIFICATION-LOG.md). Phase 37 + 37.1 closure-ready.
 progress:
-  total_phases: 7
+  total_phases: 6
   completed_phases: 3
-  total_plans: 26
+  total_plans: 17
   completed_plans: 17
-  percent: 65
+  percent: 100
 ---
 
 # State: NewsHub
@@ -91,7 +91,7 @@ Items acknowledged and carried forward from previous milestone close:
 **Next step:** `/gsd-verify-phase 36.3` — all 5 plans complete; verifier inspects the 6 ROADMAP success criteria against on-disk evidence. Plan 04 evidence is in `.planning/phases/36.3-fix-stripe-webhook-monorepo-path/36.3-04-{trigger-output,db-query}.log` and is committed to git for audit. After 36.3 verifies, run `/gsd-verify-phase 36.2` (deferred earlier) then resume `/gsd-execute-phase 36` at Plan 05.
 
 **Pre-Plan-04 alt next step (historical context):** `/gsd-execute-phase 36.3` continues at plan 04 — end-to-end Stripe CLI verification: `stripe listen --forward-to http://localhost:3001/api/webhooks/stripe` while triggering all 8 subscribed event types (`checkout.session.completed`, `customer.subscription.created/updated/deleted/paused/resumed`, `invoice.paid`, `invoice.payment_failed`); each event must return HTTP 200 in `stripe listen` output (NOT 404 — Plan 02 mounted the route; NOT 401 — `apps/web/.env` STRIPE_WEBHOOK_SECRET must match `stripe listen` whsec_); `ProcessedWebhookEvent` table must show >= 8 rows after triggers (D-10); idempotency replay (re-trigger same event) must show "already processed" log line and DB COUNT(*) = 1 not 2 (D-09). Plan 03's structural prevention is now in place: the orphan paths physically do not exist, so any `pnpm dev:backend` invocation can only resolve to the canonical `apps/web/server/index.ts` with the Plan 02 mounts. PAY-02 / PAY-03 / PAY-06 close in Plan 04, not before.
-**Resume file:** None
+**Resume file:** .planning/phases/38-advanced-ai-features/38-CONTEXT.md
 **Checkpoint:** None
 
 ### Roadmap Evolution
