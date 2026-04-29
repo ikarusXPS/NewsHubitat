@@ -36,6 +36,9 @@ model NewsArticle {
   source   NewsSource @relation(fields: [sourceId], references: [id])
   sourceId String
 
+  searchTsv  Unsupported("tsvector")? // managed by raw migration 20260429120000_38_news_article_fts; do not edit via Prisma
+  factChecks FactCheck[]
+
   @@index([publishedAt])
   @@index([perspective])
   @@index([sentiment])
@@ -44,6 +47,7 @@ model NewsArticle {
   @@index([sentiment, publishedAt]) // Sentiment charts
   @@index([topics(ops: JsonbPathOps)], type: Gin) // D-14: GIN for topics
   @@index([entities(ops: JsonbPathOps)], type: Gin) // D-14: GIN for entities
+  @@index([searchTsv], type: Gin) // Phase 38: FTS GIN index (managed via raw migration)
 }
 
 model NewsSource {
@@ -154,6 +158,9 @@ model User {
 
   // Phase 36.2: Student verification queue (per D-05)
   studentVerifications      StudentVerification[]
+
+  // Phase 38: Fact-check audit trail (D-16, D-19 override per RESEARCH.md Q-04)
+  factChecks                FactCheck[]
 
   // Indexes for token lookups (D-53)
   @@index([verificationTokenHash])
@@ -583,4 +590,33 @@ enum SubscriptionStatus {
   PAST_DUE
   CANCELED
   PAUSED
+}
+
+// ============================================================================
+// PHASE 38: ADVANCED AI FEATURES — FACT-CHECK AUDIT TRAIL
+// ============================================================================
+
+// Phase 38 — Fact-check audit trail (D-16 LOCKED + RESEARCH.md Q-04 cascade override)
+model FactCheck {
+  id                  String   @id @default(cuid())
+  userId              String
+  articleId           String?
+  claimText           String   @db.Text
+  claimHash           String   // sha256(claimText) — populated by service layer (D-18 cache key)
+  claimLanguage       String
+  verdict             String   // 'true' | 'mostly-true' | 'mixed' | 'unverified' | 'false' (D-08)
+  confidence          Int      // 0-100
+  methodologyMd       String   @db.Text
+  citationArticleIds  String[]
+  modelUsed           String   // e.g. 'openrouter:google/gemma-2-9b-it:free'
+  locale              String   // 'de' | 'en' | 'fr' (Q-05)
+  createdAt           DateTime @default(now())
+
+  user                User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  article             NewsArticle? @relation(fields: [articleId], references: [id], onDelete: SetNull)
+
+  @@index([claimHash])
+  @@index([userId])
+  @@index([articleId])
+  @@index([createdAt])
 }
