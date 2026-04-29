@@ -53,12 +53,21 @@ import { WebSocketService } from './services/websocketService';
 import { CacheService } from './services/cacheService';
 import { AIService } from './services/aiService';
 import { CleanupService } from './services/cleanupService';
+import { initWorkerEmitter } from './jobs/workerEmitter';
 import { prisma, getPoolStats } from './db/prisma';
 import { logDbHealthCheck } from './utils/dbLogger';
 
 const app = express();
 const httpServer = createServer(app);
 const PORT = process.env.PORT || 3001;
+
+// Phase 37 Plan 02 (JOB-01): boot-mode env gating
+// RUN_HTTP=true (default) — this replica accepts HTTP/WebSocket traffic
+// RUN_JOBS=true — this replica owns RSS aggregation, cleanup, email digests, worker emitter
+// Single-replica dev defaults to BOTH true (preserves existing behavior).
+// Multi-replica prod: web replicas RUN_JOBS=false, RUN_HTTP=true; worker RUN_JOBS=true, RUN_HTTP=false.
+const RUN_JOBS = process.env.RUN_JOBS !== 'false'; // default true
+const RUN_HTTP = process.env.RUN_HTTP !== 'false'; // default true
 
 // Initialize services
 const wsService = WebSocketService.getInstance();
@@ -128,11 +137,11 @@ app.use((req, _res, next) => {
   next();
 });
 
-// Initialize news aggregator
-const newsAggregator = NewsAggregator.getInstance();
-
-// Make aggregator available to routes
-app.locals.newsAggregator = newsAggregator;
+// Phase 37 Plan 02 (Pitfall 7 / T-37-05): NewsAggregator no longer attached
+// to req.app.locals (the legacy "newsAggregator" key is removed). Web
+// replicas (RUN_JOBS=false) do not construct NewsAggregator. The worker
+// constructs it inside runBootLifecycle below. Read paths use
+// newsReadService (Prisma + Redis cache).
 
 // Routes with rate limiting (D-05)
 
@@ -351,10 +360,19 @@ app.get('/api/health', async (_req, res) => {
 
   const cacheStats = await cacheService.getStats();
 
+  // Phase 37 Plan 02: web replicas don't hold in-memory NewsAggregator state.
+  // Count articles via Prisma; tolerate failures (health is liveness signal).
+  let articlesCount = 0;
+  try {
+    articlesCount = await prisma.newsArticle.count();
+  } catch {
+    articlesCount = -1;
+  }
+
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
-    articlesCount: newsAggregator.getArticleCount(),
+    articlesCount,
     services: {
       database: {
         available: true,  // Detailed check at /api/health/db
@@ -462,30 +480,6 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
   });
 });
 
-httpServer.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-  console.log('WebSocket server ready');
-  console.log('Starting news aggregation...');
-  newsAggregator.startAggregation().catch((err) => {
-    console.error('Aggregation error:', err);
-  });
-
-  // Start cleanup service for unverified account management (D-18)
-  const cleanupService = CleanupService.getInstance();
-  cleanupService.start();
-
-  // Update metrics periodically (D-14 - Phase 34: add pool metrics)
-  setInterval(() => {
-    metricsService.setWebSocketConnections(wsService.getClientCount());
-
-    // Pool metrics (D-14 - Phase 34)
-    const poolStats = getPoolStats();
-    if (poolStats) {
-      metricsService.updatePoolMetrics(poolStats);
-    }
-  }, 10000);
-});
-
 httpServer.on('error', (error: NodeJS.ErrnoException) => {
   if (error.code === 'EADDRINUSE') {
     console.error(`Port ${PORT} is already in use`);
@@ -494,6 +488,62 @@ httpServer.on('error', (error: NodeJS.ErrnoException) => {
   }
   process.exit(1);
 });
+
+/**
+ * Phase 37 Plan 02 (JOB-01) — boot-mode dispatcher.
+ *
+ * Exported so the boot-mode unit tests can drive each branch with explicit
+ * args (the tests mock NewsAggregator/CleanupService/workerEmitter and
+ * verify the right side-effects fire for web vs worker vs single-replica).
+ *
+ * Ordering invariant (Assumption A8): when runJobs is true,
+ * initWorkerEmitter() MUST run BEFORE NewsAggregator.startAggregation() so
+ * the first cross-replica broadcast has a live Redis Pub/Sub channel.
+ */
+export async function runBootLifecycle(opts: {
+  runHttp: boolean;
+  runJobs: boolean;
+}): Promise<void> {
+  if (opts.runHttp) {
+    httpServer.listen(PORT, () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+      console.log('WebSocket server ready');
+
+      // Update metrics periodically (D-14 - Phase 34: add pool metrics)
+      setInterval(() => {
+        metricsService.setWebSocketConnections(wsService.getClientCount());
+
+        // Pool metrics (D-14 - Phase 34)
+        const poolStats = getPoolStats();
+        if (poolStats) {
+          metricsService.updatePoolMetrics(poolStats);
+        }
+      }, 10000);
+    });
+  }
+
+  if (opts.runJobs) {
+    console.log('RUN_JOBS=true — starting schedulers and worker emitter');
+
+    // JOB-03: init worker emitter BEFORE startAggregation so first emit has
+    // a live Redis Pub/Sub channel (Assumption A8 ordering).
+    initWorkerEmitter();
+
+    const newsAggregator = NewsAggregator.getInstance();
+    newsAggregator.startAggregation().catch((err) => {
+      console.error('Aggregation error:', err);
+    });
+
+    // Start cleanup service for unverified account management (D-18)
+    const cleanupService = CleanupService.getInstance();
+    cleanupService.start();
+  }
+}
+
+// Drive the boot lifecycle from env vars (CLI / docker entrypoint).
+// Tests import runBootLifecycle directly and bypass this top-level call
+// via vitest's vi.mock infrastructure on the side-effect modules.
+void runBootLifecycle({ runHttp: RUN_HTTP, runJobs: RUN_JOBS });
 
 // Graceful shutdown
 const shutdown = async () => {
