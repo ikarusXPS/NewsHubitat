@@ -164,3 +164,92 @@ export const NewsQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1).openapi({ example: 1 }),
   limit: z.coerce.number().int().min(1).max(100).default(20).openapi({ example: 20 }),
 });
+
+// =============================================================================
+// PHASE 38 — ADVANCED AI FEATURES (FactCheck / Credibility / Framing)
+// =============================================================================
+// JWT-gated endpoints (BearerAuth, NOT ApiKeyAuth). The schemas below are the
+// single source of truth for runtime validation in the route handlers AND for
+// OpenAPI doc generation in `openapi/generator.ts`.
+
+export const VerdictSchema = z.enum(['true', 'mostly-true', 'mixed', 'unverified', 'false'])
+  .openapi({ description: '5-bucket fact-check verdict (D-08)' });
+
+export const ConfidenceBucketSchema = z.enum(['low', 'medium', 'high'])
+  .openapi({ description: 'Categorical confidence pill (D-05)' });
+
+export const BiasBucketSchema = z.enum(['left', 'center', 'right'])
+  .openapi({ description: 'Bias indicator (D-04)' });
+
+export const LocaleSchema = z.enum(['de', 'en', 'fr'])
+  .openapi({ description: 'Supported UI/content locale' });
+
+export const CredibilitySubDimensionsSchema = z.object({
+  accuracy: z.number().int().min(0).max(100),
+  transparency: z.number().int().min(0).max(100),
+  corrections: z.number().int().min(0).max(100),
+}).openapi('CredibilitySubDimensions');
+
+export const CredibilityResponseSchema = z.object({
+  success: z.literal(true),
+  data: z.object({
+    sourceId: z.string(),
+    score: z.number().int().min(0).max(100),
+    bias: BiasBucketSchema,
+    subDimensions: CredibilitySubDimensionsSchema,
+    methodologyMd: z.string(),
+    confidence: ConfidenceBucketSchema,
+    generatedAt: z.string().datetime(),
+    locale: LocaleSchema,
+  }),
+}).openapi('CredibilityResponse');
+
+export const FramingPerspectiveSchema = z.object({
+  narrative: z.string(),
+  omissions: z.array(z.string()).max(3),
+  vocabulary: z.array(z.string()).max(5),
+  evidenceQuotes: z.array(z.string()).max(3),
+}).openapi('FramingPerspective');
+
+// `z.record` requires a string-keyed shape; the existing PerspectiveRegionSchema
+// is a `z.enum` of string literals so it is compatible. We pass the enum so the
+// generated OpenAPI spec narrows the keyset to the 13 valid PerspectiveRegion
+// values.
+export const FramingResponseSchema = z.object({
+  success: z.literal(true),
+  data: z.object({
+    topic: z.string(),
+    locale: LocaleSchema,
+    perspectives: z.record(PerspectiveRegionSchema, FramingPerspectiveSchema),
+    aiGenerated: z.literal(true),
+  }),
+}).openapi('FramingResponse');
+
+export const FactCheckRequestSchema = z.object({
+  claim: z.string().min(10).max(500),
+  articleId: z.string().optional(),
+  language: LocaleSchema.optional(),
+}).openapi('FactCheckRequest');
+
+export const FactCheckCitationSchema = z.object({
+  articleId: z.string(),
+  title: z.string(),
+  sourceName: z.string(),
+  region: PerspectiveRegionSchema,
+  url: z.string().url(),
+}).openapi('FactCheckCitation');
+
+export const FactCheckResponseSchema = z.object({
+  success: z.literal(true),
+  data: z.object({
+    factCheckId: z.string(),
+    verdict: VerdictSchema,
+    confidence: z.number().int().min(0).max(100),
+    confidenceBucket: ConfidenceBucketSchema,
+    methodologyMd: z.string(),
+    citations: z.array(FactCheckCitationSchema).max(5),
+    locale: LocaleSchema,
+    generatedAt: z.string().datetime(),
+    cached: z.boolean(),
+  }),
+}).openapi('FactCheckResponse');
