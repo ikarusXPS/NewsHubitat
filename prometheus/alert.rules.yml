@@ -65,3 +65,24 @@ groups:
         annotations:
           summary: "Email delivery success below 95%"
           description: "Delivery rate is {{ $value | humanizePercentage }} over the last hour"
+
+      # Phase 37 / DB-04 — PgBouncer pool saturation
+      # Source: prometheuscommunity/pgbouncer-exporter:v0.12.0 (stack.yml pgbouncer-exporter service)
+      - alert: PgBouncerPoolSaturation
+        expr: pgbouncer_pools_client_waiting_connections > 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "PgBouncer client connections waiting for pool"
+          description: "{{ $value }} clients waiting on backend connections — pool may be undersized (DEFAULT_POOL_SIZE in stack.yml; topology DB-03)"
+
+      # Phase 37 — Prisma client pool waiting (paired with prisma_pool_waiting Gauge from Plan 03)
+      - alert: PrismaPoolSaturation
+        expr: prisma_pool_waiting > 0
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Prisma client pool has waiting requests"
+          description: "{{ $value }} requests queued waiting for a Prisma connection — bump max:20 (apps/web/server/db/prisma.ts) or check PgBouncer saturation"

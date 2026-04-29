@@ -15,8 +15,29 @@ alerting:
 
 scrape_configs:
   - job_name: 'newshub'
-    static_configs:
-      - targets: ['app:3001']
+    # Phase 37 / DEPLOY-02: Swarm DNS-SD — `tasks.app` resolves to all 4 replica IPs.
+    # Local dev fallback (under `docker compose up`, not `docker stack deploy`):
+    #   replace dns_sd_configs with `static_configs: [{ targets: ['app:3001'] }]`
+    dns_sd_configs:
+      - names: ['tasks.app']
+        type: A
+        port: 3001
     metrics_path: '/metrics'
     scrape_interval: 15s
     scrape_timeout: 10s
+
+  # Phase 37 / JOB-01: app-worker singleton.
+  # TODO: worker currently has no HTTP listener — see RESEARCH §Open Question 1.
+  # Uncomment once the worker exposes a /metrics endpoint on :3002.
+  # - job_name: 'newshub-worker'
+  #   static_configs:
+  #     - targets: ['app-worker:3002']
+  #   metrics_path: '/metrics'
+  #   scrape_interval: 15s
+
+  # Phase 37 / DB-04: PgBouncer pool observability via prometheuscommunity exporter.
+  - job_name: 'pgbouncer'
+    static_configs:
+      - targets: ['pgbouncer-exporter:9127']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
