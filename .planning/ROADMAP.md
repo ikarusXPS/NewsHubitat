@@ -88,7 +88,7 @@
 
 - [x] **Phase 35: Infrastructure Foundation** - Monorepo setup and API gateway (completed 2026-04-26)
 - [ ] **Phase 36: Monetization Core** - Stripe integration and subscription tiers
-- [ ] **Phase 37: Horizontal Scaling** - Docker Swarm and connection pooling
+- [x] **Phase 37: Horizontal Scaling** - Docker Swarm and connection pooling (completed 2026-04-29; 5/5 must-haves SATISFIED static; runtime items in 37-HUMAN-UAT.md; Dockerfile rewrite deferred to 37.1)
 - [ ] **Phase 38: Advanced AI Features** - Credibility scoring, bias detection, fact-checking
 - [ ] **Phase 39: Mobile Apps** - Capacitor wrapper and app store deployment
 - [ ] **Phase 40: Content Expansion** - Video, podcast, and source expansion
@@ -258,13 +258,15 @@ Plans:
 **Plans**: 7 plans across 4 waves
 
 Plans:
-- [ ] 37-01-PLAN.md — Install Socket.IO Redis adapter + worker emitter module (WS-01, WS-03, JOB-03)
-- [ ] 37-02-PLAN.md — RUN_JOBS env-gating + newsReadService refactor + drop app.locals.newsAggregator (JOB-01, JOB-02, JOB-03, JOB-04)
-- [ ] 37-03-PLAN.md — Prisma pool max:20 + Prometheus pool gauges + .env.example dual-URL (DB-01, DB-02, DB-03, DB-04 Prisma side)
-- [ ] 37-04-PLAN.md — stack.yml Swarm topology + pgbouncer/ + prometheus + alert rules (DEPLOY-01, DEPLOY-02, WS-02, WS-03, DB-01..DB-04, JOB-01)
-- [ ] 37-05-PLAN.md — Terminus drain + /api/health vs /api/ready split (DEPLOY-04, DEPLOY-05)
-- [ ] 37-06-PLAN.md — e2e-stack/ WS-04 cross-replica fanout integration test (WS-04 verification gate; checkpoint:human-verify)
-- [ ] 37-07-PLAN.md — docs/multi-region-patterns.md (INFRA-05, DEPLOY-03)
+- [x] 37-01-PLAN.md — Install Socket.IO Redis adapter + worker emitter module (WS-01, WS-03, JOB-03)
+- [x] 37-02-PLAN.md — RUN_JOBS env-gating + newsReadService refactor + drop app.locals.newsAggregator (JOB-01, JOB-02, JOB-03, JOB-04)
+- [x] 37-03-PLAN.md — Prisma pool max:20 + Prometheus pool gauges + .env.example dual-URL (DB-01, DB-02, DB-03, DB-04 Prisma side)
+- [x] 37-04-PLAN.md — stack.yml Swarm topology + pgbouncer/ + prometheus + alert rules (DEPLOY-01, DEPLOY-02, WS-02, WS-03, DB-01..DB-04, JOB-01)
+- [x] 37-05-PLAN.md — Terminus drain + /api/health vs /api/ready split (DEPLOY-04, DEPLOY-05)
+- [x] 37-06-PLAN.md — e2e-stack/ WS-04 cross-replica fanout integration test (artifacts complete; runtime gate deferred to 37.1 — see 37-HUMAN-UAT.md)
+- [x] 37-07-PLAN.md — docs/multi-region-patterns.md (INFRA-05, DEPLOY-03)
+
+**Status:** Complete (2026-04-29) — 5/5 must-haves SATISFIED static; verifier returned `human_needed` for 3 runtime items tracked in `37-HUMAN-UAT.md`. Branch: `test-ci-pipeline`. Commits: 11 plan + 4 merge + 2 docs (deferral + verification).
 
 ### Phase 38: Advanced AI Features
 **Goal**: Users see source credibility scores and can fact-check claims with AI assistance

@@ -4,14 +4,14 @@ milestone: v1.6
 milestone_name: Infrastructure & Scale
 current_plan: Not started
 status: executing
-last_updated: "2026-04-29T01:48:28.721Z"
-last_activity: 2026-04-29 -- Phase 37 planning complete
+last_updated: "2026-04-29T05:55:00.000Z"
+last_activity: 2026-04-29 -- Phase 37 complete (5/5 must-haves SATISFIED static; runtime items tracked in 37-HUMAN-UAT.md)
 progress:
   total_phases: 6
-  completed_phases: 2
-  total_plans: 17
-  completed_plans: 10
-  percent: 59
+  completed_phases: 3
+  total_plans: 24
+  completed_plans: 17
+  percent: 71
 ---
 
 # State: NewsHub
@@ -21,15 +21,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-26)
 
 **Core value:** Users can see how the same story is covered by different regional perspectives
-**Current focus:** Phase 36.5 — fix-monetization-followup-bugs
+**Current focus:** Phase 37 complete — next options: 37.1 (Dockerfile rewrite + WS-04 closure) or pick up queued 36.5
 
 ## Current Position
 
 Phase: 37
-Plan: 1 of 4
-Current Plan: Not started
-Status: Ready to execute
-Last activity: 2026-04-29 -- Phase 37 planning complete
+Plan: 7 of 7
+Current Plan: Phase complete (verifier returned human_needed; user-approved close 2026-04-29)
+Status: Complete (static verification PASSED 5/5; runtime UAT pending Swarm deploy)
+Last activity: 2026-04-29 -- Phase 37 complete on branch test-ci-pipeline
 
 ```
 v1.6 Progress: [████████████████████] (8 phases incl. 36.4 complete; Phase 36 closed by user-approved human-verify on Plan 05; verifier still owed for 36, 36.3, 36.2 before milestone close)
