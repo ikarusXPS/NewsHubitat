@@ -124,14 +124,22 @@ COPY --from=builder --chown=nodejs:nodejs /app/packages/types/index.ts ./package
 # Logs directory for winston
 RUN mkdir -p logs && chown nodejs:nodejs logs
 
-# Hand ownership of /app to nodejs so Prisma 7 can lazy-load its engine
-# binaries into /app/node_modules/.pnpm/@prisma+engines@*/... at runtime
-# (Prisma writes to its own node_modules dir on first invocation if engines
-# are missing — pnpm 10 skips @prisma/engines' postinstall script by default
-# as a security feature, so the binaries aren't pre-staged). Without this,
-# `prisma db push` and `prisma migrate deploy` fail with EACCES under the
-# non-root nodejs user.
-RUN chown -R nodejs:nodejs /app
+# NOTE on Prisma engine permissions:
+# pnpm 10 skips @prisma/engines' postinstall script by default (security
+# feature — see "Ignored build scripts" warning during pnpm install).
+# This means engine binaries aren't pre-staged in node_modules. The first
+# `prisma db push` or `prisma migrate deploy` invocation tries to write
+# the engines lazily, which fails as the non-root nodejs user.
+#
+# We do NOT chown -R /app here — that's prohibitively slow on Docker
+# Desktop + WSL2 (rewrites every metadata entry for ~1500 files in the
+# node_modules tree, often 5+ minutes).
+#
+# Instead, the e2e-stack and production deployments run their schema-init
+# container as root (via 'user: "0:0"' override). The app containers
+# (long-running, network-exposed) stay non-root. Migrations are inherently
+# privileged operations; running them as root in a one-shot container
+# is the standard pattern.
 
 USER nodejs
 

@@ -44,6 +44,13 @@ services:
     build:
       context: ..
       dockerfile: Dockerfile
+    # Run as root — Prisma 7 lazy-loads engine binaries into node_modules
+    # on first invocation (pnpm 10 skips @prisma/engines postinstall as a
+    # security feature, so engines aren't pre-staged). The non-root nodejs
+    # user can't write to root-owned node_modules → EACCES. Running this
+    # one-shot init container as root is the standard pattern; the app
+    # containers below stay non-root.
+    user: "0:0"
     environment:
       DATABASE_URL: "postgresql://newshub:test@postgres:5432/newshub?schema=public"
       DIRECT_URL: "postgresql://newshub:test@postgres:5432/newshub?schema=public"
