@@ -48,7 +48,7 @@ const createMockSocket = (id: string = 'socket-1'): MockSocket => {
 };
 
 // Create mock for Socket.IO Server - must be defined before vi.mock since it uses vi.hoisted
-const { mockIo, mockRooms, mockServerConstructor, mockRedisInstance, mockRedisConstructor, mockCreateAdapter } = vi.hoisted(() => {
+const { mockIo, mockRooms, mockServerConstructor, mockRedisConstructor, mockCreateAdapter } = vi.hoisted(() => {
   const mockRooms = new Map([
     ['region:western', new Set(['socket-1'])],
     ['topic:military', new Set(['socket-2'])],
@@ -90,7 +90,7 @@ const { mockIo, mockRooms, mockServerConstructor, mockRedisInstance, mockRedisCo
     return mockIo;
   });
 
-  return { mockIo, mockRooms, mockServerConstructor, mockRedisInstance, mockRedisConstructor, mockCreateAdapter };
+  return { mockIo, mockRooms, mockServerConstructor, mockRedisConstructor, mockCreateAdapter };
 });
 
 vi.mock('socket.io', () => ({
