@@ -48,6 +48,16 @@ export const test = base.extend({
       route.fulfill(aiOk({ gaps: [] })),
     );
 
+    // Mock geo events: when this fetch errors, EventMap renders an error
+    // fallback with NO h1, which breaks navigation tests that assert on the
+    // page heading. The empty array keeps the page on its happy path.
+    await page.route('**/api/events/geo**', (route) =>
+      route.fulfill(aiOk([])),
+    );
+    await page.route('**/api/events/timeline**', (route) =>
+      route.fulfill(aiOk([])),
+    );
+
     // Bypass blocking modals before each test:
     //   - FocusOnboarding (z-90)  — gated by hasCompletedOnboarding (zustand persist)
     //   - ConsentBanner   (z-100) — gated by newshub-consent localStorage key

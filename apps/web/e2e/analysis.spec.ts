@@ -31,8 +31,12 @@ test.describe('Analysis Page', () => {
   });
 
   test('should open compare mode modal', async ({ page }) => {
-    // Click compare button
+    // Click compare button. Wait for visibility first because Analysis renders
+    // progressively as data fetches resolve, and an immediate click can race
+    // with a re-render that detaches the element.
     const compareBtn = page.locator('button:has-text("Artikel vergleichen")');
+    await expect(compareBtn).toBeVisible();
+    await page.waitForTimeout(200); // settle re-renders
     await compareBtn.click();
 
     // Wait for modal animation
@@ -82,14 +86,11 @@ test.describe('Analysis Page', () => {
   });
 
   test('should display glass panel containers', async ({ page }) => {
-    // Wait for page to load
-    await page.waitForTimeout(1000);
+    // Wait for the first glass-panel to render (Analysis sections render
+    // after data fetches resolve, not on initial mount).
+    await page.locator('.glass-panel').first().waitFor({ state: 'visible', timeout: 15000 });
 
-    // Check for glass-panel class (Analysis uses this for sections)
-    const glassPanels = page.locator('.glass-panel');
-    const panelCount = await glassPanels.count();
-
-    // Should have at least one glass panel
+    const panelCount = await page.locator('.glass-panel').count();
     expect(panelCount).toBeGreaterThan(0);
   });
 
