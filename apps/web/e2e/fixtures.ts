@@ -19,6 +19,35 @@ export const test = base.extend({
       });
     });
 
+    // Mock AI / analysis endpoints so the suite doesn't depend on a paid or
+    // rate-limited upstream provider. NewsHub's free-tier AI quota is ~10 calls
+    // before the provider returns errors, which then breaks any test that hits
+    // the dashboard, bookmarks list, or analysis page.
+    const aiOk = (data: unknown) => ({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ success: true, data }),
+    });
+
+    await page.route('**/api/ai/ask', (route) =>
+      route.fulfill(aiOk({ answer: 'Mock AI answer for E2E', sources: [] })),
+    );
+    await page.route('**/api/ai/propaganda', (route) =>
+      route.fulfill(aiOk({ score: 0, indicators: [], summary: 'Mock propaganda analysis' })),
+    );
+    await page.route('**/api/analysis/clusters**', (route) =>
+      route.fulfill(aiOk([])),
+    );
+    await page.route('**/api/analysis/summarize', (route) =>
+      route.fulfill(aiOk({ summary: 'Mock summary for E2E' })),
+    );
+    await page.route('**/api/analysis/framing**', (route) =>
+      route.fulfill(aiOk({ framings: [] })),
+    );
+    await page.route('**/api/analysis/coverage-gaps**', (route) =>
+      route.fulfill(aiOk({ gaps: [] })),
+    );
+
     // Bypass blocking modals before each test:
     //   - FocusOnboarding (z-90)  — gated by hasCompletedOnboarding (zustand persist)
     //   - ConsentBanner   (z-100) — gated by newshub-consent localStorage key
