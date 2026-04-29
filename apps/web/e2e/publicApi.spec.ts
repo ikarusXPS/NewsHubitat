@@ -20,7 +20,7 @@ const test = base.extend<{
 }>({
   apiRequestContext: async ({ playwright }, use) => {
     const context = await playwright.request.newContext({
-      baseURL: 'http://localhost:3001',
+      baseURL: 'http://127.0.0.1:3001',
     });
     await use(context);
     await context.dispose();
@@ -40,7 +40,7 @@ test.describe('Public API', () => {
   test.beforeAll(async ({ request }) => {
     // Register test user (idempotent - skip if exists)
     try {
-      await request.post('http://localhost:3001/api/auth/register', {
+      await request.post('http://127.0.0.1:3001/api/auth/register', {
         data: { email: TEST_EMAIL, password: TEST_PASSWORD, name: TEST_NAME },
       });
     } catch {
@@ -48,7 +48,7 @@ test.describe('Public API', () => {
     }
 
     // Login to get auth token
-    const loginResponse = await request.post('http://localhost:3001/api/auth/login', {
+    const loginResponse = await request.post('http://127.0.0.1:3001/api/auth/login', {
       data: { email: TEST_EMAIL, password: TEST_PASSWORD },
     });
 
@@ -60,7 +60,7 @@ test.describe('Public API', () => {
 
   test.describe('API Key Management via API', () => {
     test('should create API key', async ({ request }) => {
-      const response = await request.post('http://localhost:3001/api/keys', {
+      const response = await request.post('http://127.0.0.1:3001/api/keys', {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -84,7 +84,7 @@ test.describe('Public API', () => {
     });
 
     test('should list user API keys', async ({ request }) => {
-      const response = await request.get('http://localhost:3001/api/keys', {
+      const response = await request.get('http://127.0.0.1:3001/api/keys', {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -112,7 +112,7 @@ test.describe('Public API', () => {
 
   test.describe('API Authentication', () => {
     test('should allow access with valid API key', async ({ request }) => {
-      const response = await request.get('http://localhost:3001/api/v1/public/news', {
+      const response = await request.get('http://127.0.0.1:3001/api/v1/public/news', {
         headers: {
           'X-API-Key': testApiKey,
         },
@@ -129,7 +129,7 @@ test.describe('Public API', () => {
     });
 
     test('should return 401 for missing API key', async ({ request }) => {
-      const response = await request.get('http://localhost:3001/api/v1/public/news');
+      const response = await request.get('http://127.0.0.1:3001/api/v1/public/news');
 
       expect(response.status()).toBe(401);
 
@@ -139,7 +139,7 @@ test.describe('Public API', () => {
     });
 
     test('should return 401 for invalid API key format', async ({ request }) => {
-      const response = await request.get('http://localhost:3001/api/v1/public/news', {
+      const response = await request.get('http://127.0.0.1:3001/api/v1/public/news', {
         headers: {
           'X-API-Key': 'invalid-key-format',
         },
@@ -154,7 +154,7 @@ test.describe('Public API', () => {
 
     test('should return 401 for invalid API key checksum', async ({ request }) => {
       // Valid format but wrong checksum
-      const response = await request.get('http://localhost:3001/api/v1/public/news', {
+      const response = await request.get('http://127.0.0.1:3001/api/v1/public/news', {
         headers: {
           'X-API-Key': 'nh_live_1234567890123456789012AB_DEAD',
         },
@@ -169,7 +169,7 @@ test.describe('Public API', () => {
 
   test.describe('Rate Limiting', () => {
     test('should include rate limit headers', async ({ request }) => {
-      const response = await request.get('http://localhost:3001/api/v1/public/news', {
+      const response = await request.get('http://127.0.0.1:3001/api/v1/public/news', {
         headers: {
           'X-API-Key': testApiKey,
         },
@@ -186,7 +186,7 @@ test.describe('Public API', () => {
 
     test('should enforce free tier rate limit (10 req/min)', async ({ request }) => {
       // Create a fresh API key for this test to avoid pollution from other tests
-      const createResponse = await request.post('http://localhost:3001/api/keys', {
+      const createResponse = await request.post('http://127.0.0.1:3001/api/keys', {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -203,14 +203,14 @@ test.describe('Public API', () => {
 
       // Make 10 requests (should all succeed)
       for (let i = 0; i < 10; i++) {
-        const response = await request.get('http://localhost:3001/api/v1/public/news?limit=1', {
+        const response = await request.get('http://127.0.0.1:3001/api/v1/public/news?limit=1', {
           headers: { 'X-API-Key': rateLimitTestKey },
         });
         expect(response.status()).toBe(200);
       }
 
       // 11th request should be rate limited
-      const response = await request.get('http://localhost:3001/api/v1/public/news?limit=1', {
+      const response = await request.get('http://127.0.0.1:3001/api/v1/public/news?limit=1', {
         headers: { 'X-API-Key': rateLimitTestKey },
       });
 
@@ -223,7 +223,7 @@ test.describe('Public API', () => {
       expect(data.limit).toBe(10);
 
       // Clean up: revoke the test key
-      await request.delete(`http://localhost:3001/api/keys/${rateLimitTestKeyId}`, {
+      await request.delete(`http://127.0.0.1:3001/api/keys/${rateLimitTestKeyId}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -232,7 +232,7 @@ test.describe('Public API', () => {
 
     test('should include Retry-After header on 429', async ({ request }) => {
       // Create a fresh key for this test
-      const createResponse = await request.post('http://localhost:3001/api/keys', {
+      const createResponse = await request.post('http://127.0.0.1:3001/api/keys', {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -249,13 +249,13 @@ test.describe('Public API', () => {
 
       // Exhaust rate limit
       for (let i = 0; i < 10; i++) {
-        await request.get('http://localhost:3001/api/v1/public/news?limit=1', {
+        await request.get('http://127.0.0.1:3001/api/v1/public/news?limit=1', {
           headers: { 'X-API-Key': retryAfterTestKey },
         });
       }
 
       // Get 429 response and check Retry-After
-      const response = await request.get('http://localhost:3001/api/v1/public/news', {
+      const response = await request.get('http://127.0.0.1:3001/api/v1/public/news', {
         headers: { 'X-API-Key': retryAfterTestKey },
       });
 
@@ -267,7 +267,7 @@ test.describe('Public API', () => {
       expect(retryAfter).toBeLessThanOrEqual(60);
 
       // Clean up
-      await request.delete(`http://localhost:3001/api/keys/${retryAfterTestKeyId}`, {
+      await request.delete(`http://127.0.0.1:3001/api/keys/${retryAfterTestKeyId}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -277,7 +277,7 @@ test.describe('Public API', () => {
 
   test.describe('Public API Endpoints', () => {
     test('should return news articles with filters', async ({ request }) => {
-      const response = await request.get('http://localhost:3001/api/v1/public/news?regions=usa&limit=5', {
+      const response = await request.get('http://127.0.0.1:3001/api/v1/public/news?regions=usa&limit=5', {
         headers: { 'X-API-Key': testApiKey },
       });
 
@@ -304,7 +304,7 @@ test.describe('Public API', () => {
 
     test('should return single article by ID', async ({ request }) => {
       // Get first article from list
-      const listResponse = await request.get('http://localhost:3001/api/v1/public/news?limit=1', {
+      const listResponse = await request.get('http://127.0.0.1:3001/api/v1/public/news?limit=1', {
         headers: { 'X-API-Key': testApiKey },
       });
       const listData = await listResponse.json();
@@ -317,7 +317,7 @@ test.describe('Public API', () => {
       const articleId = listData.data[0].id;
 
       // Fetch individual article
-      const response = await request.get(`http://localhost:3001/api/v1/public/news/${articleId}`, {
+      const response = await request.get(`http://127.0.0.1:3001/api/v1/public/news/${articleId}`, {
         headers: { 'X-API-Key': testApiKey },
       });
 
@@ -329,7 +329,7 @@ test.describe('Public API', () => {
     });
 
     test('should return 404 for non-existent article', async ({ request }) => {
-      const response = await request.get('http://localhost:3001/api/v1/public/news/non-existent-article-id-12345', {
+      const response = await request.get('http://127.0.0.1:3001/api/v1/public/news/non-existent-article-id-12345', {
         headers: { 'X-API-Key': testApiKey },
       });
 
@@ -341,7 +341,7 @@ test.describe('Public API', () => {
     });
 
     test('should return geo events', async ({ request }) => {
-      const response = await request.get('http://localhost:3001/api/v1/public/events', {
+      const response = await request.get('http://127.0.0.1:3001/api/v1/public/events', {
         headers: { 'X-API-Key': testApiKey },
       });
 
@@ -354,7 +354,7 @@ test.describe('Public API', () => {
     });
 
     test('should return sentiment statistics', async ({ request }) => {
-      const response = await request.get('http://localhost:3001/api/v1/public/sentiment', {
+      const response = await request.get('http://127.0.0.1:3001/api/v1/public/sentiment', {
         headers: { 'X-API-Key': testApiKey },
       });
 
@@ -376,7 +376,7 @@ test.describe('Public API', () => {
     });
 
     test('should serve OpenAPI spec without auth', async ({ request }) => {
-      const response = await request.get('http://localhost:3001/api/openapi.json');
+      const response = await request.get('http://127.0.0.1:3001/api/openapi.json');
 
       expect(response.status()).toBe(200);
 
@@ -389,7 +389,7 @@ test.describe('Public API', () => {
 
   test.describe('Cache Headers', () => {
     test('should set Cache-Control headers on news list', async ({ request }) => {
-      const response = await request.get('http://localhost:3001/api/v1/public/news', {
+      const response = await request.get('http://127.0.0.1:3001/api/v1/public/news', {
         headers: { 'X-API-Key': testApiKey },
       });
 
@@ -398,7 +398,7 @@ test.describe('Public API', () => {
     });
 
     test('should set Cache-Control headers on single article', async ({ request }) => {
-      const listResponse = await request.get('http://localhost:3001/api/v1/public/news?limit=1', {
+      const listResponse = await request.get('http://127.0.0.1:3001/api/v1/public/news?limit=1', {
         headers: { 'X-API-Key': testApiKey },
       });
       const listData = await listResponse.json();
@@ -408,7 +408,7 @@ test.describe('Public API', () => {
         return;
       }
 
-      const response = await request.get(`http://localhost:3001/api/v1/public/news/${listData.data[0].id}`, {
+      const response = await request.get(`http://127.0.0.1:3001/api/v1/public/news/${listData.data[0].id}`, {
         headers: { 'X-API-Key': testApiKey },
       });
 
@@ -417,7 +417,7 @@ test.describe('Public API', () => {
     });
 
     test('should set Cache-Control headers on events', async ({ request }) => {
-      const response = await request.get('http://localhost:3001/api/v1/public/events', {
+      const response = await request.get('http://127.0.0.1:3001/api/v1/public/events', {
         headers: { 'X-API-Key': testApiKey },
       });
 
@@ -426,7 +426,7 @@ test.describe('Public API', () => {
     });
 
     test('should set Cache-Control headers on sentiment', async ({ request }) => {
-      const response = await request.get('http://localhost:3001/api/v1/public/sentiment', {
+      const response = await request.get('http://127.0.0.1:3001/api/v1/public/sentiment', {
         headers: { 'X-API-Key': testApiKey },
       });
 
@@ -438,7 +438,7 @@ test.describe('Public API', () => {
   test.describe('API Key Revocation', () => {
     test('should return 401 for revoked API key', async ({ request }) => {
       // Create a key to revoke
-      const createResponse = await request.post('http://localhost:3001/api/keys', {
+      const createResponse = await request.post('http://127.0.0.1:3001/api/keys', {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -454,13 +454,13 @@ test.describe('Public API', () => {
       const revokeTestKeyId = createData.data.keyData.id;
 
       // Verify key works before revocation
-      let response = await request.get('http://localhost:3001/api/v1/public/news?limit=1', {
+      let response = await request.get('http://127.0.0.1:3001/api/v1/public/news?limit=1', {
         headers: { 'X-API-Key': revokeTestKey },
       });
       expect(response.status()).toBe(200);
 
       // Revoke the key
-      await request.delete(`http://localhost:3001/api/keys/${revokeTestKeyId}`, {
+      await request.delete(`http://127.0.0.1:3001/api/keys/${revokeTestKeyId}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -471,7 +471,7 @@ test.describe('Public API', () => {
       await new Promise(resolve => setTimeout(resolve, 1000));
 
       // Verify key no longer works
-      response = await request.get('http://localhost:3001/api/v1/public/news?limit=1', {
+      response = await request.get('http://127.0.0.1:3001/api/v1/public/news?limit=1', {
         headers: { 'X-API-Key': revokeTestKey },
       });
       expect(response.status()).toBe(401);
@@ -485,7 +485,7 @@ test.describe('Public API', () => {
   test.afterAll(async ({ request }) => {
     // Clean up: revoke all test keys
     if (testApiKeyId) {
-      await request.delete(`http://localhost:3001/api/keys/${testApiKeyId}`, {
+      await request.delete(`http://127.0.0.1:3001/api/keys/${testApiKeyId}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
