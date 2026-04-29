@@ -95,7 +95,12 @@ COPY --from=builder --chown=nodejs:nodejs /app/apps/web/prisma ./apps/web/prisma
 COPY --from=builder --chown=nodejs:nodejs /app/apps/web/src/generated ./apps/web/src/generated
 COPY --from=builder --chown=nodejs:nodejs /app/apps/web/dist ./apps/web/dist
 COPY --from=builder --chown=nodejs:nodejs /app/apps/web/server/instrument.mjs ./apps/web/server/instrument.mjs
-COPY --from=builder --chown=nodejs:nodejs /app/packages/types/dist ./packages/types/dist
+# @newshub/types is a TypeScript-source workspace package (main: "index.ts",
+# no build step). tsup has already inlined its types into dist/server/index.js
+# at build time, so the runtime image doesn't strictly need this — but we copy
+# the source anyway so the pnpm symlink at apps/web/node_modules/@newshub/types
+# resolves to a real file rather than dangling (defensive).
+COPY --from=builder --chown=nodejs:nodejs /app/packages/types/index.ts ./packages/types/index.ts
 
 # Regenerate Prisma client for the runtime platform (linux-musl on Alpine)
 RUN pnpm --filter @newshub/web exec prisma generate
