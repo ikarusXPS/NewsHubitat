@@ -9,6 +9,22 @@ const TEST_PASSWORD = 'TestPassword123!';
 const TEST_NAME = 'E2E Test User';
 
 setup('authenticate', async ({ page, request }) => {
+  // Playwright's webServer waits for the frontend (5173) but the backend (3001)
+  // starts in parallel via `npm run dev` and isn't always ready when this setup
+  // runs. Without a wait, the first registration call hits ECONNREFUSED, the
+  // user is never created, and login fails — cascading to ~30 authenticated
+  // tests. Poll the backend health endpoint up to 30 s before continuing.
+  for (let i = 0; i < 30; i++) {
+    try {
+      const health = await request.get('http://127.0.0.1:3001/api/health', { timeout: 1000 });
+      if (health.ok()) break;
+    } catch {
+      // backend still booting — retry
+    }
+    if (i === 29) throw new Error('Backend did not become ready within 30 s');
+    await new Promise((r) => setTimeout(r, 1000));
+  }
+
   // First, ensure test user exists by attempting registration via API
   // This is idempotent - will succeed on first run, fail silently if user exists
   // Use Playwright's request context (not page.evaluate) to avoid navigation race conditions
