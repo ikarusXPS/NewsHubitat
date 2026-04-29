@@ -255,7 +255,16 @@ Plans:
   3. PgBouncer connection pooler handles 100+ concurrent connections without exhaustion
   4. WebSocket connections maintain sticky sessions across replicas using Traefik configuration
   5. Multi-region deployment patterns documented for future horizontal expansion
-**Plans**: TBD
+**Plans**: 7 plans across 4 waves
+
+Plans:
+- [ ] 37-01-PLAN.md — Install Socket.IO Redis adapter + worker emitter module (WS-01, WS-03, JOB-03)
+- [ ] 37-02-PLAN.md — RUN_JOBS env-gating + newsReadService refactor + drop app.locals.newsAggregator (JOB-01, JOB-02, JOB-03, JOB-04)
+- [ ] 37-03-PLAN.md — Prisma pool max:20 + Prometheus pool gauges + .env.example dual-URL (DB-01, DB-02, DB-03, DB-04 Prisma side)
+- [ ] 37-04-PLAN.md — stack.yml Swarm topology + pgbouncer/ + prometheus + alert rules (DEPLOY-01, DEPLOY-02, WS-02, WS-03, DB-01..DB-04, JOB-01)
+- [ ] 37-05-PLAN.md — Terminus drain + /api/health vs /api/ready split (DEPLOY-04, DEPLOY-05)
+- [ ] 37-06-PLAN.md — e2e-stack/ WS-04 cross-replica fanout integration test (WS-04 verification gate; checkpoint:human-verify)
+- [ ] 37-07-PLAN.md — docs/multi-region-patterns.md (INFRA-05, DEPLOY-03)
 
 ### Phase 38: Advanced AI Features
 **Goal**: Users see source credibility scores and can fact-check claims with AI assistance
