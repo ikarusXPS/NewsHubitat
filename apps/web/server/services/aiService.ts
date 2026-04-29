@@ -1,11 +1,70 @@
 import Anthropic from '@anthropic-ai/sdk';
 import OpenAI from 'openai';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { z } from 'zod';
 import type { NewsArticle, PerspectiveRegion, Sentiment } from '../../src/types';
 import logger from '../utils/logger';
 import { hashString } from '../utils/hash';
 import { AI_CONFIG } from '../config/aiProviders';
-import { CacheService, CacheKeys } from './cacheService';
+import { CacheService, CacheKeys, CACHE_TTL } from './cacheService';
+import {
+  deriveCredibilityScore,
+  deriveBiasBucket,
+  bucketConfidence,
+} from './credibilityService';
+import { buildCredibilityPrompt } from '../prompts/credibilityPrompt';
+import { NEWS_SOURCES } from '../config/sources';
+
+/**
+ * Defensive JSON-extract from LLM responses. Free OpenRouter / Gemma models
+ * do not honor `response_format: json_object`, so we extract the first {...}
+ * block from the response text and validate it against a Zod schema. Returns
+ * `null` on any failure (the caller is expected to provide a typed fallback).
+ *
+ * Per RESEARCH.md Pitfall 1 + Pattern 2.
+ */
+export function safeParseJson<T>(raw: string, schema: z.ZodType<T>): T | null {
+  if (!raw) return null;
+  const match = raw.match(/\{[\s\S]*\}/);
+  if (!match) return null;
+  try {
+    const parsed = JSON.parse(match[0]) as unknown;
+    const result = schema.safeParse(parsed);
+    return result.success ? result.data : null;
+  } catch {
+    return null;
+  }
+}
+
+// ---- Phase 38 service-layer types ----
+
+export type Locale = 'de' | 'en' | 'fr';
+
+export interface CredibilitySubDimensions {
+  accuracy: number;
+  transparency: number;
+  corrections: number;
+}
+
+export interface CredibilityResult {
+  sourceId: string;
+  score: number; // 0-100, deterministic
+  bias: 'left' | 'center' | 'right';
+  subDimensions: CredibilitySubDimensions; // LLM-attributed
+  methodologyMd: string;
+  confidence: 'low' | 'medium' | 'high';
+  generatedAt: string; // ISO
+  locale: Locale;
+}
+
+const credibilityLlmSchema = z.object({
+  subDimensions: z.object({
+    accuracy: z.number().int().min(0).max(100),
+    transparency: z.number().int().min(0).max(100),
+    corrections: z.number().int().min(0).max(100),
+  }),
+  methodologyMd: z.string().min(1),
+});
 
 interface ClusterSummary {
   topic: string;
@@ -575,6 +634,149 @@ Response format: ["topic1", "topic2", ...]`;
     }
 
     return topics.length > 0 ? topics : ['politics'];
+  }
+
+  // ===========================================================================
+  // Phase 38 — Source credibility (Plan 38-02 Task 5)
+  //
+  // Returns a 0-100 deterministic credibility score (computed via
+  // credibilityService) plus an LLM-attributed methodology paragraph + sub-
+  // dimensions. The result is cached for 24h at CacheKeys.credibility per
+  // CONTEXT.md D-03 + D-18.
+  //
+  // Falls back gracefully on three error paths:
+  //   1. Unknown source → score=0 + "Source not found" methodology
+  //   2. LLM all-providers-failed → deterministic-only result with
+  //      sub-dimensions == score and a localized fallback methodology
+  //   3. LLM JSON malformed → same as (2)
+  //
+  // Per CONTEXT.md D-01/D-02/D-03/D-15 + D-18.
+  // ===========================================================================
+
+  async getSourceCredibility(sourceId: string, locale: Locale): Promise<CredibilityResult> {
+    return this.cacheService.getOrSet(
+      CacheKeys.credibility(sourceId, locale),
+      () => this.computeCredibility(sourceId, locale),
+      CACHE_TTL.DAY,
+    );
+  }
+
+  private async computeCredibility(
+    sourceId: string,
+    locale: Locale,
+  ): Promise<CredibilityResult> {
+    const source = NEWS_SOURCES.find((s) => s.id === sourceId);
+    if (!source) {
+      return this.fallbackCredibility(
+        sourceId,
+        locale,
+        0,
+        { accuracy: 0, transparency: 0, corrections: 0 },
+        this.sourceNotFoundMessage(locale),
+      );
+    }
+
+    const score = deriveCredibilityScore(source);
+    const bias = deriveBiasBucket(source.bias.political);
+
+    // The LLM is asked to fill in sub-dimensions and a localized methodology.
+    const prompt = buildCredibilityPrompt({
+      sourceName: source.name,
+      reliability: source.bias.reliability,
+      politicalBias: source.bias.political,
+      derivedScore: score,
+      locale,
+    });
+
+    let responseText: string | null = null;
+    try {
+      responseText = await this.callWithFallback(prompt);
+    } catch (err) {
+      logger.error('aiService.computeCredibility callWithFallback failed:', err);
+      responseText = null;
+    }
+
+    if (!responseText) {
+      // Deterministic-only fallback when no LLM provider responded.
+      return {
+        sourceId,
+        score,
+        bias,
+        subDimensions: { accuracy: score, transparency: score, corrections: score },
+        methodologyMd: this.deterministicMethodology(source.name, score, locale),
+        confidence: 'low',
+        generatedAt: new Date().toISOString(),
+        locale,
+      };
+    }
+
+    const parsed = safeParseJson(responseText, credibilityLlmSchema);
+    if (!parsed) {
+      return {
+        sourceId,
+        score,
+        bias,
+        subDimensions: { accuracy: score, transparency: score, corrections: score },
+        methodologyMd: this.deterministicMethodology(source.name, score, locale),
+        confidence: 'low',
+        generatedAt: new Date().toISOString(),
+        locale,
+      };
+    }
+
+    const rawConfidence = Math.round(
+      (parsed.subDimensions.accuracy +
+        parsed.subDimensions.transparency +
+        parsed.subDimensions.corrections) /
+        3,
+    );
+
+    return {
+      sourceId,
+      score,
+      bias,
+      subDimensions: parsed.subDimensions,
+      methodologyMd: parsed.methodologyMd,
+      confidence: bucketConfidence(rawConfidence),
+      generatedAt: new Date().toISOString(),
+      locale,
+    };
+  }
+
+  private fallbackCredibility(
+    sourceId: string,
+    locale: Locale,
+    score: number,
+    subDimensions: CredibilitySubDimensions,
+    methodologyMd: string,
+  ): CredibilityResult {
+    return {
+      sourceId,
+      score,
+      bias: 'center',
+      subDimensions,
+      methodologyMd,
+      confidence: 'low',
+      generatedAt: new Date().toISOString(),
+      locale,
+    };
+  }
+
+  private sourceNotFoundMessage(locale: Locale): string {
+    if (locale === 'de') return 'Quelle nicht gefunden.';
+    if (locale === 'fr') return 'Source not found.'; // French falls through; UI re-translates
+    return 'Source not found.';
+  }
+
+  private deterministicMethodology(
+    sourceName: string,
+    score: number,
+    locale: Locale,
+  ): string {
+    const en = `${sourceName} has a derived credibility score of ${score}/100 based on its curated reliability and political-bias profile. AI-attributed sub-dimensions are unavailable; values shown reflect the deterministic score only. These scores are AI-attributed estimates based on the source's reputation profile, not measured signals from this platform. Verify with primary sources for any consequential decision.`;
+    const de = `${sourceName} hat eine abgeleitete Glaubwürdigkeitsbewertung von ${score}/100 basierend auf der kuratierten Zuverlässigkeit und dem politischen Bias-Profil. KI-attribuierte Unterdimensionen sind nicht verfügbar; angezeigte Werte basieren ausschließlich auf der deterministischen Bewertung. Diese Werte sind KI-attribuierte Schätzungen basierend auf dem Reputationsprofil der Quelle, keine gemessenen Signale dieser Plattform. Überprüfen Sie mit Primärquellen für wichtige Entscheidungen.`;
+    const fr = `${sourceName} a une note de crédibilité dérivée de ${score}/100 basée sur sa fiabilité curated et son profil de biais politique. Les sous-dimensions attribuées par IA sont indisponibles; les valeurs affichées reflètent uniquement le score déterministe. Ces valeurs sont des estimations attribuées par IA basées sur le profil de réputation de la source, pas des signaux mesurés sur cette plateforme. Vérifiez avec des sources primaires pour toute décision importante.`;
+    return locale === 'de' ? de : locale === 'fr' ? fr : en;
   }
 
 }
