@@ -37,6 +37,11 @@ import stripeWebhookRouter from './routes/webhooks/stripe';
 import subscriptionRoutes from './routes/subscriptions';
 import { publicApiRoutes } from './routes/publicApi';
 import { apiKeyRoutes } from './routes/apiKeys';
+// Phase 37 / WS-04: test-only fanout-trigger router. Module is imported
+// statically (no side effects at load time — only exports a Router instance);
+// the actual route is gated on NODE_ENV === 'test' below so production
+// deployments never expose /api/_test/emit-fanout.
+import { testEmitRoutes } from './routes/_testEmit';
 import { authLimiter, aiTierLimiter, newsLimiter } from './middleware/rateLimiter';
 import { apiKeyAuth } from './middleware/apiKeyAuth';
 import { createApiKeyLimiter } from './middleware/apiKeyRateLimiter';
@@ -198,6 +203,15 @@ app.use('/api/keys', apiKeyRoutes);
 // Apply API key authentication and tiered rate limiting to all public API routes
 const apiKeyLimiter = createApiKeyLimiter();
 app.use('/api/v1/public', apiKeyAuth, apiKeyLimiter, publicApiRoutes);
+
+// Phase 37 / WS-04: test-only fanout-trigger endpoint, gated by NODE_ENV === 'test'.
+// e2e-stack/docker-compose.test.yml sets NODE_ENV=test on both test replicas.
+// Production deployments never set NODE_ENV=test, so this router never mounts.
+// Threat-model T-37-20: gate is the sole mitigation for the test endpoint.
+if (process.env.NODE_ENV === 'test') {
+  app.use('/api/_test', testEmitRoutes);
+  console.log('⚠ WS-04 test routes mounted at /api/_test (NODE_ENV=test only)');
+}
 
 // Serve OpenAPI spec (no auth required - public documentation)
 app.get('/api/openapi.json', (_req, res) => {
