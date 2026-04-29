@@ -9,7 +9,7 @@
  */
 import { Router, Response } from 'express';
 import type { ApiKeyRequest } from '../middleware/apiKeyAuth';
-import { NewsAggregator } from '../services/newsAggregator';
+import * as newsReadService from '../services/newsReadService';
 import { EventsService } from '../services/eventsService';
 import { NEWS_SOURCES } from '../config/sources';
 import type { PerspectiveRegion, Sentiment, EventCategory, EventSeverity, TimelineEvent } from '../../src/types';
@@ -59,10 +59,8 @@ function calculateConfidence(event: TimelineEvent): number {
  * - page: Page number (default: 1)
  * - limit: Items per page (default: 20, max: 100)
  */
-publicApiRoutes.get('/news', (req: ApiKeyRequest, res: Response) => {
+publicApiRoutes.get('/news', async (req: ApiKeyRequest, res: Response) => {
   try {
-    const aggregator = req.app.locals.newsAggregator as NewsAggregator;
-
     // Parse query parameters
     const regions = req.query.regions
       ? (req.query.regions as string).split(',') as PerspectiveRegion[]
@@ -76,7 +74,7 @@ publicApiRoutes.get('/news', (req: ApiKeyRequest, res: Response) => {
     const limit = Math.min(Math.max(1, parseInt(req.query.limit as string) || 20), 100);
     const offset = (page - 1) * limit;
 
-    const { articles, total } = aggregator.getArticles({
+    const { articles, total } = await newsReadService.getArticles({
       regions,
       topics,
       sentiment,
@@ -111,10 +109,9 @@ publicApiRoutes.get('/news', (req: ApiKeyRequest, res: Response) => {
 /**
  * GET /api/v1/public/news/:id - Get single article by ID
  */
-publicApiRoutes.get('/news/:id', (req: ApiKeyRequest, res: Response) => {
+publicApiRoutes.get('/news/:id', async (req: ApiKeyRequest, res: Response) => {
   try {
-    const aggregator = req.app.locals.newsAggregator as NewsAggregator;
-    const article = aggregator.getArticleById(req.params.id);
+    const article = await newsReadService.getArticleById(req.params.id);
 
     if (!article) {
       res.status(404).json({
@@ -151,10 +148,9 @@ publicApiRoutes.get('/news/:id', (req: ApiKeyRequest, res: Response) => {
  * Returns events with location data for map visualization.
  * Events are extracted from news articles using AI.
  */
-publicApiRoutes.get('/events', (req: ApiKeyRequest, res: Response) => {
+publicApiRoutes.get('/events', async (req: ApiKeyRequest, res: Response) => {
   try {
-    const aggregator = req.app.locals.newsAggregator as NewsAggregator;
-    const { articles } = aggregator.getArticles({ limit: 500 });
+    const { articles } = await newsReadService.getArticles({ limit: 500 });
     const allEvents = eventsService.extractEventsFromArticles(articles);
 
     // Filter to only events with location data and transform for API response
@@ -203,10 +199,9 @@ publicApiRoutes.get('/events', (req: ApiKeyRequest, res: Response) => {
  *
  * Returns positive/negative/neutral counts per geographic region.
  */
-publicApiRoutes.get('/sentiment', (req: ApiKeyRequest, res: Response) => {
+publicApiRoutes.get('/sentiment', async (req: ApiKeyRequest, res: Response) => {
   try {
-    const aggregator = req.app.locals.newsAggregator as NewsAggregator;
-    const rawStats = aggregator.getSentimentByRegion();
+    const rawStats = await newsReadService.getSentimentByRegion();
 
     // Transform to array format for API response
     const stats = Object.entries(rawStats).map(([region, counts]) => ({
