@@ -1,240 +1,196 @@
 <!-- generated-by: gsd-doc-writer -->
 # Getting Started
 
-This guide walks you through setting up NewsHub for local development, from installing prerequisites to running your first development server.
+Get NewsHub running locally in under 10 minutes. Copy each block in order — every step assumes the previous one succeeded.
 
 ## Prerequisites
 
-Before installing NewsHub, ensure you have the following installed on your system:
+Install these once on your machine:
 
-- **Node.js**: >= 22.0.0 (specified in Dockerfile and CI workflow)
-- **npm**: Included with Node.js (package manager)
-- **PostgreSQL**: 17 (via Docker recommended, see Installation Steps)
-- **Redis**: 7.4-alpine (optional, enables caching and rate limiting)
-- **Docker**: Latest version (for database, Redis, and monitoring stack)
-- **Git**: For cloning the repository
+- **Node.js** >= 18 (LTS recommended)
+- **pnpm** — install globally with the one allowed `npm` invocation:
+  ```bash
+  npm i -g pnpm
+  ```
+- **Docker** + Docker Compose (Docker Desktop on Windows/macOS includes both)
+- **Git**
 
-**Optional Tools:**
-- **Docker Compose**: Included with Docker Desktop (for orchestrating services)
+NewsHub is a pnpm monorepo. Use `pnpm` for every command after the bootstrap above.
 
-## Installation Steps
-
-Follow these steps to clone the repository and install all dependencies:
-
-1. **Clone the repository:**
+## 1. Clone the repository
 
 ```bash
-git clone https://github.com/ikarusXPS/NewsHubitat.git
+git clone https://github.com/ikarusXPS/NewsHub.git
 cd NewsHub
 ```
 
-2. **Install Node.js dependencies:**
+## 2. Install dependencies
 
 ```bash
-npm install
+pnpm install
 ```
 
-**Note:** The CI workflow uses `npm ci --legacy-peer-deps` for deterministic builds. The `--legacy-peer-deps` flag resolves peer dependency conflicts with vite-plugin-pwa and Vite 8.
+This installs all workspace packages (`apps/web`, `packages/types`).
 
-3. **Start PostgreSQL and Redis containers:**
-
-```bash
-docker compose up -d postgres redis
-```
-
-This starts PostgreSQL on port 5433 (mapped from container port 5432) and Redis on port 6379.
-
-4. **Configure environment variables:**
-
-Copy the example environment file and edit it with your configuration:
+## 3. Configure environment variables
 
 ```bash
 cp .env.example .env
 ```
 
-**Required configuration in `.env`:**
-
-- `JWT_SECRET`: Minimum 32 characters (generate with `openssl rand -base64 32`)
-- At least one AI provider key:
-  - `OPENROUTER_API_KEY` (recommended, free tier with multiple models)
-  - `GEMINI_API_KEY` (free tier, 1500 requests/day)
-  - `ANTHROPIC_API_KEY` (premium fallback)
-
-**Optional but recommended:**
-
-- `DEEPL_API_KEY`: Translation service (500k chars/month free tier)
-- `SENDGRID_API_KEY`: Email verification and digests (60-day free trial)
-- `REDIS_URL`: Set to `redis://localhost:6379` if using the Docker Redis container
-
-5. **Initialize the database:**
-
-Generate the Prisma client, sync the database schema, and seed initial data:
+Open `.env` and set the three required values:
 
 ```bash
+# Database (matches the docker-compose Postgres mapping in step 4)
+DATABASE_URL="postgresql://newshub:newshub_dev@localhost:5433/newshub?schema=public"
+
+# Redis (matches the docker-compose Redis service in step 4)
+REDIS_URL=redis://localhost:6379
+
+# JWT secret — must be at least 32 characters
+JWT_SECRET=replace-me-with-a-32-plus-character-random-string
+```
+
+Generate a strong `JWT_SECRET` with:
+
+```bash
+openssl rand -base64 32
+```
+
+**AI provider (recommended):** add at least one key so AI features work. The free OpenRouter tier is recommended:
+
+```bash
+OPENROUTER_API_KEY=your-openrouter-api-key   # https://openrouter.ai/keys
+```
+
+The app degrades gracefully without an AI key — news, translation, and visualizations still work; AI Q&A and clustering summaries fall back to keyword analysis.
+
+## 4. Start PostgreSQL and Redis
+
+```bash
+docker compose up -d postgres redis
+```
+
+This starts only the two services dev needs (Postgres on `localhost:5433`, Redis on `localhost:6379`). The full `docker compose up -d` starts the production stack — don't run that for local dev.
+
+## 5. Initialize the database
+
+```bash
+cd apps/web
 npx prisma generate
 npx prisma db push
-npm run seed
+cd ../..
 ```
 
-The `npm run seed` command runs all seed scripts (badges and AI personas). You can run them individually:
-- `npm run seed:badges` - Gamification badges only
-- `npm run seed:personas` - AI personas only (8 built-in personalities)
+`prisma generate` builds the typed client into `apps/web/src/generated/prisma/`. `prisma db push` syncs the schema to your Postgres instance.
 
-## First Run
-
-Start the development server with a single command:
+## 6. Seed initial data
 
 ```bash
-npm run dev
+pnpm seed
 ```
 
-This starts both the frontend (Vite) and backend (Express) concurrently:
-- **Frontend**: http://localhost:5173
-- **Backend API**: http://localhost:3001
+This loads gamification badges and the 8 built-in AI personas.
 
-**Alternative: Run servers separately**
-
-If you need to run the frontend and backend in separate terminal windows:
+## 7. Start the development server
 
 ```bash
-# Terminal 1: Frontend only
-npm run dev:frontend
-
-# Terminal 2: Backend only
-npm run dev:backend
+pnpm dev
 ```
 
-**Verify the application is running:**
+`pnpm dev` runs frontend and backend concurrently:
 
-1. Open your browser to http://localhost:5173
-2. The NewsHub dashboard should load with the 3D globe view
-3. Check backend health: http://localhost:3001/api/health (should return JSON with `status: "ok"`)
+- **Frontend:** http://localhost:5173
+- **Backend API:** http://localhost:3001
+
+## 8. Open the app
+
+Browse to **http://localhost:5173**. The dashboard should load with the 3D globe and live news feed.
+
+Verify the backend is healthy:
+
+```bash
+curl http://localhost:3001/api/health
+```
+
+## 9. (Optional) Pre-create test users for load testing
+
+```bash
+pnpm seed:load-test
+```
+
+Creates 100 verified test accounts (`loadtest1@example.com` through `loadtest100@example.com`) for k6 scenarios.
+
+## 10. (Optional) Inspect the database
+
+```bash
+cd apps/web && npx prisma studio
+```
+
+Prisma Studio opens at **http://localhost:5555** for browsing tables and editing rows.
 
 ## Common Setup Issues
 
-### Issue 1: Missing Environment Variables
+### `JWT_SECRET not configured` on backend startup
 
-**Symptom:** Server fails to start with error: `JWT_SECRET not configured` or `No AI provider configured`
+The backend rejects secrets shorter than 32 characters. Regenerate:
 
-**Solution:**
-1. Verify `.env` file exists in project root
-2. Set `JWT_SECRET` to a secure random string (minimum 32 characters):
-   ```bash
-   # Generate a secure secret
-   openssl rand -base64 32
-   ```
-3. Configure at least one AI provider (see `.env.example` for API key instructions)
+```bash
+openssl rand -base64 32
+```
 
-### Issue 2: Port Already in Use
+Paste the output into `JWT_SECRET=` in `.env` and restart `pnpm dev`.
 
-**Symptom:** Error: `EADDRINUSE: address already in use :::3001` or `:::5173`
+### `EADDRINUSE` on port 3001 or 5173
 
-**Solution:**
-1. Check which process is using the port:
-   ```bash
-   # Linux/macOS
-   lsof -i :3001
-   lsof -i :5173
+Another process is using the port. Find and stop it:
 
-   # Windows
-   netstat -ano | findstr :3001
-   netstat -ano | findstr :5173
-   ```
-2. Stop the conflicting process or change the port in `.env`:
-   ```bash
-   PORT=3002  # Backend port
-   # Frontend port: edit vite.config.ts server.port
-   ```
+```bash
+# Linux/macOS
+lsof -i :3001
+lsof -i :5173
 
-### Issue 3: PostgreSQL Connection Failed
+# Windows
+netstat -ano | findstr :3001
+netstat -ano | findstr :5173
+```
 
-**Symptom:** `Error: connect ECONNREFUSED ::1:5433` or Prisma client errors
+### `ECONNREFUSED` to Postgres on port 5433
 
-**Solution:**
-1. Verify PostgreSQL container is running:
-   ```bash
-   docker compose ps postgres
-   ```
-2. If not running, start it:
-   ```bash
-   docker compose up -d postgres
-   ```
-3. Check health status (should show "healthy"):
-   ```bash
-   docker compose ps postgres | grep healthy
-   ```
-4. Verify `DATABASE_URL` in `.env` matches the Docker Compose configuration:
-   ```bash
-   DATABASE_URL="postgresql://newshub:newshub_dev@localhost:5433/newshub?schema=public"
-   ```
+Postgres isn't running or isn't healthy yet:
 
-### Issue 4: Prisma Client Not Generated
+```bash
+docker compose ps postgres
+docker compose up -d postgres
+docker compose logs postgres
+```
 
-**Symptom:** TypeScript errors about `@prisma/client` or missing Prisma types
+Confirm `DATABASE_URL` in `.env` matches the docker-compose mapping (port `5433`, user `newshub`, password `newshub_dev`).
 
-**Solution:**
-1. Generate the Prisma client:
-   ```bash
-   npx prisma generate
-   ```
-2. If errors persist, delete the generated client and regenerate:
-   ```bash
-   rm -rf src/generated/prisma
-   npx prisma generate
-   ```
+### Redis warnings in the backend log
 
-### Issue 5: Redis Connection Warnings
+Redis is optional. The app falls back to in-memory caches and rate limits. To silence the warnings, ensure Redis is running:
 
-**Symptom:** Console warnings about Redis connection failed (non-fatal)
+```bash
+docker compose up -d redis
+```
 
-**Solution:**
+### TypeScript errors about `@prisma/client` after schema changes
 
-Redis is optional. The application gracefully degrades to in-memory fallback. To enable Redis:
-1. Start the Redis container:
-   ```bash
-   docker compose up -d redis
-   ```
-2. Set `REDIS_URL` in `.env`:
-   ```bash
-   REDIS_URL=redis://localhost:6379
-   ```
+Regenerate the Prisma client:
 
-### Issue 6: Node.js Version Mismatch
+```bash
+cd apps/web && npx prisma generate && cd ../..
+```
 
-**Symptom:** Build errors or dependency installation failures related to Node.js version
+## What's next?
 
-**Solution:**
-1. Check your Node.js version:
-   ```bash
-   node --version
-   ```
-2. NewsHub requires Node.js >= 22.0.0 (specified in Dockerfile and CI workflow)
-3. Install Node.js 22 using nvm:
-   ```bash
-   nvm install 22
-   nvm use 22
-   ```
-4. Reinstall dependencies:
-   ```bash
-   rm -rf node_modules package-lock.json
-   npm install
-   ```
+You're set up. Next stops:
 
-## Next Steps
-
-Once the development server is running successfully:
-
-- **Development Workflow**: See [docs/DEVELOPMENT.md](DEVELOPMENT.md) for build commands, code style, and PR guidelines
-- **Testing**: See [docs/TESTING.md](TESTING.md) for running unit tests (Vitest) and E2E tests (Playwright)
-- **Configuration**: See [docs/CONFIGURATION.md](CONFIGURATION.md) for detailed environment variable documentation
-- **Architecture**: See [docs/ARCHITECTURE.md](ARCHITECTURE.md) to understand the system design and component structure
-- **Project Guide**: See [CLAUDE.md](../CLAUDE.md) for comprehensive developer documentation, including tech stack, API endpoints, and common patterns
-
-**Quick verification checklist before development:**
-
-- [ ] `npm run dev` starts without errors
-- [ ] Frontend loads at http://localhost:5173
-- [ ] Backend health check passes: http://localhost:3001/api/health
-- [ ] PostgreSQL container is healthy: `docker compose ps postgres`
-- [ ] Database schema is synced: `npx prisma db push` (no changes expected)
-- [ ] At least one AI provider is configured in `.env`
+- **[docs/DEVELOPMENT.md](DEVELOPMENT.md)** — daily commands, code style, build/test/lint
+- **[docs/ARCHITECTURE.md](ARCHITECTURE.md)** — system design, services, data flow
+- **[docs/API.md](API.md)** — internal HTTP API reference
+- **http://localhost:3001/api-docs** — Scalar UI for the public API (live, served by your dev backend)
+- **[.planning/PROJECT.md](../.planning/PROJECT.md)** — product vision and core value
+- **[.planning/ROADMAP.md](../.planning/ROADMAP.md)** — phase breakdown and the GSD planning workflow
+- **[CONTRIBUTING.md](../CONTRIBUTING.md)** — read this before opening a PR
