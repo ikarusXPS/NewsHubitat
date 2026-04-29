@@ -6,7 +6,12 @@ FROM node:22-alpine3.19 AS deps
 WORKDIR /app
 
 # Enable pnpm via corepack (matches CI: pnpm/action-setup@v4 version: 10)
-RUN corepack enable && corepack prepare pnpm@10.32.1 --activate
+# Upgrade corepack first — Node 22's bundled corepack ships with outdated
+# signing keys and rejects pnpm 10.x signatures (Cannot find matching keyid).
+# See: https://github.com/nodejs/corepack/issues/612
+RUN npm install -g corepack@latest \
+ && corepack enable \
+ && corepack prepare pnpm@10.32.1 --activate
 
 # Copy ONLY workspace manifests + lockfile so this layer caches on lockfile change.
 # When adding a new workspace package to pnpm-workspace.yaml, add its package.json here.
@@ -26,7 +31,12 @@ RUN pnpm install --frozen-lockfile --filter @newshub/web...
 FROM node:22-alpine3.19 AS builder
 WORKDIR /app
 
-RUN corepack enable && corepack prepare pnpm@10.32.1 --activate
+# Upgrade corepack first — Node 22's bundled corepack ships with outdated
+# signing keys and rejects pnpm 10.x signatures (Cannot find matching keyid).
+# See: https://github.com/nodejs/corepack/issues/612
+RUN npm install -g corepack@latest \
+ && corepack enable \
+ && corepack prepare pnpm@10.32.1 --activate
 
 # Bring in the dep tree from stage 1
 COPY --from=deps /app/node_modules ./node_modules
@@ -48,7 +58,12 @@ RUN pnpm --filter @newshub/web build
 FROM node:22-alpine3.19 AS runner
 WORKDIR /app
 
-RUN corepack enable && corepack prepare pnpm@10.32.1 --activate
+# Upgrade corepack first — Node 22's bundled corepack ships with outdated
+# signing keys and rejects pnpm 10.x signatures (Cannot find matching keyid).
+# See: https://github.com/nodejs/corepack/issues/612
+RUN npm install -g corepack@latest \
+ && corepack enable \
+ && corepack prepare pnpm@10.32.1 --activate
 
 # Chromium dependencies for Puppeteer (D-03; preserved from legacy Dockerfile)
 # See: https://pptr.dev/troubleshooting#running-puppeteer-on-alpine
