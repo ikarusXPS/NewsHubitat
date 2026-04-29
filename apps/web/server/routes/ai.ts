@@ -1,10 +1,35 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import Anthropic from '@anthropic-ai/sdk';
 import OpenAI from 'openai';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { z } from 'zod';
 import logger from '../utils/logger';
+import { AIService } from '../services/aiService';
+import { FactCheckRequestSchema, LocaleSchema } from '../openapi/schemas';
 
 const router = Router();
+
+// AuthRequest is populated upstream by authMiddleware (mounted in server/index.ts:167).
+// Adding authMiddleware here is the documented anti-pattern (RESEARCH.md mount-order).
+interface AuthRequest extends Request {
+  user?: { userId: string; email: string };
+}
+
+function formatZodError(error: z.ZodError): string {
+  return error.issues.map((e) => e.message).join(', ');
+}
+
+/**
+ * Belt-and-suspenders prompt-injection rejection (T-38-12).
+ *
+ * Rejects user claims that contain role-play markers an LLM might honor as
+ * instruction overrides. The prompt-template `<<<CLAIM>>>` delimiter in the
+ * factCheckPrompt builder (Plan 38-02) is the second layer; the schema-level
+ * 10-500 char cap is the third. Defense in depth.
+ */
+const INJECTION_PATTERN = /\n\s*(ignore\s+previous|system\s*:|###\s*instruction|assistant\s*:)/i;
+
+const localeQuerySchema = z.object({ locale: LocaleSchema.optional() });
 
 // Multi-provider AI setup with fallback chain
 let anthropicClient: Anthropic | null = null;
@@ -303,5 +328,78 @@ Analysiere diesen Artikel auf Propaganda-Indikatoren.`;
     res.status(500).json({ error: 'Failed to analyze article' });
   }
 });
+
+// =============================================================================
+// Phase 38 — Advanced AI Features (Plan 38-03)
+// =============================================================================
+// New handlers route through AIService.getInstance() (the singleton that owns
+// the multi-provider fallback chain) — they do NOT extend `callAIWithFallback`
+// above, which is a legacy helper used only by /ask + /propaganda.
+//
+// Auth + tier-limiting come from the upstream chain at server/index.ts:167:
+//   app.use('/api/ai', authMiddleware, aiTierLimiter, aiRoutes);
+// Adding authMiddleware here is the anti-pattern in RESEARCH.md.
+
+/**
+ * POST /api/ai/fact-check — exported handler (testable in isolation).
+ */
+export async function handleFactCheck(req: AuthRequest, res: Response): Promise<void> {
+  try {
+    const result = FactCheckRequestSchema.safeParse(req.body);
+    if (!result.success) {
+      res.status(400).json({ success: false, error: formatZodError(result.error) });
+      return;
+    }
+
+    // Belt-and-suspenders prompt-injection rejection (T-38-12).
+    if (INJECTION_PATTERN.test(result.data.claim)) {
+      res.status(400).json({ success: false, error: 'Claim contains forbidden patterns' });
+      return;
+    }
+
+    const userId = req.user!.userId;
+    const { claim, articleId, language } = result.data;
+    const locale = language ?? 'en';
+
+    const aiService = AIService.getInstance();
+    const verdict = await aiService.factCheckClaim({ claim, articleId, userId, locale });
+
+    res.json({ success: true, data: verdict });
+  } catch (err) {
+    logger.error('Fact-check error:', err);
+    res.status(500).json({ success: false, error: 'Failed to fact-check claim' });
+  }
+}
+
+/**
+ * GET /api/ai/source-credibility/:sourceId — exported handler.
+ *
+ * Note: per Plan 38-02 fallbackCredibility, the service NEVER throws on
+ * unknown sourceId — it returns a degraded score=0 result. So 404 is not
+ * a normal flow here; the OpenAPI spec lists 404 only for forward-compat.
+ */
+export async function handleSourceCredibility(req: AuthRequest, res: Response): Promise<void> {
+  try {
+    const { sourceId } = req.params;
+    const queryParse = localeQuerySchema.safeParse(req.query);
+    if (!queryParse.success) {
+      res.status(400).json({ success: false, error: formatZodError(queryParse.error) });
+      return;
+    }
+    const locale = queryParse.data.locale ?? 'en';
+
+    const aiService = AIService.getInstance();
+    const data = await aiService.getSourceCredibility(sourceId, locale);
+
+    res.set('Cache-Control', 'public, max-age=600');
+    res.json({ success: true, data });
+  } catch (err) {
+    logger.error('Source-credibility error:', err);
+    res.status(500).json({ success: false, error: 'Failed to fetch source credibility' });
+  }
+}
+
+router.post('/fact-check', handleFactCheck);
+router.get('/source-credibility/:sourceId', handleSourceCredibility);
 
 export default router;
