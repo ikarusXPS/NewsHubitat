@@ -13,14 +13,11 @@ test.describe('Subscription', () => {
       // Wait for page to load
       await expect(page.locator('h1')).toContainText(/Choose Your Plan|Wähle deinen Plan/);
 
-      // Check for 3 tier names
-      const freeCard = page.getByText(/Free|Kostenlos/);
-      const premiumCard = page.getByText('Premium');
-      const enterpriseCard = page.getByText('Enterprise');
-
-      await expect(freeCard).toBeVisible();
-      await expect(premiumCard).toBeVisible();
-      await expect(enterpriseCard).toBeVisible();
+      // Check for 3 tier names. Use heading role so we don't match copy elsewhere
+      // on the page (e.g. "Enterprise-Analysen" feature description).
+      await expect(page.getByRole('heading', { name: /^(Free|Kostenlos)$/ })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Premium' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Enterprise' })).toBeVisible();
     });
 
     test('should show Premium as most popular', async ({ page }) => {
@@ -44,8 +41,10 @@ test.describe('Subscription', () => {
       // Click annual
       await annualButton.click();
 
-      // Check for "Save 2 months" indicator
-      await expect(page.getByText(/Save 2 months|Spare 2 Monate/)).toBeVisible();
+      // Check for "Save 2 months" indicator. The string appears both as a badge
+      // on the toggle button AND as an inline note under the price — match the
+      // first one.
+      await expect(page.getByText(/Save 2 months|Spare 2 Monate/).first()).toBeVisible();
     });
 
     test('should show trust badges', async ({ page }) => {
@@ -87,8 +86,9 @@ test.describe('Subscription', () => {
     test('should display price in EUR', async ({ page }) => {
       await page.goto('/pricing');
 
-      // Check for EUR price display
-      await expect(page.getByText(/EUR0|EUR9|EUR90/)).toBeVisible();
+      // Check for EUR price display. Multiple tier prices are rendered, so a
+      // shared regex matches >1 element. Pick the first.
+      await expect(page.getByText(/EUR\d+/).first()).toBeVisible();
     });
   });
 
