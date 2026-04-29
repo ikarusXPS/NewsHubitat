@@ -34,6 +34,28 @@ services:
       timeout: 3s
       retries: 10
 
+  # One-shot schema initializer. Runs `prisma db push` against the empty
+  # postgres container so the App tables (NewsArticle, User, etc.) exist
+  # before the app replicas start serving requests. Reuses the same built
+  # image as app-1/app-2 (Docker layer cache makes this free).
+  # The app replicas depend on this service via `service_completed_successfully`,
+  # so they don't boot until the schema is in place.
+  db-init:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: "postgresql://newshub:test@postgres:5432/newshub?schema=public"
+      DIRECT_URL: "postgresql://newshub:test@postgres:5432/newshub?schema=public"
+    command:
+      - "sh"
+      - "-c"
+      - "cd /app/apps/web && pnpm exec prisma db push --skip-generate --accept-data-loss"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
   traefik:
     image: traefik:v3.3
     command:
@@ -75,6 +97,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      db-init:
+        condition: service_completed_successfully
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.test.rule=PathPrefix(`/`)"
