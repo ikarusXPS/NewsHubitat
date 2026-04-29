@@ -36,7 +36,7 @@ model NewsArticle {
   source   NewsSource @relation(fields: [sourceId], references: [id])
   sourceId String
 
-  searchTsv  Unsupported("tsvector")? // managed by raw migration 20260429120000_38_news_article_fts; do not edit via Prisma
+  searchTsv  Unsupported("tsvector")? @map("search_tsv") // managed by raw migration 20260429120000_38_news_article_fts; do not edit via Prisma
   factChecks FactCheck[]
 
   @@index([publishedAt])

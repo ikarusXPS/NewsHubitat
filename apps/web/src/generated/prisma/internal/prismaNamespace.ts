@@ -408,7 +408,8 @@ export const ModelName = {
   ReferralReward: 'ReferralReward',
   Campaign: 'Campaign',
   StudentVerification: 'StudentVerification',
-  ApiKey: 'ApiKey'
+  ApiKey: 'ApiKey',
+  FactCheck: 'FactCheck'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -424,7 +425,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "newsArticle" | "newsSource" | "user" | "bookmark" | "readingHistory" | "storyCluster" | "emailSubscription" | "emailDigest" | "aIPersona" | "userPersona" | "sharedContent" | "shareClick" | "badge" | "userBadge" | "leaderboardSnapshot" | "comment" | "team" | "teamMember" | "teamBookmark" | "teamInvite" | "processedWebhookEvent" | "referralReward" | "campaign" | "studentVerification" | "apiKey"
+    modelProps: "newsArticle" | "newsSource" | "user" | "bookmark" | "readingHistory" | "storyCluster" | "emailSubscription" | "emailDigest" | "aIPersona" | "userPersona" | "sharedContent" | "shareClick" | "badge" | "userBadge" | "leaderboardSnapshot" | "comment" | "team" | "teamMember" | "teamBookmark" | "teamInvite" | "processedWebhookEvent" | "referralReward" | "campaign" | "studentVerification" | "apiKey" | "factCheck"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2278,6 +2279,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    FactCheck: {
+      payload: Prisma.$FactCheckPayload<ExtArgs>
+      fields: Prisma.FactCheckFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.FactCheckFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FactCheckPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.FactCheckFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FactCheckPayload>
+        }
+        findFirst: {
+          args: Prisma.FactCheckFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FactCheckPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.FactCheckFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FactCheckPayload>
+        }
+        findMany: {
+          args: Prisma.FactCheckFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FactCheckPayload>[]
+        }
+        create: {
+          args: Prisma.FactCheckCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FactCheckPayload>
+        }
+        createMany: {
+          args: Prisma.FactCheckCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.FactCheckCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FactCheckPayload>[]
+        }
+        delete: {
+          args: Prisma.FactCheckDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FactCheckPayload>
+        }
+        update: {
+          args: Prisma.FactCheckUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FactCheckPayload>
+        }
+        deleteMany: {
+          args: Prisma.FactCheckDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.FactCheckUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.FactCheckUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FactCheckPayload>[]
+        }
+        upsert: {
+          args: Prisma.FactCheckUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FactCheckPayload>
+        }
+        aggregate: {
+          args: Prisma.FactCheckAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateFactCheck>
+        }
+        groupBy: {
+          args: Prisma.FactCheckGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FactCheckGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.FactCheckCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FactCheckCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2710,6 +2785,25 @@ export const ApiKeyScalarFieldEnum = {
 export type ApiKeyScalarFieldEnum = (typeof ApiKeyScalarFieldEnum)[keyof typeof ApiKeyScalarFieldEnum]
 
 
+export const FactCheckScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  articleId: 'articleId',
+  claimText: 'claimText',
+  claimHash: 'claimHash',
+  claimLanguage: 'claimLanguage',
+  verdict: 'verdict',
+  confidence: 'confidence',
+  methodologyMd: 'methodologyMd',
+  citationArticleIds: 'citationArticleIds',
+  modelUsed: 'modelUsed',
+  locale: 'locale',
+  createdAt: 'createdAt'
+} as const
+
+export type FactCheckScalarFieldEnum = (typeof FactCheckScalarFieldEnum)[keyof typeof FactCheckScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -3016,6 +3110,7 @@ export type GlobalOmitConfig = {
   campaign?: Prisma.CampaignOmit
   studentVerification?: Prisma.StudentVerificationOmit
   apiKey?: Prisma.ApiKeyOmit
+  factCheck?: Prisma.FactCheckOmit
 }
 
 /* Types for Logging */

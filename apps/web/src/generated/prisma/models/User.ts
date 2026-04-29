@@ -542,6 +542,7 @@ export type UserWhereInput = {
   referredByUser?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   referredUsers?: Prisma.UserListRelationFilter
   studentVerifications?: Prisma.StudentVerificationListRelationFilter
+  factChecks?: Prisma.FactCheckListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -602,6 +603,7 @@ export type UserOrderByWithRelationInput = {
   referredByUser?: Prisma.UserOrderByWithRelationInput
   referredUsers?: Prisma.UserOrderByRelationAggregateInput
   studentVerifications?: Prisma.StudentVerificationOrderByRelationAggregateInput
+  factChecks?: Prisma.FactCheckOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -665,6 +667,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   referredByUser?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   referredUsers?: Prisma.UserListRelationFilter
   studentVerifications?: Prisma.StudentVerificationListRelationFilter
+  factChecks?: Prisma.FactCheckListRelationFilter
 }, "id" | "email" | "googleIdHash" | "githubIdHash" | "stripeCustomerId" | "stripeSubscriptionId" | "referralCode">
 
 export type UserOrderByWithAggregationInput = {
@@ -824,6 +827,7 @@ export type UserCreateInput = {
   referredByUser?: Prisma.UserCreateNestedOneWithoutReferredUsersInput
   referredUsers?: Prisma.UserCreateNestedManyWithoutReferredByUserInput
   studentVerifications?: Prisma.StudentVerificationCreateNestedManyWithoutUserInput
+  factChecks?: Prisma.FactCheckCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -883,6 +887,7 @@ export type UserUncheckedCreateInput = {
   referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferredInput
   referredUsers?: Prisma.UserUncheckedCreateNestedManyWithoutReferredByUserInput
   studentVerifications?: Prisma.StudentVerificationUncheckedCreateNestedManyWithoutUserInput
+  factChecks?: Prisma.FactCheckUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -942,6 +947,7 @@ export type UserUpdateInput = {
   referredByUser?: Prisma.UserUpdateOneWithoutReferredUsersNestedInput
   referredUsers?: Prisma.UserUpdateManyWithoutReferredByUserNestedInput
   studentVerifications?: Prisma.StudentVerificationUpdateManyWithoutUserNestedInput
+  factChecks?: Prisma.FactCheckUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -1001,6 +1007,7 @@ export type UserUncheckedUpdateInput = {
   referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferredNestedInput
   referredUsers?: Prisma.UserUncheckedUpdateManyWithoutReferredByUserNestedInput
   studentVerifications?: Prisma.StudentVerificationUncheckedUpdateManyWithoutUserNestedInput
+  factChecks?: Prisma.FactCheckUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -1544,6 +1551,20 @@ export type UserUpdateOneRequiredWithoutApiKeysNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutApiKeysInput, Prisma.UserUpdateWithoutApiKeysInput>, Prisma.UserUncheckedUpdateWithoutApiKeysInput>
 }
 
+export type UserCreateNestedOneWithoutFactChecksInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutFactChecksInput, Prisma.UserUncheckedCreateWithoutFactChecksInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutFactChecksInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutFactChecksNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutFactChecksInput, Prisma.UserUncheckedCreateWithoutFactChecksInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutFactChecksInput
+  upsert?: Prisma.UserUpsertWithoutFactChecksInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutFactChecksInput, Prisma.UserUpdateWithoutFactChecksInput>, Prisma.UserUncheckedUpdateWithoutFactChecksInput>
+}
+
 export type UserCreateWithoutReferredUsersInput = {
   id?: string
   email: string
@@ -1600,6 +1621,7 @@ export type UserCreateWithoutReferredUsersInput = {
   referralRewardsAsReferred?: Prisma.ReferralRewardCreateNestedManyWithoutReferredInput
   referredByUser?: Prisma.UserCreateNestedOneWithoutReferredUsersInput
   studentVerifications?: Prisma.StudentVerificationCreateNestedManyWithoutUserInput
+  factChecks?: Prisma.FactCheckCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReferredUsersInput = {
@@ -1658,6 +1680,7 @@ export type UserUncheckedCreateWithoutReferredUsersInput = {
   referralRewardsAsReferrer?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferrerInput
   referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferredInput
   studentVerifications?: Prisma.StudentVerificationUncheckedCreateNestedManyWithoutUserInput
+  factChecks?: Prisma.FactCheckUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReferredUsersInput = {
@@ -1721,6 +1744,7 @@ export type UserCreateWithoutReferredByUserInput = {
   referralRewardsAsReferred?: Prisma.ReferralRewardCreateNestedManyWithoutReferredInput
   referredUsers?: Prisma.UserCreateNestedManyWithoutReferredByUserInput
   studentVerifications?: Prisma.StudentVerificationCreateNestedManyWithoutUserInput
+  factChecks?: Prisma.FactCheckCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReferredByUserInput = {
@@ -1779,6 +1803,7 @@ export type UserUncheckedCreateWithoutReferredByUserInput = {
   referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferredInput
   referredUsers?: Prisma.UserUncheckedCreateNestedManyWithoutReferredByUserInput
   studentVerifications?: Prisma.StudentVerificationUncheckedCreateNestedManyWithoutUserInput
+  factChecks?: Prisma.FactCheckUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReferredByUserInput = {
@@ -1858,6 +1883,7 @@ export type UserUpdateWithoutReferredUsersInput = {
   referralRewardsAsReferred?: Prisma.ReferralRewardUpdateManyWithoutReferredNestedInput
   referredByUser?: Prisma.UserUpdateOneWithoutReferredUsersNestedInput
   studentVerifications?: Prisma.StudentVerificationUpdateManyWithoutUserNestedInput
+  factChecks?: Prisma.FactCheckUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReferredUsersInput = {
@@ -1916,6 +1942,7 @@ export type UserUncheckedUpdateWithoutReferredUsersInput = {
   referralRewardsAsReferrer?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferrerNestedInput
   referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferredNestedInput
   studentVerifications?: Prisma.StudentVerificationUncheckedUpdateManyWithoutUserNestedInput
+  factChecks?: Prisma.FactCheckUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithWhereUniqueWithoutReferredByUserInput = {
@@ -2039,6 +2066,7 @@ export type UserCreateWithoutBookmarksInput = {
   referredByUser?: Prisma.UserCreateNestedOneWithoutReferredUsersInput
   referredUsers?: Prisma.UserCreateNestedManyWithoutReferredByUserInput
   studentVerifications?: Prisma.StudentVerificationCreateNestedManyWithoutUserInput
+  factChecks?: Prisma.FactCheckCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBookmarksInput = {
@@ -2097,6 +2125,7 @@ export type UserUncheckedCreateWithoutBookmarksInput = {
   referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferredInput
   referredUsers?: Prisma.UserUncheckedCreateNestedManyWithoutReferredByUserInput
   studentVerifications?: Prisma.StudentVerificationUncheckedCreateNestedManyWithoutUserInput
+  factChecks?: Prisma.FactCheckUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBookmarksInput = {
@@ -2171,6 +2200,7 @@ export type UserUpdateWithoutBookmarksInput = {
   referredByUser?: Prisma.UserUpdateOneWithoutReferredUsersNestedInput
   referredUsers?: Prisma.UserUpdateManyWithoutReferredByUserNestedInput
   studentVerifications?: Prisma.StudentVerificationUpdateManyWithoutUserNestedInput
+  factChecks?: Prisma.FactCheckUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBookmarksInput = {
@@ -2229,6 +2259,7 @@ export type UserUncheckedUpdateWithoutBookmarksInput = {
   referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferredNestedInput
   referredUsers?: Prisma.UserUncheckedUpdateManyWithoutReferredByUserNestedInput
   studentVerifications?: Prisma.StudentVerificationUncheckedUpdateManyWithoutUserNestedInput
+  factChecks?: Prisma.FactCheckUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutReadingHistoryInput = {
@@ -2287,6 +2318,7 @@ export type UserCreateWithoutReadingHistoryInput = {
   referredByUser?: Prisma.UserCreateNestedOneWithoutReferredUsersInput
   referredUsers?: Prisma.UserCreateNestedManyWithoutReferredByUserInput
   studentVerifications?: Prisma.StudentVerificationCreateNestedManyWithoutUserInput
+  factChecks?: Prisma.FactCheckCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReadingHistoryInput = {
@@ -2345,6 +2377,7 @@ export type UserUncheckedCreateWithoutReadingHistoryInput = {
   referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferredInput
   referredUsers?: Prisma.UserUncheckedCreateNestedManyWithoutReferredByUserInput
   studentVerifications?: Prisma.StudentVerificationUncheckedCreateNestedManyWithoutUserInput
+  factChecks?: Prisma.FactCheckUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReadingHistoryInput = {
@@ -2419,6 +2452,7 @@ export type UserUpdateWithoutReadingHistoryInput = {
   referredByUser?: Prisma.UserUpdateOneWithoutReferredUsersNestedInput
   referredUsers?: Prisma.UserUpdateManyWithoutReferredByUserNestedInput
   studentVerifications?: Prisma.StudentVerificationUpdateManyWithoutUserNestedInput
+  factChecks?: Prisma.FactCheckUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReadingHistoryInput = {
@@ -2477,6 +2511,7 @@ export type UserUncheckedUpdateWithoutReadingHistoryInput = {
   referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferredNestedInput
   referredUsers?: Prisma.UserUncheckedUpdateManyWithoutReferredByUserNestedInput
   studentVerifications?: Prisma.StudentVerificationUncheckedUpdateManyWithoutUserNestedInput
+  factChecks?: Prisma.FactCheckUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutEmailSubscriptionInput = {
@@ -2535,6 +2570,7 @@ export type UserCreateWithoutEmailSubscriptionInput = {
   referredByUser?: Prisma.UserCreateNestedOneWithoutReferredUsersInput
   referredUsers?: Prisma.UserCreateNestedManyWithoutReferredByUserInput
   studentVerifications?: Prisma.StudentVerificationCreateNestedManyWithoutUserInput
+  factChecks?: Prisma.FactCheckCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutEmailSubscriptionInput = {
@@ -2593,6 +2629,7 @@ export type UserUncheckedCreateWithoutEmailSubscriptionInput = {
   referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferredInput
   referredUsers?: Prisma.UserUncheckedCreateNestedManyWithoutReferredByUserInput
   studentVerifications?: Prisma.StudentVerificationUncheckedCreateNestedManyWithoutUserInput
+  factChecks?: Prisma.FactCheckUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutEmailSubscriptionInput = {
@@ -2667,6 +2704,7 @@ export type UserUpdateWithoutEmailSubscriptionInput = {
   referredByUser?: Prisma.UserUpdateOneWithoutReferredUsersNestedInput
   referredUsers?: Prisma.UserUpdateManyWithoutReferredByUserNestedInput
   studentVerifications?: Prisma.StudentVerificationUpdateManyWithoutUserNestedInput
+  factChecks?: Prisma.FactCheckUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEmailSubscriptionInput = {
@@ -2725,6 +2763,7 @@ export type UserUncheckedUpdateWithoutEmailSubscriptionInput = {
   referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferredNestedInput
   referredUsers?: Prisma.UserUncheckedUpdateManyWithoutReferredByUserNestedInput
   studentVerifications?: Prisma.StudentVerificationUncheckedUpdateManyWithoutUserNestedInput
+  factChecks?: Prisma.FactCheckUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutEmailDigestsInput = {
@@ -2783,6 +2822,7 @@ export type UserCreateWithoutEmailDigestsInput = {
   referredByUser?: Prisma.UserCreateNestedOneWithoutReferredUsersInput
   referredUsers?: Prisma.UserCreateNestedManyWithoutReferredByUserInput
   studentVerifications?: Prisma.StudentVerificationCreateNestedManyWithoutUserInput
+  factChecks?: Prisma.FactCheckCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutEmailDigestsInput = {
@@ -2841,6 +2881,7 @@ export type UserUncheckedCreateWithoutEmailDigestsInput = {
   referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferredInput
   referredUsers?: Prisma.UserUncheckedCreateNestedManyWithoutReferredByUserInput
   studentVerifications?: Prisma.StudentVerificationUncheckedCreateNestedManyWithoutUserInput
+  factChecks?: Prisma.FactCheckUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutEmailDigestsInput = {
@@ -2915,6 +2956,7 @@ export type UserUpdateWithoutEmailDigestsInput = {
   referredByUser?: Prisma.UserUpdateOneWithoutReferredUsersNestedInput
   referredUsers?: Prisma.UserUpdateManyWithoutReferredByUserNestedInput
   studentVerifications?: Prisma.StudentVerificationUpdateManyWithoutUserNestedInput
+  factChecks?: Prisma.FactCheckUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEmailDigestsInput = {
@@ -2973,6 +3015,7 @@ export type UserUncheckedUpdateWithoutEmailDigestsInput = {
   referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferredNestedInput
   referredUsers?: Prisma.UserUncheckedUpdateManyWithoutReferredByUserNestedInput
   studentVerifications?: Prisma.StudentVerificationUncheckedUpdateManyWithoutUserNestedInput
+  factChecks?: Prisma.FactCheckUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutUserPersonasInput = {
@@ -3031,6 +3074,7 @@ export type UserCreateWithoutUserPersonasInput = {
   referredByUser?: Prisma.UserCreateNestedOneWithoutReferredUsersInput
   referredUsers?: Prisma.UserCreateNestedManyWithoutReferredByUserInput
   studentVerifications?: Prisma.StudentVerificationCreateNestedManyWithoutUserInput
+  factChecks?: Prisma.FactCheckCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutUserPersonasInput = {
@@ -3089,6 +3133,7 @@ export type UserUncheckedCreateWithoutUserPersonasInput = {
   referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferredInput
   referredUsers?: Prisma.UserUncheckedCreateNestedManyWithoutReferredByUserInput
   studentVerifications?: Prisma.StudentVerificationUncheckedCreateNestedManyWithoutUserInput
+  factChecks?: Prisma.FactCheckUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutUserPersonasInput = {
@@ -3163,6 +3208,7 @@ export type UserUpdateWithoutUserPersonasInput = {
   referredByUser?: Prisma.UserUpdateOneWithoutReferredUsersNestedInput
   referredUsers?: Prisma.UserUpdateManyWithoutReferredByUserNestedInput
   studentVerifications?: Prisma.StudentVerificationUpdateManyWithoutUserNestedInput
+  factChecks?: Prisma.FactCheckUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUserPersonasInput = {
@@ -3221,6 +3267,7 @@ export type UserUncheckedUpdateWithoutUserPersonasInput = {
   referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferredNestedInput
   referredUsers?: Prisma.UserUncheckedUpdateManyWithoutReferredByUserNestedInput
   studentVerifications?: Prisma.StudentVerificationUncheckedUpdateManyWithoutUserNestedInput
+  factChecks?: Prisma.FactCheckUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutBadgesInput = {
@@ -3279,6 +3326,7 @@ export type UserCreateWithoutBadgesInput = {
   referredByUser?: Prisma.UserCreateNestedOneWithoutReferredUsersInput
   referredUsers?: Prisma.UserCreateNestedManyWithoutReferredByUserInput
   studentVerifications?: Prisma.StudentVerificationCreateNestedManyWithoutUserInput
+  factChecks?: Prisma.FactCheckCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBadgesInput = {
@@ -3337,6 +3385,7 @@ export type UserUncheckedCreateWithoutBadgesInput = {
   referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferredInput
   referredUsers?: Prisma.UserUncheckedCreateNestedManyWithoutReferredByUserInput
   studentVerifications?: Prisma.StudentVerificationUncheckedCreateNestedManyWithoutUserInput
+  factChecks?: Prisma.FactCheckUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBadgesInput = {
@@ -3411,6 +3460,7 @@ export type UserUpdateWithoutBadgesInput = {
   referredByUser?: Prisma.UserUpdateOneWithoutReferredUsersNestedInput
   referredUsers?: Prisma.UserUpdateManyWithoutReferredByUserNestedInput
   studentVerifications?: Prisma.StudentVerificationUpdateManyWithoutUserNestedInput
+  factChecks?: Prisma.FactCheckUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBadgesInput = {
@@ -3469,6 +3519,7 @@ export type UserUncheckedUpdateWithoutBadgesInput = {
   referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferredNestedInput
   referredUsers?: Prisma.UserUncheckedUpdateManyWithoutReferredByUserNestedInput
   studentVerifications?: Prisma.StudentVerificationUncheckedUpdateManyWithoutUserNestedInput
+  factChecks?: Prisma.FactCheckUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCommentsInput = {
@@ -3527,6 +3578,7 @@ export type UserCreateWithoutCommentsInput = {
   referredByUser?: Prisma.UserCreateNestedOneWithoutReferredUsersInput
   referredUsers?: Prisma.UserCreateNestedManyWithoutReferredByUserInput
   studentVerifications?: Prisma.StudentVerificationCreateNestedManyWithoutUserInput
+  factChecks?: Prisma.FactCheckCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCommentsInput = {
@@ -3585,6 +3637,7 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferredInput
   referredUsers?: Prisma.UserUncheckedCreateNestedManyWithoutReferredByUserInput
   studentVerifications?: Prisma.StudentVerificationUncheckedCreateNestedManyWithoutUserInput
+  factChecks?: Prisma.FactCheckUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCommentsInput = {
@@ -3659,6 +3712,7 @@ export type UserUpdateWithoutCommentsInput = {
   referredByUser?: Prisma.UserUpdateOneWithoutReferredUsersNestedInput
   referredUsers?: Prisma.UserUpdateManyWithoutReferredByUserNestedInput
   studentVerifications?: Prisma.StudentVerificationUpdateManyWithoutUserNestedInput
+  factChecks?: Prisma.FactCheckUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCommentsInput = {
@@ -3717,6 +3771,7 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferredNestedInput
   referredUsers?: Prisma.UserUncheckedUpdateManyWithoutReferredByUserNestedInput
   studentVerifications?: Prisma.StudentVerificationUncheckedUpdateManyWithoutUserNestedInput
+  factChecks?: Prisma.FactCheckUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutTeamMembershipsInput = {
@@ -3775,6 +3830,7 @@ export type UserCreateWithoutTeamMembershipsInput = {
   referredByUser?: Prisma.UserCreateNestedOneWithoutReferredUsersInput
   referredUsers?: Prisma.UserCreateNestedManyWithoutReferredByUserInput
   studentVerifications?: Prisma.StudentVerificationCreateNestedManyWithoutUserInput
+  factChecks?: Prisma.FactCheckCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutTeamMembershipsInput = {
@@ -3833,6 +3889,7 @@ export type UserUncheckedCreateWithoutTeamMembershipsInput = {
   referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferredInput
   referredUsers?: Prisma.UserUncheckedCreateNestedManyWithoutReferredByUserInput
   studentVerifications?: Prisma.StudentVerificationUncheckedCreateNestedManyWithoutUserInput
+  factChecks?: Prisma.FactCheckUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutTeamMembershipsInput = {
@@ -3907,6 +3964,7 @@ export type UserUpdateWithoutTeamMembershipsInput = {
   referredByUser?: Prisma.UserUpdateOneWithoutReferredUsersNestedInput
   referredUsers?: Prisma.UserUpdateManyWithoutReferredByUserNestedInput
   studentVerifications?: Prisma.StudentVerificationUpdateManyWithoutUserNestedInput
+  factChecks?: Prisma.FactCheckUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTeamMembershipsInput = {
@@ -3965,6 +4023,7 @@ export type UserUncheckedUpdateWithoutTeamMembershipsInput = {
   referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferredNestedInput
   referredUsers?: Prisma.UserUncheckedUpdateManyWithoutReferredByUserNestedInput
   studentVerifications?: Prisma.StudentVerificationUncheckedUpdateManyWithoutUserNestedInput
+  factChecks?: Prisma.FactCheckUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutReferralRewardsAsReferrerInput = {
@@ -4023,6 +4082,7 @@ export type UserCreateWithoutReferralRewardsAsReferrerInput = {
   referredByUser?: Prisma.UserCreateNestedOneWithoutReferredUsersInput
   referredUsers?: Prisma.UserCreateNestedManyWithoutReferredByUserInput
   studentVerifications?: Prisma.StudentVerificationCreateNestedManyWithoutUserInput
+  factChecks?: Prisma.FactCheckCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReferralRewardsAsReferrerInput = {
@@ -4081,6 +4141,7 @@ export type UserUncheckedCreateWithoutReferralRewardsAsReferrerInput = {
   referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferredInput
   referredUsers?: Prisma.UserUncheckedCreateNestedManyWithoutReferredByUserInput
   studentVerifications?: Prisma.StudentVerificationUncheckedCreateNestedManyWithoutUserInput
+  factChecks?: Prisma.FactCheckUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReferralRewardsAsReferrerInput = {
@@ -4144,6 +4205,7 @@ export type UserCreateWithoutReferralRewardsAsReferredInput = {
   referredByUser?: Prisma.UserCreateNestedOneWithoutReferredUsersInput
   referredUsers?: Prisma.UserCreateNestedManyWithoutReferredByUserInput
   studentVerifications?: Prisma.StudentVerificationCreateNestedManyWithoutUserInput
+  factChecks?: Prisma.FactCheckCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReferralRewardsAsReferredInput = {
@@ -4202,6 +4264,7 @@ export type UserUncheckedCreateWithoutReferralRewardsAsReferredInput = {
   referralRewardsAsReferrer?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferrerInput
   referredUsers?: Prisma.UserUncheckedCreateNestedManyWithoutReferredByUserInput
   studentVerifications?: Prisma.StudentVerificationUncheckedCreateNestedManyWithoutUserInput
+  factChecks?: Prisma.FactCheckUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReferralRewardsAsReferredInput = {
@@ -4276,6 +4339,7 @@ export type UserUpdateWithoutReferralRewardsAsReferrerInput = {
   referredByUser?: Prisma.UserUpdateOneWithoutReferredUsersNestedInput
   referredUsers?: Prisma.UserUpdateManyWithoutReferredByUserNestedInput
   studentVerifications?: Prisma.StudentVerificationUpdateManyWithoutUserNestedInput
+  factChecks?: Prisma.FactCheckUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReferralRewardsAsReferrerInput = {
@@ -4334,6 +4398,7 @@ export type UserUncheckedUpdateWithoutReferralRewardsAsReferrerInput = {
   referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferredNestedInput
   referredUsers?: Prisma.UserUncheckedUpdateManyWithoutReferredByUserNestedInput
   studentVerifications?: Prisma.StudentVerificationUncheckedUpdateManyWithoutUserNestedInput
+  factChecks?: Prisma.FactCheckUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutReferralRewardsAsReferredInput = {
@@ -4403,6 +4468,7 @@ export type UserUpdateWithoutReferralRewardsAsReferredInput = {
   referredByUser?: Prisma.UserUpdateOneWithoutReferredUsersNestedInput
   referredUsers?: Prisma.UserUpdateManyWithoutReferredByUserNestedInput
   studentVerifications?: Prisma.StudentVerificationUpdateManyWithoutUserNestedInput
+  factChecks?: Prisma.FactCheckUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReferralRewardsAsReferredInput = {
@@ -4461,6 +4527,7 @@ export type UserUncheckedUpdateWithoutReferralRewardsAsReferredInput = {
   referralRewardsAsReferrer?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferrerNestedInput
   referredUsers?: Prisma.UserUncheckedUpdateManyWithoutReferredByUserNestedInput
   studentVerifications?: Prisma.StudentVerificationUncheckedUpdateManyWithoutUserNestedInput
+  factChecks?: Prisma.FactCheckUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutStudentVerificationsInput = {
@@ -4519,6 +4586,7 @@ export type UserCreateWithoutStudentVerificationsInput = {
   referralRewardsAsReferred?: Prisma.ReferralRewardCreateNestedManyWithoutReferredInput
   referredByUser?: Prisma.UserCreateNestedOneWithoutReferredUsersInput
   referredUsers?: Prisma.UserCreateNestedManyWithoutReferredByUserInput
+  factChecks?: Prisma.FactCheckCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutStudentVerificationsInput = {
@@ -4577,6 +4645,7 @@ export type UserUncheckedCreateWithoutStudentVerificationsInput = {
   referralRewardsAsReferrer?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferrerInput
   referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferredInput
   referredUsers?: Prisma.UserUncheckedCreateNestedManyWithoutReferredByUserInput
+  factChecks?: Prisma.FactCheckUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutStudentVerificationsInput = {
@@ -4651,6 +4720,7 @@ export type UserUpdateWithoutStudentVerificationsInput = {
   referralRewardsAsReferred?: Prisma.ReferralRewardUpdateManyWithoutReferredNestedInput
   referredByUser?: Prisma.UserUpdateOneWithoutReferredUsersNestedInput
   referredUsers?: Prisma.UserUpdateManyWithoutReferredByUserNestedInput
+  factChecks?: Prisma.FactCheckUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutStudentVerificationsInput = {
@@ -4709,6 +4779,7 @@ export type UserUncheckedUpdateWithoutStudentVerificationsInput = {
   referralRewardsAsReferrer?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferrerNestedInput
   referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferredNestedInput
   referredUsers?: Prisma.UserUncheckedUpdateManyWithoutReferredByUserNestedInput
+  factChecks?: Prisma.FactCheckUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutApiKeysInput = {
@@ -4767,6 +4838,7 @@ export type UserCreateWithoutApiKeysInput = {
   referredByUser?: Prisma.UserCreateNestedOneWithoutReferredUsersInput
   referredUsers?: Prisma.UserCreateNestedManyWithoutReferredByUserInput
   studentVerifications?: Prisma.StudentVerificationCreateNestedManyWithoutUserInput
+  factChecks?: Prisma.FactCheckCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutApiKeysInput = {
@@ -4825,6 +4897,7 @@ export type UserUncheckedCreateWithoutApiKeysInput = {
   referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferredInput
   referredUsers?: Prisma.UserUncheckedCreateNestedManyWithoutReferredByUserInput
   studentVerifications?: Prisma.StudentVerificationUncheckedCreateNestedManyWithoutUserInput
+  factChecks?: Prisma.FactCheckUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutApiKeysInput = {
@@ -4899,6 +4972,7 @@ export type UserUpdateWithoutApiKeysInput = {
   referredByUser?: Prisma.UserUpdateOneWithoutReferredUsersNestedInput
   referredUsers?: Prisma.UserUpdateManyWithoutReferredByUserNestedInput
   studentVerifications?: Prisma.StudentVerificationUpdateManyWithoutUserNestedInput
+  factChecks?: Prisma.FactCheckUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutApiKeysInput = {
@@ -4953,6 +5027,259 @@ export type UserUncheckedUpdateWithoutApiKeysInput = {
   badges?: Prisma.UserBadgeUncheckedUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
   teamMemberships?: Prisma.TeamMemberUncheckedUpdateManyWithoutUserNestedInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferrerNestedInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferredNestedInput
+  referredUsers?: Prisma.UserUncheckedUpdateManyWithoutReferredByUserNestedInput
+  studentVerifications?: Prisma.StudentVerificationUncheckedUpdateManyWithoutUserNestedInput
+  factChecks?: Prisma.FactCheckUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutFactChecksInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  name: string
+  createdAt?: Date | string
+  preferences?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  emailVerified?: boolean
+  verificationTokenHash?: string | null
+  verificationTokenExpiry?: Date | string | null
+  verificationSendCount?: number
+  lastVerificationSentAt?: Date | string | null
+  resetTokenHash?: string | null
+  resetTokenExpiry?: Date | string | null
+  resetSendCount?: number
+  lastResetSentAt?: Date | string | null
+  tokenVersion?: number
+  googleIdHash?: string | null
+  githubIdHash?: string | null
+  hasPassword?: boolean
+  emailBounced?: boolean
+  emailBouncedAt?: Date | string | null
+  emailOptOut?: boolean
+  emailOptOutAt?: Date | string | null
+  updatedAt?: Date | string
+  avatarUrl?: string | null
+  selectedPresetAvatar?: string | null
+  featuredBadgeId?: string | null
+  showOnLeaderboard?: boolean
+  isHistoryPaused?: boolean
+  deletionRequestedAt?: Date | string | null
+  deletionConfirmToken?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  subscriptionTier?: $Enums.SubscriptionTier
+  subscriptionStatus?: $Enums.SubscriptionStatus
+  subscriptionEndsAt?: Date | string | null
+  pausedUntil?: Date | string | null
+  customAccentColor?: string | null
+  referralCode?: string | null
+  freeMonthsEarned?: number
+  isStudent?: boolean
+  studentVerifiedUntil?: Date | string | null
+  bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
+  readingHistory?: Prisma.ReadingHistoryCreateNestedManyWithoutUserInput
+  emailSubscription?: Prisma.EmailSubscriptionCreateNestedOneWithoutUserInput
+  emailDigests?: Prisma.EmailDigestCreateNestedManyWithoutUserInput
+  userPersonas?: Prisma.UserPersonaCreateNestedManyWithoutUserInput
+  badges?: Prisma.UserBadgeCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutUserInput
+  teamMemberships?: Prisma.TeamMemberCreateNestedManyWithoutUserInput
+  apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutUserInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardCreateNestedManyWithoutReferrerInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardCreateNestedManyWithoutReferredInput
+  referredByUser?: Prisma.UserCreateNestedOneWithoutReferredUsersInput
+  referredUsers?: Prisma.UserCreateNestedManyWithoutReferredByUserInput
+  studentVerifications?: Prisma.StudentVerificationCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutFactChecksInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  name: string
+  createdAt?: Date | string
+  preferences?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  emailVerified?: boolean
+  verificationTokenHash?: string | null
+  verificationTokenExpiry?: Date | string | null
+  verificationSendCount?: number
+  lastVerificationSentAt?: Date | string | null
+  resetTokenHash?: string | null
+  resetTokenExpiry?: Date | string | null
+  resetSendCount?: number
+  lastResetSentAt?: Date | string | null
+  tokenVersion?: number
+  googleIdHash?: string | null
+  githubIdHash?: string | null
+  hasPassword?: boolean
+  emailBounced?: boolean
+  emailBouncedAt?: Date | string | null
+  emailOptOut?: boolean
+  emailOptOutAt?: Date | string | null
+  updatedAt?: Date | string
+  avatarUrl?: string | null
+  selectedPresetAvatar?: string | null
+  featuredBadgeId?: string | null
+  showOnLeaderboard?: boolean
+  isHistoryPaused?: boolean
+  deletionRequestedAt?: Date | string | null
+  deletionConfirmToken?: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  subscriptionTier?: $Enums.SubscriptionTier
+  subscriptionStatus?: $Enums.SubscriptionStatus
+  subscriptionEndsAt?: Date | string | null
+  pausedUntil?: Date | string | null
+  customAccentColor?: string | null
+  referralCode?: string | null
+  referredBy?: string | null
+  freeMonthsEarned?: number
+  isStudent?: boolean
+  studentVerifiedUntil?: Date | string | null
+  bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
+  readingHistory?: Prisma.ReadingHistoryUncheckedCreateNestedManyWithoutUserInput
+  emailSubscription?: Prisma.EmailSubscriptionUncheckedCreateNestedOneWithoutUserInput
+  emailDigests?: Prisma.EmailDigestUncheckedCreateNestedManyWithoutUserInput
+  userPersonas?: Prisma.UserPersonaUncheckedCreateNestedManyWithoutUserInput
+  badges?: Prisma.UserBadgeUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
+  teamMemberships?: Prisma.TeamMemberUncheckedCreateNestedManyWithoutUserInput
+  apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutUserInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferrerInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedCreateNestedManyWithoutReferredInput
+  referredUsers?: Prisma.UserUncheckedCreateNestedManyWithoutReferredByUserInput
+  studentVerifications?: Prisma.StudentVerificationUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutFactChecksInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutFactChecksInput, Prisma.UserUncheckedCreateWithoutFactChecksInput>
+}
+
+export type UserUpsertWithoutFactChecksInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutFactChecksInput, Prisma.UserUncheckedUpdateWithoutFactChecksInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutFactChecksInput, Prisma.UserUncheckedCreateWithoutFactChecksInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutFactChecksInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutFactChecksInput, Prisma.UserUncheckedUpdateWithoutFactChecksInput>
+}
+
+export type UserUpdateWithoutFactChecksInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  preferences?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verificationTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationSendCount?: Prisma.IntFieldUpdateOperationsInput | number
+  lastVerificationSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetSendCount?: Prisma.IntFieldUpdateOperationsInput | number
+  lastResetSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  googleIdHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubIdHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hasPassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailBounced?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailBouncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailOptOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailOptOutAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  selectedPresetAvatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  featuredBadgeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  showOnLeaderboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isHistoryPaused?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierFieldUpdateOperationsInput | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
+  isStudent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  studentVerifiedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
+  readingHistory?: Prisma.ReadingHistoryUpdateManyWithoutUserNestedInput
+  emailSubscription?: Prisma.EmailSubscriptionUpdateOneWithoutUserNestedInput
+  emailDigests?: Prisma.EmailDigestUpdateManyWithoutUserNestedInput
+  userPersonas?: Prisma.UserPersonaUpdateManyWithoutUserNestedInput
+  badges?: Prisma.UserBadgeUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
+  teamMemberships?: Prisma.TeamMemberUpdateManyWithoutUserNestedInput
+  apiKeys?: Prisma.ApiKeyUpdateManyWithoutUserNestedInput
+  referralRewardsAsReferrer?: Prisma.ReferralRewardUpdateManyWithoutReferrerNestedInput
+  referralRewardsAsReferred?: Prisma.ReferralRewardUpdateManyWithoutReferredNestedInput
+  referredByUser?: Prisma.UserUpdateOneWithoutReferredUsersNestedInput
+  referredUsers?: Prisma.UserUpdateManyWithoutReferredByUserNestedInput
+  studentVerifications?: Prisma.StudentVerificationUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutFactChecksInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  preferences?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verificationTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationSendCount?: Prisma.IntFieldUpdateOperationsInput | number
+  lastVerificationSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetSendCount?: Prisma.IntFieldUpdateOperationsInput | number
+  lastResetSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  googleIdHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubIdHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hasPassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailBounced?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailBouncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailOptOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailOptOutAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  selectedPresetAvatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  featuredBadgeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  showOnLeaderboard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isHistoryPaused?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionConfirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionTier?: Prisma.EnumSubscriptionTierFieldUpdateOperationsInput | $Enums.SubscriptionTier
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pausedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  customAccentColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referredBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  freeMonthsEarned?: Prisma.IntFieldUpdateOperationsInput | number
+  isStudent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  studentVerifiedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
+  readingHistory?: Prisma.ReadingHistoryUncheckedUpdateManyWithoutUserNestedInput
+  emailSubscription?: Prisma.EmailSubscriptionUncheckedUpdateOneWithoutUserNestedInput
+  emailDigests?: Prisma.EmailDigestUncheckedUpdateManyWithoutUserNestedInput
+  userPersonas?: Prisma.UserPersonaUncheckedUpdateManyWithoutUserNestedInput
+  badges?: Prisma.UserBadgeUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
+  teamMemberships?: Prisma.TeamMemberUncheckedUpdateManyWithoutUserNestedInput
+  apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutUserNestedInput
   referralRewardsAsReferrer?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferrerNestedInput
   referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferredNestedInput
   referredUsers?: Prisma.UserUncheckedUpdateManyWithoutReferredByUserNestedInput
@@ -5060,6 +5387,7 @@ export type UserUpdateWithoutReferredByUserInput = {
   referralRewardsAsReferred?: Prisma.ReferralRewardUpdateManyWithoutReferredNestedInput
   referredUsers?: Prisma.UserUpdateManyWithoutReferredByUserNestedInput
   studentVerifications?: Prisma.StudentVerificationUpdateManyWithoutUserNestedInput
+  factChecks?: Prisma.FactCheckUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReferredByUserInput = {
@@ -5118,6 +5446,7 @@ export type UserUncheckedUpdateWithoutReferredByUserInput = {
   referralRewardsAsReferred?: Prisma.ReferralRewardUncheckedUpdateManyWithoutReferredNestedInput
   referredUsers?: Prisma.UserUncheckedUpdateManyWithoutReferredByUserNestedInput
   studentVerifications?: Prisma.StudentVerificationUncheckedUpdateManyWithoutUserNestedInput
+  factChecks?: Prisma.FactCheckUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutReferredByUserInput = {
@@ -5183,6 +5512,7 @@ export type UserCountOutputType = {
   referralRewardsAsReferred: number
   referredUsers: number
   studentVerifications: number
+  factChecks: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -5198,6 +5528,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   referralRewardsAsReferred?: boolean | UserCountOutputTypeCountReferralRewardsAsReferredArgs
   referredUsers?: boolean | UserCountOutputTypeCountReferredUsersArgs
   studentVerifications?: boolean | UserCountOutputTypeCountStudentVerificationsArgs
+  factChecks?: boolean | UserCountOutputTypeCountFactChecksArgs
 }
 
 /**
@@ -5294,6 +5625,13 @@ export type UserCountOutputTypeCountStudentVerificationsArgs<ExtArgs extends run
   where?: Prisma.StudentVerificationWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountFactChecksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.FactCheckWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -5353,6 +5691,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   referredByUser?: boolean | Prisma.User$referredByUserArgs<ExtArgs>
   referredUsers?: boolean | Prisma.User$referredUsersArgs<ExtArgs>
   studentVerifications?: boolean | Prisma.User$studentVerificationsArgs<ExtArgs>
+  factChecks?: boolean | Prisma.User$factChecksArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -5512,6 +5851,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   referredByUser?: boolean | Prisma.User$referredByUserArgs<ExtArgs>
   referredUsers?: boolean | Prisma.User$referredUsersArgs<ExtArgs>
   studentVerifications?: boolean | Prisma.User$studentVerificationsArgs<ExtArgs>
+  factChecks?: boolean | Prisma.User$factChecksArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -5538,6 +5878,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     referredByUser: Prisma.$UserPayload<ExtArgs> | null
     referredUsers: Prisma.$UserPayload<ExtArgs>[]
     studentVerifications: Prisma.$StudentVerificationPayload<ExtArgs>[]
+    factChecks: Prisma.$FactCheckPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -5991,6 +6332,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   referredByUser<T extends Prisma.User$referredByUserArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$referredByUserArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   referredUsers<T extends Prisma.User$referredUsersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$referredUsersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   studentVerifications<T extends Prisma.User$studentVerificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$studentVerificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StudentVerificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  factChecks<T extends Prisma.User$factChecksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$factChecksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FactCheckPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6787,6 +7129,30 @@ export type User$studentVerificationsArgs<ExtArgs extends runtime.Types.Extensio
   take?: number
   skip?: number
   distinct?: Prisma.StudentVerificationScalarFieldEnum | Prisma.StudentVerificationScalarFieldEnum[]
+}
+
+/**
+ * User.factChecks
+ */
+export type User$factChecksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the FactCheck
+   */
+  select?: Prisma.FactCheckSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the FactCheck
+   */
+  omit?: Prisma.FactCheckOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.FactCheckInclude<ExtArgs> | null
+  where?: Prisma.FactCheckWhereInput
+  orderBy?: Prisma.FactCheckOrderByWithRelationInput | Prisma.FactCheckOrderByWithRelationInput[]
+  cursor?: Prisma.FactCheckWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.FactCheckScalarFieldEnum | Prisma.FactCheckScalarFieldEnum[]
 }
 
 /**
