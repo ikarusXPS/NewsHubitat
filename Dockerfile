@@ -90,8 +90,13 @@ COPY apps/web/package.json ./apps/web/
 COPY packages/types/package.json ./packages/types/
 RUN pnpm install --frozen-lockfile --filter @newshub/web... --prod
 
-# Copy Prisma schema + built artifacts from builder
+# Copy Prisma schema + config + built artifacts from builder.
+# prisma.config.ts is required at runtime by `prisma db push` and
+# `prisma migrate deploy` — without it, Prisma 7 cannot resolve
+# datasource.url (the schema intentionally defers URL definition
+# to the config file, see apps/web/prisma/schema.prisma).
 COPY --from=builder --chown=nodejs:nodejs /app/apps/web/prisma ./apps/web/prisma
+COPY --from=builder --chown=nodejs:nodejs /app/apps/web/prisma.config.ts ./apps/web/prisma.config.ts
 COPY --from=builder --chown=nodejs:nodejs /app/apps/web/src/generated ./apps/web/src/generated
 COPY --from=builder --chown=nodejs:nodejs /app/apps/web/dist ./apps/web/dist
 COPY --from=builder --chown=nodejs:nodejs /app/apps/web/server/instrument.mjs ./apps/web/server/instrument.mjs
