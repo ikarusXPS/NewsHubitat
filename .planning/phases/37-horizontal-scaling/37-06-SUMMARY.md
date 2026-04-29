@@ -57,17 +57,16 @@ patterns-established:
   - "Test endpoint pattern: NODE_ENV gate + route name prefix (_underscore) signals 'never expose in prod'."
 
 requirements-completed:
-  # NOTE: closure of these requires the Task 5 human-verify run to PASS.
-  # The artifacts to verify them are in place; the verification itself is gated.
-  pending_human_verify: [INFRA-02, INFRA-04]
+  closed: [INFRA-02, INFRA-04, DEPLOY-02]  # closed 2026-04-29 via 37.1 verification log
   pending_full_phase: [INFRA-01]  # closes once full phase verifier signs off
 
 # Metrics
-duration: ~7min (plan execution); human-verify gate deferred (blocked by broken root Dockerfile — see .planning/todos/pending/37-06-fanout-test-dockerfile-rewrite.md)
-verification_status: deferred_to_dockerfile_fix
-verification_attempted: 2026-04-29
-verification_blocker: "root Dockerfile uses npm ci against pnpm-monorepo state — stripe@22.1.0 missing from npm lockfile, src/generated and prisma/ paths predate apps/web/ split. Pre-existing infra debt unrelated to phase 37 logic."
-completed: 2026-04-29 (artifacts); WS-04 verification PENDING human run
+duration: ~7min (plan execution); human-verify gate executed via Phase 37.1 (Dockerfile rewrite + e2e-stack fixes)
+verification_status: verified
+verification_completed: 2026-04-29
+verification_log: .planning/phases/37.1-fix-dockerfile-monorepo/37.1-WS04-VERIFICATION-LOG.md
+verification_commit: 11558a6
+completed: 2026-04-29 (artifacts + WS-04 runtime gate closed)
 ---
 
 # Phase 37 Plan 06: Cross-Replica WS Fanout E2E Test Summary

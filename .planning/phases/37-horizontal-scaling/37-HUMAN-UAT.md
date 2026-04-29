@@ -1,21 +1,23 @@
 ---
 status: partial
 phase: 37-horizontal-scaling
-source: [37-VERIFICATION.md]
+source: [37-VERIFICATION.md, 37.1-WS04-VERIFICATION-LOG.md]
 started: 2026-04-29
 updated: 2026-04-29
 ---
 
 ## Current Test
 
-[awaiting human testing on a Docker Swarm host]
+[Test #1 WS-04 closed 2026-04-29 via Phase 37.1; tests #2 and #3 still require Docker Swarm host with load capacity]
 
 ## Tests
 
-### 1. WS-04 cross-replica fanout (BLOCKED — deferred to 37.1)
+### 1. WS-04 cross-replica fanout (PASSED)
 expected: `bash e2e-stack/run-fanout-test.sh` exits 0 with end line "OK: WS-04 cross-replica fanout verified"
-result: pending — Dockerfile rewrite required first
-blocker: see .planning/todos/pending/37-06-fanout-test-dockerfile-rewrite.md
+result: passed — verified 2026-04-29 on Docker Desktop + WSL2 (Phase 37.1)
+verification_log: .planning/phases/37.1-fix-dockerfile-monorepo/37.1-WS04-VERIFICATION-LOG.md
+verification_commit: 11558a6 (fix: use websocket-only transport in ws-fanout test)
+test_runtime: 564ms; total stack run including build + boot ~85s
 proof_optional: comment out the createAdapter line in apps/web/server/services/websocketService.ts:158, rebuild, re-run — test MUST FAIL with "Client B did not receive test:fanout within 5000ms". Revert and confirm pass. This proves the test exercises the adapter, not just the harness.
 
 ### 2. Grafana dashboard population under load
@@ -45,11 +47,11 @@ verification_steps: |
 ## Summary
 
 total: 3
-passed: 0
+passed: 1
 issues: 0
-pending: 3
+pending: 2
 skipped: 0
-blocked: 1
+blocked: 0
 
 ## Gaps
 
