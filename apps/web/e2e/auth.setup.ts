@@ -13,7 +13,7 @@ setup('authenticate', async ({ page, request }) => {
   // This is idempotent - will succeed on first run, fail silently if user exists
   // Use Playwright's request context (not page.evaluate) to avoid navigation race conditions
   try {
-    const registerResponse = await request.post('http://localhost:3001/api/auth/register', {
+    const registerResponse = await request.post('http://127.0.0.1:3001/api/auth/register', {
       data: { email: TEST_EMAIL, password: TEST_PASSWORD, name: TEST_NAME },
     });
     const registerData = await registerResponse.json();
