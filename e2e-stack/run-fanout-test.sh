@@ -51,15 +51,25 @@ done
 sleep 3
 
 echo "==> Running ws-fanout vitest spec"
-# Run vitest directly against the e2e-stack file. We resolve via the
-# apps/web vitest install (workspace root has no vitest of its own).
+# Run vitest from inside apps/web/ so 'vitest/config' and other imports
+# in vitest.config.ts resolve via apps/web's node_modules (workspace
+# root has no vitest of its own — pnpm hoisting in this monorepo
+# leaves vitest scoped to the workspace package that depends on it).
+#
+# We pass --config explicitly to use e2e-stack/vitest.config.ts (a
+# minimal node-environment config) instead of apps/web/vitest.config.ts
+# (which uses jsdom + DB mocks and would break the real-stack test).
 set +e
-WS_FANOUT_URL=http://localhost:8000 \
-  node ./apps/web/node_modules/vitest/dist/cli.js \
-  run e2e-stack/ws-fanout.test.ts \
-  --root . \
-  --no-coverage \
-  --reporter=verbose
+(
+  cd apps/web && \
+  WS_FANOUT_URL=http://localhost:8000 \
+  node node_modules/vitest/dist/cli.js \
+    run \
+    --config ../../e2e-stack/vitest.config.ts \
+    --root ../../e2e-stack \
+    --no-coverage \
+    --reporter=verbose
+)
 TEST_EXIT=$?
 set -e
 
