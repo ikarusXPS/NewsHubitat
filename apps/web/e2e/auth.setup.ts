@@ -22,16 +22,23 @@ setup('authenticate', async ({ page, request }) => {
     console.log('Registration attempt failed (user may already exist):', err);
   }
 
-  // Bypass FocusOnboarding modal to access login button
-  // Zustand persist format: { state: {...}, version: N }
+  // Bypass blocking modals so the login button is reachable:
+  //   - FocusOnboarding (z-90) renders when hasCompletedOnboarding is false (zustand persist)
+  //   - ConsentBanner    (z-100) renders when newshub-consent is null
+  // Both must be neutralized; otherwise either covers the Sign In button.
   await page.addInitScript(() => {
     localStorage.setItem('newshub-storage', JSON.stringify({
       state: {
         hasCompletedOnboarding: true,
         theme: 'dark',
-        language: 'en'
+        language: 'en',
       },
-      version: 0
+      version: 0,
+    }));
+    localStorage.setItem('newshub-consent', JSON.stringify({
+      essential: true,
+      preferences: true,
+      analytics: false,
     }));
   });
 

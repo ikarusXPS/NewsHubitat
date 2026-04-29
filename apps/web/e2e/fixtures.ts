@@ -19,13 +19,15 @@ export const test = base.extend({
       });
     });
 
-    // Bypass FocusOnboarding modal by setting hasCompletedOnboarding
-    // This runs before each test navigates to the page
+    // Bypass blocking modals before each test:
+    //   - FocusOnboarding (z-90)  — gated by hasCompletedOnboarding (zustand persist)
+    //   - ConsentBanner   (z-100) — gated by newshub-consent localStorage key
+    // Without consent set, the GDPR banner sits at the bottom and can intercept
+    // pointer events on bottom-aligned UI in some viewports.
     await page.addInitScript(() => {
       const existingStorage = localStorage.getItem('newshub-storage');
       const parsed = existingStorage ? JSON.parse(existingStorage) : { state: {}, version: 0 };
 
-      // Merge with existing state to preserve other settings
       parsed.state = {
         ...parsed.state,
         hasCompletedOnboarding: true,
@@ -34,6 +36,11 @@ export const test = base.extend({
       };
 
       localStorage.setItem('newshub-storage', JSON.stringify(parsed));
+      localStorage.setItem('newshub-consent', JSON.stringify({
+        essential: true,
+        preferences: true,
+        analytics: false,
+      }));
     });
 
     // Hide toast notifications that can intercept pointer events during tests

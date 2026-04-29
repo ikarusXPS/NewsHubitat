@@ -231,10 +231,13 @@ test.describe('Team Collaboration', () => {
 
     test('TeamSwitcher appears in mobile drawer', async ({ page }) => {
       await page.goto('/');
-      await page.waitForLoadState('networkidle');
 
-      // Open mobile drawer (hamburger menu)
+      // Avoid waitForLoadState('networkidle') here — Socket.io polling and the
+      // breaking-news refetch keep the network warm on this page, so networkidle
+      // never settles within the 20s budget. Wait for the menu button instead;
+      // it's the next thing we interact with.
       const menuButton = page.locator('button[aria-label*="menu" i], button:has(svg.lucide-menu)');
+      await menuButton.waitFor({ state: 'visible', timeout: 10000 }).catch(() => {});
 
       if (await menuButton.isVisible()) {
         await menuButton.click();

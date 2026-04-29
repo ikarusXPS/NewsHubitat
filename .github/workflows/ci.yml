@@ -195,6 +195,11 @@ jobs:
 
       - name: Report bundle size
         uses: preactjs/compressed-size-action@v2
+        # Non-blocking by design: per CLAUDE.md the bundle budget is a warning,
+        # not a gate. The action also fails when the base branch has a stale
+        # lockfile (it tries to build base for comparison), which we don't
+        # want to surface as a CI failure on PRs.
+        continue-on-error: true
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           pattern: './apps/web/dist/**/*.{js,css}'
