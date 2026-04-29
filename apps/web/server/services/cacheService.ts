@@ -393,7 +393,10 @@ export const CacheKeys = {
 
   // Analysis
   clusters: (withSummaries: boolean) => `analysis:clusters:${withSummaries}`,
-  framing: (topic: string) => `analysis:framing:${topic}`,
+  // Phase 38 (D-18): framing now keyed by sha256(topic) + locale so the same
+  // topic produces stable keys across language variants and the legacy
+  // analysis:framing: namespace is replaced with the AI namespace.
+  framing: (topicHash: string, locale: string) => `ai:framing:${topicHash}:${locale}`,
 
   // Events
   geoEvents: () => 'events:geo',
@@ -416,6 +419,13 @@ export const CacheKeys = {
   // AI cache (D-07)
   aiSummary: (clusterKey: string) => `ai:summary:${clusterKey}`,
   aiTopics: (contentHash: string) => `ai:topics:${contentHash}`,
+
+  // AI cache (Phase 38 — D-18)
+  // factCheck is locale-INDEPENDENT: verdict + confidence + citation IDs do
+  // not vary by language; only the methodology text does, and that's stored
+  // on the FactCheck DB row + re-translated at render time.
+  credibility: (sourceId: string, locale: string) => `ai:credibility:${sourceId}:${locale}`,
+  factCheck: (claimHash: string) => `ai:factcheck:${claimHash}`,
 } as const;
 
 export default CacheService;
