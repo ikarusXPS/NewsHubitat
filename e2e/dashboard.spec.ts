@@ -66,8 +66,9 @@ test.describe('Dashboard Page', () => {
 
   test('should display trend filter buttons', async ({ page }) => {
     // Trend Analysis section has All, Escalation, De-escalation buttons
+    // Note: "Escalation" also matches "De-escalation" so we use .first() to get the actual Escalation button
     const allBtn = page.locator('button:has-text("All")').first();
-    const escalationBtn = page.locator('button:has-text("Escalation")');
+    const escalationBtn = page.locator('button:has-text("Escalation")').first();
     const deEscalationBtn = page.locator('button:has-text("De-escalation")');
 
     await expect(allBtn).toBeVisible();
@@ -76,7 +77,8 @@ test.describe('Dashboard Page', () => {
   });
 
   test('should filter by escalation trend', async ({ page }) => {
-    const escalationBtn = page.locator('button:has-text("Escalation")');
+    // Use .first() because "Escalation" also matches "De-escalation"
+    const escalationBtn = page.locator('button:has-text("Escalation")').first();
 
     if (await escalationBtn.isVisible()) {
       await escalationBtn.click();

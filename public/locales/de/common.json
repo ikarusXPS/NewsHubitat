@@ -1,0 +1,110 @@
+{
+  "buttons": {
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Loschen",
+    "confirm": "Bestatigen",
+    "close": "Schliessen",
+    "apply": "Anwenden",
+    "load": "Laden",
+    "clearAll": "Alle entfernen",
+    "signIn": "Anmelden",
+    "signOut": "Abmelden"
+  },
+  "errors": {
+    "generic": "Etwas ist schiefgelaufen",
+    "network": "Netzwerkfehler. Bitte erneut versuchen.",
+    "loadFailed": "Fehler beim Laden der Daten",
+    "saveFailed": "Fehler beim Speichern"
+  },
+  "status": {
+    "connected": "Verbunden",
+    "loading": "Laden...",
+    "noData": "Keine Daten verfugbar"
+  },
+  "time": {
+    "justNow": "Gerade eben",
+    "minutesAgo": "{count, plural, one {vor # Minute} other {vor # Minuten}}",
+    "hoursAgo": "{count, plural, one {vor # Stunde} other {vor # Stunden}}",
+    "daysAgo": "{count, plural, one {vor # Tag} other {vor # Tagen}}"
+  },
+  "articles": {
+    "count": "{count, plural, =0 {Keine Artikel} one {# Artikel} other {# Artikel}}",
+    "available": "{count} von {total} Artikeln verfugbar"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "monitor": "Monitor",
+    "analysis": "Analyse",
+    "timeline": "Zeitachse",
+    "events": "Ereignisse",
+    "globe": "Globus",
+    "map": "Karte",
+    "community": "Community",
+    "bookmarks": "Lesezeichen",
+    "history": "Verlauf",
+    "settings": "Einstellungen",
+    "profile": "Profil"
+  },
+  "search": {
+    "placeholder": "Signale suchen...",
+    "clear": "Suche leeren"
+  },
+  "regions": {
+    "usa": "USA",
+    "europa": "Europa",
+    "deutschland": "Deutschland",
+    "nahost": "Nahost",
+    "tuerkei": "Turkei",
+    "russland": "Russland",
+    "china": "China",
+    "asien": "Asien",
+    "afrika": "Afrika",
+    "lateinamerika": "Lateinamerika",
+    "ozeanien": "Ozeanien",
+    "kanada": "Kanada",
+    "alternative": "Alternative"
+  },
+  "comments": {
+    "post": "Kommentar posten",
+    "reply": "Antworten",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "flag": "Melden",
+    "showReplies": "{{count}} Antworten anzeigen",
+    "hideReplies": "Antworten ausblenden",
+    "typing": "Jemand schreibt...",
+    "deleted": "[Kommentar gelöscht]",
+    "edited": "(bearbeitet)",
+    "flagged": "Zur Überprüfung gemeldet",
+    "characterCount": "{{current}} / {{max}}",
+    "characterLimitExceeded": "Kommentar zu lang",
+    "authRequired": "Melde dich an, um mitzudiskutieren",
+    "emptyState": {
+      "heading": "Noch keine Kommentare",
+      "body": "Sei der Erste, der seine Gedanken zu diesem Artikel teilt."
+    },
+    "errors": {
+      "postFailed": "Kommentar konnte nicht gepostet werden. Bitte erneut versuchen.",
+      "rateLimit": "Zu viele Kommentare. Bitte warte einen Moment.",
+      "flagged": "Dein Kommentar wurde zur Überprüfung markiert.",
+      "editExpired": "Bearbeitungszeit abgelaufen",
+      "deleteFailed": "Kommentar konnte nicht gelöscht werden."
+    },
+    "deleteConfirm": {
+      "heading": "Kommentar löschen?",
+      "body": "Dies entfernt deinen Kommentar aus der Diskussion. Antworten bleiben sichtbar.",
+      "confirm": "Löschen"
+    }
+  },
+  "upgrade": {
+    "required": "{{tier}}-Abonnement erforderlich",
+    "clickToUnlock": "Klicke zum Upgraden",
+    "unlockFeature": "Upgrade fuer {{feature}}"
+  },
+  "ai": {
+    "dailyQueries": "Taegliche KI-Anfragen",
+    "remaining": "verbleibend",
+    "upgradeCta": "Upgrade fuer unbegrenzte Anfragen"
+  }
+}

@@ -1,0 +1,586 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  // URL defined in prisma.config.ts (Prisma 7+)
+}
+
+model NewsArticle {
+  id                 String   @id
+  title              String
+  titleTranslated    Json? // D-13: JSONB stores { de?: string, en?: string }
+  content            String
+  contentTranslated  Json? // D-13: JSONB stores { de?: string, en?: string }
+  summary            String?
+  originalLanguage   String
+  publishedAt        DateTime
+  url                String   @unique
+  imageUrl           String?
+  sentiment          String
+  sentimentScore     Float
+  perspective        String
+  topics             Json // D-13: JSONB stores string[]
+  entities           Json // D-13: JSONB stores string[]
+  translationQuality Float?
+  cached             Boolean  @default(false)
+  confidence         Int?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  source   NewsSource @relation(fields: [sourceId], references: [id])
+  sourceId String
+
+  @@index([publishedAt])
+  @@index([perspective])
+  @@index([sentiment])
+  @@index([sourceId])
+  @@index([publishedAt, perspective]) // Dashboard: filtered timeline
+  @@index([sentiment, publishedAt]) // Sentiment charts
+  @@index([topics(ops: JsonbPathOps)], type: Gin) // D-14: GIN for topics
+  @@index([entities(ops: JsonbPathOps)], type: Gin) // D-14: GIN for entities
+}
+
+model NewsSource {
+  id            String        @id
+  name          String
+  country       String
+  region        String
+  language      String
+  politicalBias Float
+  reliability   Int
+  ownership     String
+  apiEndpoint   String?
+  rateLimit     Int
+  lastFetched   DateTime?
+  articles      NewsArticle[]
+
+  @@index([region])
+}
+
+model User {
+  id             String           @id @default(cuid())
+  email          String           @unique
+  passwordHash   String
+  name           String
+  createdAt      DateTime         @default(now())
+  bookmarks      Bookmark[]
+  readingHistory ReadingHistory[]
+  preferences    Json? // D-13: JSONB stores user preferences
+
+  // Email verification (AUTH-01 per D-51)
+  emailVerified           Boolean   @default(false)
+  verificationTokenHash   String?
+  verificationTokenExpiry DateTime?
+  verificationSendCount   Int       @default(0)
+  lastVerificationSentAt  DateTime?
+
+  // Password reset (AUTH-02 per D-51)
+  resetTokenHash   String?
+  resetTokenExpiry DateTime?
+  resetSendCount   Int       @default(0)
+  lastResetSentAt  DateTime?
+
+  // Session invalidation (D-27, D-28)
+  tokenVersion Int @default(0)
+
+  // OAuth Integration (Phase 26)
+  googleIdHash String? @unique // D-11: SHA-256 hash of Google provider ID
+  githubIdHash String? @unique // D-11: SHA-256 hash of GitHub provider ID
+  hasPassword  Boolean @default(true) // D-03: false for OAuth-only accounts
+
+  // Phase 22: Email bounce/opt-out tracking (D-04, D-07, D-30)
+  emailBounced   Boolean   @default(false)
+  emailBouncedAt DateTime?
+  emailOptOut    Boolean   @default(false)
+  emailOptOutAt  DateTime?
+
+  // Required for cleanup job (D-17)
+  updatedAt DateTime @updatedAt
+
+  // Phase 6: Profile & Gamification
+  avatarUrl            String?
+  selectedPresetAvatar String?
+  featuredBadgeId      String?
+  showOnLeaderboard    Boolean @default(true)
+  isHistoryPaused      Boolean @default(false)
+
+  // Phase 6: Account deletion (D-69, D-70)
+  deletionRequestedAt  DateTime?
+  deletionConfirmToken String?
+
+  // Phase 36 / 36.1 / 36.2: Stripe Subscription Fields (PAY-01..PAY-04)
+  // D-01 (36.2): SubscriptionTier/Status are now Prisma enums (UPPERCASE matches existing literals).
+  stripeCustomerId      String?            @unique
+  stripeSubscriptionId  String?            @unique
+  subscriptionTier      SubscriptionTier   @default(FREE)
+  subscriptionStatus    SubscriptionStatus @default(ACTIVE)
+  subscriptionEndsAt    DateTime?
+  pausedUntil           DateTime?
+
+  // Phase 36.2: Premium perks (PAY-04) — showPremiumBadge dropped in Phase 36.5 (CONTEXT.md D-01)
+  customAccentColor     String?
+
+  // Phase 36.2: Referrals — referredByUser self-relation declared in relations block below
+  referralCode          String?            @unique
+  referredBy            String?
+  freeMonthsEarned      Int                @default(0)
+
+  // Phase 36.2: Student discount
+  isStudent             Boolean            @default(false)
+  studentVerifiedUntil  DateTime?
+
+  // Relations for features
+  emailSubscription EmailSubscription?
+  emailDigests      EmailDigest[]
+  userPersonas      UserPersona[]
+  badges            UserBadge[]
+  comments          Comment[]
+  teamMemberships   TeamMember[]
+
+  // API Keys (Phase 35)
+  apiKeys ApiKey[]
+
+  // Phase 36.2: Referral relations (per D-04, D-06)
+  referralRewardsAsReferrer ReferralReward[]      @relation("ReferralRewardReferrer")
+  referralRewardsAsReferred ReferralReward[]      @relation("ReferralRewardReferred")
+  referredByUser            User?                 @relation("UserReferrer", fields: [referredBy], references: [id], onDelete: SetNull)
+  referredUsers             User[]                @relation("UserReferrer")
+
+  // Phase 36.2: Student verification queue (per D-05)
+  studentVerifications      StudentVerification[]
+
+  // Indexes for token lookups (D-53)
+  @@index([verificationTokenHash])
+  @@index([resetTokenHash])
+  @@index([emailVerified, createdAt]) // For cleanup job queries
+  @@index([googleIdHash])
+  @@index([githubIdHash])
+  // Leaderboard query optimization (D-05, DB-02 - Phase 34)
+  // Query: WHERE showOnLeaderboard = true AND emailVerified = true
+  @@index([showOnLeaderboard, emailVerified])
+}
+
+model Bookmark {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  articleId String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, articleId])
+  @@index([userId])
+}
+
+model ReadingHistory {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  articleId String
+  title     String?
+  source    String?
+  readAt    DateTime @default(now())
+
+  @@unique([userId, articleId, readAt])
+  @@index([userId])
+  @@index([readAt])
+}
+
+model StoryCluster {
+  id                 String   @id @default(cuid())
+  canonicalTitle     String
+  articles           Json // D-13: JSONB stores string[] of article IDs
+  perspectives       Json // D-13: JSONB stores string[]
+  biasDistribution   Json // D-13: JSONB stores object
+  framingDifferences Json // D-13: JSONB stores object
+  significance       Float?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([createdAt])
+}
+
+// ============================================================================
+// EMAIL DIGEST FEATURE
+// ============================================================================
+
+model EmailSubscription {
+  id          String    @id @default(cuid())
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  email       String
+  frequency   String // daily, weekly, realtime
+  regions     Json // D-13: JSONB array of regions to include
+  topics      Json // D-13: JSONB array of topics to include
+  minSeverity String    @default("medium") // critical, high, medium, low
+  isActive    Boolean   @default(true)
+  lastSentAt  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([userId])
+  @@index([frequency])
+  @@index([isActive])
+}
+
+model EmailDigest {
+  id           String    @id @default(cuid())
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
+  articleIds   Json // D-13: JSONB array of article IDs included
+  subject      String
+  htmlContent  String
+  sentAt       DateTime?
+  status       String    @default("pending") // pending, sent, failed
+  errorMessage String?
+  createdAt    DateTime  @default(now())
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// ============================================================================
+// AI PERSONAS FEATURE
+// ============================================================================
+
+model AIPersona {
+  id           String   @id @default(cuid())
+  name         String
+  description  String
+  systemPrompt String // The AI's personality/perspective prompt
+  icon         String? // Emoji or icon identifier
+  color        String? // Hex color for UI
+  isDefault    Boolean  @default(false)
+  isPublic     Boolean  @default(true) // Available to all users
+  createdBy    String? // User ID if custom persona
+  usageCount   Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  userPersonas UserPersona[]
+
+  @@index([isPublic])
+  @@index([isDefault])
+}
+
+model UserPersona {
+  id         String    @id @default(cuid())
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  persona    AIPersona @relation(fields: [personaId], references: [id], onDelete: Cascade)
+  personaId  String
+  isActive   Boolean   @default(false) // Currently selected persona
+  lastUsedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@unique([userId, personaId])
+  @@index([userId])
+}
+
+// ============================================================================
+// SOCIAL SHARING FEATURE
+// ============================================================================
+
+model SharedContent {
+  id          String    @id @default(cuid())
+  shareCode   String    @unique // Short unique code for URL
+  contentType String // article, cluster, comparison, digest
+  contentId   String // ID of the shared content
+  title       String
+  description String?
+  imageUrl    String?
+  createdBy   String? // User ID if logged in
+  viewCount   Int       @default(0)
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+
+  clicks ShareClick[]
+
+  @@index([shareCode])
+  @@index([contentType])
+  @@index([contentId]) // Lookup by content
+  @@index([createdAt])
+}
+
+model ShareClick {
+  id              String        @id @default(cuid())
+  sharedContent   SharedContent @relation(fields: [sharedContentId], references: [id], onDelete: Cascade)
+  sharedContentId String
+  platform        String // twitter, facebook, linkedin, whatsapp, telegram, copy, email
+  referrer        String?
+  userAgent       String?
+  ipHash          String? // Hashed IP for analytics (privacy-friendly)
+  createdAt       DateTime      @default(now())
+
+  @@index([sharedContentId])
+  @@index([platform])
+  @@index([createdAt])
+}
+
+// ============================================================================
+// PHASE 6: GAMIFICATION & READING HISTORY
+// ============================================================================
+
+model Badge {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String
+  tier        String // bronze, silver, gold, platinum (D-41)
+  category    String // volume, diversity, behavior (D-42)
+  iconType    String // emoji identifier for icon
+  threshold   Int // Required value to earn this tier
+  createdAt   DateTime @default(now())
+
+  userBadges UserBadge[]
+
+  @@index([category])
+  @@index([tier])
+}
+
+model UserBadge {
+  id       String   @id @default(cuid())
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId   String
+  badge    Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+  badgeId  String
+  earnedAt DateTime @default(now())
+  progress Int      @default(0) // Current progress toward next tier
+
+  @@unique([userId, badgeId])
+  @@index([userId])
+  @@index([badgeId])
+}
+
+model LeaderboardSnapshot {
+  id        String   @id @default(cuid())
+  date      DateTime
+  timeframe String // all-time, monthly, weekly (D-57)
+  rankings  Json // D-13: JSONB stores top 100 users (D-51)
+  createdAt DateTime @default(now())
+
+  @@index([date, timeframe])
+  @@index([timeframe])
+}
+
+// ============================================================================
+// PHASE 27: COMMENTS SYSTEM
+// ============================================================================
+
+model Comment {
+  id        String @id @default(cuid())
+  text      String @db.VarChar(5000)
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  articleId String
+
+  // Self-referencing relation for threading
+  parentComment Comment?  @relation("Replies", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  parentId      String?
+  replies       Comment[] @relation("Replies")
+
+  isDeleted   Boolean  @default(false)
+  isEdited    Boolean  @default(false)
+  isFlagged   Boolean  @default(false)
+  flagReasons Json?
+  aiModerated Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([articleId])
+  @@index([userId])
+  @@index([parentId])
+  @@index([isFlagged])
+  @@index([createdAt])
+}
+
+// ============================================================================
+// PHASE 28: TEAM COLLABORATION
+// ============================================================================
+
+model Team {
+  id          String    @id @default(cuid())
+  name        String    @db.VarChar(50)
+  description String?   @db.VarChar(500)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime? // Soft delete per Claude's discretion
+
+  members   TeamMember[]
+  bookmarks TeamBookmark[]
+  invites   TeamInvite[]
+
+  @@index([deletedAt])
+}
+
+model TeamMember {
+  id       String   @id @default(cuid())
+  team     Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  teamId   String
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId   String
+  role     String   @default("member") // owner, admin, member per D-07
+  joinedAt DateTime @default(now())
+
+  @@unique([teamId, userId])
+  @@index([teamId])
+  @@index([userId])
+}
+
+model TeamBookmark {
+  id        String   @id @default(cuid())
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  teamId    String
+  articleId String
+  addedBy   String // userId of person who added per D-06
+  note      String?  @db.VarChar(500)
+  createdAt DateTime @default(now())
+
+  @@unique([teamId, articleId])
+  @@index([teamId])
+  @@index([addedBy])
+}
+
+model TeamInvite {
+  id         String    @id @default(cuid())
+  team       Team      @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  teamId     String
+  email      String
+  tokenHash  String    @unique
+  invitedBy  String // userId
+  role       String    @default("member") // role to assign on accept
+  expiresAt  DateTime // 7 days per D-02
+  acceptedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([teamId])
+  @@index([tokenHash])
+  @@index([email])
+}
+
+// ============================================================================
+// PHASE 36.2: STRIPE WEBHOOK + REFERRALS + STUDENT DISCOUNT + CAMPAIGNS
+// ============================================================================
+
+// Stripe webhook idempotency record (D-08).
+// `id` is the Stripe event ID (caller-supplied, NOT cuid).
+// Consumer: server/services/stripeWebhookService.ts findUnique({ where: { id: eventId } })
+//           and create({ data: { id: eventId, eventType } }).
+model ProcessedWebhookEvent {
+  id        String   @id
+  eventType String
+  processed DateTime @default(now())
+
+  @@index([processed])
+}
+
+// Referral reward audit trail (D-04). Both FKs Cascade so deleting a user
+// removes their referral history. Two named relations disambiguate referrer vs referred.
+model ReferralReward {
+  id          String    @id @default(cuid())
+  referrer    User      @relation("ReferralRewardReferrer", fields: [referrerId], references: [id], onDelete: Cascade)
+  referrerId  String
+  referred    User      @relation("ReferralRewardReferred", fields: [referredId], references: [id], onDelete: Cascade)
+  referredId  String
+  rewardType  String // free_month, discount
+  rewardValue Int // months or percentage
+  appliedAt   DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([referrerId])
+  @@index([referredId])
+}
+
+// Marketing campaigns (D-07). No User FKs in 36.2; future CampaignUsage join model
+// will track per-user redemption.
+model Campaign {
+  id          String   @id @default(cuid())
+  name        String
+  discountPct Int
+  maxUses     Int? // nullable = unlimited (Claude's discretion)
+  usedCount   Int      @default(0)
+  startsAt    DateTime
+  endsAt      DateTime
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  @@index([isActive, startsAt, endsAt])
+}
+
+// Student discount verification queue (D-05). Cascade so deleting a user
+// removes their verification documents.
+model StudentVerification {
+  id          String    @id @default(cuid())
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  documentUrl String?
+  status      String // pending, approved, rejected
+  reviewedBy  String?
+  reviewedAt  DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([status])
+  @@index([userId])
+}
+
+// ============================================================================
+// PHASE 35: DEVELOPER API KEYS
+// ============================================================================
+
+// API Key for developer access (Phase 35)
+// Stores hashed keys with tier-based rate limits
+model ApiKey {
+  id          String     @id @default(cuid())
+  keyHash     String     @unique // bcrypt hash of full key (never store plaintext)
+  name        String // User-defined name (e.g., "Production", "Staging")
+  tier        ApiKeyTier @default(free)
+  environment ApiKeyEnv  @default(live)
+
+  // Ownership and limits
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Usage tracking
+  createdAt    DateTime  @default(now())
+  lastUsedAt   DateTime?
+  requestCount Int       @default(0) // Monthly request counter (reset by cleanup job)
+
+  // Revocation
+  revokedAt     DateTime?
+  revokedReason String?
+
+  // Indexes for lookup and cleanup
+  @@index([userId])
+  @@index([revokedAt])
+  @@index([lastUsedAt])
+  @@index([createdAt])
+}
+
+enum ApiKeyTier {
+  free // 10 req/min per D-15
+  pro // 100 req/min per D-15
+}
+
+enum ApiKeyEnv {
+  live // Production keys (nh_live_)
+  test // Test/sandbox keys (nh_test_)
+}
+
+// Phase 36.2: Subscription tier and status enums (D-01: UPPERCASE matches existing string literals)
+enum SubscriptionTier {
+  FREE
+  PREMIUM
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  PAUSED
+}

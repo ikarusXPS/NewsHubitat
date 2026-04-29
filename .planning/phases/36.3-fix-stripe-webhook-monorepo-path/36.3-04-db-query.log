@@ -1,0 +1,49 @@
+                  eventType                   | count 
+----------------------------------------------+-------
+ charge.failed                                |     1
+ charge.succeeded                             |     4
+ charge.updated                               |     1
+ checkout.session.completed                   |     1
+ customer.created                             |     7
+ customer.subscription.created                |     4
+ customer.subscription.deleted                |     1
+ customer.subscription.paused                 |     1
+ customer.subscription.pending_update_expired |     1
+ customer.subscription.trial_will_end         |     1
+ customer.subscription.updated                |     7
+ customer.updated                             |     6
+ invoice.created                              |     8
+ invoice.finalized                            |     7
+ invoiceitem.created                          |     2
+ invoice.paid                                 |     4
+ invoice.payment_failed                       |     1
+ invoice_payment.paid                         |     3
+ invoice.payment_succeeded                    |     4
+ invoice.updated                              |     3
+ invoice.voided                               |     1
+ payment_intent.canceled                      |     1
+ payment_intent.created                       |     7
+ payment_intent.payment_failed                |     1
+ payment_intent.succeeded                     |     4
+ payment_method.attached                      |     4
+ plan.created                                 |     5
+ price.created                                |     6
+ product.created                              |     7
+ setup_intent.canceled                        |     1
+ setup_intent.created                         |     1
+(31 rows)
+
+
+=== Idempotency replay test ===
+Event ID replayed: evt_1TRB4OD6DRGZELevF4a3YwTG
+Pre-replay rows for that event ID: 1
+Post-replay rows for that event ID: 1
+IDEMPOTENCY: PASS
+
+Backend log evidence (from /tmp/backend-listen2.log):
+[32minfo[39m: [Webhook] Event evt_1TRB4OD6DRGZELevF4a3YwTG already processed (Redis) {"service":"newshub-server","timestamp":"2026-04-28 14:56:36"}
+
+stripe listen evidence (from /tmp/stripe-listen2.log):
+Ready! You are using Stripe API Version [2026-01-28.clover]. Your webhook signing secret is whsec_5f1b1e2d4680ac05a4618524568a0659a83f18a07de78aac6427be2467bbfd31 (^C to quit)
+2026-04-28 14:56:36   --> checkout.session.completed [evt_1TRB4OD6DRGZELevF4a3YwTG]
+2026-04-28 14:56:36  <--  [200] POST http://localhost:3001/api/webhooks/stripe [evt_1TRB4OD6DRGZELevF4a3YwTG]

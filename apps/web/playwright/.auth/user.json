@@ -1,0 +1,18 @@
+{
+  "cookies": [],
+  "origins": [
+    {
+      "origin": "http://localhost:5173",
+      "localStorage": [
+        {
+          "name": "newshub-auth-token",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbW85dXBmanMwMDAxdGdxZjc3ODZwbG9yIiwiZW1haWwiOiJlMmUtdGVzdEBuZXdzaHViLnRlc3QiLCJ0b2tlblZlcnNpb24iOjAsImlhdCI6MTc3Njg1MDg3MCwiZXhwIjoxNzc3NDU1NjcwfQ.PWah7Rw-j8Et5zkMTnYyrcmkdEsq3ya0SfTw8bodzEo"
+        },
+        {
+          "name": "newshub-storage",
+          "value": "{\"state\":{\"hasCompletedOnboarding\":true,\"theme\":\"dark\",\"language\":\"en\"},\"version\":0}"
+        }
+      ]
+    }
+  ]
+}

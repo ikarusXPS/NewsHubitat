@@ -1,0 +1,360 @@
+# stack.yml — Phase 37 production Docker Swarm topology
+# Deploy: docker stack deploy -c stack.yml newshub
+# Validation target: 4 web + 1 worker on single-host Swarm (DEPLOY-02)
+#
+# Source contracts: .planning/phases/37-horizontal-scaling/37-CONTEXT.md
+#   WS-01..WS-04 (Socket.IO Redis adapter + sticky cookie)
+#   DB-01..DB-04 (PgBouncer transaction-pool, dual-URL, exporter alert)
+#   JOB-01..JOB-04 (worker singleton, RUN_JOBS gating)
+#   DEPLOY-01..DEPLOY-05 (separate stack.yml; 4+1 single-host validation)
+#
+# DEPLOY-01: docker-compose.yml stays untouched for local dev. This file is
+# Swarm-only — `docker stack deploy`, never `docker compose up`.
+version: "3.9"
+
+services:
+  # ──────────────────────────────────────────────────────────────────────────
+  # Traefik — sticky-cookie load balancer in front of 4 app replicas (WS-02)
+  # ──────────────────────────────────────────────────────────────────────────
+  traefik:
+    image: traefik:v3.3
+    command:
+      - "--providers.swarm=true"
+      - "--providers.swarm.exposedByDefault=false"
+      - "--providers.swarm.network=newshub-net"
+      - "--entrypoints.web.address=:80"
+      - "--api.dashboard=true"
+    ports:
+      - "80:80"
+      # T-37-11: dashboard on localhost only; production must firewall further
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - newshub-net
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        condition: on-failure
+        max_attempts: 5
+        delay: 5s
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # app — 4 stateless web replicas (RUN_JOBS=false, RUN_HTTP=true)
+  # JOB-01: web replicas skip aggregator/cleanup/digest schedulers on boot.
+  # WS-02: Traefik labels under deploy.labels (Swarm requirement T-37-12).
+  # ──────────────────────────────────────────────────────────────────────────
+  app:
+    image: newshub:${BUILD_TAG:-latest}
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - RUN_JOBS=false
+      - RUN_HTTP=true
+      # DB-01: route runtime queries through PgBouncer transaction-pool;
+      # ?pgbouncer=true tells Prisma to disable prepared-statement caching.
+      - DATABASE_URL=postgres://newshub:${POSTGRES_PASSWORD}@pgbouncer:6432/newshub?pgbouncer=true
+      # DB-02: bypass PgBouncer for `prisma migrate deploy` / `prisma db push`.
+      - DIRECT_URL=postgres://newshub:${POSTGRES_PASSWORD}@postgres:5432/newshub
+      # WS-03: shared Redis container hosts cache + Socket.IO adapter (socket.io# channel prefix)
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=${JWT_SECRET}
+      # AI providers (multi-provider fallback chain — at least one required)
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      # Translation providers
+      - DEEPL_API_KEY=${DEEPL_API_KEY}
+      - GOOGLE_TRANSLATE_API_KEY=${GOOGLE_TRANSLATE_API_KEY}
+      # Email (SMTP / SendGrid)
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY}
+      - SMTP_FROM=${SMTP_FROM}
+      # OAuth
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
+      - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
+      - OAUTH_SESSION_SECRET=${OAUTH_SESSION_SECRET}
+      # Stripe
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      # Sentry / observability
+      - SENTRY_DSN=${SENTRY_DSN}
+      - APP_URL=${APP_URL}
+    networks:
+      - newshub-net
+    # Pitfall 5: terminus drain takes 30s — give 5s slack so Swarm doesn't SIGKILL mid-drain.
+    stop_grace_period: 35s
+    depends_on:
+      - postgres
+      - redis
+      - pgbouncer
+    deploy:
+      mode: replicated
+      replicas: 4
+      restart_policy:
+        condition: on-failure
+        max_attempts: 5
+        delay: 5s
+      update_config:
+        parallelism: 1
+        delay: 15s
+        order: start-first
+        failure_action: rollback
+      # T-37-12: Traefik labels MUST be under deploy.labels in Swarm mode —
+      # services.app.labels (container labels) are NOT read by Traefik's Swarm provider.
+      labels:
+        - "traefik.enable=true"
+        # Update Host(...) rule for production hostname; localhost is for DEPLOY-02 single-host validation.
+        - "traefik.http.routers.newshub.rule=Host(`localhost`)"
+        - "traefik.http.routers.newshub.entrypoints=web"
+        - "traefik.http.services.newshub.loadbalancer.server.port=3001"
+        # DEPLOY-04: Traefik health probes hit /api/ready (readiness flips to false on SIGTERM)
+        - "traefik.http.services.newshub.loadbalancer.healthcheck.path=/api/ready"
+        - "traefik.http.services.newshub.loadbalancer.healthcheck.interval=10s"
+        - "traefik.http.services.newshub.loadbalancer.healthcheck.timeout=3s"
+        # WS-02 + T-37-14: sticky cookie nh_sticky pins Engine.IO long-poll → WS upgrade to one replica.
+        # httpOnly+secure prevent XSS scraping; samesite=lax allows shared-article cross-site links (Pitfall 6).
+        - "traefik.http.services.newshub.loadbalancer.sticky.cookie.name=nh_sticky"
+        - "traefik.http.services.newshub.loadbalancer.sticky.cookie.httponly=true"
+        - "traefik.http.services.newshub.loadbalancer.sticky.cookie.secure=true"
+        - "traefik.http.services.newshub.loadbalancer.sticky.cookie.samesite=lax"
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # app-worker — singleton background-jobs runner (JOB-01)
+  # T-37-10: replicas=1 + update_config.order=stop-first ensures exactly-one
+  # during rolling updates. start-first would briefly run two workers.
+  # ──────────────────────────────────────────────────────────────────────────
+  app-worker:
+    image: newshub:${BUILD_TAG:-latest}
+    environment:
+      - NODE_ENV=production
+      - RUN_JOBS=true
+      - RUN_HTTP=false
+      - DATABASE_URL=postgres://newshub:${POSTGRES_PASSWORD}@pgbouncer:6432/newshub?pgbouncer=true
+      - DIRECT_URL=postgres://newshub:${POSTGRES_PASSWORD}@postgres:5432/newshub
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=${JWT_SECRET}
+      # AI providers (worker uses these for sentiment + translation fallback)
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      # Translation providers
+      - DEEPL_API_KEY=${DEEPL_API_KEY}
+      - GOOGLE_TRANSLATE_API_KEY=${GOOGLE_TRANSLATE_API_KEY}
+      # Email (worker runs digest schedulers)
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY}
+      - SMTP_FROM=${SMTP_FROM}
+      # Sentry
+      - SENTRY_DSN=${SENTRY_DSN}
+    networks:
+      - newshub-net
+    stop_grace_period: 35s
+    depends_on:
+      - postgres
+      - redis
+      - pgbouncer
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        max_attempts: 5
+        delay: 10s
+      update_config:
+        parallelism: 1
+        order: stop-first
+        failure_action: pause
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # PgBouncer — transaction-pool collapse from 4×20=80 client conns → 25 backend (DB-01, DB-03)
+  # Image is env-driven: pgbouncer.ini + userlist.txt are generated at boot.
+  # ──────────────────────────────────────────────────────────────────────────
+  pgbouncer:
+    image: edoburu/pgbouncer:1.23.1
+    environment:
+      - DATABASE_URL=postgres://newshub:${POSTGRES_PASSWORD}@postgres:5432/newshub
+      # DB-01: transaction pool mode — codebase has no LISTEN/NOTIFY, advisory locks, or session state.
+      - POOL_MODE=transaction
+      # T-37-13 / DB-03: 25 backend conns × Postgres max_connections=200 leaves ~150 slots for ops.
+      - DEFAULT_POOL_SIZE=25
+      - MAX_CLIENT_CONN=200
+      - RESERVE_POOL_SIZE=5
+      - SERVER_RESET_QUERY=DISCARD ALL
+      - AUTH_TYPE=md5
+      - ADMIN_USERS=newshub
+    networks:
+      - newshub-net
+    depends_on:
+      - postgres
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        max_attempts: 5
+        delay: 5s
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # PgBouncer exporter — DB-04 PgBouncer-side observability
+  # Scrapes the pool admin DB and exposes /metrics on :9127 for Prometheus.
+  # ──────────────────────────────────────────────────────────────────────────
+  pgbouncer-exporter:
+    image: prometheuscommunity/pgbouncer-exporter:v0.12.0
+    environment:
+      - PGBOUNCER_EXPORTER_HOST=0.0.0.0
+      - PGBOUNCER_EXPORTER_PORT=9127
+      - PGBOUNCER_USER=newshub
+      - PGBOUNCER_PASS=${POSTGRES_PASSWORD}
+      - PGBOUNCER_HOST=pgbouncer
+      - PGBOUNCER_PORT=6432
+    networks:
+      - newshub-net
+    depends_on:
+      - pgbouncer
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        max_attempts: 5
+        delay: 5s
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # Postgres — primary data store (DB-03: max_connections=200 leaves slack for ops)
+  # ──────────────────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:17
+    environment:
+      - POSTGRES_USER=newshub
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=newshub
+    # DB-03: max_connections=200 retains ~150 slots after PgBouncer's 25 backend conns.
+    command: postgres -c max_connections=200
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - newshub-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U newshub -d newshub"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        max_attempts: 5
+        delay: 5s
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # Redis — shared broker for cache + Socket.IO adapter (WS-03)
+  # ──────────────────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7.4-alpine
+    command: >
+      redis-server
+      --appendonly yes
+      --appendfsync everysec
+      --save 900 1
+      --save 300 10
+      --save 60 10000
+    volumes:
+      - redis_data:/data
+    networks:
+      - newshub-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        max_attempts: 5
+        delay: 5s
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # Prometheus — scrape config in ./prometheus/prometheus.yml (DB-04 / Phase 20)
+  # ──────────────────────────────────────────────────────────────────────────
+  prometheus:
+    image: prom/prometheus:v3.4.0
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=15d'
+      - '--web.enable-lifecycle'
+    volumes:
+      - ./prometheus:/etc/prometheus:ro
+      - prometheus_data:/prometheus
+    networks:
+      - newshub-net
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        max_attempts: 5
+        delay: 5s
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # Alertmanager — PgBouncerPoolSaturation + PrismaPoolSaturation routing
+  # ──────────────────────────────────────────────────────────────────────────
+  alertmanager:
+    image: prom/alertmanager:v0.28.1
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+    volumes:
+      - ./alertmanager:/etc/alertmanager:ro
+      - alertmanager_data:/alertmanager
+    networks:
+      - newshub-net
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        max_attempts: 5
+        delay: 5s
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # Grafana — dashboards consume Prometheus metrics
+  # ──────────────────────────────────────────────────────────────────────────
+  grafana:
+    image: grafana/grafana-oss:13.0.1
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana_data:/var/lib/grafana
+    networks:
+      - newshub-net
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        max_attempts: 5
+        delay: 5s
+
+networks:
+  newshub-net:
+    driver: overlay
+
+volumes:
+  postgres_data:
+  redis_data:
+  prometheus_data:
+  alertmanager_data:
+  grafana_data:

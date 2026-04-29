@@ -1,0 +1,106 @@
+{
+  "title": "Teams",
+  "myTeams": "My Teams",
+  "createTeam": "Create Team",
+  "teamSettings": "Team Settings",
+  "teamMembers": "Team Members",
+  "teamBookmarks": "Team Bookmarks",
+  "inviteMember": "Invite Member",
+  "sendInvite": "Send Invite",
+  "saveToTeam": "Save to Team",
+  "personal": "Personal",
+
+  "empty": {
+    "noTeams": {
+      "title": "No teams yet",
+      "description": "Create a team to share bookmarks and collaborate with others."
+    },
+    "noBookmarks": {
+      "title": "No shared bookmarks",
+      "description": "Save articles to this team to share with all members."
+    },
+    "noMembers": {
+      "title": "Invite your team",
+      "description": "Send email invites to add members to this team."
+    }
+  },
+
+  "roles": {
+    "owner": "Owner",
+    "admin": "Admin",
+    "member": "Member"
+  },
+
+  "form": {
+    "teamName": "Team Name",
+    "teamNamePlaceholder": "Enter team name",
+    "description": "Description",
+    "descriptionPlaceholder": "Optional team description",
+    "email": "Email",
+    "emailPlaceholder": "member@example.com",
+    "role": "Role"
+  },
+
+  "validation": {
+    "nameRequired": "Team name is required",
+    "nameTooShort": "Team name must be at least 3 characters",
+    "nameTooLong": "Team name must be 50 characters or less",
+    "emailInvalid": "Please enter a valid email address",
+    "descriptionTooLong": "Description must be under 500 characters"
+  },
+
+  "actions": {
+    "leaveTeam": "Leave Team",
+    "removeMember": "Remove Member",
+    "deleteTeam": "Delete Team",
+    "removeBookmark": "Remove Bookmark",
+    "transferOwnership": "Transfer Ownership",
+    "changeRole": "Change Role"
+  },
+
+  "confirm": {
+    "leaveTeam": {
+      "title": "Leave Team",
+      "message": "You will lose access to shared bookmarks. This cannot be undone."
+    },
+    "removeMember": {
+      "title": "Remove Member",
+      "message": "This will remove {{name}} from the team. They will lose access to shared bookmarks."
+    },
+    "deleteTeam": {
+      "title": "Delete Team",
+      "message": "All team data including bookmarks will be deleted after 7 days. This cannot be undone."
+    },
+    "removeBookmark": {
+      "title": "Remove Bookmark",
+      "message": "Remove this article from team bookmarks?"
+    }
+  },
+
+  "success": {
+    "teamCreated": "Team created successfully",
+    "inviteSent": "Invite sent to {{email}}",
+    "inviteAccepted": "You've joined {{team}}",
+    "memberRemoved": "Member removed from team",
+    "bookmarkAdded": "Saved to {{team}}",
+    "bookmarkRemoved": "Removed from team bookmarks",
+    "teamDeleted": "Team deleted"
+  },
+
+  "errors": {
+    "inviteFailed": "Could not send invite. Please try again.",
+    "teamLimit": "You've reached the maximum of 10 teams.",
+    "permissionDenied": "You don't have permission for this action.",
+    "alreadyMember": "This user is already a team member.",
+    "invitePending": "An invite has already been sent to this email.",
+    "invalidInvite": "This invite is invalid or has expired.",
+    "cannotRemoveOwner": "Cannot remove team owner.",
+    "ownerCannotLeave": "Owner cannot leave. Transfer ownership first."
+  },
+
+  "addedBy": "Added by {{name}}",
+  "members_one": "{{count}} member",
+  "members_other": "{{count}} members",
+  "bookmarks_one": "{{count}} bookmark",
+  "bookmarks_other": "{{count}} bookmarks"
+}

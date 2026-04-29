@@ -1,0 +1,32 @@
+# Traefik file-provider config for the e2e-stack WS-04 fanout test.
+#
+# We use the file provider instead of the docker provider because Docker
+# Desktop on Windows + WSL2 has unreliable docker.sock access from inside
+# the Traefik container (Error response from daemon: "" — empty error).
+# The file provider is also more deterministic for a fixed test stack with
+# 2 known replicas.
+
+http:
+  routers:
+    test:
+      rule: "PathPrefix(`/`)"
+      entryPoints:
+        - web
+      service: test
+
+  services:
+    test:
+      loadBalancer:
+        servers:
+          - url: "http://app-1:3001"
+          - url: "http://app-2:3001"
+        # Sticky session cookie — matches the test expectation that two
+        # different clients get pinned to two different replicas.
+        # T-37-18: secure=false because the test runs over plain HTTP on
+        # localhost. Production stack.yml (Plan 04) uses secure=true.
+        sticky:
+          cookie:
+            name: nh_sticky
+            httpOnly: true
+            secure: false
+            sameSite: lax

@@ -8,6 +8,7 @@ on:
 permissions:
   contents: read
   packages: write
+  pull-requests: write
 
 jobs:
   lint:
@@ -15,38 +16,48 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
 
       - name: Setup Node.js
-        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8
+        uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: pnpm install --frozen-lockfile
 
       - name: Run linter
-        run: npm run lint
+        run: pnpm lint
 
   typecheck:
     name: Type Check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
 
       - name: Setup Node.js
-        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8
+        uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: pnpm install --frozen-lockfile
 
       - name: Run type check
-        run: npm run typecheck
+        run: pnpm typecheck
 
   test:
     name: Unit Tests
@@ -83,39 +94,160 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
 
       - name: Setup Node.js
-        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8
+        uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma client
-        run: npx prisma generate
+        run: pnpm --filter @newshub/web exec prisma generate
 
       - name: Push database schema
-        run: npx prisma db push
+        run: pnpm --filter @newshub/web exec prisma db push
 
       - name: Run unit tests with coverage
-        run: npm run test:coverage
+        run: pnpm test:coverage
+
+  bundle-analysis:
+    name: Bundle Analysis
+    runs-on: ubuntu-latest
+    needs: [lint, typecheck, test]
+    env:
+      # prisma.config.ts has a fail-fast guard on DATABASE_URL even for `prisma generate`.
+      # No actual DB is reached here — the value just satisfies the guard.
+      DATABASE_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm --filter @newshub/web exec prisma generate
+
+      - name: Build with visualizer
+        run: pnpm build
+
+      # Bundle size warning (per D-16 - warn but don't block)
+      - name: Check bundle size
+        id: bundle-size
+        run: |
+          # Extract main chunk sizes from build output
+          echo "## Bundle Size Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Find the main index chunk (not vendor chunks)
+          MAIN_CHUNK=$(find apps/web/dist/assets -name "index-*.js" -type f | head -1)
+          if [ -n "$MAIN_CHUNK" ]; then
+            SIZE=$(stat --printf="%s" "$MAIN_CHUNK" 2>/dev/null || stat -f%z "$MAIN_CHUNK" 2>/dev/null)
+            SIZE_KB=$((SIZE / 1024))
+            echo "Main chunk: ${SIZE_KB}KB" >> $GITHUB_STEP_SUMMARY
+
+            # Warn if > 250KB (per D-16)
+            if [ "$SIZE_KB" -gt 250 ]; then
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "**Warning:** Main chunk exceeds 250KB target (${SIZE_KB}KB)" >> $GITHUB_STEP_SUMMARY
+              echo "::warning::Bundle size ${SIZE_KB}KB exceeds 250KB target"
+            else
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "Bundle size within target" >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+
+          # Also report total JS size
+          TOTAL_JS=$(find apps/web/dist/assets -name "*.js" -type f -exec stat --printf="%s\n" {} + 2>/dev/null | awk '{s+=$1}END{print s}' || find apps/web/dist/assets -name "*.js" -type f -exec stat -f%z {} + 2>/dev/null | awk '{s+=$1}END{print s}')
+          TOTAL_JS_KB=$((TOTAL_JS / 1024))
+          echo "Total JS: ${TOTAL_JS_KB}KB" >> $GITHUB_STEP_SUMMARY
+
+          # Link to bundle analysis
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "See [bundle analysis artifact](../artifacts) for details" >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload bundle stats
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-stats
+          path: apps/web/dist/stats.html
+          retention-days: 30
+
+      - name: Report bundle size
+        uses: preactjs/compressed-size-action@v2
+        # Non-blocking by design: per CLAUDE.md the bundle budget is a warning,
+        # not a gate. The action also fails when the base branch has a stale
+        # lockfile (it tries to build base for comparison), which we don't
+        # want to surface as a CI failure on PRs.
+        continue-on-error: true
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          pattern: './apps/web/dist/**/*.{js,css}'
+          compression: 'brotli'
 
   build:
     name: Build Docker Image
     runs-on: ubuntu-latest
     needs: [lint, typecheck, test]
+    env:
+      # prisma.config.ts has a fail-fast guard on DATABASE_URL even for `prisma generate`.
+      # No actual DB is reached here — the value just satisfies the guard.
+      DATABASE_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
     steps:
       - name: Checkout
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm --filter @newshub/web exec prisma generate
+
+      - name: Build with source map upload
+        run: pnpm build
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+          SENTRY_RELEASE: newshub@${{ github.sha }}
+          VITE_SENTRY_RELEASE: newshub@${{ github.sha }}
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@d70bba72b1f3fd22344832f00baa16ece964efeb
+        uses: docker/setup-buildx-action@v3
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@e92390c5fb421da1463c202d546fed0ec5c39f20
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -123,7 +255,7 @@ jobs:
 
       - name: Extract metadata for Docker
         id: meta
-        uses: docker/metadata-action@8e5442c4ef9f78752691e2d8f8d19755c6f78e81
+        uses: docker/metadata-action@v5
         with:
           images: ghcr.io/${{ github.repository }}
           tags: |
@@ -132,14 +264,14 @@ jobs:
             type=ref,event=branch
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@15560696de535e4014efeff63c48f16952e52dd1
+        uses: docker/build-push-action@v6
         with:
           context: .
           push: ${{ github.ref == 'refs/heads/master' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-to: type=gha,mode=min
 
   e2e:
     name: E2E Tests
@@ -178,35 +310,46 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
 
       - name: Setup Node.js
-        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8
+        uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma client
-        run: npx prisma generate
+        run: pnpm --filter @newshub/web exec prisma generate
 
       - name: Push database schema
-        run: npx prisma db push
+        run: pnpm --filter @newshub/web exec prisma db push
+
+      - name: Seed test data
+        run: pnpm seed
 
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
+        run: pnpm --filter @newshub/web exec playwright install --with-deps chromium
 
       - name: Run E2E tests
-        run: npx playwright test
+        run: pnpm --filter @newshub/web exec playwright test --reporter=html
+        timeout-minutes: 30
+        env:
+          DEBUG: pw:api
 
       - name: Upload Playwright report
-        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: playwright-report
-          path: playwright-report/
+          path: apps/web/playwright-report/
           retention-days: 7
 
   deploy-staging:
@@ -219,17 +362,65 @@ jobs:
       url: https://staging.newshub.example.com
     steps:
       - name: Deploy via SSH
-        uses: appleboy/ssh-action@029f5b4aeeeb58fdfe1410a5d17f967dacf36262
+        uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.STAGING_HOST }}
           username: ${{ secrets.STAGING_USER }}
           key: ${{ secrets.STAGING_SSH_KEY }}
+          envs: SENTRY_RELEASE,SENTRY_ENVIRONMENT
           script: |
             cd /app/newshub
+            export SENTRY_RELEASE=newshub@${{ github.sha }}
+            export SENTRY_ENVIRONMENT=staging
             docker compose pull
             docker compose up -d --wait
             docker compose ps
             curl -f http://localhost:3001/api/health/db || exit 1
+        env:
+          SENTRY_RELEASE: newshub@${{ github.sha }}
+          SENTRY_ENVIRONMENT: staging
+
+  lighthouse:
+    name: Lighthouse CI
+    runs-on: ubuntu-latest
+    needs: [deploy-staging]
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Wait for staging deployment
+        run: |
+          echo "Waiting for staging to be ready..."
+          for i in {1..30}; do
+            if curl -sf ${{ secrets.STAGING_URL }}/api/health > /dev/null; then
+              echo "Staging is ready"
+              exit 0
+            fi
+            echo "Attempt $i failed, waiting 10s..."
+            sleep 10
+          done
+          echo "Staging failed to become ready"
+          exit 1
+
+      - name: Run Lighthouse CI
+        id: lighthouse
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          configPath: ./lighthouserc.js
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+          runs: 3
+        env:
+          STAGING_URL: ${{ secrets.STAGING_URL }}
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+      - name: Upload Lighthouse reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports
+          path: .lighthouseci/
+          retention-days: 30
 
   deploy-production:
     name: Deploy to Production
@@ -240,14 +431,20 @@ jobs:
       url: https://newshub.example.com
     steps:
       - name: Deploy via SSH
-        uses: appleboy/ssh-action@029f5b4aeeeb58fdfe1410a5d17f967dacf36262
+        uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.PRODUCTION_HOST }}
           username: ${{ secrets.PRODUCTION_USER }}
           key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          envs: SENTRY_RELEASE,SENTRY_ENVIRONMENT
           script: |
             cd /app/newshub
+            export SENTRY_RELEASE=newshub@${{ github.sha }}
+            export SENTRY_ENVIRONMENT=production
             docker compose pull
             docker compose up -d --wait
             docker compose ps
             curl -f http://localhost:3001/api/health/db || exit 1
+        env:
+          SENTRY_RELEASE: newshub@${{ github.sha }}
+          SENTRY_ENVIRONMENT: production

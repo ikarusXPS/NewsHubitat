@@ -1,0 +1,47 @@
+{
+  "hero": {
+    "title": "Global News Perspectives",
+    "subtitle": "Multi-perspective news analysis from {sourceCount} sources across {regionCount} regions",
+    "stats": {
+      "articles": "Articles",
+      "sources": "Sources",
+      "regions": "Regions",
+      "lastUpdate": "Last Update"
+    }
+  },
+  "feed": {
+    "title": "News Feed",
+    "empty": "No articles match your current filters",
+    "loadMore": "Load more articles",
+    "refresh": "Refresh",
+    "filters": {
+      "allRegions": "All Regions",
+      "allSentiments": "All Sentiments"
+    }
+  },
+  "sentiment": {
+    "positive": "Positive",
+    "negative": "Negative",
+    "neutral": "Neutral"
+  },
+  "article": {
+    "readMore": "Read more",
+    "translate": "Translate",
+    "translating": "Translating...",
+    "bookmark": "Bookmark",
+    "bookmarked": "Bookmarked",
+    "share": "Share",
+    "source": "Source",
+    "region": "Region"
+  },
+  "clusters": {
+    "title": "Topic Clusters",
+    "perspectives": "{count, plural, one {# perspective} other {# perspectives}}",
+    "articles": "{count, plural, one {# article} other {# articles}}"
+  },
+  "focusSuggestions": {
+    "title": "Focus Suggestions",
+    "apply": "Apply",
+    "dismiss": "Dismiss"
+  }
+}

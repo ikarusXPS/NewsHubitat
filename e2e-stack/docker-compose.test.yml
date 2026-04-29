@@ -1,0 +1,138 @@
+# e2e-stack/docker-compose.test.yml
+# Phase 37 / WS-04 verification harness: 2 web replicas behind Traefik
+# Used by: bash e2e-stack/run-fanout-test.sh (or pnpm test:fanout)
+#
+# This is NOT a Swarm stack — it uses regular `docker compose` so the test
+# runs identically on developer machines and in CI. The production Swarm
+# topology (stack.yml, Plan 04) uses `deploy.labels` for Traefik wiring;
+# this harness uses container-level labels because docker compose's Traefik
+# provider reads them from `services.<name>.labels`, not `deploy.labels`.
+#
+# Shape: postgres + redis + traefik + 2× app (replica-A and replica-B).
+# Traefik exposes port 8000 on the host (avoids clash with local dev on
+# 3001 / 5173 / 9090). Sticky cookie name `nh_sticky` matches Plan 04.
+
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: newshub
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: newshub
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U newshub -d newshub"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+  redis:
+    image: redis:7.4-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # One-shot schema initializer. Runs `prisma db push` against the empty
+  # postgres container so the App tables (NewsArticle, User, etc.) exist
+  # before the app replicas start serving requests. Reuses the same built
+  # image as app-1/app-2 (Docker layer cache makes this free).
+  # The app replicas depend on this service via `service_completed_successfully`,
+  # so they don't boot until the schema is in place.
+  db-init:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    # Run as root — Prisma 7 lazy-loads engine binaries into node_modules
+    # on first invocation (pnpm 10 skips @prisma/engines postinstall as a
+    # security feature, so engines aren't pre-staged). The non-root nodejs
+    # user can't write to root-owned node_modules → EACCES. Running this
+    # one-shot init container as root is the standard pattern; the app
+    # containers below stay non-root.
+    user: "0:0"
+    environment:
+      DATABASE_URL: "postgresql://newshub:test@postgres:5432/newshub?schema=public"
+      DIRECT_URL: "postgresql://newshub:test@postgres:5432/newshub?schema=public"
+      # Avoid corepack interactive download prompt (no TTY in compose up -d).
+      COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
+    # Call prisma directly via node_modules/.bin to bypass corepack/pnpm
+    # entirely — this avoids the interactive download prompt and the
+    # version-resolution roundtrip on every container start.
+    # --accept-data-loss is safe here: postgres is empty on every test run.
+    command:
+      - "sh"
+      - "-c"
+      - "cd /app/apps/web && ./node_modules/.bin/prisma db push --accept-data-loss"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  traefik:
+    image: traefik:v3.3
+    command:
+      # File provider — read routing config from a static YAML file.
+      # See traefik-dynamic.yml for the routes/services definition.
+      # We chose file provider over docker provider because Docker Desktop
+      # on Windows + WSL2 backend produces "Error response from daemon: """
+      # when Traefik tries to read container labels via the docker socket.
+      - "--providers.file.filename=/etc/traefik/dynamic.yml"
+      - "--providers.file.watch=false"
+      - "--entrypoints.web.address=:80"
+      - "--api.dashboard=false"
+    ports:
+      - "8000:80"
+    volumes:
+      - ./traefik-dynamic.yml:/etc/traefik/dynamic.yml:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  app-1: &app
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: test
+      PORT: "3001"
+      RUN_JOBS: "false"
+      RUN_HTTP: "true"
+      DATABASE_URL: "postgresql://newshub:test@postgres:5432/newshub?schema=public"
+      DIRECT_URL: "postgresql://newshub:test@postgres:5432/newshub?schema=public"
+      REDIS_URL: "redis://redis:6379"
+      JWT_SECRET: "test-secret-min-32-characters-long-xx"
+      ALLOWED_ORIGINS: "http://localhost:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      db-init:
+        condition: service_completed_successfully
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.test.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.test.entrypoints=web"
+      - "traefik.http.services.test.loadbalancer.server.port=3001"
+      # T-37-18: secure=false because the test runs over plain HTTP on localhost.
+      # Production stack.yml uses secure=true (Plan 04). Documented in README.md.
+      - "traefik.http.services.test.loadbalancer.sticky.cookie.name=nh_sticky"
+      - "traefik.http.services.test.loadbalancer.sticky.cookie.httponly=true"
+      - "traefik.http.services.test.loadbalancer.sticky.cookie.secure=false"
+      - "traefik.http.services.test.loadbalancer.sticky.cookie.samesite=lax"
+
+  app-2:
+    <<: *app
+
+# Notes:
+# - No `volumes:` block: Postgres state is ephemeral; the test runs ~30s.
+# - No explicit `networks:` block: default compose network is fine, all
+#   services resolve each other by service name.
+# - Both app replicas share the same Traefik service definition via the
+#   anchor/alias pattern. Traefik discovers both containers and round-robins
+#   between them (the sticky cookie pins individual sessions).
+# - The test harness MUST tear down with `-v` so postgres/redis volumes
+#   don't accumulate across runs.

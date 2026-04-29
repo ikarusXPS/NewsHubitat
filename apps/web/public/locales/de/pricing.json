@@ -1,0 +1,65 @@
+{
+  "title": "Wähle deinen Plan",
+  "subtitle": "Schalte die volle Kraft der Multi-Perspektiven-Nachrichtenanalyse frei",
+  "monthly": "Monatlich",
+  "annual": "Jährlich",
+  "perMonth": "/Monat",
+  "perYear": "/Jahr",
+  "save2Months": "Spare 2 Monate",
+  "mostPopular": "Beliebtester Plan",
+  "customPricing": "Individuell",
+  "currentPlan": "Aktueller Plan",
+  "subscribe": "Abonnieren",
+  "loading": "Laden...",
+  "tiers": {
+    "free": {
+      "name": "Kostenlos",
+      "description": "Starte mit den grundlegenden Nachrichtenanalyse-Funktionen",
+      "cta": "Loslegen"
+    },
+    "premium": {
+      "name": "Premium",
+      "description": "Unbegrenzter Zugang zu allen Funktionen und KI-Fähigkeiten"
+    },
+    "enterprise": {
+      "name": "Enterprise",
+      "description": "Individuelle Lösungen für Teams und Organisationen",
+      "cta": "Vertrieb kontaktieren"
+    }
+  },
+  "features": {
+    "aiQueries": "KI-Analyse-Anfragen",
+    "readingHistory": "Lesehistorie",
+    "allRegions": "Alle 13 Regionen",
+    "eventMapGlobe": "Event-Karte & Globus",
+    "timeline": "Historische Zeitleiste",
+    "bookmarks": "Unbegrenzte Lesezeichen",
+    "gamification": "Abzeichen & Rangliste",
+    "dataExport": "Datenexport",
+    "comments": "Artikel-Kommentare",
+    "aiPersonas": "KI-Personas",
+    "realtimeUpdates": "Echtzeit-Updates",
+    "customPresets": "Eigene Fokus-Vorlagen",
+    "teamCreation": "Team-Arbeitsbereiche",
+    "advancedFilters": "Erweiterte Filter",
+    "adFree": "Werbefreies Erlebnis",
+    "teamBilling": "Zentrale Team-Abrechnung",
+    "enterpriseAnalytics": "Enterprise-Analysen",
+    "prioritySupport": "Prioritäts-Support",
+    "sla": "99,9% SLA"
+  },
+  "badges": {
+    "secure": "Sichere Zahlung",
+    "paymentMethods": "Visa, Mastercard, SEPA",
+    "moneyBack": "14-Tage-Geld-zurück-Garantie"
+  },
+  "success": {
+    "title": "Willkommen bei Premium!",
+    "message": "Dein Abonnement ist jetzt aktiv. Genieße unbegrenzten Zugang zu allen Funktionen.",
+    "verifying": "Abonnement wird überprüft...",
+    "error": "Etwas ist schiefgelaufen. Bitte kontaktiere den Support.",
+    "goHome": "Zum Dashboard",
+    "explore": "Jetzt entdecken",
+    "redirect": "Weiterleitung zum Dashboard in 3 Sekunden..."
+  }
+}
