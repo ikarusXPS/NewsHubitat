@@ -6,6 +6,9 @@ import { BookmarkButton } from './BookmarkButton';
 import { useCreateShare, type ShareUrls } from '../hooks/useShare';
 import { ResponsiveImage } from './ResponsiveImage';
 import { SwipeableCard } from './mobile/SwipeableCard';
+import { CredibilityPill } from './credibility/CredibilityPill';
+import { BiasBadge } from './credibility/BiasBadge';
+import { useCredibility } from '../hooks/useCredibility';
 import { cn, getRegionColor, getSentimentColor, truncate } from '../lib/utils';
 import { formatDateTime } from '../lib/formatters';
 import { useAppStore } from '../store';
@@ -50,6 +53,11 @@ export function NewsCard({ article, priority = false, onTranslate }: NewsCardPro
   const [shareCode, setShareCode] = useState<string | null>(null);
   const [isCreatingShare, setIsCreatingShare] = useState(false);
   const createShare = useCreateShare();
+
+  // Phase 38 D-04 / D-05: per-source credibility + bias surfaces (24h cached
+  // by both server Redis and client TanStack Query, so 130 sources × 3 locales
+  // is well within the AI inference budget).
+  const { data: credibility } = useCredibility(article.source.id);
 
   const handleAnalyze = async () => {
     if (isAnalyzing) return;
@@ -217,6 +225,11 @@ export function NewsCard({ article, priority = false, onTranslate }: NewsCardPro
               {localArticle.confidence}%
             </span>
           )}
+          {/* Phase 38: source-level credibility + bias badges */}
+          {credibility ? (
+            <CredibilityPill score={credibility.score} confidence={credibility.confidence} />
+          ) : null}
+          <BiasBadge politicalBias={localArticle.source.bias.political} />
         </div>
         <div className="flex items-center gap-1">
           <BookmarkButton

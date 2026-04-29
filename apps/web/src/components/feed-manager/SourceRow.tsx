@@ -1,6 +1,9 @@
 import { ToggleLeft, ToggleRight, ExternalLink, Target } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useAppStore } from '../../store';
+import { CredibilityPill } from '../credibility/CredibilityPill';
+import { BiasBadge } from '../credibility/BiasBadge';
+import { useCredibility } from '../../hooks/useCredibility';
 import type { NewsSource } from '../../types';
 
 interface SourceRowProps {
@@ -21,6 +24,9 @@ function getCountryFlag(countryCode: string): string {
 
 export function SourceRow({ source, isEnabled, onToggle }: SourceRowProps) {
   const { setActiveSourceFilter } = useAppStore();
+
+  // Phase 38: source credibility (cached 24h server + client).
+  const { data: credibility } = useCredibility(source.id);
 
   const handleFilterBySource = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -53,38 +59,28 @@ export function SourceRow({ source, isEnabled, onToggle }: SourceRowProps) {
             >
               {source.name}
             </span>
-            {/* Reliability Badge */}
-            <span
-              className={cn(
-                'text-[9px] font-mono px-1.5 py-0.5 rounded',
-                source.bias.reliability >= 8
-                  ? 'bg-[#00ff88]/10 text-[#00ff88]'
-                  : source.bias.reliability >= 6
-                    ? 'bg-[#ffee00]/10 text-[#ffee00]'
-                    : 'bg-[#ff0044]/10 text-[#ff0044]'
-              )}
-            >
-              R:{source.bias.reliability}
-            </span>
+            {/* Phase 38: replace inline R:reliability span with the
+                Phase 38 CredibilityPill. While credibility is loading, show a
+                neutral fallback pill so the row never appears empty. */}
+            {credibility ? (
+              <CredibilityPill score={credibility.score} confidence={credibility.confidence} />
+            ) : (
+              <span
+                className={cn(
+                  'text-[9px] font-mono px-1.5 py-0.5 rounded',
+                  'bg-gray-800/50 text-gray-500'
+                )}
+              >
+                R:{source.bias.reliability}
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-2 text-[10px] text-gray-500 font-mono">
             <span>{source.language.toUpperCase()}</span>
             <span>|</span>
-            <span
-              className={cn(
-                source.bias.political < -0.2
-                  ? 'text-blue-400'
-                  : source.bias.political > 0.2
-                    ? 'text-red-400'
-                    : 'text-gray-400'
-              )}
-            >
-              {source.bias.political < -0.2
-                ? 'Left'
-                : source.bias.political > 0.2
-                  ? 'Right'
-                  : 'Center'}
-            </span>
+            {/* Phase 38: replace inline bias span with the BiasBadge component
+                (D-04 LOCKED — same thresholds, single source of truth). */}
+            <BiasBadge politicalBias={source.bias.political} />
             <span>|</span>
             <span className="capitalize">{source.bias.ownership}</span>
           </div>
