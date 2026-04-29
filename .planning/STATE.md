@@ -4,14 +4,14 @@ milestone: v1.6
 milestone_name: Infrastructure & Scale
 current_plan: Not started
 status: executing
-last_updated: "2026-04-29T05:55:00.000Z"
-last_activity: 2026-04-29 -- Phase 37 complete (5/5 must-haves SATISFIED static; runtime items tracked in 37-HUMAN-UAT.md)
+last_updated: "2026-04-29T06:30:00.000Z"
+last_activity: 2026-04-29 -- Phase 37.1 planned (Dockerfile rewrite + WS-04 close-out, 2 plans across 2 waves)
 progress:
-  total_phases: 6
+  total_phases: 7
   completed_phases: 3
-  total_plans: 24
+  total_plans: 26
   completed_plans: 17
-  percent: 71
+  percent: 65
 ---
 
 # State: NewsHub
@@ -21,15 +21,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-26)
 
 **Core value:** Users can see how the same story is covered by different regional perspectives
-**Current focus:** Phase 37 complete — next options: 37.1 (Dockerfile rewrite + WS-04 closure) or pick up queued 36.5
+**Current focus:** Phase 37.1 — fix-dockerfile-monorepo (planned, awaiting `/gsd-execute-phase 37.1`)
 
 ## Current Position
 
-Phase: 37
-Plan: 7 of 7
-Current Plan: Phase complete (verifier returned human_needed; user-approved close 2026-04-29)
-Status: Complete (static verification PASSED 5/5; runtime UAT pending Swarm deploy)
-Last activity: 2026-04-29 -- Phase 37 complete on branch test-ci-pipeline
+Phase: 37.1
+Plan: 1 of 2
+Current Plan: 37.1-01 (Dockerfile rewrite for pnpm monorepo)
+Status: Planned — ready to execute
+Last activity: 2026-04-29 -- Phase 37.1 planned (2 plans, 2 waves; plan-02 has human-verify checkpoint for WS-04 fanout test)
 
 ```
 v1.6 Progress: [████████████████████] (8 phases incl. 36.4 complete; Phase 36 closed by user-approved human-verify on Plan 05; verifier still owed for 36, 36.3, 36.2 before milestone close)
@@ -54,6 +54,7 @@ v1.6 Progress: [████████████████████] (8
 | 36.4 | Relocate Plan-03/04 monetization artifacts (INSERTED) | PAY-01, PAY-02, PAY-04..PAY-07 | Yes | **Complete** (4/4 plans — verified PASS 10/10 ROADMAP criteria; D-09 probes PASS but had a false-positive — see 36.5; D-10 audit = 0) |
 | 36.5 | Fix monetization follow-up bugs (INSERTED) | PAY-04, PAY-06 | Partial | **Planned** (4/4 plans, 3 waves; plan-checker PASSED 10/10; awaiting `/gsd-execute-phase 36.5`) |
 | 37 | Horizontal Scaling | 5 reqs (INFRA-01 to INFRA-05) | No | **Complete** (7/7 plans on `test-ci-pipeline` — Wave 1+2+3 verified via typecheck + 1317 tests; 37-06 WS-04 runtime verification deferred to 37.1, blocked by pre-existing broken root Dockerfile per .planning/todos/pending/37-06-fanout-test-dockerfile-rewrite.md) |
+| 37.1 | Fix root Dockerfile for pnpm monorepo + close WS-04 (INSERTED) | INFRA-04, DEPLOY-01 | No | **Planned** (2/2 plans, 2 waves; plan-02 has human-verify checkpoint requiring `bash e2e-stack/run-fanout-test.sh` on Docker host) |
 | 38 | Advanced AI Features | 7 reqs (AI-01 to AI-07) | Yes | Not started |
 | 39 | Mobile Apps | 8 reqs (MOB-01 to MOB-08) | Yes | Not started |
 | 40 | Content Expansion | 7 reqs (CONT-01 to CONT-07) | Yes | Not started |

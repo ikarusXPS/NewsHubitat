@@ -89,6 +89,7 @@
 - [x] **Phase 35: Infrastructure Foundation** - Monorepo setup and API gateway (completed 2026-04-26)
 - [ ] **Phase 36: Monetization Core** - Stripe integration and subscription tiers
 - [x] **Phase 37: Horizontal Scaling** - Docker Swarm and connection pooling (completed 2026-04-29; 5/5 must-haves SATISFIED static; runtime items in 37-HUMAN-UAT.md; Dockerfile rewrite deferred to 37.1)
+- [ ] **Phase 37.1 (INSERTED): Fix root Dockerfile for pnpm monorepo + close WS-04** — Rewrite Dockerfile that predates the phase-35 monorepo migration; re-run e2e-stack/run-fanout-test.sh to close WS-04 cross-replica fanout gate
 - [ ] **Phase 38: Advanced AI Features** - Credibility scoring, bias detection, fact-checking
 - [ ] **Phase 39: Mobile Apps** - Capacitor wrapper and app store deployment
 - [ ] **Phase 40: Content Expansion** - Video, podcast, and source expansion
@@ -267,6 +268,22 @@ Plans:
 - [x] 37-07-PLAN.md — docs/multi-region-patterns.md (INFRA-05, DEPLOY-03)
 
 **Status:** Complete (2026-04-29) — 5/5 must-haves SATISFIED static; verifier returned `human_needed` for 3 runtime items tracked in `37-HUMAN-UAT.md`. Branch: `test-ci-pipeline`. Commits: 11 plan + 4 merge + 2 docs (deferral + verification).
+
+### Phase 37.1 (INSERTED): Fix root Dockerfile for pnpm monorepo + close WS-04
+**Goal**: Rewrite the root `Dockerfile` so it builds cleanly against the pnpm monorepo (it predates the phase-35 monorepo split and uses `npm ci --frozen-lockfile` against a non-existent `package-lock.json`), then re-run `bash e2e-stack/run-fanout-test.sh` to close the WS-04 cross-replica fanout runtime gate that was deferred from Phase 37 plan 06.
+**Depends on**: Phase 37 (e2e-stack harness, Socket.IO Redis adapter, sticky-session Traefik labels — all already merged on `test-ci-pipeline`)
+**Requirements**: INFRA-04 (cross-replica WebSocket — runtime closure), DEPLOY-01 (Swarm-deployable image — fixed Dockerfile is the prerequisite for any production stack deploy)
+**Success Criteria** (what must be TRUE):
+  1. `docker build -t newshub:37.1 .` from repo root succeeds with no `npm ci`, no `EUSAGE`, no missing-from-lockfile errors. Build uses pnpm with corepack and the existing `pnpm-lock.yaml`.
+  2. `bash e2e-stack/run-fanout-test.sh` exits 0 with the end line `OK: WS-04 cross-replica fanout verified`. The `e2e-stack-app-1` and `e2e-stack-app-2` images build via the rewritten Dockerfile.
+  3. Optional sanity gate confirms the test exercises the adapter: temporarily commenting the `createAdapter(pubClient, subClient)` line in `apps/web/server/services/websocketService.ts` causes the test to fail with `Client B did not receive test:fanout within 5000ms`. After reverting, the test passes again.
+  4. Phase 37 closure artifacts are reconciled: `37-06-SUMMARY.md` `verification_status` flips to `verified`, the pending todo at `.planning/todos/pending/37-06-fanout-test-dockerfile-rewrite.md` is moved to `.planning/todos/completed/`, the parent UAT `37-HUMAN-UAT.md` test #1 status flips from `pending`/`blocked` to `passed`, and the `infra-debt` row tracking 37-06 is removed from `STATE.md` Deferred Items.
+  5. The runtime image keeps the existing Chromium/Puppeteer block, runs as the non-root `nodejs` user, exposes port 3001, and `HEALTHCHECK` continues to hit a `/api/health` endpoint that the rewritten image actually serves.
+**Plans**: 2 plans across 2 waves
+
+Plans:
+- [ ] 37.1-01-PLAN.md — Rewrite root Dockerfile for pnpm monorepo (corepack pnpm, workspace install, monorepo-aware paths for prisma generate / build / CMD)
+- [ ] 37.1-02-PLAN.md — Re-run e2e-stack fanout test, close WS-04, reconcile 37-06 SUMMARY + UAT + todo + STATE deferred-items (autonomous: false; human-verify gated)
 
 ### Phase 38: Advanced AI Features
 **Goal**: Users see source credibility scores and can fact-check claims with AI assistance
