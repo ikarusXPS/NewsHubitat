@@ -300,7 +300,7 @@ Plans:
 **UI hint**: yes
 
 Plans:
-- [ ] 38-01-PLAN.md — [BLOCKING] Schema foundation: FactCheck Prisma model + tsvector FTS migration + GIN index + db migrate deploy + prisma generate (Wave 1)
+- [x] 38-01-PLAN.md — [BLOCKING] Schema foundation: FactCheck Prisma model + tsvector FTS migration + GIN index + db migrate deploy + prisma generate (Wave 1)
 - [ ] 38-02-PLAN.md — Backend services: credibilityService (deterministic) + factCheckReadService (Postgres FTS) + 3 prompts + 3 new aiService methods + CacheKeys extension (Wave 2, depends_on [38-01] — needs regenerated Prisma client)
 - [ ] 38-03-PLAN.md — Routes + Zod OpenAPI: POST /api/ai/fact-check + GET /api/ai/source-credibility/:id + rewritten GET /api/analysis/framing + BearerAuth + openapi:generate (Wave 3, depends_on [38-01, 38-02])
 - [ ] 38-04-PLAN.md — i18n locale files: factcheck.json + credibility.json for DE/EN/FR + i18n.ts namespace registration (Wave 3, depends_on [] — co-scheduled with 38-03 for unified review)
