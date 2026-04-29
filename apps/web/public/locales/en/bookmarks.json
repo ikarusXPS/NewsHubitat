@@ -1,0 +1,18 @@
+{
+  "title": "Saved Articles",
+  "description": "Your bookmarked articles for later reading.",
+  "empty": {
+    "title": "No saved articles",
+    "description": "Click the bookmark icon on an article to save it."
+  },
+  "error": {
+    "loadFailed": "Error loading articles"
+  },
+  "actions": {
+    "clearAll": "Clear all"
+  },
+  "status": {
+    "available": "{count} of {total} articles available",
+    "someUnavailable": "Some articles are no longer available and have been removed from the server."
+  }
+}

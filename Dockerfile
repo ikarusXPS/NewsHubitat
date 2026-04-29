@@ -1,31 +1,63 @@
+# syntax=docker/dockerfile:1.6
 # =============================================================================
-# Stage 1: Dependencies
+# Stage 1: Dependencies (pnpm workspace install — production + dev for builder)
 # =============================================================================
 FROM node:22-alpine3.19 AS deps
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+# Enable pnpm via corepack (matches CI: pnpm/action-setup@v4 version: 10)
+# Upgrade corepack first — Node 22's bundled corepack ships with outdated
+# signing keys and rejects pnpm 10.x signatures (Cannot find matching keyid).
+# See: https://github.com/nodejs/corepack/issues/612
+RUN npm install -g corepack@latest \
+ && corepack enable \
+ && corepack prepare pnpm@10.32.1 --activate
 
-# Install all dependencies (including devDependencies for build)
-# Note: --legacy-peer-deps needed for vite-plugin-pwa peer dep conflict with vite@8
-RUN npm ci --frozen-lockfile --legacy-peer-deps
+# Copy ONLY workspace manifests + lockfile so this layer caches on lockfile change.
+# When adding a new workspace package to pnpm-workspace.yaml, add its package.json here.
+COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
+COPY apps/web/package.json ./apps/web/
+COPY packages/types/package.json ./packages/types/
+
+# Workspace install scoped to @newshub/web and its transitive workspace deps
+# (currently @newshub/types). The frozen-lockfile flag fails the build if
+# pnpm-lock.yaml does not match the manifests (same lockfile-strictness
+# guarantee that the legacy install command provided).
+RUN pnpm install --frozen-lockfile --filter @newshub/web...
 
 # =============================================================================
-# Stage 2: Builder
+# Stage 2: Builder (Prisma generate + Vite + tsup)
 # =============================================================================
 FROM node:22-alpine3.19 AS builder
 WORKDIR /app
 
-# Copy dependencies from deps stage
+# Upgrade corepack first — Node 22's bundled corepack ships with outdated
+# signing keys and rejects pnpm 10.x signatures (Cannot find matching keyid).
+# See: https://github.com/nodejs/corepack/issues/612
+RUN npm install -g corepack@latest \
+ && corepack enable \
+ && corepack prepare pnpm@10.32.1 --activate
+
+# Bring in the dep tree from stage 1
 COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
+COPY --from=deps /app/packages/types/node_modules ./packages/types/node_modules
+
+# Copy source (after .dockerignore trim — context should be small)
 COPY . .
 
-# Generate Prisma client for linux-musl (Alpine)
-RUN npx prisma generate
+# Build-time stub DATABASE_URL — prisma.config.ts has a fail-fast guard
+# that throws if DATABASE_URL is unset, and `prisma generate` loads the
+# config file even though it never opens a real connection. The runtime
+# image uses the real DATABASE_URL injected via env vars (docker compose /
+# Swarm secrets), which overrides this stub.
+ENV DATABASE_URL=postgresql://build-stub:stub@localhost:5432/stub
 
-# Build frontend (Vite) and backend (tsup)
-RUN npm run build
+# Generate Prisma client against apps/web/prisma/schema.prisma → apps/web/src/generated/prisma
+RUN pnpm --filter @newshub/web exec prisma generate
+
+# Build frontend (vite → apps/web/dist) + backend (tsup → apps/web/dist/server)
+RUN pnpm --filter @newshub/web build
 
 # =============================================================================
 # Stage 3: Production Runtime
@@ -33,7 +65,14 @@ RUN npm run build
 FROM node:22-alpine3.19 AS runner
 WORKDIR /app
 
-# Install Chromium dependencies for Puppeteer (D-03)
+# Upgrade corepack first — Node 22's bundled corepack ships with outdated
+# signing keys and rejects pnpm 10.x signatures (Cannot find matching keyid).
+# See: https://github.com/nodejs/corepack/issues/612
+RUN npm install -g corepack@latest \
+ && corepack enable \
+ && corepack prepare pnpm@10.32.1 --activate
+
+# Chromium dependencies for Puppeteer (D-03; preserved from legacy Dockerfile)
 # See: https://pptr.dev/troubleshooting#running-puppeteer-on-alpine
 RUN apk add --no-cache \
     chromium \
@@ -41,42 +80,77 @@ RUN apk add --no-cache \
     freetype \
     harfbuzz \
     ca-certificates \
-    ttf-freefont
+    ttf-freefont \
+    wget
 
-# Environment for Puppeteer to use system Chromium
+# Puppeteer points at the system chromium
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
     PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser \
     NODE_ENV=production
 
-# Create non-root user for security (D-05)
+# Non-root user for security (D-05)
 RUN addgroup -S nodejs && adduser -S nodejs -G nodejs
 
-# Copy production dependencies only (reinstall without devDeps)
-COPY package*.json ./
-RUN npm ci --frozen-lockfile --omit=dev --legacy-peer-deps
+# Reinstall workspace deps in production-only mode (slimmer node_modules)
+COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
+COPY apps/web/package.json ./apps/web/
+COPY packages/types/package.json ./packages/types/
+RUN pnpm install --frozen-lockfile --filter @newshub/web... --prod
 
-# Copy Prisma schema and generated client
-COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/src/generated ./src/generated
+# Copy Prisma schema + config + built artifacts from builder.
+# prisma.config.ts is required at runtime by `prisma db push` and
+# `prisma migrate deploy` — without it, Prisma 7 cannot resolve
+# datasource.url (the schema intentionally defers URL definition
+# to the config file, see apps/web/prisma/schema.prisma).
+COPY --from=builder --chown=nodejs:nodejs /app/apps/web/prisma ./apps/web/prisma
+COPY --from=builder --chown=nodejs:nodejs /app/apps/web/prisma.config.ts ./apps/web/prisma.config.ts
+COPY --from=builder --chown=nodejs:nodejs /app/apps/web/src/generated ./apps/web/src/generated
+COPY --from=builder --chown=nodejs:nodejs /app/apps/web/dist ./apps/web/dist
+COPY --from=builder --chown=nodejs:nodejs /app/apps/web/server/instrument.mjs ./apps/web/server/instrument.mjs
+# @newshub/types is a TypeScript-source workspace package (main: "index.ts",
+# no build step). tsup has already inlined its types into dist/server/index.js
+# at build time, so the runtime image doesn't strictly need this — but we copy
+# the source anyway so the pnpm symlink at apps/web/node_modules/@newshub/types
+# resolves to a real file rather than dangling (defensive).
+COPY --from=builder --chown=nodejs:nodejs /app/packages/types/index.ts ./packages/types/index.ts
 
-# Regenerate Prisma client for runtime (ensures platform match)
-RUN npx prisma generate
+# NOTE: We do NOT re-run `prisma generate` here. Builder and runner
+# stages both use node:22-alpine3.19 — same kernel, same musl libc,
+# same Prisma engine binary. The client copied from /app/apps/web/src/generated
+# is platform-compatible. Skipping the regenerate avoids the build-time
+# DATABASE_URL requirement from prisma.config.ts and shaves seconds off
+# the build.
 
-# Copy built artifacts
-COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
-
-# Create logs directory with proper permissions for winston
+# Logs directory for winston
 RUN mkdir -p logs && chown nodejs:nodejs logs
 
-# Switch to non-root user
+# NOTE on Prisma engine permissions:
+# pnpm 10 skips @prisma/engines' postinstall script by default (security
+# feature — see "Ignored build scripts" warning during pnpm install).
+# This means engine binaries aren't pre-staged in node_modules. The first
+# `prisma db push` or `prisma migrate deploy` invocation tries to write
+# the engines lazily, which fails as the non-root nodejs user.
+#
+# We do NOT chown -R /app here — that's prohibitively slow on Docker
+# Desktop + WSL2 (rewrites every metadata entry for ~1500 files in the
+# node_modules tree, often 5+ minutes).
+#
+# Instead, the e2e-stack and production deployments run their schema-init
+# container as root (via 'user: "0:0"' override). The app containers
+# (long-running, network-exposed) stay non-root. Migrations are inherently
+# privileged operations; running them as root in a one-shot container
+# is the standard pattern.
+
 USER nodejs
 
-# Expose port (D-17)
 EXPOSE 3001
 
-# Health check using wget (curl not in alpine by default)
+# Liveness probe — /api/health/db returns 200 when Prisma can SELECT 1.
+# Do NOT use /api/ready here: that endpoint returns 503 during graceful drain
+# (phase 37 plan-05) and would cause Docker/Swarm to kill the container mid-drain.
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
     CMD wget -q --spider http://localhost:3001/api/health/db || exit 1
 
-# Start server (D-16)
-CMD ["node", "dist/server/index.js"]
+# Sentry instrument.mjs MUST be preloaded via --import (matches apps/web/package.json start script).
+# Path is monorepo-relative from /app.
+CMD ["node", "--import", "./apps/web/server/instrument.mjs", "apps/web/dist/server/index.js"]

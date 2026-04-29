@@ -1,0 +1,25 @@
+{
+  "buttons": {
+    "share": "Teilen",
+    "copyLink": "Link kopieren",
+    "copied": "Link kopiert!"
+  },
+  "platforms": {
+    "twitter": "Auf Twitter teilen",
+    "linkedin": "Auf LinkedIn teilen",
+    "facebook": "Auf Facebook teilen",
+    "whatsapp": "Auf WhatsApp teilen"
+  },
+  "myShares": {
+    "title": "Meine Shares",
+    "noShares": "Noch keine Shares",
+    "noSharesBody": "Teile einen Artikel, um hier Statistiken zu sehen.",
+    "views": "{count, plural, one {# Aufruf} other {# Aufrufe}}",
+    "clicks": "{count, plural, one {# Klick} other {# Klicks}}",
+    "sharedOn": "Geteilt am {date}"
+  },
+  "errors": {
+    "shareFailed": "Teilen fehlgeschlagen. Erneut versuchen.",
+    "copyFailed": "Link konnte nicht kopiert werden"
+  }
+}

@@ -36,3 +36,30 @@ dev.db
 
 # Playwright auth state (security: contains session tokens)
 playwright/.auth/user.json
+
+# Load test data with plain passwords
+k6/data/users.json
+
+# Secrets — never commit
+.env
+.env.*
+!.env.example
+apps/web/.env
+apps/web/.env.*
+!apps/web/.env.example
+
+# Test output and coverage
+coverage/
+test-results/
+playwright-report/
+playwright-report-*/
+apps/web/playwright-report/
+apps/web/test-results/
+
+# k6 load-test reports
+summary.html
+summary.json
+
+# Windows / shell-quoting accidents
+nul
+NewsHub/

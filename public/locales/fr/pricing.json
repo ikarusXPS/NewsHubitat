@@ -1,0 +1,65 @@
+{
+  "title": "Choisissez votre forfait",
+  "subtitle": "Debloquez la puissance de l'analyse multi-perspectives",
+  "monthly": "Mensuel",
+  "annual": "Annuel",
+  "perMonth": "/mois",
+  "perYear": "/an",
+  "save2Months": "Economisez 2 mois",
+  "mostPopular": "Le plus populaire",
+  "customPricing": "Sur mesure",
+  "currentPlan": "Plan actuel",
+  "subscribe": "S'abonner",
+  "loading": "Chargement...",
+  "tiers": {
+    "free": {
+      "name": "Gratuit",
+      "description": "Commencez avec les fonctionnalites d'analyse essentielles",
+      "cta": "Commencer"
+    },
+    "premium": {
+      "name": "Premium",
+      "description": "Acces illimite a toutes les fonctionnalites et capacites IA"
+    },
+    "enterprise": {
+      "name": "Enterprise",
+      "description": "Solutions personnalisees pour equipes et organisations",
+      "cta": "Contacter les ventes"
+    }
+  },
+  "features": {
+    "aiQueries": "Requetes d'analyse IA",
+    "readingHistory": "Historique de lecture",
+    "allRegions": "Toutes les 13 regions",
+    "eventMapGlobe": "Carte des evenements & Globe",
+    "timeline": "Chronologie historique",
+    "bookmarks": "Signets illimites",
+    "gamification": "Badges & Classement",
+    "dataExport": "Export de donnees",
+    "comments": "Commentaires d'articles",
+    "aiPersonas": "Personas IA",
+    "realtimeUpdates": "Mises a jour en temps reel",
+    "customPresets": "Prereglages de focus personnalises",
+    "teamCreation": "Espaces d'equipe",
+    "advancedFilters": "Filtres avances",
+    "adFree": "Sans publicite",
+    "teamBilling": "Facturation centralisee",
+    "enterpriseAnalytics": "Analyses Enterprise",
+    "prioritySupport": "Support prioritaire",
+    "sla": "SLA 99,9%"
+  },
+  "badges": {
+    "secure": "Paiement securise",
+    "paymentMethods": "Visa, Mastercard, SEPA",
+    "moneyBack": "Garantie de remboursement 14 jours"
+  },
+  "success": {
+    "title": "Bienvenue dans Premium!",
+    "message": "Votre abonnement est maintenant actif. Profitez d'un acces illimite.",
+    "verifying": "Verification de votre abonnement...",
+    "error": "Une erreur s'est produite. Veuillez contacter le support.",
+    "goHome": "Aller au tableau de bord",
+    "explore": "Commencer a explorer",
+    "redirect": "Redirection vers le tableau de bord dans 3 secondes..."
+  }
+}

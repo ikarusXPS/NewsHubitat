@@ -1,0 +1,106 @@
+{
+  "title": "Teams",
+  "myTeams": "Meine Teams",
+  "createTeam": "Team erstellen",
+  "teamSettings": "Team-Einstellungen",
+  "teamMembers": "Team-Mitglieder",
+  "teamBookmarks": "Team-Lesezeichen",
+  "inviteMember": "Mitglied einladen",
+  "sendInvite": "Einladung senden",
+  "saveToTeam": "Im Team speichern",
+  "personal": "Persoenlich",
+
+  "empty": {
+    "noTeams": {
+      "title": "Noch keine Teams",
+      "description": "Erstellen Sie ein Team, um Lesezeichen zu teilen und mit anderen zusammenzuarbeiten."
+    },
+    "noBookmarks": {
+      "title": "Keine geteilten Lesezeichen",
+      "description": "Speichern Sie Artikel in diesem Team, um sie mit allen Mitgliedern zu teilen."
+    },
+    "noMembers": {
+      "title": "Laden Sie Ihr Team ein",
+      "description": "Senden Sie E-Mail-Einladungen, um Mitglieder hinzuzufuegen."
+    }
+  },
+
+  "roles": {
+    "owner": "Eigentuemer",
+    "admin": "Admin",
+    "member": "Mitglied"
+  },
+
+  "form": {
+    "teamName": "Team-Name",
+    "teamNamePlaceholder": "Team-Name eingeben",
+    "description": "Beschreibung",
+    "descriptionPlaceholder": "Optionale Team-Beschreibung",
+    "email": "E-Mail",
+    "emailPlaceholder": "mitglied@beispiel.de",
+    "role": "Rolle"
+  },
+
+  "validation": {
+    "nameRequired": "Team-Name ist erforderlich",
+    "nameTooShort": "Team-Name muss mindestens 3 Zeichen haben",
+    "nameTooLong": "Team-Name darf maximal 50 Zeichen haben",
+    "emailInvalid": "Bitte geben Sie eine gueltige E-Mail-Adresse ein",
+    "descriptionTooLong": "Beschreibung darf maximal 500 Zeichen haben"
+  },
+
+  "actions": {
+    "leaveTeam": "Team verlassen",
+    "removeMember": "Mitglied entfernen",
+    "deleteTeam": "Team loeschen",
+    "removeBookmark": "Lesezeichen entfernen",
+    "transferOwnership": "Eigentum uebertragen",
+    "changeRole": "Rolle aendern"
+  },
+
+  "confirm": {
+    "leaveTeam": {
+      "title": "Team verlassen",
+      "message": "Sie verlieren den Zugriff auf geteilte Lesezeichen. Dies kann nicht rueckgaengig gemacht werden."
+    },
+    "removeMember": {
+      "title": "Mitglied entfernen",
+      "message": "Dies entfernt {{name}} aus dem Team. Der Zugriff auf geteilte Lesezeichen geht verloren."
+    },
+    "deleteTeam": {
+      "title": "Team loeschen",
+      "message": "Alle Teamdaten einschliesslich Lesezeichen werden nach 7 Tagen geloescht. Dies kann nicht rueckgaengig gemacht werden."
+    },
+    "removeBookmark": {
+      "title": "Lesezeichen entfernen",
+      "message": "Diesen Artikel aus den Team-Lesezeichen entfernen?"
+    }
+  },
+
+  "success": {
+    "teamCreated": "Team erfolgreich erstellt",
+    "inviteSent": "Einladung an {{email}} gesendet",
+    "inviteAccepted": "Sie sind {{team}} beigetreten",
+    "memberRemoved": "Mitglied aus Team entfernt",
+    "bookmarkAdded": "In {{team}} gespeichert",
+    "bookmarkRemoved": "Aus Team-Lesezeichen entfernt",
+    "teamDeleted": "Team geloescht"
+  },
+
+  "errors": {
+    "inviteFailed": "Einladung konnte nicht gesendet werden. Bitte versuchen Sie es erneut.",
+    "teamLimit": "Sie haben das Maximum von 10 Teams erreicht.",
+    "permissionDenied": "Sie haben keine Berechtigung fuer diese Aktion.",
+    "alreadyMember": "Dieser Benutzer ist bereits Team-Mitglied.",
+    "invitePending": "Eine Einladung wurde bereits an diese E-Mail gesendet.",
+    "invalidInvite": "Diese Einladung ist ungueltig oder abgelaufen.",
+    "cannotRemoveOwner": "Team-Eigentuemer kann nicht entfernt werden.",
+    "ownerCannotLeave": "Eigentuemer kann nicht verlassen. Uebertragen Sie zuerst das Eigentum."
+  },
+
+  "addedBy": "Hinzugefuegt von {{name}}",
+  "members_one": "{{count}} Mitglied",
+  "members_other": "{{count}} Mitglieder",
+  "bookmarks_one": "{{count}} Lesezeichen",
+  "bookmarks_other": "{{count}} Lesezeichen"
+}

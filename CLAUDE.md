@@ -6,174 +6,174 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 NewsHub is a multi-perspective global news analysis platform. It aggregates news from 130 sources across 13 regions, with real-time translation, sentiment analysis, perspective comparison visualization, and AI-powered insights.
 
+## Planning Workflow (.planning/)
+
+This repo is driven by the GSD planning system. Read these before resuming work:
+
+- `.planning/STATE.md` — Current milestone, phase, in-flight plan, and decisions log (read first)
+- `.planning/ROADMAP.md` — Phase breakdown, dependencies, and goals
+- `.planning/PROJECT.md` — Product vision and core value
+- `.planning/phases/<NN-name>/` — Per-phase artifacts: `PLAN.md`, `RESEARCH.md`, `CONTEXT.md`, `SUMMARY.md`, `UAT.md`, `VERIFICATION.md`
+- `.planning/debug/` — Active debug sessions (anything not `*-resolved*` is unresolved)
+- `.planning/todos/pending/` — Pending operational todos
+
+When picking up a phase, read its `PLAN.md` plus the relevant Decisions rows in `STATE.md`. Don't duplicate decisions into new docs — append to STATE.md.
+
+## Monorepo Structure
+
+This is a pnpm monorepo with workspace packages:
+
+```
+NewsHub/
+├── apps/
+│   └── web/                    # Main web application (frontend + backend)
+│       ├── src/                # React frontend
+│       ├── server/             # Express backend
+│       ├── prisma/             # Database schema
+│       └── e2e/                # Playwright tests
+├── packages/
+│   └── types/                  # Shared TypeScript types (@newshub/types)
+├── pnpm-workspace.yaml
+└── package.json                # Root scripts (proxy to apps/web)
+```
+
 ## Commands
 
 ```bash
 # Development
-npm run dev              # Both frontend + backend concurrently
-npm run dev:frontend     # Frontend only (port 5173)
-npm run dev:backend      # Backend only (port 3001)
+pnpm dev                  # Both frontend (5173) + backend (3001)
+pnpm dev:frontend         # Frontend only
+pnpm dev:backend          # Backend only
 
 # Build & Verify (run before committing)
-npm run typecheck && npm run test:run && npm run build
+pnpm typecheck && pnpm test:run && pnpm build
 
 # Quality
-npm run typecheck        # TypeScript validation
-npm run lint             # ESLint validation
+pnpm typecheck            # TypeScript validation (all packages)
+pnpm lint                 # ESLint validation (all packages)
 
-# Unit Testing (Vitest)
-npm run test             # Run unit tests
-npm run test:run         # Run tests once (CI mode)
-npm run test:coverage    # Coverage report (80% threshold)
+# Unit Testing (Vitest) - 80% coverage enforced
+pnpm test                 # Run unit tests (watch mode)
+pnpm test:run             # Run tests once (CI mode)
+pnpm test:coverage        # Coverage report (fails below 80%)
 
 # E2E Testing (Playwright)
-npm run test:e2e         # Playwright headless
-npm run test:e2e:headed  # Playwright with browser visible
-npm run test:e2e:ui      # Interactive UI mode
+pnpm test:e2e             # Playwright headless
+pnpm test:e2e:headed      # Playwright with browser visible
+pnpm test:e2e:ui          # Interactive UI mode
 
 # Database (Prisma + PostgreSQL)
-docker compose up -d     # Start PostgreSQL container
-npx prisma generate      # Generate Prisma client
-npx prisma db push       # Sync schema to PostgreSQL
-npx prisma studio        # Database GUI (localhost:5555)
+docker compose up -d postgres redis   # Start services
+cd apps/web && npx prisma generate    # Generate client (after schema changes)
+cd apps/web && npx prisma db push     # Sync schema to database
+cd apps/web && npx prisma studio      # Database GUI (localhost:5555)
 
 # Seed Data
-npm run seed             # Run all seed scripts (badges + personas)
-npm run seed:badges      # Seed gamification badges only
-npm run seed:personas    # Seed AI personas only
+pnpm seed                 # All seed scripts (badges + personas)
+pnpm seed:badges          # Gamification badges only
+pnpm seed:personas        # AI personas only
+pnpm seed:load-test       # Pre-create 100 verified test users (loadtest1-100@example.com)
 
-# Docker (Production)
-docker compose build app          # Build app container
-docker compose up -d              # Start all services (app, postgres, redis)
-docker compose ps                 # Check container health
-docker compose logs -f app        # Watch app logs
+# Load Testing (k6)
+pnpm load:smoke           # Quick smoke scenario
+pnpm load:full            # Full load scenario
+# Manual via GitHub Actions: workflow_dispatch on load-test.yml (STAGING_URL only)
+
+# OpenAPI Spec
+cd apps/web && pnpm openapi:generate   # Regenerate public/openapi.json from Zod schemas
+
+# CI Validation
+pnpm validate:ci          # Validate .github/workflows/ci.yml syntax
 
 # Run Single Tests
-npm run test -- src/lib/utils.test.ts           # Single unit test file
-npm run test -- -t "mapCentering"               # Tests matching pattern
-npx playwright test e2e/auth.spec.ts            # Single E2E test file
+pnpm test -- apps/web/src/lib/utils.test.ts      # Single unit test file
+pnpm test -- -t "mapCentering"                   # Tests matching pattern
+cd apps/web && npx playwright test e2e/auth.spec.ts  # Single E2E test
+
+# Docker (Production)
+docker compose up -d      # All services (app, postgres, redis, prometheus, grafana)
+docker compose logs -f app
+
+# Monitoring (included in docker compose)
+# Prometheus: localhost:9090 | Grafana: localhost:3000 (admin/admin)
 ```
 
 ## Tech Stack
 
-- **Frontend**: React 19.2 + Vite 8 + TypeScript 6 + Tailwind CSS v4
-- **State**: Zustand v5 (persisted to localStorage under `newshub-storage`)
-- **Server State**: TanStack Query v5 (5-min refetch, 2-min stale time)
+- **Frontend**: React 19 + Vite 8 + TypeScript 6 + Tailwind CSS v4
+- **State**: Zustand v5 (localStorage `newshub-storage`) + TanStack Query v5
 - **Visualization**: Recharts 3, globe.gl 2, Leaflet 1.9
 - **Backend**: Express 5 (TypeScript, ES modules)
 - **Database**: PostgreSQL via Prisma 7 (adapter: @prisma/adapter-pg)
-- **Real-time**: Socket.io for WebSocket updates
-- **AI**: Multi-provider fallback (Gemini → OpenRouter → Anthropic)
+- **Real-time**: Socket.io
+- **AI**: Multi-provider fallback (OpenRouter → Gemini → Anthropic)
 - **Translation**: Multi-provider chain (DeepL → Google → LibreTranslate → Claude)
+- **Testing**: Vitest (unit, 80% coverage) + Playwright (E2E)
+- **Monitoring**: Prometheus + Grafana + Alertmanager; Sentry for errors
 
 ## Architecture
 
-### Frontend (`src/`)
+### Frontend (`apps/web/src/`)
 - **Routing**: React Router v7 with lazy-loaded pages via Suspense
 - **State**: Zustand store for UI (theme, language, filters, bookmarks, feed settings, reading history)
 - **Data Fetching**: TanStack Query with error/loading states
 - **Auth**: Context API with JWT in localStorage
+- **Offline Sync**: `services/syncService.ts` queues actions in IndexedDB when offline
 
-### Backend (`server/`)
+### Backend (`apps/web/server/`)
 - **Singleton Services**: All services use `getInstance()` pattern
 - **Data Flow**: RSS/HTML crawl → Dedup → Sentiment → Translation → Database/Cache
-- **Database**: PostgreSQL via Prisma, schema at `prisma/schema.prisma`
 - **Generated Client**: `src/generated/prisma/` (do not edit)
 - **Caching**: Redis for JWT blacklist, rate limits, AI responses; in-memory fallback
-- **Real-time**: WebSocket service for live updates via Socket.io
-- **Background Jobs**: Cleanup service for expired tokens and unverified accounts
-- **Rate Limiting**: Tiered (auth 5/min, AI 10/min, news 100/min) via express-rate-limit + Redis
+- **Rate Limiting**: Tiered (auth 5/min, AI 10/min, news 100/min)
 
-### Key Services (`server/services/`)
+### Key Services (`apps/web/server/services/`)
 | Service | Purpose |
 |---------|---------|
 | `newsAggregator.ts` | Orchestrates RSS fetching, dedup, and storage |
 | `aiService.ts` | Multi-provider AI with fallback chain |
 | `translationService.ts` | Multi-provider translation chain |
 | `websocketService.ts` | Real-time updates via Socket.io |
-| `cleanupService.ts` | Background cleanup for tokens/accounts |
-| `stealthScraper.ts` | Puppeteer-based scraping with stealth plugins |
-| `personaService.ts` | AI persona management |
-| `emailService.ts` | Email digest and notifications |
-| `syncService.ts` | Background sync with IndexedDB queue for offline actions |
-| `cacheService.ts` | Redis wrapper with JWT blacklist and graceful degradation |
+| `cleanupService.ts` | Daily cleanup: unverified accounts (30d), analytics (90d) |
+| `cacheService.ts` | Redis wrapper with graceful degradation |
+| `teamService.ts` | Team collaboration features |
+| `commentService.ts` | Article comments with threading |
+| `subscriptionService.ts` | Stripe subscription management |
 
-### Key Directories
-| Directory | Purpose |
-|-----------|---------|
-| `src/components/` | React components (SignalCard, GlobeView, NewsFeed, etc.) |
-| `src/pages/` | Route pages (Dashboard, Analysis, Monitor, Timeline, EventMap, Community) |
-| `src/store/` | Zustand store with state slices |
-| `src/types/` | TypeScript definitions |
-| `server/routes/` | API endpoints (news, translate, auth, ai, events) |
-| `server/services/` | Business logic services |
-| `server/config/sources.ts` | 130 news source configurations |
-| `prisma/schema.prisma` | Database schema |
-| `server/config/aiProviders.ts` | AI model and cache configuration |
+### Shared Types (`packages/types/`)
+Import shared types from `@newshub/types`:
+```typescript
+import type { PerspectiveRegion, NewsArticle, ApiResponse } from '@newshub/types';
+```
 
-## Database Models
+## Database Schema (`apps/web/prisma/schema.prisma`)
 
 ### Core Models
-- `NewsArticle` - Articles with translations stored as JSONB (`titleTranslated`, `contentTranslated`)
-- `NewsSource` - 130 configured news sources with bias metadata
-- `User` - Authentication with email verification, password reset, token versioning
-- `Bookmark` - User article bookmarks
+- `NewsArticle` - Articles with JSONB translations (`titleTranslated`, `contentTranslated`)
+- `NewsSource` - 130 news sources with bias metadata
+- `User` - Auth with email verification, OAuth (Google/GitHub), token versioning
+- `Bookmark` / `ReadingHistory` - User article interactions
 
 ### Feature Models
 - `StoryCluster` - Topic clustering with perspective analysis
 - `EmailSubscription` / `EmailDigest` - Email digest feature
 - `AIPersona` / `UserPersona` - Customizable AI personalities (8 built-in)
 - `SharedContent` / `ShareClick` - Social sharing analytics
+- `Comment` - Threaded article comments
+- `Team` / `TeamMember` / `TeamBookmark` / `TeamInvite` - Team collaboration
+- `ApiKey` - Developer API keys with tier-based rate limits
 
 ### Gamification Models
 - `Badge` - Achievement badges with tiers (bronze, silver, gold, platinum)
 - `UserBadge` - User earned badges with progress tracking
-- `LeaderboardSnapshot` - Periodic leaderboard snapshots (weekly, monthly, all-time)
-
-## Store State Slices
-
-The Zustand store (`src/store/index.ts`) manages all client-side state:
-
-```typescript
-interface AppState {
-  // Core UI
-  theme: 'dark' | 'light';
-  language: 'de' | 'en';
-  filters: FilterState;
-
-  // Feed Manager - source control
-  feedState: {
-    enabledSources: Record<string, boolean>;  // sourceId → enabled
-    customFeeds: CustomFeed[];                // user-created feed presets
-    activeSourceFilter: string | null;        // single-source filter mode
-  };
-
-  // Read Marking - article tracking
-  readState: {
-    readArticles: string[];      // article IDs marked as read
-    hideReadArticles: boolean;   // toggle to hide read articles
-  };
-
-  // Reading History (with pause/resume)
-  readingHistory: ReadingHistoryEntry[];
-  isHistoryPaused: boolean;
-
-  // User Features
-  bookmarkedArticles: string[];
-  activeFocusPreset: FocusPreset | null;
-  customPresets: FocusPreset[];
-}
-```
-
-Key actions: `toggleSource()`, `markAsRead()`, `toggleHideReadArticles()`, `setActiveSourceFilter()`, `pauseHistory()`, `resumeHistory()`
+- `LeaderboardSnapshot` - Periodic leaderboard snapshots
 
 ## Key Patterns
 
 ### Query Key Synchronization (CRITICAL)
-Components sharing the same data MUST use identical `queryKey` values to share the React Query cache:
+Components sharing data MUST use identical `queryKey` values:
 
 ```typescript
-// CORRECT: Same key = shared cache = consistent data
 // Monitor.tsx AND EventMap.tsx both use:
 queryKey: ['geo-events']
 staleTime: 60_000
@@ -181,25 +181,16 @@ refetchInterval: 2 * 60_000
 ```
 
 ### Multi-Provider AI Fallback
-The AI service (`server/services/aiService.ts`) uses a fallback chain:
-1. **Gemini** (free tier, 1500 req/day) - Primary
-2. **OpenRouter** (multi-model, paid) - Secondary
+The AI service uses a fallback chain:
+1. **OpenRouter** (free models) - Primary
+2. **Gemini** (free tier, 1500 req/day) - Secondary
 3. **Anthropic** (premium) - Fallback
-
-If all providers fail, keyword-based analysis is used as final fallback.
+4. Keyword-based analysis - Final fallback
 
 ### Graceful Degradation
-Components that might fail should return `null` on error:
-
 ```typescript
-const { data, error } = useQuery({
-  queryKey: ['data'],
-  queryFn: fetchData,
-  retry: 1,
-});
-
+const { data, error } = useQuery({ queryKey: ['data'], queryFn: fetchData, retry: 1 });
 if (error) return null;  // Don't break the page
-if (!data) return null;
 ```
 
 ### Class Utility
@@ -235,38 +226,94 @@ interface ApiResponse<T> {
 | `/api/auth/register` | POST | Create account (triggers email verification) |
 | `/api/auth/login` | POST | Login (returns JWT) |
 | `/api/auth/me` | GET | Current user (Bearer token) |
-| `/api/auth/verify-email` | POST | Verify email with token |
-| `/api/auth/request-password-reset` | POST | Request password reset email |
 | `/api/analysis/clusters` | GET | Topic clustering (`?summaries=true` for AI) |
 | `/api/ai/ask` | POST | RAG Q&A `{question, context[]}` |
 | `/api/events/geo` | GET | Geo-located events |
 | `/api/events/timeline` | GET | Historical event timeline |
-| `/api/news/sentiment` | GET | Sentiment statistics by region |
-| `/api/analysis/framing` | GET | Framing comparison by topic |
+| `/api/comments/:articleId` | GET/POST | Article comments |
+| `/api/teams` | GET/POST | Team management |
 | `/api/health` | GET | Server status |
-| `/api/health/db` | GET | PostgreSQL connectivity (for Docker healthcheck) |
-| `/api/health/redis` | GET | Redis connectivity and stats |
-| `/api/bookmarks` | POST | Create bookmark (auth required, idempotent) |
-| `/api/history` | POST | Create reading history entry (auth required) |
+| `/api/metrics` | GET | Prometheus metrics |
+
+## Public API & OpenAPI
+
+External developers consume `apps/web/server/routes/publicApi.ts`, gated by API keys.
+
+- **Key format:** `nh_{env}_{random}_{checksum}` (Stripe-inspired); `bcrypt` factor 10 hashing
+- **Header:** `X-API-Key` (per OpenAPI security scheme)
+- **Limits:** Max 3 keys per user (prevents rate-limit bypass via key multiplication); checksum pre-validation prevents wasteful DB lookups
+- **Rate limiting:** Keyed by API key ID (NAT/VPN friendly); IETF `RateLimit-*` headers
+- **Spec source:** Code-first via `@asteasolutions/zod-to-openapi` — Zod schemas in `server/openapi/schemas.ts` are the single source of truth for runtime validation AND API docs
+- **Docs UI:** Scalar at `/api-docs`; spec served from `/openapi.json`
+- **Cache:** Validated keys cached 5 min in Redis (only first 15 chars stored as identifier for security)
+
+## Subscription Tiers (Stripe)
+
+Tiered access enforced via middleware. Tiers: `FREE` / `PREMIUM` / `ENTERPRISE`.
+
+- **SDK:** `stripe@22.1.0`, API version pinned to `2024-12-18.acacia`
+- **FREE limits:** 10 AI queries/day, 7-day reading history visibility, 100 history entries (PREMIUM: 1000)
+- **Middleware:**
+  - `requireTier(tier)` — hard gate; returns 403 with `upgradeUrl` for `CANCELED`/`PAUSED`
+  - `attachUserTier` — soft attach without blocking (for tier-aware UI)
+  - `aiTierLimiter` — 24h sliding window for FREE tier AI usage
+- **Grace period:** `PAST_DUE` allows access for 7 days; `CANCELED`/`PAUSED` blocks Premium routes immediately
+- **Webhook (CRITICAL):** Webhook route MUST be registered **before** `express.json()` so the raw body is preserved for HMAC signature verification. Idempotency: 24h dual-storage (Redis + DB).
+- **Security:** Price ID whitelist on checkout (prevents arbitrary price injection); return 200 on processing errors so Stripe doesn't retry duplicates
+- **Cache:** 5-min subscription status TTL; gracefully degrades when `STRIPE_SECRET_KEY` not set
+
+## i18n & PWA
+
+- **i18n:** `react-i18next` + `i18next-icu` for ICU plural rules; languages **DE / EN / FR**
+- **Translation files:** `apps/web/src/i18n/locales/{de,en,fr}/`
+- **Language sync:** Bidirectional between Zustand store and i18next — `useAppStore.subscribe` watches language, syncs to i18next on load (so language persists across sessions)
+- **Date format:** Hybrid — relative ("5 min ago") for < 7 days, absolute ("Apr 23, 2026") for >= 7 days
+- **PWA:** `vite-plugin-pwa` ships service worker + offline shell; install banner via `InstallPromptBanner`
+- **Mobile:** `md:` (768px) is the primary breakpoint, not `lg:`; safe-area insets via CSS `env(safe-area-inset-*)` for notched devices
+
+## CI/CD
+
+- **`.github/workflows/ci.yml`** — Lint, typecheck, test (80% coverage gate), build; Lighthouse CI runs **after deploy-staging on master only** (90+ required for performance / accessibility / best-practices / SEO; Core Web Vitals tracked warn-only)
+- **`.github/workflows/load-test.yml`** — k6 load tests via `workflow_dispatch` against `STAGING_URL` (manual trigger; never runs on production)
+- **Validate locally:** `pnpm validate:ci` (uses `action-validator`)
+- **Sentry:** `@sentry/vite-plugin` uploads source maps during CI build; release tag `newshub@${{ github.sha }}`; environment set per deploy job (staging vs production)
+- **Bundle budget:** 250KB warning threshold (CI annotation, non-blocking)
+- **Artifacts:** Lighthouse reports retained 30 days; load-test JSON+HTML retained 30 days
+
+## Performance Budgets
+
+Codified targets (validated via k6 + Lighthouse):
+
+| Metric | Threshold |
+|--------|-----------|
+| News API p95 | < 500ms |
+| AI API p95 | < 5s |
+| Auth API p95 | < 300ms |
+| LCP / CLS / INP / FCP | < 2s / < 0.05 / < 150ms / < 1.5s (warn-only) |
+| Slow query warning | > 100ms (dev only, via `queryCounter` middleware) |
+| N+1 detection | Warn if request issues > 5 queries (dev only, `AsyncLocalStorage` request scope) |
+
+Dev-only diagnostics are gated by `NODE_ENV !== 'production'`.
 
 ## E2E Testing Structure
 
-Playwright tests are split into authenticated and unauthenticated projects:
+Playwright tests split into authenticated and unauthenticated projects:
 
 ```typescript
-// playwright.config.ts
+// apps/web/playwright.config.ts
 projects: [
   { name: 'setup', testMatch: /.*\.setup\.ts/ },  // Creates auth state
-  { name: 'chromium', ... },                       // Unauthenticated tests
-  {
-    name: 'chromium-auth',
-    storageState: 'playwright/.auth/user.json',   // Auth state file
-    dependencies: ['setup'],                       // Runs after setup
-  },
+  { name: 'chromium', ... },                       // Unauthenticated
+  { name: 'chromium-auth', storageState: 'playwright/.auth/user.json', dependencies: ['setup'] },
 ]
 ```
 
-Auth-required tests (`profile.spec.ts`, `settings.spec.ts`, `history.spec.ts`) run in `chromium-auth` project.
+Debug E2E:
+```bash
+cd apps/web && npx playwright test --debug     # Step-through debugger
+cd apps/web && npx playwright test --ui        # Interactive UI
+cd apps/web && npx playwright show-report      # View last report
+```
 
 ## UI Design System
 
@@ -282,10 +329,11 @@ Auth-required tests (`profile.spec.ts`, `settings.spec.ts`, `history.spec.ts`) r
 PORT=3001
 DATABASE_URL="postgresql://newshub:newshub_dev@localhost:5433/newshub?schema=public"
 REDIS_URL=redis://localhost:6379
+JWT_SECRET=               # Required, minimum 32 characters
 
-# AI (ONE required, priority: Gemini → OpenRouter → Anthropic)
-GEMINI_API_KEY=           # FREE tier - 1500 req/day (recommended)
-OPENROUTER_API_KEY=       # Paid - multi-model access
+# AI (ONE required, priority: OpenRouter → Gemini → Anthropic)
+OPENROUTER_API_KEY=       # FREE tier - multiple free models (recommended)
+GEMINI_API_KEY=           # FREE tier - 1500 req/day
 ANTHROPIC_API_KEY=        # Premium fallback
 
 # Translation (at least one recommended)
@@ -297,17 +345,27 @@ SMTP_HOST=
 SMTP_PORT=
 SMTP_USER=
 SMTP_PASS=
+
+# OAuth (optional)
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+GITHUB_CLIENT_ID=
+GITHUB_CLIENT_SECRET=
+
+# Payments (optional)
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
 ```
 
 ## Adding New Sources
 
-Edit `server/config/sources.ts`:
+Edit `apps/web/server/config/sources.ts`:
 ```typescript
 {
   id: 'source-id',
   name: 'Source Name',
   country: 'XX',
-  region: 'usa' | 'europa' | 'deutschland' | 'nahost' | 'tuerkei' | 'russland' | 'china' | 'asien' | 'afrika' | 'lateinamerika' | 'ozeanien' | 'kanada' | 'alternative',
+  region: 'usa' | 'europa' | 'deutschland' | 'nahost' | ...,
   language: 'en',
   bias: { political: 0, reliability: 8, ownership: 'private' },
   apiEndpoint: 'https://example.com/rss.xml',
@@ -315,20 +373,22 @@ Edit `server/config/sources.ts`:
 }
 ```
 
-## Common Issues & Solutions
+## GDPR Compliance
 
-### Event Counts Differ Between Pages
-**Problem**: Monitor shows different event counts than EventMap.
-**Solution**: Use identical `queryKey`, `staleTime`, and `refetchInterval` values across components.
+### Consent Management
+- `ConsentContext` manages 3 categories: essential (required), preferences, analytics
+- `ConsentBanner` shows on first visit, stores in `newshub-consent` localStorage
 
-### AI Service Not Available
-**Problem**: AI features return errors.
-**Solution**: Configure at least one AI provider in `.env`. The service falls back to keyword-based analysis if all providers fail.
+### Data Retention (automated via cleanupService)
+| Data | Retention |
+|------|-----------|
+| Unverified accounts | 30 days |
+| ShareClick analytics | 90 days |
+| JWT tokens | 7 days (Redis blacklist) |
 
-### Articles Not Clickable in Clusters
-**Problem**: Articles appear as plain text.
-**Solution**: Ensure backend includes `url` field and frontend renders as `<a>` tags.
-
-### Email Verification Not Working
-**Problem**: Users can't verify email.
-**Solution**: Configure SMTP environment variables. Check `cleanupService.ts` for token expiration handling.
+### User Rights
+| Right | Endpoint |
+|-------|----------|
+| Data Export (Art. 20) | `GET /api/account/export?format=json\|csv` |
+| Account Deletion (Art. 17) | `POST /api/account/delete-request` (7-day grace) |
+| History Pause (Art. 18) | `isHistoryPaused` store toggle |
