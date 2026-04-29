@@ -4,8 +4,8 @@ milestone: v1.6
 milestone_name: Infrastructure & Scale
 current_plan: Not started
 status: planning
-last_updated: "2026-04-28T22:51:07.378Z"
-last_activity: 2026-04-28
+last_updated: "2026-04-29T00:00:00.000Z"
+last_activity: 2026-04-29
 progress:
   total_phases: 6
   completed_phases: 2
@@ -95,6 +95,7 @@ Items acknowledged and carried forward from previous milestone close:
 
 ### Roadmap Evolution
 
+- 2026-04-29 — Phase 37 (Horizontal Scaling) context captured via `/gsd-discuss-phase 37`. Decisions locked across 4 areas: WebSocket fanout (`@socket.io/redis-adapter` + Traefik cookie sticky `nh_sticky` + reuse existing Redis); PgBouncer (transaction-mode pooling + `?pgbouncer=true` Prisma flag + `DIRECT_URL` for migrations + 4 replicas × max:20 → pool 25 → PG max_connections 200 + pgbouncer-exporter + Prisma `getPoolStats` Prometheus gauges); Singleton jobs (dedicated `app-worker` Swarm service replicas=1 with `RUN_JOBS=true` env, web replicas drop in-memory NewsAggregator Maps and read via Prisma + `CacheService`, worker emits real-time events via Socket.IO Emitter bound to Redis adapter, full state-sharing refactor lands in Phase 37); Swarm artifact (separate `stack.yml` for Swarm leaving `docker-compose.yml` unchanged for local dev, validation target = 4 web replicas + 1 worker on single-host Swarm, multi-region INFRA-05 satisfied by `docs/multi-region-patterns.md` only, graceful shutdown in-scope: `/api/ready` readiness split + SIGTERM Socket.IO drain with 30s grace + Prisma pool close). Artifacts: `.planning/phases/37-horizontal-scaling/37-CONTEXT.md` + `37-DISCUSSION-LOG.md`. Phase 36.5 work remains the active execution focus; Phase 37 awaits `/gsd-plan-phase 37` after milestone-36 closes.
 - 2026-04-28 — Phase 36.5 inserted after Phase 36.4 (FOLLOW-UP). Goal: close two non-blocking defects surfaced by Plan 36-05 live human-verify but deferred to keep Plan 05 closure scope clean. (FU-1) `customer.subscription.created` webhook handler emits empty error log line on event replay; idempotency rollback works correctly so net behaviour is correct, but the silent error masks a latent bug. (FU-2) `showPremiumBadge` is stored as a standalone boolean on User decoupled from `subscriptionTier`; sidebar tier badge fires from this vanity flag rather than real tier — observed during 36-05 live verify (IKARUSXPS sidebar showed PREMIUM while DB had FREE). NOT part of 36-05 scope: the broader "re-run 36.4-04 D-09 probes against the corrected `authMiddleware → aiTierLimiter` middleware chain" audit is queued separately as a candidate for 36.6. Awaits `/gsd-plan-phase 36.5`.
 - 2026-04-27 — Phase 36.1 inserted after Phase 36 (URGENT). Reason: 36-01 closed without writing the User-model migration that 36-02's `subscriptionService.ts` requires. Discovered during /gsd-execute-phase 36 pre-flight. Blocks 36-05 tests.
 - 2026-04-28 — Phase 36.1 complete. 5 nullable subscription fields + 2 unique indexes added to User model; subscriptionService read-path patched with `?? 'FREE'` / `?? 'ACTIVE'` fallbacks (consequence of nullable schema choice). Larger 36-debt (ProcessedWebhookEvent, ReferralReward, Campaign, StudentVerification, Prisma enums) explicitly deferred to a future phase 36.2 — documented in 36.1-01-SUMMARY.md "Known Stubs".
