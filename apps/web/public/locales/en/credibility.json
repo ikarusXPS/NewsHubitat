@@ -1,0 +1,35 @@
+{
+  "pill": {
+    "label": "Credibility"
+  },
+  "drawer": {
+    "title": "Source credibility",
+    "subDimensions": "Sub-dimensions",
+    "accuracy": "Accuracy",
+    "transparency": "Transparency",
+    "corrections": "Corrections",
+    "disclosure": "These sub-dimensions are AI-attributed estimates, not measured signals.",
+    "score": "Score: {{score}}/100",
+    "close": "Close"
+  },
+  "bias": {
+    "left": "Left-leaning",
+    "center": "Centrist",
+    "right": "Right-leaning"
+  },
+  "confidence": {
+    "low": "Low confidence",
+    "medium": "Medium confidence",
+    "high": "High confidence"
+  },
+  "framing": {
+    "aiGenerated": "AI-generated",
+    "section": {
+      "narrative": "Narrative",
+      "omissions": "Notable omissions",
+      "vocabulary": "Charged vocabulary",
+      "evidenceQuotes": "Evidence quotes"
+    },
+    "noData": "No framing analysis available for this topic."
+  }
+}
