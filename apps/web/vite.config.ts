@@ -56,6 +56,10 @@ export default defineConfig({
       workbox: {
         // Increase max size to include globe-vendor chunk (~2.5MB)
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024, // 3MB
+        // Exclude bundle-visualizer artifact from precache — it's a CI-only
+        // diagnostic file that ships in dist/ but should never be served to
+        // users or precached by the service worker (4+ MB, exceeds limit).
+        globIgnores: ['**/stats.html', '**/stats.html.gz', '**/stats.html.br'],
         // Offline fallback page for failed navigations
         navigateFallback: '/offline.html',
         navigateFallbackDenylist: [/^\/api/],  // Don't intercept API calls
