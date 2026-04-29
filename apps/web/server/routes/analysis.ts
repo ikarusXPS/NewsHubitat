@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import * as newsReadService from '../services/newsReadService';
 import { AIService } from '../services/aiService';
+import logger from '../utils/logger';
 
 export const analysisRoutes = Router();
 
@@ -111,58 +112,42 @@ analysisRoutes.post('/summarize', async (req: Request, res: Response) => {
   });
 });
 
-// Get framing comparison
+// Get framing comparison (Phase 38 D-14: replaced the legacy heuristic
+// per-region sentiment aggregation with the LLM-driven
+// aiService.generateFramingAnalysis pipeline).
 analysisRoutes.get('/framing', async (req: Request, res: Response) => {
-  const topic = req.query.topic as string | undefined;
+  try {
+    const topic = req.query.topic as string | undefined;
+    const localeRaw = req.query.locale as string | undefined;
 
-  const { articles } = await newsReadService.getArticles({
-    search: topic,
-    limit: 100,
-  });
-
-  // Always calculate regions data
-  const byRegion: Record<string, { count: number; avgSentiment: number }> = {};
-
-  for (const article of articles) {
-    if (!byRegion[article.perspective]) {
-      byRegion[article.perspective] = { count: 0, avgSentiment: 0 };
+    if (!topic || topic.trim().length < 2) {
+      res.status(400).json({ success: false, error: 'topic is required (min 2 chars)' });
+      return;
     }
-    byRegion[article.perspective].count++;
-    byRegion[article.perspective].avgSentiment += article.sentimentScore;
-  }
 
-  for (const region of Object.keys(byRegion)) {
-    byRegion[region].avgSentiment /= byRegion[region].count;
-  }
+    const locale: 'de' | 'en' | 'fr' =
+      localeRaw === 'de' || localeRaw === 'en' || localeRaw === 'fr' ? localeRaw : 'en';
 
-  const comparison = await aiService.generateComparison(articles);
+    const analysis = await aiService.generateFramingAnalysis(topic.trim(), locale);
 
-  // Cache for 10 minutes - framing analysis
-  res.set('Cache-Control', 'public, max-age=600');
-  res.set('Vary', 'Accept-Encoding');
+    // Cache for 10 minutes - framing analysis (the AI service caches 24h
+    // internally; the HTTP layer adds short-window CDN/proxy caching).
+    res.set('Cache-Control', 'public, max-age=600');
+    res.set('Vary', 'Accept-Encoding');
 
-  if (!comparison) {
     res.json({
       success: true,
       data: {
-        topic: topic || 'all',
-        regions: byRegion,
-        aiGenerated: false,
+        topic: analysis.topic,
+        locale: analysis.locale,
+        perspectives: analysis.perspectives,
+        aiGenerated: analysis.aiGenerated,
       },
     });
-    return;
+  } catch (err) {
+    logger.error('Framing analysis error:', err);
+    res.status(500).json({ success: false, error: 'Failed to generate framing analysis' });
   }
-
-  res.json({
-    success: true,
-    data: {
-      topic: topic || 'all',
-      regions: byRegion,
-      framing: comparison.framing,
-      bias: comparison.bias,
-      aiGenerated: true,
-    },
-  });
 });
 
 // Coverage gap detection
