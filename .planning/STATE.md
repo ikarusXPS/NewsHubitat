@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Infrastructure & Scale
-current_plan: 37.1-01 (Dockerfile rewrite for pnpm monorepo)
-status: executing
-last_updated: "2026-04-29T10:39:56.419Z"
-last_activity: 2026-04-29 -- Phase 37.1 WS-04 cross-replica fanout VERIFIED (commit 11558a6, test 564ms, log at .planning/phases/37.1-fix-dockerfile-monorepo/37.1-WS04-VERIFICATION-LOG.md). Phase 37 + 37.1 closure-ready.
+current_plan: 38-01 (FactCheck schema + tsvector FTS migration)
+status: planned
+last_updated: "2026-04-29T11:40:00.000Z"
+last_activity: 2026-04-29 -- Phase 38 (Advanced AI Features) planned. 6 plans across 5 waves committed; plan-checker PASSED on revision iteration 2 (2 BLOCKERs fixed: 38-02 wave-shift to depends_on [38-01], 38-RESEARCH §"Open Questions (RESOLVED)" markers). Coverage gates: 7/7 AI requirements + 19/19 D-XX decisions.
 progress:
   total_phases: 6
   completed_phases: 3
-  total_plans: 17
+  total_plans: 23
   completed_plans: 17
-  percent: 100
+  percent: 74
 ---
 
 # State: NewsHub
@@ -21,15 +21,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-26)
 
 **Core value:** Users can see how the same story is covered by different regional perspectives
-**Current focus:** Phase 37.1 — fix-dockerfile-monorepo (planned, awaiting `/gsd-execute-phase 37.1`)
+**Current focus:** Phase 38 — advanced-ai-features (planned, awaiting `/gsd-execute-phase 38`)
 
 ## Current Position
 
-Phase: 37.1
-Plan: 1 of 2
-Current Plan: 37.1-01 (Dockerfile rewrite for pnpm monorepo)
-Status: Planned — ready to execute
-Last activity: 2026-04-29 -- Phase 37.1 WS-04 cross-replica fanout VERIFIED (commit 11558a6, test 564ms, log at .planning/phases/37.1-fix-dockerfile-monorepo/37.1-WS04-VERIFICATION-LOG.md). Phase 37 + 37.1 closure-ready.
+Phase: 38
+Plan: 1 of 6
+Current Plan: 38-01 (FactCheck schema + tsvector FTS migration; [BLOCKING] schema push gate)
+Status: Ready to execute
+Last activity: 2026-04-29 -- Phase 38 planning complete. 6 plans across 5 waves: Wave 1 (38-01 schema), Wave 2 (38-02 services depends_on 38-01), Wave 3 (38-03 routes + 38-04 i18n parallel), Wave 4 (38-05 frontend), Wave 5 (38-06 verification). Plan-checker PASSED iteration 2; all gates pass (7/7 AI-XX requirements, 19/19 D-XX decisions, no forbidden-root paths). Critical research finding: CONTEXT.md D-11 wrong about existing GIN indexes — Plan 38-01 hand-writes the missing tsvector + GIN migration on NewsArticle.title || content.
 
 ```
 v1.6 Progress: [████████████████████] (8 phases incl. 36.4 complete; Phase 36 closed by user-approved human-verify on Plan 05; verifier still owed for 36, 36.3, 36.2 before milestone close)

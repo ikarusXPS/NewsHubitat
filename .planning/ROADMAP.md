@@ -296,8 +296,16 @@ Plans:
   4. User can compare framing analysis showing how different sources cover same topic
   5. User can request fact-check on specific claims with confidence level and source citations
   6. AI analysis results are cached in Redis with 24h TTL to minimize inference costs
-**Plans**: TBD
+**Plans**: 6 plans across 5 waves
 **UI hint**: yes
+
+Plans:
+- [ ] 38-01-PLAN.md — [BLOCKING] Schema foundation: FactCheck Prisma model + tsvector FTS migration + GIN index + db migrate deploy + prisma generate (Wave 1)
+- [ ] 38-02-PLAN.md — Backend services: credibilityService (deterministic) + factCheckReadService (Postgres FTS) + 3 prompts + 3 new aiService methods + CacheKeys extension (Wave 2, depends_on [38-01] — needs regenerated Prisma client)
+- [ ] 38-03-PLAN.md — Routes + Zod OpenAPI: POST /api/ai/fact-check + GET /api/ai/source-credibility/:id + rewritten GET /api/analysis/framing + BearerAuth + openapi:generate (Wave 3, depends_on [38-01, 38-02])
+- [ ] 38-04-PLAN.md — i18n locale files: factcheck.json + credibility.json for DE/EN/FR + i18n.ts namespace registration (Wave 3, depends_on [] — co-scheduled with 38-03 for unified review)
+- [ ] 38-05-PLAN.md — Frontend UI: 6 new components (CredibilityPill, BiasBadge, VerdictPill, FactCheckButton, FactCheckDrawer, CitationCard, CredibilityDrawer) + 2 hooks + FramingComparison rewrite + NewsCard/SourceRow/Article integration (Wave 4, depends_on [38-01, 38-02, 38-03, 38-04])
+- [ ] 38-06-PLAN.md — Verification gate: Playwright E2E factcheck.spec.ts + Redis TTL probes + 38-VERIFICATION.md evidence matrix (Wave 5, depends_on [38-01..38-05])
 
 ### Phase 39: Mobile Apps
 **Goal**: Users can install native iOS and Android apps from app stores with push notifications

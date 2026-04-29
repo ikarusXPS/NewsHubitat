@@ -535,19 +535,21 @@ registry.registerPath({
 | A5 | The fact-check button should fire on `mouseup`/`touchend` not `selectionchange` | Pitfall 5 | LOW — UX detail, easy to swap |
 | A6 | `methodologyMd` should store the language of the requesting user at submit time (not always English), with on-render translation if user later switches language | Q-05 | MEDIUM — affects DB row content; documented as Claude's discretion in CONTEXT.md, recommendation provided |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-> Resolved questions are noted; only items still requiring planner decision are listed.
+> All open questions in this section have been resolved during planning. Each entry retains the original Recommendation: line and is annotated with an explicit RESOLVED: marker recording the chosen disposition and the plan that implements it.
 
 1. **A1: Should the credibility formula clamp the bias-penalty curve differently for high-reliability vs low-reliability sources?**
    - What we know: A reliable source with hard bias (e.g., NYT bias=-0.3, reliability=8) scores 56 today; a less-reliable centrist (reliability=5, bias=0) scores 35. The formula values reliability over bias — which is what experts say (Ad Fontes, Media Bias/Fact Check). [VERIFIED via existing source data in apps/web/server/config/sources.ts:11,21,31,41]
    - What's unclear: Whether bias-penalty should taper at extremes (e.g., max -20 instead of -30) or be quadratic.
    - Recommendation: Ship the linear formula; expose constants as named exports so the planner / a future tuning phase can adjust without touching call sites.
+   - RESOLVED: Linear formula `score = clamp(reliability * 10 + (1 - |politicalBias|) * weight, 0, 100)` per Plan 38-02 `credibilityService.deriveCredibilityScore`. Constants exposed as named exports for future-phase tuning without call-site churn.
 
 2. **A4: Should we also add a per-language tsvector column for higher recall?**
    - What we know: `simple` dictionary skips stemming; `english`/`german`/`french` configurations enable language-specific stemming. Per-language tsvector + index = three GIN indexes per article = 3x storage cost on ~130k articles.
    - What's unclear: Whether the recall improvement from per-language stemming justifies the index cost in Phase 38 timeframe.
    - Recommendation: Single `simple` index for Phase 38. Defer per-language tsvectors to a "Semantic retrieval" phase if recall complaints surface in production.
+   - RESOLVED: Single `simple` config tsvector column per Plan 38-01 migration `20260429120000_38_news_article_fts/migration.sql` (one GIN index, uniform cross-language tokenization, deferred per-language stemming to a future "Semantic retrieval" phase).
 
 3. **Naming the new endpoints — `/api/ai/...` vs `/api/analysis/...`?**
    - What we know: Both `/api/ai` and `/api/analysis` mount the same `authMiddleware + aiTierLimiter + aiRoutes` chain (apps/web/server/index.ts:167-168). Existing convention: `/api/ai/ask`, `/api/ai/propaganda` are interactive AI calls; `/api/analysis/clusters`, `/api/analysis/framing` are batch analytical reads.
@@ -557,6 +559,7 @@ registry.registerPath({
      - `GET  /api/analysis/framing/:topic` (analytical read; reuses existing route file by replacing the heuristic call site)
 
    The split mirrors existing convention. `/source-credibility` could arguably go under `/api/sources/` but no `/sources` route exists today; sticking with `/api/ai/` keeps it under the gate-already-mounted prefix.
+   - RESOLVED: Mixed endpoint placement per Plan 38-03 narrative — `POST /api/ai/fact-check` and `GET /api/ai/source-credibility/:sourceId` (interactive AI calls, mounted under `/api/ai` to inherit `authMiddleware + aiTierLimiter`); `GET /api/analysis/framing` (analytical read, replaces the existing heuristic handler in `routes/analysis.ts`). Both mount points already share the same auth+limiter chain in `apps/web/server/index.ts:167-168`, so tier-gating behavior is uniform across all three routes.
 
 ## Environment Availability
 
