@@ -319,8 +319,32 @@ Plans:
   5. User can authenticate via biometric (Face ID/Touch ID/fingerprint)
   6. App displays cached articles offline in read-only mode
   7. Mobile apps share 60%+ business logic with web through monorepo packages
-**Plans**: TBD
+**Plans**: 6 plans across 4 waves (drafted 2026-04-29..30)
 **UI hint**: yes
+**Plans:**
+
+**Wave 1:**
+- [ ] 39-01-PLAN.md — apps/mobile workspace + Capacitor 8.3.1 init + native plugins (haptics, status-bar, splash, keyboard, app, push-notifications) — MOB-01, MOB-02, MOB-07
+
+**Wave 2** *(blocked on Wave 1 completion)*:
+- [ ] 39-02-PLAN.md — Server: Prisma `PushSubscription`/`KeywordWatch`/`NotificationPreference` + `pushService` + `notificationFanoutService` + Zod routes + `cleanupService` 90d cleanup — MOB-03, MOB-04
+- [ ] 39-03-PLAN.md — Client: `lib/platform.ts::isNativeApp()` + reader-app gate retrofits (UpgradePrompt, TierCard, AIUsageCounter, InstallPromptBanner, useHapticFeedback, SPA 429 consumer) + OfflineBanner per-session dismissibility + i18n DE/EN/FR — MOB-06, MOB-07, MOB-08
+
+**Wave 3** *(blocked on Wave 2 completion)*:
+- [ ] 39-04-PLAN.md — Push end-to-end: `usePushNotifications` hook + `<NotificationsSection />` in SettingsPage + fanout subscriber in `workerEmitter.ts` + 4 trigger systems (breaking, affinity, keyword, digest) + tier/volume/quiet-hours/dedup gates + dead-token cleanup — MOB-03, MOB-04
+
+**Wave 4** *(blocked on Wave 3 completion)*:
+- [ ] 39-05-PLAN.md — Biometric: `@capgo/capacitor-native-biometric@^8.4.2` + `useBiometricAuth` + `AuthContext` JWT hand-off + `BiometricSection` (after NotificationsSection) + iCloud Keychain device-only spike (Pitfall A1) + 3-fail fallback — MOB-05
+- [ ] 39-06-PLAN.md — CI/CD + signing: `mobile-ios.yml` (macos-latest + Fastlane match) + `mobile-android.yml` (ubuntu-latest + base64 keystore) + `apps/mobile/ios/fastlane/{Fastfile,Appfile,Matchfile}` + Android `signingConfigs.release` + `apps/mobile/README.md` runbook — MOB-01, MOB-02 *(autonomous: false — signing-key creation requires user interaction)*
+
+**Cross-cutting constraints (every plan's `must_haves.truths`):**
+- Capacitor 8.3.1 (research 2026-04-29 supersedes CONTEXT.md Q-04 framing of 6.x/7.x)
+- D-08/D-09: iOS/Android builds hide every pricing surface; FREE-tier 429s render generic "feature not available" with `newshub.example` as plain text (no `<a href>`)
+- D-04: FCM + APNs only via single `firebase-admin` SDK; no Web Push / VAPID; no silent payloads
+- D-12: PWA service worker is the only offline storage; no Capacitor SQLite, no eager IndexedDB pre-cache
+- D-13: Code sharing satisfied trivially because `apps/mobile` consumes `apps/web/dist`
+- Reader-app gate single seam: `apps/web/src/lib/platform.ts::isNativeApp()`
+- Fanout hook point: `apps/web/server/jobs/workerEmitter.ts` (consumer of `newsAggregator.ts:287-292`'s emit functions); no new emit point added
 
 ### Phase 40: Content Expansion
 **Goal**: Users can access video and podcast content with transcription for Premium subscribers
