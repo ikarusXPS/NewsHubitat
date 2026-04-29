@@ -745,8 +745,16 @@ describe('CacheKeys', () => {
     expect(CacheKeys.rateLimit('192.168.1.1', '/api/news')).toBe('ratelimit:192.168.1.1:/api/news');
   });
 
-  it('framing() returns correct format', () => {
-    expect(CacheKeys.framing('ukraine-conflict')).toBe('analysis:framing:ukraine-conflict');
+  it('framing() returns correct format with topicHash + locale (Phase 38 D-18)', () => {
+    expect(CacheKeys.framing('ukraine-conflict', 'en')).toBe('ai:framing:ukraine-conflict:en');
+  });
+
+  it('credibility() returns correct format with sourceId + locale (Phase 38 D-18)', () => {
+    expect(CacheKeys.credibility('cnn', 'en')).toBe('ai:credibility:cnn:en');
+  });
+
+  it('factCheck() returns correct format keyed only on claimHash (locale-independent per D-18)', () => {
+    expect(CacheKeys.factCheck('abc123sha256')).toBe('ai:factcheck:abc123sha256');
   });
 
   it('trendingTopics() returns correct format', () => {
