@@ -75,7 +75,8 @@ export const ModelName = {
   ReferralReward: 'ReferralReward',
   Campaign: 'Campaign',
   StudentVerification: 'StudentVerification',
-  ApiKey: 'ApiKey'
+  ApiKey: 'ApiKey',
+  FactCheck: 'FactCheck'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -485,6 +486,25 @@ export const ApiKeyScalarFieldEnum = {
 } as const
 
 export type ApiKeyScalarFieldEnum = (typeof ApiKeyScalarFieldEnum)[keyof typeof ApiKeyScalarFieldEnum]
+
+
+export const FactCheckScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  articleId: 'articleId',
+  claimText: 'claimText',
+  claimHash: 'claimHash',
+  claimLanguage: 'claimLanguage',
+  verdict: 'verdict',
+  confidence: 'confidence',
+  methodologyMd: 'methodologyMd',
+  citationArticleIds: 'citationArticleIds',
+  modelUsed: 'modelUsed',
+  locale: 'locale',
+  createdAt: 'createdAt'
+} as const
+
+export type FactCheckScalarFieldEnum = (typeof FactCheckScalarFieldEnum)[keyof typeof FactCheckScalarFieldEnum]
 
 
 export const SortOrder = {
