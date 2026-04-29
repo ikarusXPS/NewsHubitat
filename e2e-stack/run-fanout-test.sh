@@ -70,7 +70,8 @@ set +e
   node node_modules/vitest/dist/cli.js \
     run \
     --config "$REPO_ROOT/e2e-stack/vitest.config.ts" \
-    --root "$REPO_ROOT/e2e-stack" \
+    --root "$REPO_ROOT/apps/web" \
+    "$REPO_ROOT/e2e-stack/ws-fanout.test.ts" \
     --no-coverage \
     --reporter=verbose
 )

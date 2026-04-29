@@ -15,7 +15,9 @@ export default {
   test: {
     environment: 'node' as const,
     globals: false,
-    include: ['ws-fanout.test.ts'],
+    // No include glob — the test file is passed as an explicit CLI argument
+    // by run-fanout-test.sh. We use --root apps/web so Node resolves
+    // 'socket.io-client' (and other deps) via apps/web/node_modules.
     exclude: ['node_modules'],
     testTimeout: 30000,
     hookTimeout: 30000,
