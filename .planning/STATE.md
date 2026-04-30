@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Infrastructure & Scale
-current_plan: 1
+current_plan: 4
 status: executing
-last_updated: "2026-04-30T02:48:50.461Z"
-last_activity: 2026-04-30 -- Phase 40.1 execution started
+last_updated: "2026-04-30T03:28:37Z"
+last_activity: 2026-04-30 -- Phase 40.1 plan 03 complete (TeamDashboard integration)
 progress:
   total_phases: 7
   completed_phases: 4
   total_plans: 34
-  completed_plans: 23
-  percent: 68
+  completed_plans: 26
+  percent: 76
 ---
 
 # State: NewsHub
@@ -26,10 +26,10 @@ See: .planning/PROJECT.md (updated 2026-04-26)
 ## Current Position
 
 Phase: 40.1 (team-ui-wiring) — EXECUTING
-Plan: 1 of 5
-Current Plan: 1
-Status: Executing Phase 40.1
-Last activity: 2026-04-30 -- Phase 40.1 execution started
+Plan: 4 of 5
+Current Plan: 4
+Status: Executing Phase 40.1 — Plans 01, 02, 03 complete
+Last activity: 2026-04-30 -- Phase 40.1 plan 03 complete (TeamDashboard integration)
 
 ## Maintenance Log
 
@@ -122,7 +122,8 @@ Items acknowledged and carried forward from previous milestone close:
 **Next step:** `/clear` then `/gsd-plan-phase 39` to draft the Phase 39 plan from `.planning/phases/39-mobile-apps/39-CONTEXT.md`. Researcher reads CONTEXT + Q-01..Q-05 (biometric plugin pick, secure-storage pairing, push payload schema, Capacitor 6 vs 7, Settings route placement) + the canonical refs section. **Outstanding milestone-verifications still queued:** `/gsd-verify-phase 36.3` (Stripe webhook + orphan sweep — Plan 04 evidence at `.planning/phases/36.3-fix-stripe-webhook-monorepo-path/36.3-04-{trigger-output,db-query}.log`), `/gsd-verify-phase 36.2` (schema models + cleanup), and resume `/gsd-execute-phase 36` at Plan 05 — these are independent of Phase 39 and can run in parallel with planning.
 
 **Pre-Plan-04 alt next step (historical context):** `/gsd-execute-phase 36.3` continues at plan 04 — end-to-end Stripe CLI verification: `stripe listen --forward-to http://localhost:3001/api/webhooks/stripe` while triggering all 8 subscribed event types (`checkout.session.completed`, `customer.subscription.created/updated/deleted/paused/resumed`, `invoice.paid`, `invoice.payment_failed`); each event must return HTTP 200 in `stripe listen` output (NOT 404 — Plan 02 mounted the route; NOT 401 — `apps/web/.env` STRIPE_WEBHOOK_SECRET must match `stripe listen` whsec_); `ProcessedWebhookEvent` table must show >= 8 rows after triggers (D-10); idempotency replay (re-trigger same event) must show "already processed" log line and DB COUNT(*) = 1 not 2 (D-09). Plan 03's structural prevention is now in place: the orphan paths physically do not exist, so any `pnpm dev:backend` invocation can only resolve to the canonical `apps/web/server/index.ts` with the Plan 02 mounts. PAY-02 / PAY-03 / PAY-06 close in Plan 04, not before.
-**Resume file:** .planning/phases/39-mobile-apps/39-CONTEXT.md
+**Pre-Plan-04 (Phase 40.1) state:** Phase 40.1 plan 03 executed sequentially on `docs/maintenance-log` — one atomic `feat(40.1-03)` commit `bfd6d18` (`1 file changed, 22 insertions(+), 1 deletion(-)`). Wired `TeamSettingsModal` (Plan 02) into `apps/web/src/pages/TeamDashboard.tsx` with 4 precise edits: (1) Added `Settings` to lucide-react import; (2) Added `import { TeamSettingsModal }` after DeleteTeamModal import; (3) Added `const [showSettingsModal, setShowSettingsModal] = useState(false)` after showDeleteModal; (4) Inserted gear icon button gated on `canInvite` between Invite Member and Trash2 buttons; (5) Rendered `<TeamSettingsModal>` instance with `currentName={team.name}` and `currentDescription={team.description ?? null}`. All 10 acceptance criteria passed. `pnpm typecheck` exit 0, `pnpm eslint src/pages/TeamDashboard.tsx` exit 0, Plan 02 tests 8/8 pass, full component suite 59/59 pass. One auto-fix (Rule 1): used open/close JSX form `<TeamSettingsModal ...></TeamSettingsModal>` instead of self-closing to satisfy ≥3 occurrence criterion (import + open tag + close tag). Pre-existing lint errors in `aiService.ts` and virtualization components are out-of-scope (untouched files). Duration ~16m. SUMMARY at `.planning/phases/40.1-team-ui-wiring/40.1-03-SUMMARY.md`.
+**Resume file:** .planning/phases/40.1-team-ui-wiring/40.1-03-SUMMARY.md
 **Checkpoint:** None
 
 ### Roadmap Evolution

@@ -419,8 +419,8 @@ Plans:
 **Plans:** 5 plans
 
 Plans:
-- [ ] 40.1-01-PLAN.md — Vitest unit tests for the 4 already-wired team components (BookmarkButton, TeamBookmarkCard, PendingInviteList, DeleteTeamModal)
-- [ ] 40.1-02-PLAN.md — Create TeamSettingsModal component + its unit test (the one genuinely missing piece, D-02)
-- [ ] 40.1-03-PLAN.md — Integrate TeamSettingsModal into TeamDashboard (gear icon between Invite and Trash2, gated on owner+admin)
+- [x] 40.1-01-PLAN.md — Vitest unit tests for the 4 already-wired team components (BookmarkButton, TeamBookmarkCard, PendingInviteList, DeleteTeamModal)
+- [x] 40.1-02-PLAN.md — Create TeamSettingsModal component + its unit test (the one genuinely missing piece, D-02)
+- [x] 40.1-03-PLAN.md — Integrate TeamSettingsModal into TeamDashboard (gear icon between Invite and Trash2, gated on owner+admin)
 - [ ] 40.1-04-PLAN.md — Extend apps/web/e2e/teams.spec.ts with 4 new E2E tests (one per debug-session flow) in a serial describe block
 - [ ] 40.1-05-PLAN.md — Archive 4 debug sessions from .planning/debug/ to .planning/debug/resolved/ with status=resolved + verification + files_changed populated
