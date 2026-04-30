@@ -303,10 +303,18 @@ test.describe('Team Collaboration', () => {
       await page.goto('/');
       await page.waitForLoadState('domcontentloaded');
 
+      // The chevron-down lives in Dashboard → NewsFeed (lazy) → VirtualizedGrid → SignalCard → BookmarkButton,
+      // and only renders after useTeams() resolves with at least one team. Wait up to 15 s for that whole chain
+      // before deciding to skip — otherwise isVisible() returns false instantly and the serial block cascades.
       const trigger = page.locator('button:has(svg.lucide-bookmark):has(svg.lucide-chevron-down)').first();
-      const visible = await trigger.isVisible().catch(() => false);
-      if (!visible) {
-        test.skip(true, 'No article cards with team-bookmark dropdown visible — likely no articles loaded');
+      try {
+        await trigger.waitFor({ state: 'visible', timeout: 15000 });
+      } catch {
+        // The Dashboard at / mounts NewsFeed in different view modes (signals vs grid) and only
+        // the grid renders BookmarkButton-equipped article cards. In dev with seeded data the
+        // signals view often wins this race. The wiring is proven by unit tests
+        // (apps/web/src/components/BookmarkButton.test.tsx) — skip live exercise here.
+        test.skip(true, 'No article cards with team-bookmark dropdown visible after 15 s — homepage view variance');
         return;
       }
       await trigger.click();
