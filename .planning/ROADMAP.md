@@ -410,3 +410,13 @@ Plans:
 
 *Roadmap created: 2026-04-18*
 *Last updated: 2026-04-28 — Phase 36.4 COMPLETE (4/4 plans verified PASS, 10/10 ROADMAP success criteria + 6/6 PAY requirements). Tier middleware live at apps/web/server/middleware/requireTier.ts (171 lines, 15 unit tests); aiTierLimiter mounted on /api/ai + /api/analysis (FREE 10/day with PREMIUM bypass); /pricing + /subscription/success routes wired in App.tsx with DE/EN/FR locales. D-09 probes all PASS (FREE /api/history meta.tier=FREE; FREE 11th /api/ai/ask returns 429 + upgradeUrl=/pricing; FREE /api/account/export returns 403 + upgradeUrl=/pricing). D-10 anti-pattern audit = 0 forbidden-root files across all 14 phase commits. Phase 36-05 human-verify (paused 2026-04-28 with empty SPA shell at /pricing) is now unblocked. Next: resume `/gsd-execute-phase 36` at Plan 05, then `/gsd-verify-phase 36.3` and `/gsd-verify-phase 36.2`.*
+
+### Phase 40.1: team-ui-wiring (INSERTED)
+
+**Goal:** [Urgent work - to be planned]
+**Requirements**: TBD
+**Depends on:** Phase 40
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 40.1 to break down)
