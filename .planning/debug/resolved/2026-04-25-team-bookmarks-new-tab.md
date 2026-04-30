@@ -1,8 +1,8 @@
 ---
-status: diagnosed
+status: resolved
 trigger: "Team bookmarks can't open in new tab - team bookmarks empty and cant open in new tab"
 created: 2026-04-25T00:00:00Z
-updated: 2026-04-25T00:06:00Z
+updated: 2026-04-30T00:00:00Z
 symptoms_prefilled: true
 goal: find_root_cause_only
 ---
@@ -83,8 +83,19 @@ fix: |
   2. Update TeamBookmark TypeScript interface to include article: { title: string, url: string }
   3. Update TeamDashboard to pass articleTitle and articleUrl from bookmark.article to TeamBookmarkCard
 
-verification:
+  The backend at apps/web/server/routes/teams.ts enriches each bookmark with
+  article: { id, title, url } via separate findMany + map (no Prisma relation, intentional).
+  TeamDashboard.tsx passes articleTitle={bookmark.article?.title} articleUrl={bookmark.article?.url}.
+  TeamBookmarkCard.tsx renders <a href={articleUrl || /article/${articleId}} target="_blank" rel="noopener noreferrer">.
+  All three fixes were made silently between 2026-04-25 and 2026-04-30; phase 40.1 verifies them.
+verification: |
+  - Vitest unit test: apps/web/src/components/teams/TeamBookmarkCard.test.tsx (≥7 tests, all pass)
+  - E2E test: apps/web/e2e/teams.spec.ts > "Phase 40.1 — wired flows" > "team bookmark anchor has target=_blank and non-fallback href"
+  - grep verification on TeamBookmarkCard: `grep -q 'href={articleUrl' apps/web/src/components/teams/TeamBookmarkCard.tsx` exits 0
+  - grep verification on TeamDashboard: `grep -q 'articleUrl={bookmark.article?.url}' apps/web/src/pages/TeamDashboard.tsx` exits 0
 files_changed:
-  - server/routes/teams.ts (add article join in bookmarks query)
-  - src/hooks/useTeamBookmarks.ts (update TeamBookmark interface)
-  - src/pages/TeamDashboard.tsx (pass article props to TeamBookmarkCard)
+  - apps/web/server/routes/teams.ts (article join in GET bookmarks endpoint, pre-40.1 silent fix)
+  - apps/web/src/hooks/useTeamBookmarks.ts (TeamBookmark interface includes article: { id, title, url } | null, pre-40.1 silent fix)
+  - apps/web/src/pages/TeamDashboard.tsx (passes articleTitle + articleUrl to TeamBookmarkCard, pre-40.1 silent fix)
+  - apps/web/src/components/teams/TeamBookmarkCard.test.tsx (new, phase 40.1 plan 01)
+  - apps/web/e2e/teams.spec.ts (new E2E coverage, phase 40.1 plan 04)

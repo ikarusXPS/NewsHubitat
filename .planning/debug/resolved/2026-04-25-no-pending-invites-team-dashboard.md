@@ -1,8 +1,8 @@
 ---
-status: diagnosed
+status: resolved
 trigger: "No pending invites listed in Team Dashboard"
 created: 2026-04-25T10:00:00Z
-updated: 2026-04-25T10:05:00Z
+updated: 2026-04-30T00:00:00Z
 ---
 
 ## Current Focus
@@ -52,6 +52,16 @@ started: Phase 28 UAT
 ## Resolution
 
 root_cause: TeamDashboard.tsx is missing (1) a "Pending Invites" tab/section, (2) import and usage of the useTeamInvites hook, and (3) a UI component to display pending invites. The backend API (GET /api/teams/:teamId/invites) and frontend hook (useTeamInvites) both exist and work correctly, but the TeamDashboard component was never updated to consume and display this data.
-fix:
-verification:
-files_changed: []
+fix: |
+  TeamDashboard.tsx now declares a 3-tab state ('bookmarks' | 'members' | 'invites'),
+  imports useTeamInvites at line 13, renders PendingInviteList on the invites tab (line 260),
+  and shows a count badge (line 200-204). The PendingInviteList component itself was already
+  present. The fix was made silently between 2026-04-25 and 2026-04-30; phase 40.1 verifies it.
+verification: |
+  - Vitest unit test: apps/web/src/components/teams/PendingInviteList.test.tsx (≥5 tests, all pass)
+  - E2E test: apps/web/e2e/teams.spec.ts > "Phase 40.1 — wired flows" > "owner sees Pending Invites tab and sent invites appear in the list"
+  - grep verification: `grep -q "useTeamInvites" apps/web/src/pages/TeamDashboard.tsx` exits 0
+files_changed:
+  - apps/web/src/pages/TeamDashboard.tsx (3rd tab + useTeamInvites + PendingInviteList render, pre-40.1 silent fix)
+  - apps/web/src/components/teams/PendingInviteList.test.tsx (new, phase 40.1 plan 01)
+  - apps/web/e2e/teams.spec.ts (new E2E coverage, phase 40.1 plan 04)
