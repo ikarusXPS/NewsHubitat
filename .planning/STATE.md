@@ -86,7 +86,7 @@ v1.6 Progress: [████████████████████] (9
 | 38 | Advanced AI Features | 7 reqs (AI-01 to AI-07) | Yes | **Complete** (6/6 plans; VERIFICATION.md status=passed 2026-04-29; 6/6 ROADMAP criteria + 7/7 AI-XX + 19/19 D-XX + 0 violations; 1412/1412 unit + 5/5 E2E green) |
 | 39 | Mobile Apps | 8 reqs (MOB-01 to MOB-08) | Yes | Not started |
 | 40 | Content Expansion | 7 reqs (CONT-01 to CONT-07) | Yes | Not started |
-| 40.1 | Team UI Wiring (INSERTED) | Debt-payback Phase 28 v1.4 | Yes | Not planned (4 diagnosed debug sessions bundled — `/gsd-plan-phase 40.1` to break down) |
+| 40.1 | Team UI Wiring (INSERTED) | Debt-payback Phase 28 v1.4 | Yes | **Complete** (5/5 plans; VERIFICATION 15/15 must-haves; UAT 3 PASS + 1 PARTIAL — Test 15 live E2E green, Tests 12/13/14 skip in dev due to homepage view-mode race; covered by 26 unit tests. Two side-fixes shipped during verification: cap FocusSuggestions toast stack height (339d66a), mock focus-suggestions in auth.setup.ts (fba1d73)) |
 
 **Coverage:** 37/37 requirements mapped (100%) — 40.1 is debt-payback, not new requirements
 
