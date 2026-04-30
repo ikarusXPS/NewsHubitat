@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Infrastructure & Scale
-current_plan: 5
-status: idle
-last_updated: "2026-04-30T04:00:00Z"
-last_activity: 2026-04-30
+current_plan: 2
+status: paused
+last_updated: "2026-04-30T05:57:38.095Z"
+last_activity: 2026-04-30 -- Phase 39 plan 01 complete (Capacitor scaffold); paused awaiting Firebase + Apple/Google credentials
 progress:
   total_phases: 7
   completed_phases: 4
   total_plans: 34
-  completed_plans: 28
-  percent: 82
+  completed_plans: 29
+  percent: 85
 ---
 
 # State: NewsHub
@@ -21,15 +21,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-26)
 
 **Core value:** Users can see how the same story is covered by different regional perspectives
-**Current focus:** Phase 40.1 — team-ui-wiring
+**Current focus:** Phase 39 — mobile-apps
 
 ## Current Position
 
-Phase: 40.1 (team-ui-wiring) — COMPLETE
-Plan: 5 of 5 (all complete)
-Current Plan: 5
-Status: Phase 40.1 complete — all 5 plans executed; 4 debug sessions archived to .planning/debug/resolved/
-Last activity: 2026-04-30 -- Phase 40.1 plan 05 complete (debug session archival; phase 40.1 fully done)
+Phase: 39 (mobile-apps) — PAUSED (1/6 plans complete)
+Plan: 2 of 6 (next to execute)
+Current Plan: 2
+Status: Paused after Plan 01 (Capacitor 8.3.1 scaffold) — Firebase/Apple/Google credentials not yet provisioned. Resume via `/gsd-execute-phase 39` once `apps/web/.env` has `FIREBASE_PROJECT_ID/CLIENT_EMAIL/PRIVATE_KEY` for Plan 02 (push backend); Plan 06 additionally needs `APPLE_TEAM_ID`, `APP_STORE_CONNECT_API_*`, `MATCH_*`.
+Last activity: 2026-04-30 -- Phase 39 plan 01 complete (3 commits 35a4c16, 8faac2c, 4f7a902 — apps/mobile/ Capacitor 8.3.1 scaffold; iOS+Android native projects generated; bundle ID com.newshub.app set; pnpm typecheck green; SUMMARY at .planning/phases/39-mobile-apps/39-01-SUMMARY.md)
 
 ## Maintenance Log
 
@@ -67,7 +67,7 @@ v1.6 Progress: [████████████████████] (9
 
 **Milestone:** v1.6 - Infrastructure & Scale
 **Goal:** Comprehensive expansion across infrastructure, AI, mobile, monetization, and content
-**Status:** Ready to execute
+**Status:** Executing Phase 39
 **Previous:** v1.5 complete 2026-04-26
 
 ### Phase Summary

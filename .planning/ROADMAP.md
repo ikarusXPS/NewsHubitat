@@ -324,7 +324,7 @@ Plans:
 **Plans:**
 
 **Wave 1:**
-- [ ] 39-01-PLAN.md — apps/mobile workspace + Capacitor 8.3.1 init + native plugins (haptics, status-bar, splash, keyboard, app, push-notifications) — MOB-01, MOB-02, MOB-07
+- [x] 39-01-PLAN.md — apps/mobile workspace + Capacitor 8.3.1 init + native plugins (haptics, status-bar, splash, keyboard, app, push-notifications) — MOB-01, MOB-02, MOB-07 *(complete 2026-04-30)*
 
 **Wave 2** *(blocked on Wave 1 completion)*:
 - [ ] 39-02-PLAN.md — Server: Prisma `PushSubscription`/`KeywordWatch`/`NotificationPreference` + `pushService` + `notificationFanoutService` + Zod routes + `cleanupService` 90d cleanup — MOB-03, MOB-04
