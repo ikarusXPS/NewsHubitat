@@ -4,7 +4,7 @@
 
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Users, Bookmark, UserPlus, Loader2, ArrowLeft, Mail, Trash2 } from 'lucide-react';
+import { Users, Bookmark, UserPlus, Loader2, ArrowLeft, Mail, Trash2, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '../lib/utils';
 import { useAuth } from '../contexts/AuthContext';
@@ -17,6 +17,7 @@ import { TeamRoleBadge } from '../components/teams/TeamRoleBadge';
 import { InviteModal } from '../components/teams/InviteModal';
 import { PendingInviteList } from '../components/teams/PendingInviteList';
 import { DeleteTeamModal } from '../components/teams/DeleteTeamModal';
+import { TeamSettingsModal } from '../components/teams/TeamSettingsModal';
 
 export function TeamDashboard() {
   const { teamId } = useParams();
@@ -25,6 +26,7 @@ export function TeamDashboard() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [activeTab, setActiveTab] = useState<'bookmarks' | 'members' | 'invites'>('bookmarks');
 
   const { team, isLoading: teamLoading } = useTeam(teamId);
@@ -115,6 +117,16 @@ export function TeamDashboard() {
             >
               <UserPlus className="h-4 w-4" />
               <span>{t('inviteMember', 'Invite Member')}</span>
+            </button>
+          )}
+          {canInvite && (
+            <button
+              onClick={() => setShowSettingsModal(true)}
+              className="p-2 rounded-lg text-gray-400 hover:text-[#00f0ff] hover:bg-[rgba(0,240,255,0.1)] transition-colors"
+              title={t('settings.title', 'Team Settings')}
+              aria-label={t('settings.title', 'Team Settings')}
+            >
+              <Settings className="h-5 w-5" />
             </button>
           )}
           {team.role === 'owner' && (
@@ -268,6 +280,15 @@ export function TeamDashboard() {
         teamId={teamId!}
         teamName={team.name}
       />
+
+      {/* Team Settings Modal */}
+      <TeamSettingsModal
+        isOpen={showSettingsModal}
+        onClose={() => setShowSettingsModal(false)}
+        teamId={teamId!}
+        currentName={team.name}
+        currentDescription={team.description ?? null}
+      ></TeamSettingsModal>
 
       {/* Delete Team Modal */}
       <DeleteTeamModal
