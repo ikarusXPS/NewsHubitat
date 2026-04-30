@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Infrastructure & Scale
 current_plan: 5
-status: executing
-last_updated: "2026-04-30T03:45:36Z"
+status: idle
+last_updated: "2026-04-30T04:00:00Z"
 last_activity: 2026-04-30
 progress:
   total_phases: 7
   completed_phases: 4
   total_plans: 34
-  completed_plans: 27
-  percent: 79
+  completed_plans: 28
+  percent: 82
 ---
 
 # State: NewsHub
@@ -25,11 +25,11 @@ See: .planning/PROJECT.md (updated 2026-04-26)
 
 ## Current Position
 
-Phase: 40.1 (team-ui-wiring) — EXECUTING
-Plan: 5 of 5
+Phase: 40.1 (team-ui-wiring) — COMPLETE
+Plan: 5 of 5 (all complete)
 Current Plan: 5
-Status: Executing Phase 40.1 — Plans 01, 02, 03, 04 complete
-Last activity: 2026-04-30 -- Phase 40.1 plan 04 complete (4 E2E tests for team wiring flows)
+Status: Phase 40.1 complete — all 5 plans executed; 4 debug sessions archived to .planning/debug/resolved/
+Last activity: 2026-04-30 -- Phase 40.1 plan 05 complete (debug session archival; phase 40.1 fully done)
 
 ## Maintenance Log
 
