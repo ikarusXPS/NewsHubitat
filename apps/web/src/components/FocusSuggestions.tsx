@@ -89,7 +89,7 @@ export function FocusSuggestions() {
   if (suggestions.length === 0) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 space-y-3 max-w-md">
+    <div className="fixed bottom-4 right-4 z-50 space-y-3 max-w-md max-h-[calc(100vh-4rem)] overflow-y-auto pointer-events-auto">
       <AnimatePresence>
         {suggestions.map((suggestion, index) => (
           <motion.div
