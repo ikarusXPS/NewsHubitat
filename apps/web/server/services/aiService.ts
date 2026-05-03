@@ -1,11 +1,151 @@
 import Anthropic from '@anthropic-ai/sdk';
 import OpenAI from 'openai';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { z } from 'zod';
+import * as crypto from 'crypto';
 import type { NewsArticle, PerspectiveRegion, Sentiment } from '../../src/types';
 import logger from '../utils/logger';
 import { hashString } from '../utils/hash';
 import { AI_CONFIG } from '../config/aiProviders';
-import { CacheService, CacheKeys } from './cacheService';
+import { CacheService, CacheKeys, CACHE_TTL } from './cacheService';
+import {
+  deriveCredibilityScore,
+  deriveBiasBucket,
+  bucketConfidence,
+} from './credibilityService';
+import { buildCredibilityPrompt } from '../prompts/credibilityPrompt';
+import { buildFramingPrompt } from '../prompts/framingPrompt';
+import { buildFactCheckPrompt } from '../prompts/factCheckPrompt';
+import { NEWS_SOURCES } from '../config/sources';
+import * as newsReadService from './newsReadService';
+import { searchClaimEvidence, mergeAndDedup } from './factCheckReadService';
+import { TranslationService } from './translationService';
+import { prisma } from '../db/prisma';
+import type { Prisma } from '../../src/generated/prisma/client';
+
+/**
+ * Defensive JSON-extract from LLM responses. Free OpenRouter / Gemma models
+ * do not honor `response_format: json_object`, so we extract the first {...}
+ * block from the response text and validate it against a Zod schema. Returns
+ * `null` on any failure (the caller is expected to provide a typed fallback).
+ *
+ * Per RESEARCH.md Pitfall 1 + Pattern 2.
+ */
+export function safeParseJson<T>(raw: string, schema: z.ZodType<T>): T | null {
+  if (!raw) return null;
+  const match = raw.match(/\{[\s\S]*\}/);
+  if (!match) return null;
+  try {
+    const parsed = JSON.parse(match[0]) as unknown;
+    const result = schema.safeParse(parsed);
+    return result.success ? result.data : null;
+  } catch {
+    return null;
+  }
+}
+
+// ---- Phase 38 service-layer types ----
+
+export type Locale = 'de' | 'en' | 'fr';
+
+export interface CredibilitySubDimensions {
+  accuracy: number;
+  transparency: number;
+  corrections: number;
+}
+
+export interface CredibilityResult {
+  sourceId: string;
+  score: number; // 0-100, deterministic
+  bias: 'left' | 'center' | 'right';
+  subDimensions: CredibilitySubDimensions; // LLM-attributed
+  methodologyMd: string;
+  confidence: 'low' | 'medium' | 'high';
+  generatedAt: string; // ISO
+  locale: Locale;
+}
+
+const credibilityLlmSchema = z.object({
+  subDimensions: z.object({
+    accuracy: z.number().int().min(0).max(100),
+    transparency: z.number().int().min(0).max(100),
+    corrections: z.number().int().min(0).max(100),
+  }),
+  methodologyMd: z.string().min(1),
+});
+
+export interface FramingPerspective {
+  narrative: string;
+  omissions: string[];
+  vocabulary: string[];
+  evidenceQuotes: string[];
+}
+
+export interface FramingAnalysis {
+  topic: string;
+  locale: Locale;
+  perspectives: Partial<Record<PerspectiveRegion, FramingPerspective>>;
+  aiGenerated: boolean;
+}
+
+const framingLlmSchema = z.object({
+  perspectives: z.record(
+    z.string(),
+    z.object({
+      narrative: z.string(),
+      omissions: z.array(z.string()).max(5),
+      vocabulary: z.array(z.string()).max(10),
+      evidenceQuotes: z.array(z.string()).max(5),
+    }),
+  ),
+});
+
+const VALID_PERSPECTIVE_REGIONS: PerspectiveRegion[] = [
+  'usa',
+  'europa',
+  'deutschland',
+  'nahost',
+  'tuerkei',
+  'russland',
+  'china',
+  'asien',
+  'afrika',
+  'lateinamerika',
+  'ozeanien',
+  'kanada',
+  'alternative',
+];
+
+// ---- Phase 38 fact-check types (Task 7) ----
+
+export type Verdict = 'true' | 'mostly-true' | 'mixed' | 'unverified' | 'false';
+
+export interface FactCheckCitation {
+  articleId: string;
+  title: string;
+  sourceName: string;
+  region: PerspectiveRegion;
+  url: string;
+}
+
+export interface FactCheckResult {
+  factCheckId: string;
+  verdict: Verdict;
+  confidence: number; // 0-100 raw
+  confidenceBucket: 'low' | 'medium' | 'high';
+  methodologyMd: string;
+  citations: FactCheckCitation[]; // up to 5 (D-13)
+  locale: Locale;
+  generatedAt: string;
+  cached: boolean;
+}
+
+const factCheckLlmSchema = z.object({
+  verdict: z.enum(['true', 'mostly-true', 'mixed', 'unverified', 'false']),
+  confidence: z.number().int().min(0).max(100),
+  citationIndices: z.array(z.number().int().min(1)).max(5),
+  methodologyMd: z.string().min(1),
+});
 
 interface ClusterSummary {
   topic: string;
@@ -575,6 +715,468 @@ Response format: ["topic1", "topic2", ...]`;
     }
 
     return topics.length > 0 ? topics : ['politics'];
+  }
+
+  // ===========================================================================
+  // Phase 38 — Source credibility (Plan 38-02 Task 5)
+  //
+  // Returns a 0-100 deterministic credibility score (computed via
+  // credibilityService) plus an LLM-attributed methodology paragraph + sub-
+  // dimensions. The result is cached for 24h at CacheKeys.credibility per
+  // CONTEXT.md D-03 + D-18.
+  //
+  // Falls back gracefully on three error paths:
+  //   1. Unknown source → score=0 + "Source not found" methodology
+  //   2. LLM all-providers-failed → deterministic-only result with
+  //      sub-dimensions == score and a localized fallback methodology
+  //   3. LLM JSON malformed → same as (2)
+  //
+  // Per CONTEXT.md D-01/D-02/D-03/D-15 + D-18.
+  // ===========================================================================
+
+  async getSourceCredibility(sourceId: string, locale: Locale): Promise<CredibilityResult> {
+    return this.cacheService.getOrSet(
+      CacheKeys.credibility(sourceId, locale),
+      () => this.computeCredibility(sourceId, locale),
+      CACHE_TTL.DAY,
+    );
+  }
+
+  private async computeCredibility(
+    sourceId: string,
+    locale: Locale,
+  ): Promise<CredibilityResult> {
+    const source = NEWS_SOURCES.find((s) => s.id === sourceId);
+    if (!source) {
+      return this.fallbackCredibility(
+        sourceId,
+        locale,
+        0,
+        { accuracy: 0, transparency: 0, corrections: 0 },
+        this.sourceNotFoundMessage(locale),
+      );
+    }
+
+    const score = deriveCredibilityScore(source);
+    const bias = deriveBiasBucket(source.bias.political);
+
+    // The LLM is asked to fill in sub-dimensions and a localized methodology.
+    const prompt = buildCredibilityPrompt({
+      sourceName: source.name,
+      reliability: source.bias.reliability,
+      politicalBias: source.bias.political,
+      derivedScore: score,
+      locale,
+    });
+
+    let responseText: string | null;
+    try {
+      responseText = await this.callWithFallback(prompt);
+    } catch (err) {
+      logger.error('aiService.computeCredibility callWithFallback failed:', err);
+      responseText = null;
+    }
+
+    if (!responseText) {
+      // Deterministic-only fallback when no LLM provider responded.
+      return {
+        sourceId,
+        score,
+        bias,
+        subDimensions: { accuracy: score, transparency: score, corrections: score },
+        methodologyMd: this.deterministicMethodology(source.name, score, locale),
+        confidence: 'low',
+        generatedAt: new Date().toISOString(),
+        locale,
+      };
+    }
+
+    const parsed = safeParseJson(responseText, credibilityLlmSchema);
+    if (!parsed) {
+      return {
+        sourceId,
+        score,
+        bias,
+        subDimensions: { accuracy: score, transparency: score, corrections: score },
+        methodologyMd: this.deterministicMethodology(source.name, score, locale),
+        confidence: 'low',
+        generatedAt: new Date().toISOString(),
+        locale,
+      };
+    }
+
+    const rawConfidence = Math.round(
+      (parsed.subDimensions.accuracy +
+        parsed.subDimensions.transparency +
+        parsed.subDimensions.corrections) /
+        3,
+    );
+
+    return {
+      sourceId,
+      score,
+      bias,
+      subDimensions: parsed.subDimensions,
+      methodologyMd: parsed.methodologyMd,
+      confidence: bucketConfidence(rawConfidence),
+      generatedAt: new Date().toISOString(),
+      locale,
+    };
+  }
+
+  private fallbackCredibility(
+    sourceId: string,
+    locale: Locale,
+    score: number,
+    subDimensions: CredibilitySubDimensions,
+    methodologyMd: string,
+  ): CredibilityResult {
+    return {
+      sourceId,
+      score,
+      bias: 'center',
+      subDimensions,
+      methodologyMd,
+      confidence: 'low',
+      generatedAt: new Date().toISOString(),
+      locale,
+    };
+  }
+
+  private sourceNotFoundMessage(locale: Locale): string {
+    if (locale === 'de') return 'Quelle nicht gefunden.';
+    if (locale === 'fr') return 'Source not found.'; // French falls through; UI re-translates
+    return 'Source not found.';
+  }
+
+  private deterministicMethodology(
+    sourceName: string,
+    score: number,
+    locale: Locale,
+  ): string {
+    const en = `${sourceName} has a derived credibility score of ${score}/100 based on its curated reliability and political-bias profile. AI-attributed sub-dimensions are unavailable; values shown reflect the deterministic score only. These scores are AI-attributed estimates based on the source's reputation profile, not measured signals from this platform. Verify with primary sources for any consequential decision.`;
+    const de = `${sourceName} hat eine abgeleitete Glaubwürdigkeitsbewertung von ${score}/100 basierend auf der kuratierten Zuverlässigkeit und dem politischen Bias-Profil. KI-attribuierte Unterdimensionen sind nicht verfügbar; angezeigte Werte basieren ausschließlich auf der deterministischen Bewertung. Diese Werte sind KI-attribuierte Schätzungen basierend auf dem Reputationsprofil der Quelle, keine gemessenen Signale dieser Plattform. Überprüfen Sie mit Primärquellen für wichtige Entscheidungen.`;
+    const fr = `${sourceName} a une note de crédibilité dérivée de ${score}/100 basée sur sa fiabilité curated et son profil de biais politique. Les sous-dimensions attribuées par IA sont indisponibles; les valeurs affichées reflètent uniquement le score déterministe. Ces valeurs sont des estimations attribuées par IA basées sur le profil de réputation de la source, pas des signaux mesurés sur cette plateforme. Vérifiez avec des sources primaires pour toute décision importante.`;
+    return locale === 'de' ? de : locale === 'fr' ? fr : en;
+  }
+
+  // ===========================================================================
+  // Phase 38 — Framing analysis (Plan 38-02 Task 6)
+  //
+  // Replaces the heuristic generateComparison with an LLM-driven framing
+  // analyzer. Fetches recent articles for the topic, groups by region (cap 3
+  // per region), passes through buildFramingPrompt + callWithFallback, and
+  // filters output keys against the 13 valid PerspectiveRegion values.
+  //
+  // Cache key: ai:framing:<sha256(topic).slice(0,16)>:<locale> (D-18).
+  // Falls back gracefully when articles=[], LLM null, or JSON malformed.
+  //
+  // Per CONTEXT.md D-14 + D-17.
+  // ===========================================================================
+
+  async generateFramingAnalysis(topic: string, locale: Locale): Promise<FramingAnalysis> {
+    const topicHash = crypto
+      .createHash('sha256')
+      .update(topic.toLowerCase().trim())
+      .digest('hex')
+      .slice(0, 16);
+
+    return this.cacheService.getOrSet(
+      CacheKeys.framing(topicHash, locale),
+      () => this.computeFraming(topic, locale),
+      CACHE_TTL.DAY,
+    );
+  }
+
+  private async computeFraming(topic: string, locale: Locale): Promise<FramingAnalysis> {
+    const articles = await this.fetchArticlesForTopic(topic);
+
+    if (articles.length === 0) {
+      return { topic, locale, perspectives: {}, aiGenerated: false };
+    }
+
+    // Group by region (cap 3 per region for prompt budget).
+    const articlesByRegion = new Map<PerspectiveRegion, NewsArticle[]>();
+    for (const a of articles) {
+      const region = a.perspective;
+      const arr = articlesByRegion.get(region) ?? [];
+      if (arr.length < 3) arr.push(a);
+      articlesByRegion.set(region, arr);
+    }
+
+    const prompt = buildFramingPrompt({ topic, articlesByRegion, locale });
+
+    let responseText: string | null;
+    try {
+      responseText = await this.callWithFallback(prompt);
+    } catch (err) {
+      logger.error('aiService.computeFraming callWithFallback failed:', err);
+      responseText = null;
+    }
+
+    if (!responseText) {
+      return { topic, locale, perspectives: {}, aiGenerated: false };
+    }
+
+    const parsed = safeParseJson(responseText, framingLlmSchema);
+    if (!parsed) {
+      return { topic, locale, perspectives: {}, aiGenerated: false };
+    }
+
+    // Filter out unknown region keys; the LLM was instructed to use only the
+    // 13 valid PerspectiveRegion values, but defensive filtering protects
+    // against drift.
+    const perspectives: Partial<Record<PerspectiveRegion, FramingPerspective>> = {};
+    for (const [region, body] of Object.entries(parsed.perspectives)) {
+      if (VALID_PERSPECTIVE_REGIONS.includes(region as PerspectiveRegion)) {
+        perspectives[region as PerspectiveRegion] = body;
+      }
+    }
+
+    return { topic, locale, perspectives, aiGenerated: true };
+  }
+
+  private async fetchArticlesForTopic(topic: string): Promise<NewsArticle[]> {
+    try {
+      const result = await newsReadService.getArticles({ search: topic, limit: 50 });
+      return result.articles ?? [];
+    } catch (err) {
+      logger.error('aiService.fetchArticlesForTopic failed:', err);
+      return [];
+    }
+  }
+
+  // ===========================================================================
+  // Phase 38 — Fact-check claim (Plan 38-02 Task 7)
+  //
+  // Multi-step pipeline:
+  //   1. claimHash = sha256(claim) — locale-INDEPENDENT cache key (D-18)
+  //   2. Cache hit → return + still write audit row (D-16)
+  //   3. Translate claim DE/EN/FR (D-12; FR uses original claim if locale!=='fr'
+  //      since translationService only supports DE/EN as targets — graceful
+  //      degradation, not a feature gap)
+  //   4. Three parallel FTS searches via factCheckReadService.searchClaimEvidence
+  //   5. Merge by max-rank via mergeAndDedup; take top 10 for prompt budget
+  //   6. Hydrate full articles (source, url, region, summary) via prisma.findMany
+  //   7. Build prompt with delimiters (T-38-05 prompt-injection mitigation)
+  //   8. callWithFallback + safeParseJson; fallback verdict='unverified' on any
+  //      LLM failure
+  //   9. Resolve 1-based citationIndices to article IDs (max 5 per D-13)
+  //   10. Persist FactCheck audit row (D-16)
+  //   11. Cache for 24h (D-18)
+  //
+  // Per CONTEXT.md D-08, D-10, D-12, D-13, D-16, D-18, D-19.
+  // ===========================================================================
+
+  async factCheckClaim(args: {
+    claim: string;
+    articleId?: string;
+    userId: string;
+    locale: Locale;
+  }): Promise<FactCheckResult> {
+    const claimHash = crypto.createHash('sha256').update(args.claim).digest('hex');
+    const cacheKey = CacheKeys.factCheck(claimHash);
+
+    // Try cache first (verdict + confidence + citation IDs are language-agnostic).
+    const cached = await this.cacheService.get<FactCheckResult>(cacheKey);
+    if (cached) {
+      // D-16: audit-trail write happens on every call — even cache hits.
+      await this.writeFactCheckRow({
+        claim: args.claim,
+        claimHash,
+        articleId: args.articleId,
+        userId: args.userId,
+        locale: args.locale,
+        verdict: cached.verdict,
+        confidence: cached.confidence,
+        methodologyMd: cached.methodologyMd,
+        citationArticleIds: cached.citations.map((c) => c.articleId),
+      });
+      return { ...cached, cached: true };
+    }
+
+    // 1. Translate claim to DE/EN/FR (D-12 cross-language search).
+    //    translationService.translate only accepts 'de' | 'en' as target lang;
+    //    'fr' falls back to the original claim text. Translation errors also
+    //    fall back to the original claim — never throws.
+    const claimTexts = await this.translateClaimToAllLanguages(args.claim, args.locale);
+
+    // 2. Three parallel FTS searches.
+    const [deResults, enResults, frResults] = await Promise.all([
+      searchClaimEvidence(claimTexts.de, 10, 90),
+      searchClaimEvidence(claimTexts.en, 10, 90),
+      searchClaimEvidence(claimTexts.fr, 10, 90),
+    ]);
+
+    // 3. Merge by max-rank, take top 10 for prompt budget.
+    const merged = mergeAndDedup(deResults, enResults, frResults).slice(0, 10);
+
+    // 4. Hydrate full article fields needed for the prompt + citation cards.
+    const articleIds = merged.map((m) => m.id);
+    type ArticleWithSource = Prisma.NewsArticleGetPayload<{ include: { source: true } }>;
+    let articles: ArticleWithSource[] = [];
+    if (articleIds.length > 0) {
+      try {
+        articles = await prisma.newsArticle.findMany({
+          where: { id: { in: articleIds } },
+          include: { source: true },
+        });
+      } catch (err) {
+        logger.error('aiService.factCheckClaim findMany failed:', err);
+        articles = [];
+      }
+    }
+    const articleById = new Map<string, ArticleWithSource>(articles.map((a) => [a.id, a]));
+
+    const evidenceSnippets = merged.map((m) => {
+      const a = articleById.get(m.id);
+      const snippet = ((a?.summary ?? a?.content) ?? '').slice(0, 300);
+      return {
+        id: m.id,
+        title: a?.title ?? m.title,
+        sourceName: a?.source?.name ?? 'Unknown',
+        region: ((a?.perspective ?? 'usa') as PerspectiveRegion),
+        language: a?.originalLanguage ?? 'en',
+        snippet,
+      };
+    });
+
+    // 5. LLM verdict.
+    const prompt = buildFactCheckPrompt({
+      claim: args.claim,
+      evidenceSnippets,
+      locale: args.locale,
+    });
+
+    let responseText: string | null;
+    try {
+      responseText = await this.callWithFallback(prompt);
+    } catch (err) {
+      logger.error('aiService.factCheckClaim callWithFallback failed:', err);
+      responseText = null;
+    }
+
+    const parsed = responseText ? safeParseJson(responseText, factCheckLlmSchema) : null;
+
+    const verdict: Verdict = parsed?.verdict ?? 'unverified';
+    const rawConfidence = parsed?.confidence ?? 0;
+    const methodologyMd = parsed?.methodologyMd ?? this.factCheckUnavailableMessage(args.locale);
+
+    // 6. Resolve citation indices (1-based) to article IDs (max 5 per D-13).
+    const citationArticleIds: string[] = [];
+    const citations: FactCheckCitation[] = [];
+    const idxList = parsed?.citationIndices ?? [];
+    for (const idx of idxList) {
+      const e = evidenceSnippets[idx - 1];
+      if (!e) continue; // out-of-range — silently skip
+      const a = articleById.get(e.id);
+      citationArticleIds.push(e.id);
+      citations.push({
+        articleId: e.id,
+        title: e.title,
+        sourceName: e.sourceName,
+        region: e.region,
+        url: a?.url ?? `/article/${e.id}`,
+      });
+      if (citations.length >= 5) break;
+    }
+
+    // 7. Persist FactCheck audit row.
+    const factCheckRow = await this.writeFactCheckRow({
+      claim: args.claim,
+      claimHash,
+      articleId: args.articleId,
+      userId: args.userId,
+      locale: args.locale,
+      verdict,
+      confidence: rawConfidence,
+      methodologyMd,
+      citationArticleIds,
+    });
+
+    const result: FactCheckResult = {
+      factCheckId: factCheckRow.id,
+      verdict,
+      confidence: rawConfidence,
+      confidenceBucket: bucketConfidence(rawConfidence),
+      methodologyMd,
+      citations,
+      locale: args.locale,
+      generatedAt: new Date().toISOString(),
+      cached: false,
+    };
+
+    // 8. Write Redis cache.
+    await this.cacheService.set(cacheKey, result, CACHE_TTL.DAY);
+
+    return result;
+  }
+
+  /**
+   * Translate the claim text to DE/EN. FR falls through to the original claim
+   * text because translationService.translate only accepts DE/EN as target —
+   * graceful degradation, not a feature gap. Translation errors also fall back
+   * to the original claim text.
+   */
+  private async translateClaimToAllLanguages(
+    claim: string,
+    locale: Locale,
+  ): Promise<{ de: string; en: string; fr: string }> {
+    const translation = TranslationService.getInstance();
+
+    const safeTranslate = async (target: 'de' | 'en'): Promise<string> => {
+      if (locale === target) return claim;
+      try {
+        const result = await translation.translate(claim, target);
+        return result?.text ?? claim;
+      } catch {
+        return claim;
+      }
+    };
+
+    const [de, en] = await Promise.all([safeTranslate('de'), safeTranslate('en')]);
+    // French is not supported by translationService at this layer — fall back
+    // to the original claim text. The FTS index uses 'simple' config, which
+    // tokenizes any input language, so this still produces sensible matches.
+    const fr = claim;
+
+    return { de, en, fr };
+  }
+
+  private async writeFactCheckRow(args: {
+    claim: string;
+    claimHash: string;
+    articleId?: string;
+    userId: string;
+    locale: Locale;
+    verdict?: Verdict;
+    confidence?: number;
+    methodologyMd?: string;
+    citationArticleIds?: string[];
+  }): Promise<{ id: string }> {
+    const provider = this.activeProvider;
+    return prisma.factCheck.create({
+      data: {
+        userId: args.userId,
+        articleId: args.articleId ?? null,
+        claimText: args.claim,
+        claimHash: args.claimHash,
+        claimLanguage: args.locale,
+        verdict: args.verdict ?? 'unverified',
+        confidence: args.confidence ?? 0,
+        methodologyMd: args.methodologyMd ?? '',
+        citationArticleIds: args.citationArticleIds ?? [],
+        modelUsed: provider,
+        locale: args.locale,
+      },
+    });
+  }
+
+  private factCheckUnavailableMessage(locale: Locale): string {
+    const en = `AI analysis is currently unavailable. The verdict defaults to "unverified" because no model could process this claim. Please retry in a few minutes.`;
+    const de = `KI-Analyse ist derzeit nicht verfügbar. Das Urteil ist standardmäßig "nicht verifiziert", da kein Modell diese Behauptung verarbeiten konnte. Bitte versuchen Sie es in einigen Minuten erneut.`;
+    const fr = `L'analyse IA n'est actuellement pas disponible. Le verdict est par défaut "non vérifié" car aucun modèle n'a pu traiter cette affirmation. Veuillez réessayer dans quelques minutes.`;
+    return locale === 'de' ? de : locale === 'fr' ? fr : en;
   }
 
 }

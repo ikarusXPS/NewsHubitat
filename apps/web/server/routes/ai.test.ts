@@ -1,9 +1,24 @@
 /**
  * Unit tests for AI route coverage gap detection
  * Tests the detectCoverageGap and buildGapInstruction functions
+ *
+ * NOTE (Phase 38): `./ai` now imports `../services/aiService`, which transitively
+ * imports `../db/prisma` (top-of-file). The prisma module throws if DATABASE_URL
+ * is not set in the test env. We mock the entire AIService here so the import
+ * chain stops at this file rather than reaching prisma.
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+
+vi.mock('../services/aiService', () => ({
+  AIService: {
+    getInstance: () => ({
+      factCheckClaim: vi.fn(),
+      getSourceCredibility: vi.fn(),
+    }),
+  },
+}));
+
 import { detectCoverageGap, buildGapInstruction } from './ai';
 
 interface ArticleContext {

@@ -19,6 +19,12 @@ import {
   ErrorResponseSchema,
   RateLimitErrorResponseSchema,
   NewsQuerySchema,
+  // Phase 38 — Advanced AI Features (JWT-gated)
+  FactCheckRequestSchema,
+  FactCheckResponseSchema,
+  CredibilityResponseSchema,
+  FramingResponseSchema,
+  LocaleSchema,
 } from './schemas';
 
 /**
@@ -36,6 +42,14 @@ export async function generateOpenApiSpec(outputPath: string): Promise<void> {
     in: 'header',
     name: 'X-API-Key',
     description: 'API key for authentication. Format: nh_live_xxxx or nh_test_xxxx. Obtain from /developers page.',
+  });
+
+  // Phase 38 — JWT bearer authentication for /api/ai and /api/analysis routes
+  // (mounted via authMiddleware + aiTierLimiter chain in server/index.ts).
+  registry.registerComponent('securitySchemes', 'BearerAuth', {
+    type: 'http',
+    scheme: 'bearer',
+    bearerFormat: 'JWT',
   });
 
   // =========================================================================
@@ -253,6 +267,110 @@ export async function generateOpenApiSpec(outputPath: string): Promise<void> {
   });
 
   // =========================================================================
+  // Phase 38 — Advanced AI Features (JWT-gated)
+  // =========================================================================
+
+  // POST /api/ai/fact-check
+  registry.registerPath({
+    method: 'post',
+    path: '/api/ai/fact-check',
+    summary: 'Fact-check a user-highlighted claim against the NewsHub corpus',
+    description:
+      'Returns a 5-bucket verdict (true/mostly-true/mixed/unverified/false), confidence percentage, methodology paragraph, and up to 5 internal-corpus citations. Verdict + citations are language-agnostic; methodology text is generated in the requested locale. Cached 24h on (sha256(claim)).',
+    tags: ['AI'],
+    security: [{ BearerAuth: [] }],
+    request: {
+      body: { content: { 'application/json': { schema: FactCheckRequestSchema } } },
+    },
+    responses: {
+      200: {
+        description: 'Verdict + citations',
+        content: { 'application/json': { schema: FactCheckResponseSchema } },
+      },
+      400: {
+        description: 'Invalid claim (length, content, or pattern rejected)',
+        content: { 'application/json': { schema: ErrorResponseSchema } },
+      },
+      401: {
+        description: 'Unauthenticated',
+        content: { 'application/json': { schema: ErrorResponseSchema } },
+      },
+      429: {
+        description: 'Daily AI query limit reached (FREE tier)',
+        content: { 'application/json': { schema: RateLimitErrorResponseSchema } },
+      },
+    },
+  });
+
+  // GET /api/ai/source-credibility/{sourceId}
+  registry.registerPath({
+    method: 'get',
+    path: '/api/ai/source-credibility/{sourceId}',
+    summary: 'Get a 0-100 credibility score + AI-attributed methodology for a news source',
+    description:
+      'Returns deterministic 0-100 score (anchored on curated reliability + bias), bias bucket (left/center/right per MediaBiasBar thresholds), three AI-attributed sub-dimensions (accuracy/transparency/corrections), and a locale-tagged methodology paragraph. Cached 24h per (sourceId, locale). The methodology explicitly discloses sub-dimensions are AI-attributed estimates, not measured signals.',
+    tags: ['AI'],
+    security: [{ BearerAuth: [] }],
+    request: {
+      params: z.object({ sourceId: z.string() }),
+      query: z.object({ locale: LocaleSchema.optional() }),
+    },
+    responses: {
+      200: {
+        description: 'Credibility + methodology',
+        content: { 'application/json': { schema: CredibilityResponseSchema } },
+      },
+      401: {
+        description: 'Unauthenticated',
+        content: { 'application/json': { schema: ErrorResponseSchema } },
+      },
+      404: {
+        description: 'Unknown sourceId',
+        content: { 'application/json': { schema: ErrorResponseSchema } },
+      },
+      429: {
+        description: 'Daily AI query limit reached (FREE tier)',
+        content: { 'application/json': { schema: RateLimitErrorResponseSchema } },
+      },
+    },
+  });
+
+  // GET /api/analysis/framing
+  registry.registerPath({
+    method: 'get',
+    path: '/api/analysis/framing',
+    summary: 'Get LLM-driven framing analysis comparing how regions cover the same topic',
+    description:
+      'Replaces the legacy sentiment heuristic with structured per-region narrative, omissions, vocabulary, and evidence-quote output. Cached 24h per (sha256(topic), locale).',
+    tags: ['Analysis'],
+    security: [{ BearerAuth: [] }],
+    request: {
+      query: z.object({
+        topic: z.string().min(2),
+        locale: LocaleSchema.optional(),
+      }),
+    },
+    responses: {
+      200: {
+        description: 'Per-region framing analysis',
+        content: { 'application/json': { schema: FramingResponseSchema } },
+      },
+      400: {
+        description: 'Missing or invalid topic',
+        content: { 'application/json': { schema: ErrorResponseSchema } },
+      },
+      401: {
+        description: 'Unauthenticated',
+        content: { 'application/json': { schema: ErrorResponseSchema } },
+      },
+      429: {
+        description: 'Daily AI query limit reached (FREE tier)',
+        content: { 'application/json': { schema: RateLimitErrorResponseSchema } },
+      },
+    },
+  });
+
+  // =========================================================================
   // GENERATE DOCUMENT
   // =========================================================================
   const generator = new OpenApiGeneratorV31(registry.definitions);
@@ -315,6 +433,8 @@ Responses include \`Cache-Control\` headers. Honor these for optimal performance
       { name: 'News', description: 'News article endpoints - access articles from 130+ global sources' },
       { name: 'Events', description: 'Geo-located event endpoints - events extracted from news articles' },
       { name: 'Analytics', description: 'Statistics and analytics - sentiment and trend data' },
+      { name: 'AI', description: 'AI-powered fact-check and source credibility (Phase 38, JWT-gated)' },
+      { name: 'Analysis', description: 'AI-driven framing analysis across regional perspectives (Phase 38, JWT-gated)' },
     ],
   });
 

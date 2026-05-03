@@ -1,0 +1,35 @@
+{
+  "pill": {
+    "label": "Glaubwürdigkeit"
+  },
+  "drawer": {
+    "title": "Quellen-Glaubwürdigkeit",
+    "subDimensions": "Unterdimensionen",
+    "accuracy": "Genauigkeit",
+    "transparency": "Transparenz",
+    "corrections": "Korrekturen",
+    "disclosure": "Diese Unterdimensionen sind KI-attribuierte Schätzungen, keine gemessenen Signale.",
+    "score": "Bewertung: {{score}}/100",
+    "close": "Schließen"
+  },
+  "bias": {
+    "left": "Linksgerichtet",
+    "center": "Mitte",
+    "right": "Rechtsgerichtet"
+  },
+  "confidence": {
+    "low": "Geringe Sicherheit",
+    "medium": "Mittlere Sicherheit",
+    "high": "Hohe Sicherheit"
+  },
+  "framing": {
+    "aiGenerated": "KI-generiert",
+    "section": {
+      "narrative": "Narrativ",
+      "omissions": "Auffällige Auslassungen",
+      "vocabulary": "Wertende Begriffe",
+      "evidenceQuotes": "Belegstellen"
+    },
+    "noData": "Für dieses Thema ist keine Framing-Analyse verfügbar."
+  }
+}

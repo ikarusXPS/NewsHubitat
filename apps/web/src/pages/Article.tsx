@@ -14,6 +14,8 @@ import {
 import { CommentSection } from '../components/comments/CommentSection';
 import { ResponsiveImage } from '../components/ResponsiveImage';
 import { ShareButtons } from '../components/sharing';
+import { FactCheckButton } from '../components/factcheck/FactCheckButton';
+import { FactCheckDrawer } from '../components/factcheck/FactCheckDrawer';
 import { useCreateShare, type ShareUrls } from '../hooks/useShare';
 import { useAppStore } from '../store';
 import { cn, getRegionColor, getSentimentColor } from '../lib/utils';
@@ -47,6 +49,8 @@ export function Article() {
   const [shareUrls, setShareUrls] = useState<ShareUrls | null>(null);
   const [shareCode, setShareCode] = useState<string | null>(null);
   const [isCreatingShare, setIsCreatingShare] = useState(false);
+  // Phase 38: claim text captured by FactCheckButton's selection listener.
+  const [factCheckClaim, setFactCheckClaim] = useState<string | null>(null);
   const createShare = useCreateShare();
 
   const {
@@ -292,12 +296,27 @@ export function Article() {
           </div>
         )}
 
-        {/* Article Content */}
-        <div className="prose prose-invert prose-lg max-w-none">
+        {/* Article Content — `data-testid="article-content"` is the scope
+            anchor for FactCheckButton's Selection API listener (T-38-20). */}
+        <div className="prose prose-invert prose-lg max-w-none" data-testid="article-content">
           <div className="text-gray-200 leading-relaxed whitespace-pre-wrap">
             {getDisplayContent()}
           </div>
         </div>
+
+        {/* Phase 38: selection-driven fact-check button + inline drawer.
+            FactCheckButton is fixed-positioned and only renders when the user
+            highlights 10-500 chars inside [data-testid="article-content"];
+            FactCheckDrawer owns the mutation lifecycle and renders the
+            verdict + citations beneath the body. */}
+        <FactCheckButton onClaim={(c) => setFactCheckClaim(c)} />
+        {factCheckClaim ? (
+          <FactCheckDrawer
+            claim={factCheckClaim}
+            articleId={article.id}
+            onClose={() => setFactCheckClaim(null)}
+          />
+        ) : null}
 
         {/* Translation Quality Indicator */}
         {!showOriginal && hasTranslation && article.translationQuality !== undefined && (

@@ -34,6 +34,14 @@
     {
       "name": "Analytics",
       "description": "Statistics and analytics - sentiment and trend data"
+    },
+    {
+      "name": "AI",
+      "description": "AI-powered fact-check and source credibility (Phase 38, JWT-gated)"
+    },
+    {
+      "name": "Analysis",
+      "description": "AI-driven framing analysis across regional perspectives (Phase 38, JWT-gated)"
     }
   ],
   "components": {
@@ -43,6 +51,11 @@
         "in": "header",
         "name": "X-API-Key",
         "description": "API key for authentication. Format: nh_live_xxxx or nh_test_xxxx. Obtain from /developers page."
+      },
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       }
     },
     "schemas": {
@@ -544,6 +557,383 @@
           "neutral",
           "total"
         ]
+      },
+      "FactCheckResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "factCheckId": {
+                "type": "string"
+              },
+              "verdict": {
+                "type": "string",
+                "enum": [
+                  "true",
+                  "mostly-true",
+                  "mixed",
+                  "unverified",
+                  "false"
+                ],
+                "description": "5-bucket fact-check verdict (D-08)"
+              },
+              "confidence": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "confidenceBucket": {
+                "type": "string",
+                "enum": [
+                  "low",
+                  "medium",
+                  "high"
+                ],
+                "description": "Categorical confidence pill (D-05)"
+              },
+              "methodologyMd": {
+                "type": "string"
+              },
+              "citations": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/FactCheckCitation"
+                },
+                "maxItems": 5
+              },
+              "locale": {
+                "type": "string",
+                "enum": [
+                  "de",
+                  "en",
+                  "fr"
+                ],
+                "description": "Supported UI/content locale"
+              },
+              "generatedAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "cached": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "factCheckId",
+              "verdict",
+              "confidence",
+              "confidenceBucket",
+              "methodologyMd",
+              "citations",
+              "locale",
+              "generatedAt",
+              "cached"
+            ]
+          }
+        },
+        "required": [
+          "success",
+          "data"
+        ]
+      },
+      "FactCheckCitation": {
+        "type": "object",
+        "properties": {
+          "articleId": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "sourceName": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string",
+            "enum": [
+              "usa",
+              "europa",
+              "deutschland",
+              "nahost",
+              "tuerkei",
+              "russland",
+              "china",
+              "asien",
+              "afrika",
+              "lateinamerika",
+              "ozeanien",
+              "kanada",
+              "alternative"
+            ],
+            "description": "Geographic region perspective"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "required": [
+          "articleId",
+          "title",
+          "sourceName",
+          "region",
+          "url"
+        ]
+      },
+      "FactCheckRequest": {
+        "type": "object",
+        "properties": {
+          "claim": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 500
+          },
+          "articleId": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string",
+            "enum": [
+              "de",
+              "en",
+              "fr"
+            ],
+            "description": "Supported UI/content locale"
+          }
+        },
+        "required": [
+          "claim"
+        ]
+      },
+      "CredibilityResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "sourceId": {
+                "type": "string"
+              },
+              "score": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "bias": {
+                "type": "string",
+                "enum": [
+                  "left",
+                  "center",
+                  "right"
+                ],
+                "description": "Bias indicator (D-04)"
+              },
+              "subDimensions": {
+                "$ref": "#/components/schemas/CredibilitySubDimensions"
+              },
+              "methodologyMd": {
+                "type": "string"
+              },
+              "confidence": {
+                "type": "string",
+                "enum": [
+                  "low",
+                  "medium",
+                  "high"
+                ],
+                "description": "Categorical confidence pill (D-05)"
+              },
+              "generatedAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "locale": {
+                "type": "string",
+                "enum": [
+                  "de",
+                  "en",
+                  "fr"
+                ],
+                "description": "Supported UI/content locale"
+              }
+            },
+            "required": [
+              "sourceId",
+              "score",
+              "bias",
+              "subDimensions",
+              "methodologyMd",
+              "confidence",
+              "generatedAt",
+              "locale"
+            ]
+          }
+        },
+        "required": [
+          "success",
+          "data"
+        ]
+      },
+      "CredibilitySubDimensions": {
+        "type": "object",
+        "properties": {
+          "accuracy": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "transparency": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "corrections": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          }
+        },
+        "required": [
+          "accuracy",
+          "transparency",
+          "corrections"
+        ]
+      },
+      "FramingResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "topic": {
+                "type": "string"
+              },
+              "locale": {
+                "type": "string",
+                "enum": [
+                  "de",
+                  "en",
+                  "fr"
+                ],
+                "description": "Supported UI/content locale"
+              },
+              "perspectives": {
+                "type": "object",
+                "properties": {
+                  "usa": {
+                    "$ref": "#/components/schemas/FramingPerspective"
+                  },
+                  "europa": {
+                    "$ref": "#/components/schemas/FramingPerspective"
+                  },
+                  "deutschland": {
+                    "$ref": "#/components/schemas/FramingPerspective"
+                  },
+                  "nahost": {
+                    "$ref": "#/components/schemas/FramingPerspective"
+                  },
+                  "tuerkei": {
+                    "$ref": "#/components/schemas/FramingPerspective"
+                  },
+                  "russland": {
+                    "$ref": "#/components/schemas/FramingPerspective"
+                  },
+                  "china": {
+                    "$ref": "#/components/schemas/FramingPerspective"
+                  },
+                  "asien": {
+                    "$ref": "#/components/schemas/FramingPerspective"
+                  },
+                  "afrika": {
+                    "$ref": "#/components/schemas/FramingPerspective"
+                  },
+                  "lateinamerika": {
+                    "$ref": "#/components/schemas/FramingPerspective"
+                  },
+                  "ozeanien": {
+                    "$ref": "#/components/schemas/FramingPerspective"
+                  },
+                  "kanada": {
+                    "$ref": "#/components/schemas/FramingPerspective"
+                  },
+                  "alternative": {
+                    "$ref": "#/components/schemas/FramingPerspective"
+                  }
+                }
+              },
+              "aiGenerated": {
+                "type": "boolean",
+                "enum": [
+                  true
+                ]
+              }
+            },
+            "required": [
+              "topic",
+              "locale",
+              "perspectives",
+              "aiGenerated"
+            ]
+          }
+        },
+        "required": [
+          "success",
+          "data"
+        ]
+      },
+      "FramingPerspective": {
+        "type": "object",
+        "properties": {
+          "narrative": {
+            "type": "string"
+          },
+          "omissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 3
+          },
+          "vocabulary": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 5
+          },
+          "evidenceQuotes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 3
+          }
+        },
+        "required": [
+          "narrative",
+          "omissions",
+          "vocabulary",
+          "evidenceQuotes"
+        ]
       }
     },
     "parameters": {}
@@ -884,6 +1274,234 @@
           },
           "429": {
             "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RateLimitErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ai/fact-check": {
+      "post": {
+        "summary": "Fact-check a user-highlighted claim against the NewsHub corpus",
+        "description": "Returns a 5-bucket verdict (true/mostly-true/mixed/unverified/false), confidence percentage, methodology paragraph, and up to 5 internal-corpus citations. Verdict + citations are language-agnostic; methodology text is generated in the requested locale. Cached 24h on (sha256(claim)).",
+        "tags": [
+          "AI"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FactCheckRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verdict + citations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FactCheckResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid claim (length, content, or pattern rejected)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Daily AI query limit reached (FREE tier)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RateLimitErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ai/source-credibility/{sourceId}": {
+      "get": {
+        "summary": "Get a 0-100 credibility score + AI-attributed methodology for a news source",
+        "description": "Returns deterministic 0-100 score (anchored on curated reliability + bias), bias bucket (left/center/right per MediaBiasBar thresholds), three AI-attributed sub-dimensions (accuracy/transparency/corrections), and a locale-tagged methodology paragraph. Cached 24h per (sourceId, locale). The methodology explicitly discloses sub-dimensions are AI-attributed estimates, not measured signals.",
+        "tags": [
+          "AI"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "sourceId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "de",
+                "en",
+                "fr"
+              ],
+              "description": "Supported UI/content locale"
+            },
+            "required": false,
+            "description": "Supported UI/content locale",
+            "name": "locale",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Credibility + methodology",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CredibilityResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown sourceId",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Daily AI query limit reached (FREE tier)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RateLimitErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/analysis/framing": {
+      "get": {
+        "summary": "Get LLM-driven framing analysis comparing how regions cover the same topic",
+        "description": "Replaces the legacy sentiment heuristic with structured per-region narrative, omissions, vocabulary, and evidence-quote output. Cached 24h per (sha256(topic), locale).",
+        "tags": [
+          "Analysis"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 2
+            },
+            "required": true,
+            "name": "topic",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "de",
+                "en",
+                "fr"
+              ],
+              "description": "Supported UI/content locale"
+            },
+            "required": false,
+            "description": "Supported UI/content locale",
+            "name": "locale",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Per-region framing analysis",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FramingResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing or invalid topic",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Daily AI query limit reached (FREE tier)",
             "content": {
               "application/json": {
                 "schema": {

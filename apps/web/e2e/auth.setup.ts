@@ -9,6 +9,22 @@ const TEST_PASSWORD = 'TestPassword123!';
 const TEST_NAME = 'E2E Test User';
 
 setup('authenticate', async ({ page, request }) => {
+  // Mock /api/focus/suggestions to return an empty list. With many suggestions
+  // active, the bottom-right toast stack overflows upward and intercepts pointer
+  // events on the header's Sign In button. fixtures.ts applies the same mock
+  // for regular tests; auth.setup.ts runs separately and must mock it itself.
+  await page.route('**/api/focus/suggestions', (route) => {
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        success: true,
+        data: [],
+        meta: { count: 0, generatedAt: new Date().toISOString() },
+      }),
+    });
+  });
+
   // Playwright's webServer waits for the frontend (5173) but the backend (3001)
   // starts in parallel via `npm run dev` and isn't always ready when this setup
   // runs. Without a wait, the first registration call hits ECONNREFUSED, the

@@ -1,0 +1,34 @@
+{
+  "name": "@newshub/mobile",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "NewsHub Capacitor 8 mobile wrapper (iOS + Android)",
+  "scripts": {
+    "build": "pnpm --filter @newshub/web build && pnpm cap:sync",
+    "cap:sync": "cap sync",
+    "cap:sync:ios": "cap sync ios",
+    "cap:sync:android": "cap sync android",
+    "cap:open:ios": "cap open ios",
+    "cap:open:android": "cap open android",
+    "cap:add:ios": "cap add ios",
+    "cap:add:android": "cap add android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.3.1",
+    "@capacitor/app": "^8.1.0",
+    "@capacitor/core": "^8.3.1",
+    "@capacitor/haptics": "^8.0.2",
+    "@capacitor/ios": "^8.3.1",
+    "@capacitor/keyboard": "^8.0.3",
+    "@capacitor/preferences": "^8.0.1",
+    "@capacitor/push-notifications": "^8.0.3",
+    "@capacitor/splash-screen": "^8.0.1",
+    "@capacitor/status-bar": "^8.0.2",
+    "@capgo/capacitor-native-biometric": "^8.4.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.3.1",
+    "typescript": "~6.0.3"
+  }
+}
