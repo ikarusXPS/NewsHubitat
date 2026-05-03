@@ -28,6 +28,26 @@ export type NewsArticle = Prisma.NewsArticleModel
  */
 export type NewsSource = Prisma.NewsSourceModel
 /**
+ * Model Podcast
+ * 
+ */
+export type Podcast = Prisma.PodcastModel
+/**
+ * Model PodcastEpisode
+ * 
+ */
+export type PodcastEpisode = Prisma.PodcastEpisodeModel
+/**
+ * Model Video
+ * 
+ */
+export type Video = Prisma.VideoModel
+/**
+ * Model Transcript
+ * 
+ */
+export type Transcript = Prisma.TranscriptModel
+/**
  * Model User
  * 
  */
