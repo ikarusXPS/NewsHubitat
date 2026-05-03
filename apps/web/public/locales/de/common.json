@@ -63,7 +63,11 @@
     "lateinamerika": "Lateinamerika",
     "ozeanien": "Ozeanien",
     "kanada": "Kanada",
-    "alternative": "Alternative"
+    "alternative": "Alternative",
+    "sudostasien": "Südostasien",
+    "nordeuropa": "Nordeuropa",
+    "sub-saharan-africa": "Subsahara-Afrika",
+    "indien": "Indien"
   },
   "comments": {
     "post": "Kommentar posten",
