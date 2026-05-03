@@ -9,11 +9,12 @@
  * This job is just the iterator + retry shell, mirroring CleanupService's
  * start/stop/runOnce lifecycle.
  *
- * Gating: this job module does NOT internally check RUN_JOBS. The placeholder
- * comment at apps/web/server/index.ts:538 explicitly says the seam invokes
- * start() inside the existing RUN_JOBS-gated `runBootLifecycle({ runJobs })`
- * call, so by construction the worker replica is the only one that schedules
- * this. Web replicas (RUN_JOBS=false) never reach the start() call site.
+ * Gating: per the placeholder comment at apps/web/server/index.ts:538
+ * ("both check RUN_JOBS internally inside the job module's start() method"),
+ * `start()` self-skips when RUN_JOBS=false. The seam in index.ts simply calls
+ * `PodcastFeedPollJob.getInstance().start()` unconditionally; only the
+ * app-worker Swarm replica (RUN_JOBS=true) actually schedules the interval.
+ * Web replicas log a debug line and return without spawning the timer.
  */
 
 import { PodcastService } from '../services/podcastService';
@@ -41,6 +42,13 @@ export class PodcastFeedPollJob {
   }
 
   start(): void {
+    // RUN_JOBS internal gate (per index.ts:538 placeholder contract): web
+    // replicas with RUN_JOBS=false never schedule this job. Default true so
+    // single-replica dev preserves existing behaviour.
+    if (process.env.RUN_JOBS === 'false') {
+      logger.debug('PodcastFeedPollJob skipped: RUN_JOBS=false');
+      return;
+    }
     if (this.isRunning) {
       logger.warn('PodcastFeedPollJob already running');
       return;
