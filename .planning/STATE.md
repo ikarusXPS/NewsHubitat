@@ -4,8 +4,8 @@ milestone: v1.6
 milestone_name: Infrastructure & Scale
 current_plan: 2
 status: paused
-last_updated: "2026-05-03T21:24:35Z"
-last_activity: 2026-05-03 -- Phase 36 retroactive VERIFICATION.md written via gsd-verifier (6/6 SC + 7/7 PAY verified in apps/web code; 2 human-needed items both already closed); ROADMAP.md drift fix for Phase 37.1 (3 stale [ ] → [x]) committed 3cc19f3
+last_updated: "2026-05-03T21:38:00Z"
+last_activity: 2026-05-03 -- Phase 40 CONTEXT.md captured via /gsd-discuss-phase 40 (4 areas, 11 locked decisions D-A1..D-D2, 5 cross-cutting CC-01..CC-05, 6 Q-XX, 14 deferred ideas; commit b38d148); Phase 36 retroactive VERIFICATION.md committed e06994e; ROADMAP 37.1 drift fix 3cc19f3
 progress:
   total_phases: 7
   completed_phases: 4
@@ -21,7 +21,7 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-26)
 
 **Core value:** Users can see how the same story is covered by different regional perspectives
-**Current focus:** Phase 39 — mobile-apps
+**Current focus:** Phase 40 — content-expansion (CONTEXT captured 2026-05-03; awaiting `/gsd-plan-phase 40`). Phase 39 (mobile-apps) remains paused awaiting Firebase + Apple/Google credentials.
 
 ## Current Position
 
