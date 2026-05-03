@@ -21,6 +21,7 @@ import * as newsReadService from './newsReadService';
 import { searchClaimEvidence, mergeAndDedup } from './factCheckReadService';
 import { TranslationService } from './translationService';
 import { prisma } from '../db/prisma';
+import type { Prisma } from '../../src/generated/prisma/client';
 
 /**
  * Defensive JSON-extract from LLM responses. Free OpenRouter / Gemma models
@@ -768,7 +769,7 @@ Response format: ["topic1", "topic2", ...]`;
       locale,
     });
 
-    let responseText: string | null = null;
+    let responseText: string | null;
     try {
       responseText = await this.callWithFallback(prompt);
     } catch (err) {
@@ -905,7 +906,7 @@ Response format: ["topic1", "topic2", ...]`;
 
     const prompt = buildFramingPrompt({ topic, articlesByRegion, locale });
 
-    let responseText: string | null = null;
+    let responseText: string | null;
     try {
       responseText = await this.callWithFallback(prompt);
     } catch (err) {
@@ -1012,7 +1013,8 @@ Response format: ["topic1", "topic2", ...]`;
 
     // 4. Hydrate full article fields needed for the prompt + citation cards.
     const articleIds = merged.map((m) => m.id);
-    let articles: any[] = [];
+    type ArticleWithSource = Prisma.NewsArticleGetPayload<{ include: { source: true } }>;
+    let articles: ArticleWithSource[] = [];
     if (articleIds.length > 0) {
       try {
         articles = await prisma.newsArticle.findMany({
@@ -1024,7 +1026,7 @@ Response format: ["topic1", "topic2", ...]`;
         articles = [];
       }
     }
-    const articleById = new Map<string, any>(articles.map((a) => [a.id, a]));
+    const articleById = new Map<string, ArticleWithSource>(articles.map((a) => [a.id, a]));
 
     const evidenceSnippets = merged.map((m) => {
       const a = articleById.get(m.id);
@@ -1046,7 +1048,7 @@ Response format: ["topic1", "topic2", ...]`;
       locale: args.locale,
     });
 
-    let responseText: string | null = null;
+    let responseText: string | null;
     try {
       responseText = await this.callWithFallback(prompt);
     } catch (err) {
