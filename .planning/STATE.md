@@ -4,8 +4,8 @@ milestone: v1.6
 milestone_name: Infrastructure & Scale
 current_plan: 2
 status: paused
-last_updated: "2026-05-03T19:10:00.000Z"
-last_activity: 2026-05-03 -- PR #4 merged to master (cdb9d55); Phase 38/39-scaffold/40.1 bundle landed; STATE drift audit reconciled 36.2/36.3/36.5 status to disk reality
+last_updated: "2026-05-03T21:24:35Z"
+last_activity: 2026-05-03 -- Phase 36 retroactive VERIFICATION.md written via gsd-verifier (6/6 SC + 7/7 PAY verified in apps/web code; 2 human-needed items both already closed); ROADMAP.md drift fix for Phase 37.1 (3 stale [ ] → [x]) committed 3cc19f3
 progress:
   total_phases: 7
   completed_phases: 4
@@ -95,7 +95,7 @@ v1.6 Progress: [████████████████████] (9
 | Phase | Name | Requirements | UI | Status |
 |-------|------|--------------|-----|--------|
 | 35 | Infrastructure Foundation | 4 reqs (INFRA-01 partial, PAY-08, PAY-09, PAY-10) | No | **Complete** (5/5 plans) — UAT 5/5 PASS + 35.1 hotfix |
-| 36 | Monetization Core | 7 reqs (PAY-01 to PAY-07) | Yes | **Complete** (5/5 plans; Plan 05 closed via human-verify "approved" 2026-04-28; awaiting `/gsd-verify-phase 36`) |
+| 36 | Monetization Core | 7 reqs (PAY-01 to PAY-07) | Yes | **Verified — human_needed** (5/5 plans; VERIFICATION status=human_needed 2026-05-03T19:18Z, 6/6 ROADMAP success criteria verified in code + 7/7 PAY reqs satisfied; 2 human items both already closed: live ad-free UI confirmation closed by Plan 05 approval 2026-04-28, `customer.subscription.resumed` live event deferred to production-readiness per 36.3-04 — Stripe CLI cannot trigger that fixture) |
 | 36.1 | Add Subscription Schema Fields (INSERTED) | PAY-01 (foundation) | No | **Complete** (1/1 plans) — verified PASS 5/5 |
 | 36.2 | Close 36-debt — schema models + cleanup (INSERTED) | PAY-02..PAY-07 | No | **Verified** (4/4 plans; VERIFICATION status=passed 2026-04-28T12:35Z, 6/6 must-haves) |
 | 36.3 | Fix Stripe Webhook Monorepo Path (INSERTED) | PAY-02, PAY-03, PAY-06 | No | **Verified — human_needed** (5/5 plans; VERIFICATION status=human_needed 2026-04-28T13:19Z, 6/6 must-haves PASS in code + empirical evidence; 1 outstanding live-Stripe test for `customer.subscription.resumed` deferred to production-readiness phase — `stripe trigger` CLI does not expose this fixture, requires a real failed-payment cycle) |
@@ -110,7 +110,7 @@ v1.6 Progress: [████████████████████] (9
 
 **Coverage:** 37/37 requirements mapped (100%) — 40.1 is debt-payback, not new requirements
 
-**Next step:** The only outstanding milestone-36 verification work is **Phase 36** itself — no `36-VERIFICATION.md` exists on disk despite 5/5 plans being complete and Plan 05 closed via human-verify "approved" 2026-04-28. Run `/clear` then `/gsd-verify-phase 36`. (36.2 / 36.3 / 36.5 verifications confirmed on disk during PR #4 post-merge audit 2026-05-03 — STATE table updated to reflect reality; previous "awaiting /gsd-verify-phase X" rows for those three were stale documentation, not actual debt.)
+**Next step:** Milestone 36 verification debt CLOSED 2026-05-03 — `36-VERIFICATION.md` written via gsd-verifier agent (the `/gsd-verify-phase` command name in prior STATE notes does not exist as an installed skill; spawned the verifier directly). Verdict PASS_WITH_HUMAN_NEEDED, both human items already closed (live ad-free closed 2026-04-28 Plan 05 approval; `customer.subscription.resumed` live event carried as production-readiness deferred per 36.3-04). Remaining milestone v1.6 work: Phase 39 plans 02-06 (paused on Firebase + Apple/Google credentials), Phase 40 (Content Expansion — no plans drafted yet).
 
 **Phase 39 status unchanged:** Plan 02 still gated on Firebase + Apple/Google credentials provisioning. Independent of Phase 36 verification work.
 
