@@ -384,6 +384,8 @@ cd apps/web && npx playwright show-report      # View last report
 | `settings.spec.ts` × 3 (Deutsch/English buttons) | UI moved to header LanguageSwitcher (D-04); tests target dead code |
 | `analysis.spec.ts` × 2 (compare modal open/close) | Button consistently misses 10s visibility budget under 4-worker parallel CI load |
 | `publicApi.spec.ts` Cache Headers + Revocation | Self-skip when 3-key-per-user cap (D-10) is hit; covered by upstream auth tests |
+| `dashboard.spec.ts` should have refresh/sync button | Fallback assertion `expect(count).toBeGreaterThan(0)` against any-button-with-SVG fires before lazy Dashboard tree mounts in CI. Re-enable once the assertion targets a hydration-anchored selector (e.g. `data-testid="refresh-button"`) |
+| `factcheck.spec.ts` × 1 (drawer with verdict + citations) | Happy-path requires a seeded article whose content contains a fact-checkable claim; CI seed data is opaque and the drawer never resolves to a verdict in budget. The other 4 factcheck tests exercise the security/limit surfaces directly via `request` and stay green. Re-enable once seed pipeline guarantees a known fact-checkable article (or the test mocks the LLM verdict via Playwright route interception) |
 
 ### Z-index ladder
 
