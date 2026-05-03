@@ -362,7 +362,7 @@ Plans:
 **UI hint**: yes
 
 Plans:
-- [ ] 40-01-PLAN.md — Cross-cutting prep (schema + types + isNativeApp() stub + i18n + 4 server/index.ts placeholders) — Wave 1, BLOCKING for entire phase, autonomous=true; revised 9e3d56f after iter 1 schema fixes
+- [x] 40-01-PLAN.md — Cross-cutting prep (schema + types + isNativeApp() stub + i18n + 4 server/index.ts placeholders) — Wave 1, BLOCKING for entire phase, autonomous=true; revised 9e3d56f after iter 1 schema fixes
 - [ ] 40-02-PLAN.md — Source curation (proposed-sources.md → human-verify → sources.ts merge + bias-balance script) — Wave 2, autonomous=false (D-A4 human-verify checkpoint)
 - [ ] 40-03-PLAN.md — Podcast backend (Podcast Index + iTunes + curated podcasts.ts + routes + feed-poll worker) — Wave 2, autonomous=true; revised abeefe8 with stripHtml() at persistence boundary
 - [ ] 40-04-PLAN.md — Podcast frontend (RelatedPodcasts inline + PodcastsPage + vanilla audio player + Sidebar entry + DE/EN/FR i18n) — Wave 3, depends_on [40-01, 40-03]
@@ -412,7 +412,7 @@ Plans:
 | 37. Horizontal Scaling | v1.6 | 0/? | Not started | - |
 | 38. Advanced AI Features | v1.6 | 0/? | Not started | - |
 | 39. Mobile Apps | v1.6 | 0/? | Not started | - |
-| 40. Content Expansion | v1.6 | 0/? | Not started | - |
+| 40. Content Expansion | v1.6 | 1/6 | In Progress|  |
 
 ---
 
@@ -424,7 +424,7 @@ Plans:
 **Goal:** Pay back 4 diagnosed UI-wiring debt sessions from Phase 28 (Team Collaboration). Wire team-feature UI to existing backend, prove via tests, archive 4 debug sessions to .planning/debug/resolved/.
 **Requirements**: null (debt-payback phase — no new REQ-IDs to map; 40.1-CONTEXT.md is the contract)
 **Depends on:** Phase 40
-**Plans:** 5/5 plans executed — COMPLETE
+**Plans:** 1/6 plans executed
 
 Plans:
 - [x] 40.1-01-PLAN.md — Vitest unit tests for the 4 already-wired team components (BookmarkButton, TeamBookmarkCard, PendingInviteList, DeleteTeamModal)

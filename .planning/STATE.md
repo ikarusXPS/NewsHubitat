@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Infrastructure & Scale
-current_plan: 2
-status: paused
-last_updated: "2026-05-03T23:39:14Z"
-last_activity: 2026-05-03 -- Phase 40 plans complete (chunked /gsd-plan-phase 40): 6 plans across 3 waves, 6523 total lines; iter 1 plan-checker found 8 HIGH (concentrated in 40-01 schema/contract mismatches with consumers) + 4 MEDIUM + 3 LOW; iter 2 PASSED after 40-01 + 40-03 revisions (commits 9e3d56f, abeefe8). RESEARCH 910 lines (c34ca17), PATTERNS 997 lines / 49 files (fa87425), outline (9cf30af), 6 plan commits + 2 revision commits. Ready for /gsd-execute-phase 40.
+current_plan: 1
+status: executing
+last_updated: "2026-05-03T21:48:46.253Z"
+last_activity: 2026-05-03 -- Phase 40 execution started
 progress:
   total_phases: 7
-  completed_phases: 4
-  total_plans: 34
+  completed_phases: 5
+  total_plans: 40
   completed_plans: 29
-  percent: 85
+  percent: 73
 ---
 
 # State: NewsHub
@@ -21,15 +21,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-26)
 
 **Core value:** Users can see how the same story is covered by different regional perspectives
-**Current focus:** Phase 40 — content-expansion (CONTEXT captured 2026-05-03; awaiting `/gsd-plan-phase 40`). Phase 39 (mobile-apps) remains paused awaiting Firebase + Apple/Google credentials.
+**Current focus:** Phase 40 — content-expansion
 
 ## Current Position
 
-Phase: 39 (mobile-apps) — PAUSED (1/6 plans complete)
-Plan: 2 of 6 (next to execute)
-Current Plan: 2
-Status: Paused after Plan 01 (Capacitor 8.3.1 scaffold) — Firebase/Apple/Google credentials not yet provisioned. Resume via `/gsd-execute-phase 39` once `apps/web/.env` has `FIREBASE_PROJECT_ID/CLIENT_EMAIL/PRIVATE_KEY` for Plan 02 (push backend); Plan 06 additionally needs `APPLE_TEAM_ID`, `APP_STORE_CONNECT_API_*`, `MATCH_*`.
-Last activity: 2026-04-30 -- Phase 39 plan 01 complete (3 commits 35a4c16, 8faac2c, 4f7a902 — apps/mobile/ Capacitor 8.3.1 scaffold; iOS+Android native projects generated; bundle ID com.newshub.app set; pnpm typecheck green; SUMMARY at .planning/phases/39-mobile-apps/39-01-SUMMARY.md)
+Phase: 40 (content-expansion) — EXECUTING
+Plan: 1 of 6
+Current Plan: 1
+Status: Executing Phase 40
+Last activity: 2026-05-03 -- Phase 40 execution started
 
 ## Maintenance Log
 
@@ -87,7 +87,7 @@ v1.6 Progress: [████████████████████] (9
 
 **Milestone:** v1.6 - Infrastructure & Scale
 **Goal:** Comprehensive expansion across infrastructure, AI, mobile, monetization, and content
-**Status:** Executing Phase 39
+**Status:** Executing Phase 40
 **Previous:** v1.5 complete 2026-04-26
 
 ### Phase Summary
