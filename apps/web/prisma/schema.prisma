@@ -147,7 +147,7 @@ model Video {
 
   @@index([channelId, publishedAt])
   @@index([publishedAt])
-  @@index([searchTsv], type: Gin)                    // Phase 40 Q-02: FTS GIN index (managed via raw migration; declared here for type-safe Prisma queries)
+  @@index([searchTsv], map: "video_search_tsv_idx", type: Gin) // Phase 40 Q-02: FTS GIN index (managed via raw migration; explicit map: keeps the lowercase name from the raw migration)
 }
 
 // Phase 40 CC-05 (timestamped + searchable) + Q-05 (transcript-excerpt FTS).
@@ -169,7 +169,7 @@ model Transcript {
 
   @@unique([contentType, contentId])               // one transcript per piece of content. (Multi-language support: store one Transcript per (contentType, contentId) and choose language at write time. If multi-language transcripts ever needed, add language to this @@unique in a follow-up migration.)
   @@index([contentType, contentId])
-  @@index([searchTsv], type: Gin)                  // Q-05: FTS GIN index for transcript-excerpt search (managed via raw migration; declared here for type-safe Prisma queries)
+  @@index([searchTsv], map: "transcript_search_tsv_idx", type: Gin) // Q-05: FTS GIN index (managed via raw migration; explicit map: keeps the lowercase name from the raw migration)
 }
 
 model User {
