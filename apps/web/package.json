@@ -29,7 +29,8 @@
     "seed:load-test": "tsx scripts/seed-load-test-users.js",
     "load:smoke": "k6 run k6/load-test.js --env K6_SCENARIO=smoke",
     "load:full": "k6 run k6/load-test.js --env K6_SCENARIO=load",
-    "openapi:generate": "tsx server/openapi/generator.ts public/openapi.json"
+    "openapi:generate": "tsx server/openapi/generator.ts public/openapi.json",
+    "check:source-bias": "tsx scripts/check-source-bias-coverage.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",
