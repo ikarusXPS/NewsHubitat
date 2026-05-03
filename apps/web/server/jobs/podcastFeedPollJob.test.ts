@@ -45,15 +45,19 @@ describe('PodcastFeedPollJob', () => {
     vi.useRealTimers();
   });
 
+  const ORIGINAL_RUN_JOBS = process.env.RUN_JOBS;
+
   beforeEach(() => {
     pollFeed.mockReset();
     pollFeed.mockResolvedValue(0);
     vi.clearAllMocks();
+    delete process.env.RUN_JOBS; // default: undefined => not 'false' => job runs
   });
 
   afterEach(() => {
     PodcastFeedPollJob.getInstance().stop();
     (PodcastFeedPollJob as unknown as { instance: PodcastFeedPollJob | undefined }).instance = undefined;
+    process.env.RUN_JOBS = ORIGINAL_RUN_JOBS;
   });
 
   describe('singleton', () => {
@@ -61,6 +65,19 @@ describe('PodcastFeedPollJob', () => {
       const a = PodcastFeedPollJob.getInstance();
       const b = PodcastFeedPollJob.getInstance();
       expect(a).toBe(b);
+    });
+  });
+
+  describe('RUN_JOBS internal gate', () => {
+    it('start() self-skips when RUN_JOBS=false (web replica)', async () => {
+      process.env.RUN_JOBS = 'false';
+      const job = PodcastFeedPollJob.getInstance();
+      job.start();
+      await vi.advanceTimersByTimeAsync(0);
+      expect(pollFeed).not.toHaveBeenCalled();
+      // Advance 24h: still nothing
+      await vi.advanceTimersByTimeAsync(24 * 60 * 60 * 1000);
+      expect(pollFeed).not.toHaveBeenCalled();
     });
   });
 
