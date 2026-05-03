@@ -62,9 +62,114 @@ model NewsSource {
   apiEndpoint   String?
   rateLimit     Int
   lastFetched   DateTime?
+  biasDiversityNote String?      // Phase 40 D-A3: 'limited' for state-dominated press regions (russland, china); null otherwise; surfaced as framing-analysis footnote
   articles      NewsArticle[]
 
   @@index([region])
+}
+
+// ============================================================================
+// PHASE 40: CONTENT EXPANSION — PODCASTS, VIDEOS, TRANSCRIPTS
+// ============================================================================
+
+// Phase 40 D-B1: Curated baseline + Podcast Index discoveries.
+// `category` and `reliability` are non-optional — required by curated baseline
+// quality bar (D-B1) and by 40-04 PodcastsPage browse-by-category UI.
+model Podcast {
+  id            String           @id              // UUID or slug; slug for curated, UUID for Podcast Index discoveries
+  title         String
+  author        String?
+  description   String?
+  rssUrl        String           @unique          // RSS feed URL — unique enough to dedupe
+  imageUrl      String?
+  language      String                            // ISO 639-1 (e.g. 'en', 'de', 'fr')
+  category      String                            // Required: free-text category from RSS feed (curated entries MUST set this). Browse-by-category UI in 40-04 depends on it.
+  reliability   Int                               // Required: 1-10 reliability score (mirror NewsSource.reliability convention). Curated baseline quality bar per D-B1.
+  source        String                            // 'curated' | 'podcast-index' | 'itunes'
+  podcastIndexId String?         @unique          // Podcast Index ID when discovered via that API; null for curated/iTunes
+  region        String?                           // Optional perspective tag for curated entries (matches PerspectiveRegion union values)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  episodes      PodcastEpisode[]
+
+  @@index([source])
+  @@index([region])
+  @@index([language])
+}
+
+// Phase 40 D-C2: Transcribe-once-serve-many dedupe via @unique([podcastGuid]).
+// `transcriptUrl` (NOT publisherTranscriptUrl) carries the Podcasting 2.0
+// <podcast:transcript> URL — 40-03 + 40-06 read this exact field name (Pitfall 4).
+// `transcriptType` carries the MIME type so the transcript service knows how to parse
+// without re-fetching. NO `transcripts Transcript[]` back-relation — Transcript uses
+// a flat `contentId String` shape (no relation arrow).
+model PodcastEpisode {
+  id              String   @id                       // UUID
+  podcast         Podcast  @relation(fields: [podcastId], references: [id], onDelete: Cascade)
+  podcastId       String
+  title           String
+  description     String?
+  audioUrl        String                              // Direct mp3/m4a URL from RSS enclosure
+  durationSec     Int?
+  publishedAt     DateTime
+  episodeUrl      String?                             // Web URL of the episode (for "open in original player" link)
+  imageUrl        String?
+  podcastGuid     String   @unique                    // RSS <guid> — primary dedupe key across sources
+  transcriptUrl   String?                             // <podcast:transcript> tag from RSS namespace (Pitfall 4 short-circuit). 40-03 + 40-06 read this field name verbatim. When present, transcript service skips Whisper.
+  transcriptType  String?                             // text/vtt | application/srt | text/plain | etc. — MIME type from the <podcast:transcript> tag's `type` attribute. Lets the transcript service parse without re-fetching to sniff.
+  createdAt       DateTime @default(now())
+
+  @@index([podcastId, publishedAt])                  // browse-by-podcast newest-first
+  @@index([publishedAt])                             // global newest-first
+}
+
+// Phase 40 D-D1: curated channel index + per-article matching; FTS column for D-D1 + Q-02.
+// `youtubeId` is NULLABLE; separate `vimeoId String? @unique` field. Exactly one of
+// youtubeId / vimeoId must be non-null per write path (40-05/40-06 expectation;
+// app-level invariant enforced at videoService write paths). NO `transcripts
+// Transcript[]` back-relation — Transcript uses a flat `contentId String` shape.
+model Video {
+  id              String   @id                       // UUID
+  youtubeId       String?  @unique                   // 11-char YouTube video ID; nullable because Vimeo videos use vimeoId instead. Exactly one of youtubeId / vimeoId must be non-null. Enforced at videoService write paths.
+  vimeoId         String?  @unique                   // Vimeo video ID (numeric string, e.g. "76979871"); nullable because YouTube videos use youtubeId instead. Exactly one of youtubeId / vimeoId must be non-null. Enforced at videoService write paths.
+  channelId       String?                            // YouTube UCxxxx channel ID (resolved at build time per RESEARCH anti-pattern). Nullable because Vimeo videos found via article-body link have no channel index entry.
+  channelName     String?                            // Nullable for the same reason as channelId.
+  title           String
+  description     String                             // Full description; concatenated with title in tsvector per Q-02
+  tags            Json?                              // JSONB string[] from YouTube channel tags
+  publishedAt     DateTime
+  durationSec     Int?
+  thumbnailUrl    String?
+  region          String?                            // Optional perspective tag from the curated channel's region
+  createdAt       DateTime @default(now())
+
+  searchTsv       Unsupported("tsvector")? @map("search_tsv") // managed by raw migration 20260504_40_video_fts; do not edit via Prisma
+
+  @@index([channelId, publishedAt])
+  @@index([publishedAt])
+  @@index([searchTsv], type: Gin)                    // Phase 40 Q-02: FTS GIN index (managed via raw migration)
+}
+
+// Phase 40 CC-05 (timestamped + searchable) + Q-05 (transcript-excerpt FTS).
+// Uses a flat `contentId String` discriminator + `@@unique([contentType, contentId])`
+// rather than dual nullable FKs. This is a LOOSE foreign key — sentinel rows remain
+// valid even after content deletion. App-level integrity (transcriptService verifies
+// contentId resolves on write). 40-06 expects this exact flat shape.
+model Transcript {
+  id              String          @id               // UUID
+  contentId       String                            // PodcastEpisode.id or Video.id depending on contentType. Loose FK; sentinel rows valid even after content deletion. App-level integrity.
+  contentType     String                            // 'podcast' | 'video'
+  language        String          @default("en")
+  segments        Json                              // CC-05: JSONB stores [{startSec, endSec, text}, ...]
+  fullText        String                            // Denormalised concatenation of segments[].text — feeds search_tsv per Q-05
+  provider        String                            // 'youtube-captions' | 'whisper' | 'publisher-transcript' (per Pitfall 4)
+  transcribedAt   DateTime        @default(now())
+
+  searchTsv       Unsupported("tsvector")? @map("search_tsv") // managed by raw migration 20260504_40_transcript_fts; do not edit via Prisma
+
+  @@unique([contentType, contentId])               // one transcript per piece of content. (Multi-language support: store one Transcript per (contentType, contentId) and choose language at write time. If multi-language transcripts ever needed, add language to this @@unique in a follow-up migration.)
+  @@index([contentType, contentId])
+  @@index([searchTsv], type: Gin)                  // Q-05: FTS GIN index for transcript-excerpt search (managed via raw migration)
 }
 
 model User {
