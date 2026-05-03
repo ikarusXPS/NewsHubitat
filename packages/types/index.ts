@@ -66,6 +66,10 @@ export interface NewsSource {
   };
   apiEndpoint?: string;
   rateLimit?: number;
+  // Phase 40 D-A3: 'limited' marks state-dominated press regions (russland, china) as exempt
+  // from the per-region bias-balance gate. Surfaced as a framing-analysis footnote.
+  // Atomic mirror with apps/web/src/types/index.ts.
+  biasDiversityNote?: 'limited';
 }
 
 export interface NewsArticle {
