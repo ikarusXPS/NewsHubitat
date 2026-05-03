@@ -358,8 +358,16 @@ Plans:
   5. Premium users see auto-generated video transcription with searchable text
   6. Media pipeline handles video/audio transcoding with Cloudinary integration
   7. Storage costs remain predictable through embed-first strategy and upload quotas
-**Plans**: TBD
+**Plans**: 6 plans across 3 waves (planned 2026-05-03; verified PASS plan-checker iter 2)
 **UI hint**: yes
+
+Plans:
+- [ ] 40-01-PLAN.md — Cross-cutting prep (schema + types + isNativeApp() stub + i18n + 4 server/index.ts placeholders) — Wave 1, BLOCKING for entire phase, autonomous=true; revised 9e3d56f after iter 1 schema fixes
+- [ ] 40-02-PLAN.md — Source curation (proposed-sources.md → human-verify → sources.ts merge + bias-balance script) — Wave 2, autonomous=false (D-A4 human-verify checkpoint)
+- [ ] 40-03-PLAN.md — Podcast backend (Podcast Index + iTunes + curated podcasts.ts + routes + feed-poll worker) — Wave 2, autonomous=true; revised abeefe8 with stripHtml() at persistence boundary
+- [ ] 40-04-PLAN.md — Podcast frontend (RelatedPodcasts inline + PodcastsPage + vanilla audio player + Sidebar entry + DE/EN/FR i18n) — Wave 3, depends_on [40-01, 40-03]
+- [ ] 40-05-PLAN.md — Video full slice (services + youtubeQuota middleware + curated video-channels.ts + lite-youtube + Vimeo lite + worker) — Wave 2, heaviest plan (~50% context)
+- [ ] 40-06-PLAN.md — Transcripts (Whisper + ffmpeg chunking + youtube-caption-extractor + TranscriptDrawer with 3 UI branches + nightly worker + Premium gate) — Wave 3, depends_on [40-03, 40-05]
 
 ## Progress
 
