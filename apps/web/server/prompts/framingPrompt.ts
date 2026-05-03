@@ -45,7 +45,7 @@ Produce a JSON object with this exact shape:
 }
 
 Rules:
-- The "<region>" key must be one of: usa, europa, deutschland, nahost, tuerkei, russland, china, asien, afrika, lateinamerika, ozeanien, kanada, alternative.
+- The "<region>" key must be one of: usa, europa, deutschland, nahost, tuerkei, russland, china, asien, afrika, lateinamerika, ozeanien, kanada, alternative, sudostasien, nordeuropa, sub-saharan-africa, indien.
 - Only include regions that appear in the input articles.
 - vocabulary[] entries are short charged words/phrases (1-3 words each).
 - evidenceQuotes[] must be substrings actually present in the input articles.
