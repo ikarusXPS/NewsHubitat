@@ -53,6 +53,10 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   NewsArticle: 'NewsArticle',
   NewsSource: 'NewsSource',
+  Podcast: 'Podcast',
+  PodcastEpisode: 'PodcastEpisode',
+  Video: 'Video',
+  Transcript: 'Transcript',
   User: 'User',
   Bookmark: 'Bookmark',
   ReadingHistory: 'ReadingHistory',
@@ -133,10 +137,83 @@ export const NewsSourceScalarFieldEnum = {
   ownership: 'ownership',
   apiEndpoint: 'apiEndpoint',
   rateLimit: 'rateLimit',
-  lastFetched: 'lastFetched'
+  lastFetched: 'lastFetched',
+  biasDiversityNote: 'biasDiversityNote'
 } as const
 
 export type NewsSourceScalarFieldEnum = (typeof NewsSourceScalarFieldEnum)[keyof typeof NewsSourceScalarFieldEnum]
+
+
+export const PodcastScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  author: 'author',
+  description: 'description',
+  rssUrl: 'rssUrl',
+  imageUrl: 'imageUrl',
+  language: 'language',
+  category: 'category',
+  reliability: 'reliability',
+  source: 'source',
+  podcastIndexId: 'podcastIndexId',
+  region: 'region',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PodcastScalarFieldEnum = (typeof PodcastScalarFieldEnum)[keyof typeof PodcastScalarFieldEnum]
+
+
+export const PodcastEpisodeScalarFieldEnum = {
+  id: 'id',
+  podcastId: 'podcastId',
+  title: 'title',
+  description: 'description',
+  audioUrl: 'audioUrl',
+  durationSec: 'durationSec',
+  publishedAt: 'publishedAt',
+  episodeUrl: 'episodeUrl',
+  imageUrl: 'imageUrl',
+  podcastGuid: 'podcastGuid',
+  transcriptUrl: 'transcriptUrl',
+  transcriptType: 'transcriptType',
+  createdAt: 'createdAt'
+} as const
+
+export type PodcastEpisodeScalarFieldEnum = (typeof PodcastEpisodeScalarFieldEnum)[keyof typeof PodcastEpisodeScalarFieldEnum]
+
+
+export const VideoScalarFieldEnum = {
+  id: 'id',
+  youtubeId: 'youtubeId',
+  vimeoId: 'vimeoId',
+  channelId: 'channelId',
+  channelName: 'channelName',
+  title: 'title',
+  description: 'description',
+  tags: 'tags',
+  publishedAt: 'publishedAt',
+  durationSec: 'durationSec',
+  thumbnailUrl: 'thumbnailUrl',
+  region: 'region',
+  createdAt: 'createdAt'
+} as const
+
+export type VideoScalarFieldEnum = (typeof VideoScalarFieldEnum)[keyof typeof VideoScalarFieldEnum]
+
+
+export const TranscriptScalarFieldEnum = {
+  id: 'id',
+  contentId: 'contentId',
+  contentType: 'contentType',
+  language: 'language',
+  segments: 'segments',
+  fullText: 'fullText',
+  provider: 'provider',
+  transcribedAt: 'transcribedAt'
+} as const
+
+export type TranscriptScalarFieldEnum = (typeof TranscriptScalarFieldEnum)[keyof typeof TranscriptScalarFieldEnum]
 
 
 export const UserScalarFieldEnum = {

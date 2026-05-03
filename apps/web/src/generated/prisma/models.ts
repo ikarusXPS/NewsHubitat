@@ -10,6 +10,10 @@
  */
 export type * from './models/NewsArticle.js'
 export type * from './models/NewsSource.js'
+export type * from './models/Podcast.js'
+export type * from './models/PodcastEpisode.js'
+export type * from './models/Video.js'
+export type * from './models/Transcript.js'
 export type * from './models/User.js'
 export type * from './models/Bookmark.js'
 export type * from './models/ReadingHistory.js'

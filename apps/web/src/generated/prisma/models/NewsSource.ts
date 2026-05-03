@@ -50,6 +50,7 @@ export type NewsSourceMinAggregateOutputType = {
   apiEndpoint: string | null
   rateLimit: number | null
   lastFetched: Date | null
+  biasDiversityNote: string | null
 }
 
 export type NewsSourceMaxAggregateOutputType = {
@@ -64,6 +65,7 @@ export type NewsSourceMaxAggregateOutputType = {
   apiEndpoint: string | null
   rateLimit: number | null
   lastFetched: Date | null
+  biasDiversityNote: string | null
 }
 
 export type NewsSourceCountAggregateOutputType = {
@@ -78,6 +80,7 @@ export type NewsSourceCountAggregateOutputType = {
   apiEndpoint: number
   rateLimit: number
   lastFetched: number
+  biasDiversityNote: number
   _all: number
 }
 
@@ -106,6 +109,7 @@ export type NewsSourceMinAggregateInputType = {
   apiEndpoint?: true
   rateLimit?: true
   lastFetched?: true
+  biasDiversityNote?: true
 }
 
 export type NewsSourceMaxAggregateInputType = {
@@ -120,6 +124,7 @@ export type NewsSourceMaxAggregateInputType = {
   apiEndpoint?: true
   rateLimit?: true
   lastFetched?: true
+  biasDiversityNote?: true
 }
 
 export type NewsSourceCountAggregateInputType = {
@@ -134,6 +139,7 @@ export type NewsSourceCountAggregateInputType = {
   apiEndpoint?: true
   rateLimit?: true
   lastFetched?: true
+  biasDiversityNote?: true
   _all?: true
 }
 
@@ -235,6 +241,7 @@ export type NewsSourceGroupByOutputType = {
   apiEndpoint: string | null
   rateLimit: number
   lastFetched: Date | null
+  biasDiversityNote: string | null
   _count: NewsSourceCountAggregateOutputType | null
   _avg: NewsSourceAvgAggregateOutputType | null
   _sum: NewsSourceSumAggregateOutputType | null
@@ -272,6 +279,7 @@ export type NewsSourceWhereInput = {
   apiEndpoint?: Prisma.StringNullableFilter<"NewsSource"> | string | null
   rateLimit?: Prisma.IntFilter<"NewsSource"> | number
   lastFetched?: Prisma.DateTimeNullableFilter<"NewsSource"> | Date | string | null
+  biasDiversityNote?: Prisma.StringNullableFilter<"NewsSource"> | string | null
   articles?: Prisma.NewsArticleListRelationFilter
 }
 
@@ -287,6 +295,7 @@ export type NewsSourceOrderByWithRelationInput = {
   apiEndpoint?: Prisma.SortOrderInput | Prisma.SortOrder
   rateLimit?: Prisma.SortOrder
   lastFetched?: Prisma.SortOrderInput | Prisma.SortOrder
+  biasDiversityNote?: Prisma.SortOrderInput | Prisma.SortOrder
   articles?: Prisma.NewsArticleOrderByRelationAggregateInput
 }
 
@@ -305,6 +314,7 @@ export type NewsSourceWhereUniqueInput = Prisma.AtLeast<{
   apiEndpoint?: Prisma.StringNullableFilter<"NewsSource"> | string | null
   rateLimit?: Prisma.IntFilter<"NewsSource"> | number
   lastFetched?: Prisma.DateTimeNullableFilter<"NewsSource"> | Date | string | null
+  biasDiversityNote?: Prisma.StringNullableFilter<"NewsSource"> | string | null
   articles?: Prisma.NewsArticleListRelationFilter
 }, "id">
 
@@ -320,6 +330,7 @@ export type NewsSourceOrderByWithAggregationInput = {
   apiEndpoint?: Prisma.SortOrderInput | Prisma.SortOrder
   rateLimit?: Prisma.SortOrder
   lastFetched?: Prisma.SortOrderInput | Prisma.SortOrder
+  biasDiversityNote?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.NewsSourceCountOrderByAggregateInput
   _avg?: Prisma.NewsSourceAvgOrderByAggregateInput
   _max?: Prisma.NewsSourceMaxOrderByAggregateInput
@@ -342,6 +353,7 @@ export type NewsSourceScalarWhereWithAggregatesInput = {
   apiEndpoint?: Prisma.StringNullableWithAggregatesFilter<"NewsSource"> | string | null
   rateLimit?: Prisma.IntWithAggregatesFilter<"NewsSource"> | number
   lastFetched?: Prisma.DateTimeNullableWithAggregatesFilter<"NewsSource"> | Date | string | null
+  biasDiversityNote?: Prisma.StringNullableWithAggregatesFilter<"NewsSource"> | string | null
 }
 
 export type NewsSourceCreateInput = {
@@ -356,6 +368,7 @@ export type NewsSourceCreateInput = {
   apiEndpoint?: string | null
   rateLimit: number
   lastFetched?: Date | string | null
+  biasDiversityNote?: string | null
   articles?: Prisma.NewsArticleCreateNestedManyWithoutSourceInput
 }
 
@@ -371,6 +384,7 @@ export type NewsSourceUncheckedCreateInput = {
   apiEndpoint?: string | null
   rateLimit: number
   lastFetched?: Date | string | null
+  biasDiversityNote?: string | null
   articles?: Prisma.NewsArticleUncheckedCreateNestedManyWithoutSourceInput
 }
 
@@ -386,6 +400,7 @@ export type NewsSourceUpdateInput = {
   apiEndpoint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rateLimit?: Prisma.IntFieldUpdateOperationsInput | number
   lastFetched?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  biasDiversityNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   articles?: Prisma.NewsArticleUpdateManyWithoutSourceNestedInput
 }
 
@@ -401,6 +416,7 @@ export type NewsSourceUncheckedUpdateInput = {
   apiEndpoint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rateLimit?: Prisma.IntFieldUpdateOperationsInput | number
   lastFetched?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  biasDiversityNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   articles?: Prisma.NewsArticleUncheckedUpdateManyWithoutSourceNestedInput
 }
 
@@ -416,6 +432,7 @@ export type NewsSourceCreateManyInput = {
   apiEndpoint?: string | null
   rateLimit: number
   lastFetched?: Date | string | null
+  biasDiversityNote?: string | null
 }
 
 export type NewsSourceUpdateManyMutationInput = {
@@ -430,6 +447,7 @@ export type NewsSourceUpdateManyMutationInput = {
   apiEndpoint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rateLimit?: Prisma.IntFieldUpdateOperationsInput | number
   lastFetched?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  biasDiversityNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type NewsSourceUncheckedUpdateManyInput = {
@@ -444,6 +462,7 @@ export type NewsSourceUncheckedUpdateManyInput = {
   apiEndpoint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rateLimit?: Prisma.IntFieldUpdateOperationsInput | number
   lastFetched?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  biasDiversityNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type NewsSourceScalarRelationFilter = {
@@ -463,6 +482,7 @@ export type NewsSourceCountOrderByAggregateInput = {
   apiEndpoint?: Prisma.SortOrder
   rateLimit?: Prisma.SortOrder
   lastFetched?: Prisma.SortOrder
+  biasDiversityNote?: Prisma.SortOrder
 }
 
 export type NewsSourceAvgOrderByAggregateInput = {
@@ -483,6 +503,7 @@ export type NewsSourceMaxOrderByAggregateInput = {
   apiEndpoint?: Prisma.SortOrder
   rateLimit?: Prisma.SortOrder
   lastFetched?: Prisma.SortOrder
+  biasDiversityNote?: Prisma.SortOrder
 }
 
 export type NewsSourceMinOrderByAggregateInput = {
@@ -497,6 +518,7 @@ export type NewsSourceMinOrderByAggregateInput = {
   apiEndpoint?: Prisma.SortOrder
   rateLimit?: Prisma.SortOrder
   lastFetched?: Prisma.SortOrder
+  biasDiversityNote?: Prisma.SortOrder
 }
 
 export type NewsSourceSumOrderByAggregateInput = {
@@ -543,6 +565,7 @@ export type NewsSourceCreateWithoutArticlesInput = {
   apiEndpoint?: string | null
   rateLimit: number
   lastFetched?: Date | string | null
+  biasDiversityNote?: string | null
 }
 
 export type NewsSourceUncheckedCreateWithoutArticlesInput = {
@@ -557,6 +580,7 @@ export type NewsSourceUncheckedCreateWithoutArticlesInput = {
   apiEndpoint?: string | null
   rateLimit: number
   lastFetched?: Date | string | null
+  biasDiversityNote?: string | null
 }
 
 export type NewsSourceCreateOrConnectWithoutArticlesInput = {
@@ -587,6 +611,7 @@ export type NewsSourceUpdateWithoutArticlesInput = {
   apiEndpoint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rateLimit?: Prisma.IntFieldUpdateOperationsInput | number
   lastFetched?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  biasDiversityNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type NewsSourceUncheckedUpdateWithoutArticlesInput = {
@@ -601,6 +626,7 @@ export type NewsSourceUncheckedUpdateWithoutArticlesInput = {
   apiEndpoint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rateLimit?: Prisma.IntFieldUpdateOperationsInput | number
   lastFetched?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  biasDiversityNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -646,6 +672,7 @@ export type NewsSourceSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   apiEndpoint?: boolean
   rateLimit?: boolean
   lastFetched?: boolean
+  biasDiversityNote?: boolean
   articles?: boolean | Prisma.NewsSource$articlesArgs<ExtArgs>
   _count?: boolean | Prisma.NewsSourceCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["newsSource"]>
@@ -662,6 +689,7 @@ export type NewsSourceSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   apiEndpoint?: boolean
   rateLimit?: boolean
   lastFetched?: boolean
+  biasDiversityNote?: boolean
 }, ExtArgs["result"]["newsSource"]>
 
 export type NewsSourceSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -676,6 +704,7 @@ export type NewsSourceSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   apiEndpoint?: boolean
   rateLimit?: boolean
   lastFetched?: boolean
+  biasDiversityNote?: boolean
 }, ExtArgs["result"]["newsSource"]>
 
 export type NewsSourceSelectScalar = {
@@ -690,9 +719,10 @@ export type NewsSourceSelectScalar = {
   apiEndpoint?: boolean
   rateLimit?: boolean
   lastFetched?: boolean
+  biasDiversityNote?: boolean
 }
 
-export type NewsSourceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "country" | "region" | "language" | "politicalBias" | "reliability" | "ownership" | "apiEndpoint" | "rateLimit" | "lastFetched", ExtArgs["result"]["newsSource"]>
+export type NewsSourceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "country" | "region" | "language" | "politicalBias" | "reliability" | "ownership" | "apiEndpoint" | "rateLimit" | "lastFetched" | "biasDiversityNote", ExtArgs["result"]["newsSource"]>
 export type NewsSourceInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   articles?: boolean | Prisma.NewsSource$articlesArgs<ExtArgs>
   _count?: boolean | Prisma.NewsSourceCountOutputTypeDefaultArgs<ExtArgs>
@@ -717,6 +747,7 @@ export type $NewsSourcePayload<ExtArgs extends runtime.Types.Extensions.Internal
     apiEndpoint: string | null
     rateLimit: number
     lastFetched: Date | null
+    biasDiversityNote: string | null
   }, ExtArgs["result"]["newsSource"]>
   composites: {}
 }
@@ -1152,6 +1183,7 @@ export interface NewsSourceFieldRefs {
   readonly apiEndpoint: Prisma.FieldRef<"NewsSource", 'String'>
   readonly rateLimit: Prisma.FieldRef<"NewsSource", 'Int'>
   readonly lastFetched: Prisma.FieldRef<"NewsSource", 'DateTime'>
+  readonly biasDiversityNote: Prisma.FieldRef<"NewsSource", 'String'>
 }
     
 

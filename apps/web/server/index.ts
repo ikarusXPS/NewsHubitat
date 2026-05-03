@@ -197,6 +197,10 @@ app.use('/api/subscriptions', authMiddleware, subscriptionRoutes);
 // API key management routes (Phase 35-04) - for developer self-service
 app.use('/api/keys', apiKeyRoutes);
 
+// 40: podcast routes mount here (40-03 will replace this comment with the route mount + middleware)
+// 40: video routes mount here (40-05 will replace this comment with the route mount + middleware + youtubeQuota wiring)
+// 40: transcripts route mount here (40-06 will replace this comment with the route mount + requireTier('PREMIUM') middleware)
+
 // =============================================================================
 // Public API v1 (Phase 35) - D-05: versioned at /api/v1/public/*
 // =============================================================================
@@ -530,6 +534,8 @@ void runBootLifecycle({
     }, 10000);
   },
 });
+
+// 40: worker job starts here (40-03 starts podcastFeedPollJob, 40-05 starts videoChannelPollJob; both check RUN_JOBS internally inside the job module's start() method, so this seam just needs to import + invoke them)
 
 // Phase 37 Plan 05 (DEPLOY-04, DEPLOY-05): graceful shutdown via @godaddy/terminus.
 // Replaces the inline SIGTERM/SIGINT handler that previously lived here.

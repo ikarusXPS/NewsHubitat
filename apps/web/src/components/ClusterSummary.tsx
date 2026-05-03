@@ -61,6 +61,11 @@ const REGION_COLORS_HEX: Record<PerspectiveRegion, string> = {
   ozeanien: '#14b8a6',
   kanada: '#ef4444',
   alternative: '#06b6d4',
+  // Phase 40 D-A2: 4 new sub-regions
+  sudostasien: '#00d4b8',
+  nordeuropa: '#4ecdc4',
+  'sub-saharan-africa': '#ffa500',
+  indien: '#ff7f00',
 };
 
 const REGION_LABELS: Record<PerspectiveRegion, string> = {
@@ -77,6 +82,11 @@ const REGION_LABELS: Record<PerspectiveRegion, string> = {
   ozeanien: 'Ozeanien',
   kanada: 'Kanada',
   alternative: 'Alternative',
+  // Phase 40 D-A2: 4 new sub-regions
+  sudostasien: 'Südostasien',
+  nordeuropa: 'Nordeuropa',
+  'sub-saharan-africa': 'Subsahara-Afrika',
+  indien: 'Indien',
 };
 
 function ClusterCard({ cluster, isExpanded, onToggle }: {
