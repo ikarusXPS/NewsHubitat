@@ -89,7 +89,7 @@
 - [x] **Phase 35: Infrastructure Foundation** - Monorepo setup and API gateway (completed 2026-04-26)
 - [ ] **Phase 36: Monetization Core** - Stripe integration and subscription tiers
 - [x] **Phase 37: Horizontal Scaling** - Docker Swarm and connection pooling (completed 2026-04-29; 5/5 must-haves SATISFIED static; runtime items in 37-HUMAN-UAT.md; Dockerfile rewrite deferred to 37.1)
-- [ ] **Phase 37.1 (INSERTED): Fix root Dockerfile for pnpm monorepo + close WS-04** — Rewrite Dockerfile that predates the phase-35 monorepo migration; re-run e2e-stack/run-fanout-test.sh to close WS-04 cross-replica fanout gate
+- [x] **Phase 37.1 (INSERTED): Fix root Dockerfile for pnpm monorepo + close WS-04** — Rewrite Dockerfile that predates the phase-35 monorepo migration; re-run e2e-stack/run-fanout-test.sh to close WS-04 cross-replica fanout gate (completed 2026-04-29; Dockerfile rewrite `67ec0a7` + 6 follow-up fixes; WS-04 verified PASS in 564ms; closure log + reconciliation `e5b8414`)
 - [x] **Phase 38: Advanced AI Features** - Credibility scoring, bias detection, fact-checking (completed 2026-04-29)
 - [ ] **Phase 39: Mobile Apps** - Capacitor wrapper and app store deployment
 - [ ] **Phase 40: Content Expansion** - Video, podcast, and source expansion
@@ -282,8 +282,8 @@ Plans:
 **Plans**: 2 plans across 2 waves
 
 Plans:
-- [ ] 37.1-01-PLAN.md — Rewrite root Dockerfile for pnpm monorepo (corepack pnpm, workspace install, monorepo-aware paths for prisma generate / build / CMD)
-- [ ] 37.1-02-PLAN.md — Re-run e2e-stack fanout test, close WS-04, reconcile 37-06 SUMMARY + UAT + todo + STATE deferred-items (autonomous: false; human-verify gated)
+- [x] 37.1-01-PLAN.md — Rewrite root Dockerfile for pnpm monorepo (corepack pnpm, workspace install, monorepo-aware paths for prisma generate / build / CMD) — completed 2026-04-29 (commit 67ec0a7 + 6 follow-up fixes b83e089/2a8fd8e/c5967f2/345e3d2/69d9f88/1ea9ce5)
+- [x] 37.1-02-PLAN.md — Re-run e2e-stack fanout test, close WS-04, reconcile 37-06 SUMMARY + UAT + todo + STATE deferred-items (autonomous: false; human-verify gated) — completed 2026-04-29 (commit e5b8414; WS-04 verified PASS in 564ms; final substantive fix: websocket-only transport because socket.io-client v4 in Node.js doesn't manage cookies across HTTP polling behind sticky LB)
 
 ### Phase 38: Advanced AI Features
 **Goal**: Users see source credibility scores and can fact-check claims with AI assistance
