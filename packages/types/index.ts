@@ -15,7 +15,12 @@ export type PerspectiveRegion =
   | 'lateinamerika'
   | 'ozeanien'
   | 'kanada'
-  | 'alternative';
+  | 'alternative'
+  // Phase 40 D-A2: 4 new sub-regions (atomic mirror with apps/web/src/types/index.ts)
+  | 'sudostasien'
+  | 'nordeuropa'
+  | 'sub-saharan-africa'
+  | 'indien';
 
 export type Sentiment = 'positive' | 'negative' | 'neutral';
 
