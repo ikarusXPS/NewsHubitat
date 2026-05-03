@@ -36,7 +36,7 @@ model NewsArticle {
   source   NewsSource @relation(fields: [sourceId], references: [id])
   sourceId String
 
-  searchTsv  Unsupported("tsvector")? @map("search_tsv") // managed by raw migration 20260429120000_38_news_article_fts; do not edit via Prisma
+  searchTsv  Unsupported("tsvector")? @default(dbgenerated("to_tsvector('simple'::regconfig, ((COALESCE(title, ''::text) || ' '::text) || COALESCE(content, ''::text)))")) @map("search_tsv") // managed by raw migration 20260429120000_38_news_article_fts; @default(dbgenerated(...)) tells Prisma the column is GENERATED so push doesn't try to drop the default expression (which fails on generated columns)
   factChecks FactCheck[]
 
   @@index([publishedAt])
@@ -143,11 +143,11 @@ model Video {
   region          String?                            // Optional perspective tag from the curated channel's region
   createdAt       DateTime @default(now())
 
-  searchTsv       Unsupported("tsvector")? @map("search_tsv") // managed by raw migration 20260504_40_video_fts; do not edit via Prisma
+  searchTsv       Unsupported("tsvector")? @default(dbgenerated("to_tsvector('simple'::regconfig, ((COALESCE(title, ''::text) || ' '::text) || COALESCE(description, ''::text)))")) @map("search_tsv") // managed by raw migration 20260504_40_video_fts; @default(dbgenerated(...)) tells Prisma the column is GENERATED so push does not try to alter it
 
   @@index([channelId, publishedAt])
   @@index([publishedAt])
-  @@index([searchTsv], type: Gin)                    // Phase 40 Q-02: FTS GIN index (managed via raw migration)
+  @@index([searchTsv], type: Gin)                    // Phase 40 Q-02: FTS GIN index (managed via raw migration; declared here for type-safe Prisma queries)
 }
 
 // Phase 40 CC-05 (timestamped + searchable) + Q-05 (transcript-excerpt FTS).
@@ -165,11 +165,11 @@ model Transcript {
   provider        String                            // 'youtube-captions' | 'whisper' | 'publisher-transcript' (per Pitfall 4)
   transcribedAt   DateTime        @default(now())
 
-  searchTsv       Unsupported("tsvector")? @map("search_tsv") // managed by raw migration 20260504_40_transcript_fts; do not edit via Prisma
+  searchTsv       Unsupported("tsvector")? @default(dbgenerated("to_tsvector('simple'::regconfig, COALESCE(\"fullText\", ''::text))")) @map("search_tsv") // managed by raw migration 20260504_40_transcript_fts; @default(dbgenerated(...)) tells Prisma the column is GENERATED so push does not try to alter it
 
   @@unique([contentType, contentId])               // one transcript per piece of content. (Multi-language support: store one Transcript per (contentType, contentId) and choose language at write time. If multi-language transcripts ever needed, add language to this @@unique in a follow-up migration.)
   @@index([contentType, contentId])
-  @@index([searchTsv], type: Gin)                  // Q-05: FTS GIN index for transcript-excerpt search (managed via raw migration)
+  @@index([searchTsv], type: Gin)                  // Q-05: FTS GIN index for transcript-excerpt search (managed via raw migration; declared here for type-safe Prisma queries)
 }
 
 model User {

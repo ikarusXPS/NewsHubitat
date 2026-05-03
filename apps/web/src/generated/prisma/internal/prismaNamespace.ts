@@ -386,6 +386,10 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   NewsArticle: 'NewsArticle',
   NewsSource: 'NewsSource',
+  Podcast: 'Podcast',
+  PodcastEpisode: 'PodcastEpisode',
+  Video: 'Video',
+  Transcript: 'Transcript',
   User: 'User',
   Bookmark: 'Bookmark',
   ReadingHistory: 'ReadingHistory',
@@ -425,7 +429,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "newsArticle" | "newsSource" | "user" | "bookmark" | "readingHistory" | "storyCluster" | "emailSubscription" | "emailDigest" | "aIPersona" | "userPersona" | "sharedContent" | "shareClick" | "badge" | "userBadge" | "leaderboardSnapshot" | "comment" | "team" | "teamMember" | "teamBookmark" | "teamInvite" | "processedWebhookEvent" | "referralReward" | "campaign" | "studentVerification" | "apiKey" | "factCheck"
+    modelProps: "newsArticle" | "newsSource" | "podcast" | "podcastEpisode" | "video" | "transcript" | "user" | "bookmark" | "readingHistory" | "storyCluster" | "emailSubscription" | "emailDigest" | "aIPersona" | "userPersona" | "sharedContent" | "shareClick" | "badge" | "userBadge" | "leaderboardSnapshot" | "comment" | "team" | "teamMember" | "teamBookmark" | "teamInvite" | "processedWebhookEvent" | "referralReward" | "campaign" | "studentVerification" | "apiKey" | "factCheck"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -574,6 +578,302 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.NewsSourceCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.NewsSourceCountAggregateOutputType> | number
+        }
+      }
+    }
+    Podcast: {
+      payload: Prisma.$PodcastPayload<ExtArgs>
+      fields: Prisma.PodcastFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PodcastFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PodcastPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PodcastFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PodcastPayload>
+        }
+        findFirst: {
+          args: Prisma.PodcastFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PodcastPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PodcastFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PodcastPayload>
+        }
+        findMany: {
+          args: Prisma.PodcastFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PodcastPayload>[]
+        }
+        create: {
+          args: Prisma.PodcastCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PodcastPayload>
+        }
+        createMany: {
+          args: Prisma.PodcastCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PodcastCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PodcastPayload>[]
+        }
+        delete: {
+          args: Prisma.PodcastDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PodcastPayload>
+        }
+        update: {
+          args: Prisma.PodcastUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PodcastPayload>
+        }
+        deleteMany: {
+          args: Prisma.PodcastDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PodcastUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PodcastUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PodcastPayload>[]
+        }
+        upsert: {
+          args: Prisma.PodcastUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PodcastPayload>
+        }
+        aggregate: {
+          args: Prisma.PodcastAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePodcast>
+        }
+        groupBy: {
+          args: Prisma.PodcastGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PodcastGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PodcastCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PodcastCountAggregateOutputType> | number
+        }
+      }
+    }
+    PodcastEpisode: {
+      payload: Prisma.$PodcastEpisodePayload<ExtArgs>
+      fields: Prisma.PodcastEpisodeFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PodcastEpisodeFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PodcastEpisodePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PodcastEpisodeFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PodcastEpisodePayload>
+        }
+        findFirst: {
+          args: Prisma.PodcastEpisodeFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PodcastEpisodePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PodcastEpisodeFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PodcastEpisodePayload>
+        }
+        findMany: {
+          args: Prisma.PodcastEpisodeFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PodcastEpisodePayload>[]
+        }
+        create: {
+          args: Prisma.PodcastEpisodeCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PodcastEpisodePayload>
+        }
+        createMany: {
+          args: Prisma.PodcastEpisodeCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PodcastEpisodeCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PodcastEpisodePayload>[]
+        }
+        delete: {
+          args: Prisma.PodcastEpisodeDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PodcastEpisodePayload>
+        }
+        update: {
+          args: Prisma.PodcastEpisodeUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PodcastEpisodePayload>
+        }
+        deleteMany: {
+          args: Prisma.PodcastEpisodeDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PodcastEpisodeUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PodcastEpisodeUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PodcastEpisodePayload>[]
+        }
+        upsert: {
+          args: Prisma.PodcastEpisodeUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PodcastEpisodePayload>
+        }
+        aggregate: {
+          args: Prisma.PodcastEpisodeAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePodcastEpisode>
+        }
+        groupBy: {
+          args: Prisma.PodcastEpisodeGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PodcastEpisodeGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PodcastEpisodeCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PodcastEpisodeCountAggregateOutputType> | number
+        }
+      }
+    }
+    Video: {
+      payload: Prisma.$VideoPayload<ExtArgs>
+      fields: Prisma.VideoFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.VideoFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.VideoFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoPayload>
+        }
+        findFirst: {
+          args: Prisma.VideoFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.VideoFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoPayload>
+        }
+        findMany: {
+          args: Prisma.VideoFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoPayload>[]
+        }
+        create: {
+          args: Prisma.VideoCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoPayload>
+        }
+        createMany: {
+          args: Prisma.VideoCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.VideoCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoPayload>[]
+        }
+        delete: {
+          args: Prisma.VideoDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoPayload>
+        }
+        update: {
+          args: Prisma.VideoUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoPayload>
+        }
+        deleteMany: {
+          args: Prisma.VideoDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.VideoUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.VideoUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoPayload>[]
+        }
+        upsert: {
+          args: Prisma.VideoUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoPayload>
+        }
+        aggregate: {
+          args: Prisma.VideoAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateVideo>
+        }
+        groupBy: {
+          args: Prisma.VideoGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VideoGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.VideoCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VideoCountAggregateOutputType> | number
+        }
+      }
+    }
+    Transcript: {
+      payload: Prisma.$TranscriptPayload<ExtArgs>
+      fields: Prisma.TranscriptFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TranscriptFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranscriptPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TranscriptFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranscriptPayload>
+        }
+        findFirst: {
+          args: Prisma.TranscriptFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranscriptPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TranscriptFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranscriptPayload>
+        }
+        findMany: {
+          args: Prisma.TranscriptFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranscriptPayload>[]
+        }
+        create: {
+          args: Prisma.TranscriptCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranscriptPayload>
+        }
+        createMany: {
+          args: Prisma.TranscriptCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TranscriptCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranscriptPayload>[]
+        }
+        delete: {
+          args: Prisma.TranscriptDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranscriptPayload>
+        }
+        update: {
+          args: Prisma.TranscriptUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranscriptPayload>
+        }
+        deleteMany: {
+          args: Prisma.TranscriptDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TranscriptUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TranscriptUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranscriptPayload>[]
+        }
+        upsert: {
+          args: Prisma.TranscriptUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranscriptPayload>
+        }
+        aggregate: {
+          args: Prisma.TranscriptAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTranscript>
+        }
+        groupBy: {
+          args: Prisma.TranscriptGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TranscriptGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TranscriptCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TranscriptCountAggregateOutputType> | number
         }
       }
     }
@@ -2430,10 +2730,83 @@ export const NewsSourceScalarFieldEnum = {
   ownership: 'ownership',
   apiEndpoint: 'apiEndpoint',
   rateLimit: 'rateLimit',
-  lastFetched: 'lastFetched'
+  lastFetched: 'lastFetched',
+  biasDiversityNote: 'biasDiversityNote'
 } as const
 
 export type NewsSourceScalarFieldEnum = (typeof NewsSourceScalarFieldEnum)[keyof typeof NewsSourceScalarFieldEnum]
+
+
+export const PodcastScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  author: 'author',
+  description: 'description',
+  rssUrl: 'rssUrl',
+  imageUrl: 'imageUrl',
+  language: 'language',
+  category: 'category',
+  reliability: 'reliability',
+  source: 'source',
+  podcastIndexId: 'podcastIndexId',
+  region: 'region',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PodcastScalarFieldEnum = (typeof PodcastScalarFieldEnum)[keyof typeof PodcastScalarFieldEnum]
+
+
+export const PodcastEpisodeScalarFieldEnum = {
+  id: 'id',
+  podcastId: 'podcastId',
+  title: 'title',
+  description: 'description',
+  audioUrl: 'audioUrl',
+  durationSec: 'durationSec',
+  publishedAt: 'publishedAt',
+  episodeUrl: 'episodeUrl',
+  imageUrl: 'imageUrl',
+  podcastGuid: 'podcastGuid',
+  transcriptUrl: 'transcriptUrl',
+  transcriptType: 'transcriptType',
+  createdAt: 'createdAt'
+} as const
+
+export type PodcastEpisodeScalarFieldEnum = (typeof PodcastEpisodeScalarFieldEnum)[keyof typeof PodcastEpisodeScalarFieldEnum]
+
+
+export const VideoScalarFieldEnum = {
+  id: 'id',
+  youtubeId: 'youtubeId',
+  vimeoId: 'vimeoId',
+  channelId: 'channelId',
+  channelName: 'channelName',
+  title: 'title',
+  description: 'description',
+  tags: 'tags',
+  publishedAt: 'publishedAt',
+  durationSec: 'durationSec',
+  thumbnailUrl: 'thumbnailUrl',
+  region: 'region',
+  createdAt: 'createdAt'
+} as const
+
+export type VideoScalarFieldEnum = (typeof VideoScalarFieldEnum)[keyof typeof VideoScalarFieldEnum]
+
+
+export const TranscriptScalarFieldEnum = {
+  id: 'id',
+  contentId: 'contentId',
+  contentType: 'contentType',
+  language: 'language',
+  segments: 'segments',
+  fullText: 'fullText',
+  provider: 'provider',
+  transcribedAt: 'transcribedAt'
+} as const
+
+export type TranscriptScalarFieldEnum = (typeof TranscriptScalarFieldEnum)[keyof typeof TranscriptScalarFieldEnum]
 
 
 export const UserScalarFieldEnum = {
@@ -3087,6 +3460,10 @@ export type PrismaClientOptions = ({
 export type GlobalOmitConfig = {
   newsArticle?: Prisma.NewsArticleOmit
   newsSource?: Prisma.NewsSourceOmit
+  podcast?: Prisma.PodcastOmit
+  podcastEpisode?: Prisma.PodcastEpisodeOmit
+  video?: Prisma.VideoOmit
+  transcript?: Prisma.TranscriptOmit
   user?: Prisma.UserOmit
   bookmark?: Prisma.BookmarkOmit
   readingHistory?: Prisma.ReadingHistoryOmit
