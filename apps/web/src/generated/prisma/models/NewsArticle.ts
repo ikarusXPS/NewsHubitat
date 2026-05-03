@@ -337,6 +337,7 @@ export type NewsArticleWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"NewsArticle"> | Date | string
   sourceId?: Prisma.StringFilter<"NewsArticle"> | string
   source?: Prisma.XOR<Prisma.NewsSourceScalarRelationFilter, Prisma.NewsSourceWhereInput>
+  factChecks?: Prisma.FactCheckListRelationFilter
 }
 
 export type NewsArticleOrderByWithRelationInput = {
@@ -362,6 +363,7 @@ export type NewsArticleOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   sourceId?: Prisma.SortOrder
   source?: Prisma.NewsSourceOrderByWithRelationInput
+  factChecks?: Prisma.FactCheckOrderByRelationAggregateInput
 }
 
 export type NewsArticleWhereUniqueInput = Prisma.AtLeast<{
@@ -390,6 +392,7 @@ export type NewsArticleWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"NewsArticle"> | Date | string
   sourceId?: Prisma.StringFilter<"NewsArticle"> | string
   source?: Prisma.XOR<Prisma.NewsSourceScalarRelationFilter, Prisma.NewsSourceWhereInput>
+  factChecks?: Prisma.FactCheckListRelationFilter
 }, "id" | "url">
 
 export type NewsArticleOrderByWithAggregationInput = {
@@ -470,6 +473,7 @@ export type NewsArticleCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   source: Prisma.NewsSourceCreateNestedOneWithoutArticlesInput
+  factChecks?: Prisma.FactCheckCreateNestedManyWithoutArticleInput
 }
 
 export type NewsArticleUncheckedCreateInput = {
@@ -494,6 +498,7 @@ export type NewsArticleUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   sourceId: string
+  factChecks?: Prisma.FactCheckUncheckedCreateNestedManyWithoutArticleInput
 }
 
 export type NewsArticleUpdateInput = {
@@ -518,6 +523,7 @@ export type NewsArticleUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   source?: Prisma.NewsSourceUpdateOneRequiredWithoutArticlesNestedInput
+  factChecks?: Prisma.FactCheckUpdateManyWithoutArticleNestedInput
 }
 
 export type NewsArticleUncheckedUpdateInput = {
@@ -542,6 +548,7 @@ export type NewsArticleUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sourceId?: Prisma.StringFieldUpdateOperationsInput | string
+  factChecks?: Prisma.FactCheckUncheckedUpdateManyWithoutArticleNestedInput
 }
 
 export type NewsArticleCreateManyInput = {
@@ -701,6 +708,11 @@ export type NewsArticleOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type NewsArticleNullableScalarRelationFilter = {
+  is?: Prisma.NewsArticleWhereInput | null
+  isNot?: Prisma.NewsArticleWhereInput | null
+}
+
 export type StringFieldUpdateOperationsInput = {
   set?: string
 }
@@ -783,6 +795,22 @@ export type NewsArticleUncheckedUpdateManyWithoutSourceNestedInput = {
   deleteMany?: Prisma.NewsArticleScalarWhereInput | Prisma.NewsArticleScalarWhereInput[]
 }
 
+export type NewsArticleCreateNestedOneWithoutFactChecksInput = {
+  create?: Prisma.XOR<Prisma.NewsArticleCreateWithoutFactChecksInput, Prisma.NewsArticleUncheckedCreateWithoutFactChecksInput>
+  connectOrCreate?: Prisma.NewsArticleCreateOrConnectWithoutFactChecksInput
+  connect?: Prisma.NewsArticleWhereUniqueInput
+}
+
+export type NewsArticleUpdateOneWithoutFactChecksNestedInput = {
+  create?: Prisma.XOR<Prisma.NewsArticleCreateWithoutFactChecksInput, Prisma.NewsArticleUncheckedCreateWithoutFactChecksInput>
+  connectOrCreate?: Prisma.NewsArticleCreateOrConnectWithoutFactChecksInput
+  upsert?: Prisma.NewsArticleUpsertWithoutFactChecksInput
+  disconnect?: Prisma.NewsArticleWhereInput | boolean
+  delete?: Prisma.NewsArticleWhereInput | boolean
+  connect?: Prisma.NewsArticleWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.NewsArticleUpdateToOneWithWhereWithoutFactChecksInput, Prisma.NewsArticleUpdateWithoutFactChecksInput>, Prisma.NewsArticleUncheckedUpdateWithoutFactChecksInput>
+}
+
 export type NewsArticleCreateWithoutSourceInput = {
   id: string
   title: string
@@ -804,6 +832,7 @@ export type NewsArticleCreateWithoutSourceInput = {
   confidence?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  factChecks?: Prisma.FactCheckCreateNestedManyWithoutArticleInput
 }
 
 export type NewsArticleUncheckedCreateWithoutSourceInput = {
@@ -827,6 +856,7 @@ export type NewsArticleUncheckedCreateWithoutSourceInput = {
   confidence?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  factChecks?: Prisma.FactCheckUncheckedCreateNestedManyWithoutArticleInput
 }
 
 export type NewsArticleCreateOrConnectWithoutSourceInput = {
@@ -882,6 +912,118 @@ export type NewsArticleScalarWhereInput = {
   sourceId?: Prisma.StringFilter<"NewsArticle"> | string
 }
 
+export type NewsArticleCreateWithoutFactChecksInput = {
+  id: string
+  title: string
+  titleTranslated?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content: string
+  contentTranslated?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  summary?: string | null
+  originalLanguage: string
+  publishedAt: Date | string
+  url: string
+  imageUrl?: string | null
+  sentiment: string
+  sentimentScore: number
+  perspective: string
+  topics: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  entities: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  translationQuality?: number | null
+  cached?: boolean
+  confidence?: number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  source: Prisma.NewsSourceCreateNestedOneWithoutArticlesInput
+}
+
+export type NewsArticleUncheckedCreateWithoutFactChecksInput = {
+  id: string
+  title: string
+  titleTranslated?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content: string
+  contentTranslated?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  summary?: string | null
+  originalLanguage: string
+  publishedAt: Date | string
+  url: string
+  imageUrl?: string | null
+  sentiment: string
+  sentimentScore: number
+  perspective: string
+  topics: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  entities: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  translationQuality?: number | null
+  cached?: boolean
+  confidence?: number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sourceId: string
+}
+
+export type NewsArticleCreateOrConnectWithoutFactChecksInput = {
+  where: Prisma.NewsArticleWhereUniqueInput
+  create: Prisma.XOR<Prisma.NewsArticleCreateWithoutFactChecksInput, Prisma.NewsArticleUncheckedCreateWithoutFactChecksInput>
+}
+
+export type NewsArticleUpsertWithoutFactChecksInput = {
+  update: Prisma.XOR<Prisma.NewsArticleUpdateWithoutFactChecksInput, Prisma.NewsArticleUncheckedUpdateWithoutFactChecksInput>
+  create: Prisma.XOR<Prisma.NewsArticleCreateWithoutFactChecksInput, Prisma.NewsArticleUncheckedCreateWithoutFactChecksInput>
+  where?: Prisma.NewsArticleWhereInput
+}
+
+export type NewsArticleUpdateToOneWithWhereWithoutFactChecksInput = {
+  where?: Prisma.NewsArticleWhereInput
+  data: Prisma.XOR<Prisma.NewsArticleUpdateWithoutFactChecksInput, Prisma.NewsArticleUncheckedUpdateWithoutFactChecksInput>
+}
+
+export type NewsArticleUpdateWithoutFactChecksInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  titleTranslated?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  contentTranslated?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  originalLanguage?: Prisma.StringFieldUpdateOperationsInput | string
+  publishedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  url?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sentiment?: Prisma.StringFieldUpdateOperationsInput | string
+  sentimentScore?: Prisma.FloatFieldUpdateOperationsInput | number
+  perspective?: Prisma.StringFieldUpdateOperationsInput | string
+  topics?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  entities?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  translationQuality?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  cached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  confidence?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  source?: Prisma.NewsSourceUpdateOneRequiredWithoutArticlesNestedInput
+}
+
+export type NewsArticleUncheckedUpdateWithoutFactChecksInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  titleTranslated?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  contentTranslated?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  originalLanguage?: Prisma.StringFieldUpdateOperationsInput | string
+  publishedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  url?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sentiment?: Prisma.StringFieldUpdateOperationsInput | string
+  sentimentScore?: Prisma.FloatFieldUpdateOperationsInput | number
+  perspective?: Prisma.StringFieldUpdateOperationsInput | string
+  topics?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  entities?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  translationQuality?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  cached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  confidence?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sourceId?: Prisma.StringFieldUpdateOperationsInput | string
+}
+
 export type NewsArticleCreateManySourceInput = {
   id: string
   title: string
@@ -926,6 +1068,7 @@ export type NewsArticleUpdateWithoutSourceInput = {
   confidence?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  factChecks?: Prisma.FactCheckUpdateManyWithoutArticleNestedInput
 }
 
 export type NewsArticleUncheckedUpdateWithoutSourceInput = {
@@ -949,6 +1092,7 @@ export type NewsArticleUncheckedUpdateWithoutSourceInput = {
   confidence?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  factChecks?: Prisma.FactCheckUncheckedUpdateManyWithoutArticleNestedInput
 }
 
 export type NewsArticleUncheckedUpdateManyWithoutSourceInput = {
@@ -975,6 +1119,35 @@ export type NewsArticleUncheckedUpdateManyWithoutSourceInput = {
 }
 
 
+/**
+ * Count Type NewsArticleCountOutputType
+ */
+
+export type NewsArticleCountOutputType = {
+  factChecks: number
+}
+
+export type NewsArticleCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  factChecks?: boolean | NewsArticleCountOutputTypeCountFactChecksArgs
+}
+
+/**
+ * NewsArticleCountOutputType without action
+ */
+export type NewsArticleCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the NewsArticleCountOutputType
+   */
+  select?: Prisma.NewsArticleCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * NewsArticleCountOutputType without action
+ */
+export type NewsArticleCountOutputTypeCountFactChecksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.FactCheckWhereInput
+}
+
 
 export type NewsArticleSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -999,6 +1172,8 @@ export type NewsArticleSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   updatedAt?: boolean
   sourceId?: boolean
   source?: boolean | Prisma.NewsSourceDefaultArgs<ExtArgs>
+  factChecks?: boolean | Prisma.NewsArticle$factChecksArgs<ExtArgs>
+  _count?: boolean | Prisma.NewsArticleCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["newsArticle"]>
 
 export type NewsArticleSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1078,6 +1253,8 @@ export type NewsArticleSelectScalar = {
 export type NewsArticleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "titleTranslated" | "content" | "contentTranslated" | "summary" | "originalLanguage" | "publishedAt" | "url" | "imageUrl" | "sentiment" | "sentimentScore" | "perspective" | "topics" | "entities" | "translationQuality" | "cached" | "confidence" | "createdAt" | "updatedAt" | "sourceId", ExtArgs["result"]["newsArticle"]>
 export type NewsArticleInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   source?: boolean | Prisma.NewsSourceDefaultArgs<ExtArgs>
+  factChecks?: boolean | Prisma.NewsArticle$factChecksArgs<ExtArgs>
+  _count?: boolean | Prisma.NewsArticleCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type NewsArticleIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   source?: boolean | Prisma.NewsSourceDefaultArgs<ExtArgs>
@@ -1090,6 +1267,7 @@ export type $NewsArticlePayload<ExtArgs extends runtime.Types.Extensions.Interna
   name: "NewsArticle"
   objects: {
     source: Prisma.$NewsSourcePayload<ExtArgs>
+    factChecks: Prisma.$FactCheckPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1508,6 +1686,7 @@ readonly fields: NewsArticleFieldRefs;
 export interface Prisma__NewsArticleClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   source<T extends Prisma.NewsSourceDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.NewsSourceDefaultArgs<ExtArgs>>): Prisma.Prisma__NewsSourceClient<runtime.Types.Result.GetResult<Prisma.$NewsSourcePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  factChecks<T extends Prisma.NewsArticle$factChecksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.NewsArticle$factChecksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FactCheckPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1956,6 +2135,30 @@ export type NewsArticleDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * Limit how many NewsArticles to delete.
    */
   limit?: number
+}
+
+/**
+ * NewsArticle.factChecks
+ */
+export type NewsArticle$factChecksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the FactCheck
+   */
+  select?: Prisma.FactCheckSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the FactCheck
+   */
+  omit?: Prisma.FactCheckOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.FactCheckInclude<ExtArgs> | null
+  where?: Prisma.FactCheckWhereInput
+  orderBy?: Prisma.FactCheckOrderByWithRelationInput | Prisma.FactCheckOrderByWithRelationInput[]
+  cursor?: Prisma.FactCheckWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.FactCheckScalarFieldEnum | Prisma.FactCheckScalarFieldEnum[]
 }
 
 /**

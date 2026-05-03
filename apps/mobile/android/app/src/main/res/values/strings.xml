@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">NewsHub</string>
+    <string name="title_activity_main">NewsHub</string>
+    <string name="package_name">com.newshub.app</string>
+    <string name="custom_url_scheme">com.newshub.app</string>
+</resources>

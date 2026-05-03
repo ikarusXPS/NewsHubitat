@@ -90,7 +90,7 @@
 - [ ] **Phase 36: Monetization Core** - Stripe integration and subscription tiers
 - [x] **Phase 37: Horizontal Scaling** - Docker Swarm and connection pooling (completed 2026-04-29; 5/5 must-haves SATISFIED static; runtime items in 37-HUMAN-UAT.md; Dockerfile rewrite deferred to 37.1)
 - [ ] **Phase 37.1 (INSERTED): Fix root Dockerfile for pnpm monorepo + close WS-04** — Rewrite Dockerfile that predates the phase-35 monorepo migration; re-run e2e-stack/run-fanout-test.sh to close WS-04 cross-replica fanout gate
-- [ ] **Phase 38: Advanced AI Features** - Credibility scoring, bias detection, fact-checking
+- [x] **Phase 38: Advanced AI Features** - Credibility scoring, bias detection, fact-checking (completed 2026-04-29)
 - [ ] **Phase 39: Mobile Apps** - Capacitor wrapper and app store deployment
 - [ ] **Phase 40: Content Expansion** - Video, podcast, and source expansion
 
@@ -300,12 +300,12 @@ Plans:
 **UI hint**: yes
 
 Plans:
-- [ ] 38-01-PLAN.md — [BLOCKING] Schema foundation: FactCheck Prisma model + tsvector FTS migration + GIN index + db migrate deploy + prisma generate (Wave 1)
-- [ ] 38-02-PLAN.md — Backend services: credibilityService (deterministic) + factCheckReadService (Postgres FTS) + 3 prompts + 3 new aiService methods + CacheKeys extension (Wave 2, depends_on [38-01] — needs regenerated Prisma client)
-- [ ] 38-03-PLAN.md — Routes + Zod OpenAPI: POST /api/ai/fact-check + GET /api/ai/source-credibility/:id + rewritten GET /api/analysis/framing + BearerAuth + openapi:generate (Wave 3, depends_on [38-01, 38-02])
-- [ ] 38-04-PLAN.md — i18n locale files: factcheck.json + credibility.json for DE/EN/FR + i18n.ts namespace registration (Wave 3, depends_on [] — co-scheduled with 38-03 for unified review)
-- [ ] 38-05-PLAN.md — Frontend UI: 6 new components (CredibilityPill, BiasBadge, VerdictPill, FactCheckButton, FactCheckDrawer, CitationCard, CredibilityDrawer) + 2 hooks + FramingComparison rewrite + NewsCard/SourceRow/Article integration (Wave 4, depends_on [38-01, 38-02, 38-03, 38-04])
-- [ ] 38-06-PLAN.md — Verification gate: Playwright E2E factcheck.spec.ts + Redis TTL probes + 38-VERIFICATION.md evidence matrix (Wave 5, depends_on [38-01..38-05])
+- [x] 38-01-PLAN.md — [BLOCKING] Schema foundation: FactCheck Prisma model + tsvector FTS migration + GIN index + db migrate deploy + prisma generate (Wave 1)
+- [x] 38-02-PLAN.md — Backend services: credibilityService (deterministic) + factCheckReadService (Postgres FTS) + 3 prompts + 3 new aiService methods + CacheKeys extension (Wave 2, depends_on [38-01] — needs regenerated Prisma client)
+- [x] 38-03-PLAN.md — Routes + Zod OpenAPI: POST /api/ai/fact-check + GET /api/ai/source-credibility/:id + rewritten GET /api/analysis/framing + BearerAuth + openapi:generate (Wave 3, depends_on [38-01, 38-02])
+- [x] 38-04-PLAN.md — i18n locale files: factcheck.json + credibility.json for DE/EN/FR + i18n.ts namespace registration (Wave 3, depends_on [] — co-scheduled with 38-03 for unified review)
+- [x] 38-05-PLAN.md — Frontend UI: 6 new components (CredibilityPill, BiasBadge, VerdictPill, FactCheckButton, FactCheckDrawer, CitationCard, CredibilityDrawer) + 2 hooks + FramingComparison rewrite + NewsCard/SourceRow/Article integration (Wave 4, depends_on [38-01, 38-02, 38-03, 38-04])
+- [x] 38-06-PLAN.md — Verification gate: Playwright E2E factcheck.spec.ts + Redis TTL probes + 38-VERIFICATION.md evidence matrix (Wave 5, depends_on [38-01..38-05])
 
 ### Phase 39: Mobile Apps
 **Goal**: Users can install native iOS and Android apps from app stores with push notifications
@@ -319,8 +319,32 @@ Plans:
   5. User can authenticate via biometric (Face ID/Touch ID/fingerprint)
   6. App displays cached articles offline in read-only mode
   7. Mobile apps share 60%+ business logic with web through monorepo packages
-**Plans**: TBD
+**Plans**: 6 plans across 4 waves (drafted 2026-04-29..30)
 **UI hint**: yes
+**Plans:**
+
+**Wave 1:**
+- [x] 39-01-PLAN.md — apps/mobile workspace + Capacitor 8.3.1 init + native plugins (haptics, status-bar, splash, keyboard, app, push-notifications) — MOB-01, MOB-02, MOB-07 *(complete 2026-04-30)*
+
+**Wave 2** *(blocked on Wave 1 completion)*:
+- [ ] 39-02-PLAN.md — Server: Prisma `PushSubscription`/`KeywordWatch`/`NotificationPreference` + `pushService` + `notificationFanoutService` + Zod routes + `cleanupService` 90d cleanup — MOB-03, MOB-04
+- [ ] 39-03-PLAN.md — Client: `lib/platform.ts::isNativeApp()` + reader-app gate retrofits (UpgradePrompt, TierCard, AIUsageCounter, InstallPromptBanner, useHapticFeedback, SPA 429 consumer) + OfflineBanner per-session dismissibility + i18n DE/EN/FR — MOB-06, MOB-07, MOB-08
+
+**Wave 3** *(blocked on Wave 2 completion)*:
+- [ ] 39-04-PLAN.md — Push end-to-end: `usePushNotifications` hook + `<NotificationsSection />` in SettingsPage + fanout subscriber in `workerEmitter.ts` + 4 trigger systems (breaking, affinity, keyword, digest) + tier/volume/quiet-hours/dedup gates + dead-token cleanup — MOB-03, MOB-04
+
+**Wave 4** *(blocked on Wave 3 completion)*:
+- [ ] 39-05-PLAN.md — Biometric: `@capgo/capacitor-native-biometric@^8.4.2` + `useBiometricAuth` + `AuthContext` JWT hand-off + `BiometricSection` (after NotificationsSection) + iCloud Keychain device-only spike (Pitfall A1) + 3-fail fallback — MOB-05
+- [ ] 39-06-PLAN.md — CI/CD + signing: `mobile-ios.yml` (macos-latest + Fastlane match) + `mobile-android.yml` (ubuntu-latest + base64 keystore) + `apps/mobile/ios/fastlane/{Fastfile,Appfile,Matchfile}` + Android `signingConfigs.release` + `apps/mobile/README.md` runbook — MOB-01, MOB-02 *(autonomous: false — signing-key creation requires user interaction)*
+
+**Cross-cutting constraints (every plan's `must_haves.truths`):**
+- Capacitor 8.3.1 (research 2026-04-29 supersedes CONTEXT.md Q-04 framing of 6.x/7.x)
+- D-08/D-09: iOS/Android builds hide every pricing surface; FREE-tier 429s render generic "feature not available" with `newshub.example` as plain text (no `<a href>`)
+- D-04: FCM + APNs only via single `firebase-admin` SDK; no Web Push / VAPID; no silent payloads
+- D-12: PWA service worker is the only offline storage; no Capacitor SQLite, no eager IndexedDB pre-cache
+- D-13: Code sharing satisfied trivially because `apps/mobile` consumes `apps/web/dist`
+- Reader-app gate single seam: `apps/web/src/lib/platform.ts::isNativeApp()`
+- Fanout hook point: `apps/web/server/jobs/workerEmitter.ts` (consumer of `newsAggregator.ts:287-292`'s emit functions); no new emit point added
 
 ### Phase 40: Content Expansion
 **Goal**: Users can access video and podcast content with transcription for Premium subscribers
@@ -385,4 +409,18 @@ Plans:
 ---
 
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-28 — Phase 36.4 COMPLETE (4/4 plans verified PASS, 10/10 ROADMAP success criteria + 6/6 PAY requirements). Tier middleware live at apps/web/server/middleware/requireTier.ts (171 lines, 15 unit tests); aiTierLimiter mounted on /api/ai + /api/analysis (FREE 10/day with PREMIUM bypass); /pricing + /subscription/success routes wired in App.tsx with DE/EN/FR locales. D-09 probes all PASS (FREE /api/history meta.tier=FREE; FREE 11th /api/ai/ask returns 429 + upgradeUrl=/pricing; FREE /api/account/export returns 403 + upgradeUrl=/pricing). D-10 anti-pattern audit = 0 forbidden-root files across all 14 phase commits. Phase 36-05 human-verify (paused 2026-04-28 with empty SPA shell at /pricing) is now unblocked. Next: resume `/gsd-execute-phase 36` at Plan 05, then `/gsd-verify-phase 36.3` and `/gsd-verify-phase 36.2`.*
+*Last updated: 2026-04-30 — Phase 40.1 COMPLETE (5/5 plans; VERIFICATION 15/15 must-haves verified; UAT 3 PASS + 1 PARTIAL). Wired 4 team-UI debt sessions: (1) BookmarkButton/TeamBookmarkCard/PendingInviteList/DeleteTeamModal unit tests added (26 tests), (2) new TeamSettingsModal component + 8 tests, (3) Settings gear integrated into TeamDashboard gated on owner+admin, (4) 4 E2E tests appended to teams.spec.ts (Test 15 owner-delete live PASS; Tests 12/13/14 skip cleanly in dev due to Dashboard NewsFeed signals-vs-grid view-mode race — wiring fully proven by unit tests), (5) all 4 debug sessions archived to `.planning/debug/resolved/` with verification + files_changed populated. Two side-fixes shipped during verification: `fix(focus-suggestions): cap toast stack height to prevent header overlap` (339d66a) — was a latent UX bug overlapping the header Sign In; `test(e2e): mock focus-suggestions in auth.setup.ts` (fba1d73) — unblocks all 14+ authenticated E2E tests. Next: `/gsd-progress` to see updated roadmap; remaining v1.6 work: Phase 39 (mobile-apps) + Phase 40 (content-expansion); 36-05 human-verify still queued.*
+
+### Phase 40.1: team-ui-wiring (INSERTED)
+
+**Goal:** Pay back 4 diagnosed UI-wiring debt sessions from Phase 28 (Team Collaboration). Wire team-feature UI to existing backend, prove via tests, archive 4 debug sessions to .planning/debug/resolved/.
+**Requirements**: null (debt-payback phase — no new REQ-IDs to map; 40.1-CONTEXT.md is the contract)
+**Depends on:** Phase 40
+**Plans:** 5/5 plans executed — COMPLETE
+
+Plans:
+- [x] 40.1-01-PLAN.md — Vitest unit tests for the 4 already-wired team components (BookmarkButton, TeamBookmarkCard, PendingInviteList, DeleteTeamModal)
+- [x] 40.1-02-PLAN.md — Create TeamSettingsModal component + its unit test (the one genuinely missing piece, D-02)
+- [x] 40.1-03-PLAN.md — Integrate TeamSettingsModal into TeamDashboard (gear icon between Invite and Trash2, gated on owner+admin)
+- [x] 40.1-04-PLAN.md — Extend apps/web/e2e/teams.spec.ts with 4 new E2E tests (one per debug-session flow) in a serial describe block
+- [x] 40.1-05-PLAN.md — Archive 4 debug sessions from .planning/debug/ to .planning/debug/resolved/ with status=resolved + verification + files_changed populated

@@ -1,0 +1,30 @@
+{
+  "verdicts": {
+    "true": "Wahr",
+    "mostly-true": "Größtenteils wahr",
+    "mixed": "Gemischt",
+    "unverified": "Nicht verifiziert",
+    "false": "Falsch"
+  },
+  "button": {
+    "label": "Faktencheck",
+    "loading": "Wird geprüft..."
+  },
+  "drawer": {
+    "title": "Faktencheck-Ergebnis",
+    "methodology": "Methodik",
+    "citations": "Zitierte Quellen",
+    "close": "Schließen",
+    "noCitations": "Keine Quellen verfügbar."
+  },
+  "error": {
+    "tooShort": "Mindestens 10 Zeichen markieren",
+    "tooLong": "Höchstens 500 Zeichen markieren",
+    "rateLimit": "Tägliches AI-Limit erreicht. Upgrade für unbegrenzte Faktenchecks.",
+    "rejected": "Behauptung enthält verbotene Muster",
+    "generic": "Faktencheck konnte nicht abgeschlossen werden. Bitte erneut versuchen."
+  },
+  "unverified": {
+    "explanation": "Der Korpus enthielt nicht genügend Belege, um diese Behauptung zu prüfen."
+  }
+}

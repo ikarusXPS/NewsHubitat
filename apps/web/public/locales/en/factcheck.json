@@ -1,0 +1,30 @@
+{
+  "verdicts": {
+    "true": "True",
+    "mostly-true": "Mostly true",
+    "mixed": "Mixed",
+    "unverified": "Unverified",
+    "false": "False"
+  },
+  "button": {
+    "label": "Fact-check this",
+    "loading": "Checking..."
+  },
+  "drawer": {
+    "title": "Fact-check result",
+    "methodology": "Methodology",
+    "citations": "Sources cited",
+    "close": "Close",
+    "noCitations": "No citations available."
+  },
+  "error": {
+    "tooShort": "Highlight at least 10 characters",
+    "tooLong": "Highlight no more than 500 characters",
+    "rateLimit": "Daily AI limit reached. Upgrade for unlimited fact-checks.",
+    "rejected": "Claim contains forbidden patterns",
+    "generic": "Could not complete fact-check. Please retry."
+  },
+  "unverified": {
+    "explanation": "The corpus did not contain enough evidence to verify this claim."
+  }
+}

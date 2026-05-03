@@ -1,8 +1,8 @@
 ---
-status: diagnosed
+status: resolved
 trigger: "Bookmarks not saved to team - On any article, click BookmarkButton. If user has teams, dropdown shows Personal and team options. Select a team, bookmark is saved to team with Added by [name] attribution."
 created: 2026-04-25T00:00:00Z
-updated: 2026-04-25T00:01:00Z
+updated: 2026-04-30T00:00:00Z
 symptoms_prefilled: true
 goal: find_root_cause_only
 ---
@@ -59,6 +59,17 @@ started: unknown - UAT phase 28
 ## Resolution
 
 root_cause: The BookmarkButton component (src/components/BookmarkButton.tsx) was created with full team bookmark dropdown functionality, but it was NEVER integrated into the article card components (SignalCard.tsx, NewsCard.tsx). Both card components still use inline bookmark buttons that call the personal-only toggleBookmark() from Zustand store, which has no team support.
-fix: Replace inline bookmark buttons in SignalCard.tsx and NewsCard.tsx with the BookmarkButton component
-verification: pending
-files_changed: []
+fix: |
+  BookmarkButton is now imported and rendered in NewsCard.tsx (line 5, line 235) and
+  SignalCard.tsx (line 20, line 382). The team dropdown opens on click when the user
+  has teams. Phase 40.1 added unit + E2E coverage to prevent silent regression. The
+  fix itself was made silently between 2026-04-25 and 2026-04-30; phase 40.1 verifies it.
+verification: |
+  - Vitest unit test: apps/web/src/components/BookmarkButton.test.tsx (≥6 tests, all pass)
+  - E2E test: apps/web/e2e/teams.spec.ts > "Phase 40.1 — wired flows" > "saves a bookmark to a team via dropdown"
+  - grep verification: `grep -l "BookmarkButton" apps/web/src/components/NewsCard.tsx apps/web/src/components/SignalCard.tsx` returns both files
+files_changed:
+  - apps/web/src/components/NewsCard.tsx (BookmarkButton integration, pre-40.1 silent fix)
+  - apps/web/src/components/SignalCard.tsx (BookmarkButton integration, pre-40.1 silent fix)
+  - apps/web/src/components/BookmarkButton.test.tsx (new, phase 40.1 plan 01)
+  - apps/web/e2e/teams.spec.ts (new E2E coverage, phase 40.1 plan 04)

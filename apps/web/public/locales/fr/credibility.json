@@ -1,0 +1,35 @@
+{
+  "pill": {
+    "label": "Crédibilité"
+  },
+  "drawer": {
+    "title": "Crédibilité de la source",
+    "subDimensions": "Sous-dimensions",
+    "accuracy": "Précision",
+    "transparency": "Transparence",
+    "corrections": "Corrections",
+    "disclosure": "Ces sous-dimensions sont des estimations attribuées par IA, pas des signaux mesurés.",
+    "score": "Note: {{score}}/100",
+    "close": "Fermer"
+  },
+  "bias": {
+    "left": "Tendance gauche",
+    "center": "Centriste",
+    "right": "Tendance droite"
+  },
+  "confidence": {
+    "low": "Confiance faible",
+    "medium": "Confiance moyenne",
+    "high": "Confiance élevée"
+  },
+  "framing": {
+    "aiGenerated": "Généré par IA",
+    "section": {
+      "narrative": "Narratif",
+      "omissions": "Omissions notables",
+      "vocabulary": "Vocabulaire chargé",
+      "evidenceQuotes": "Citations de preuve"
+    },
+    "noData": "Aucune analyse de cadrage disponible pour ce sujet."
+  }
+}

@@ -75,6 +75,43 @@ vi.mock('./cacheService', () => ({
   CacheKeys: {
     aiSummary: (key: string) => `ai:summary:${key}`,
     aiTopics: (hash: string) => `ai:topics:${hash}`,
+    credibility: (sourceId: string, locale: string) => `ai:credibility:${sourceId}:${locale}`,
+    framing: (topicHash: string, locale: string) => `ai:framing:${topicHash}:${locale}`,
+    factCheck: (claimHash: string) => `ai:factcheck:${claimHash}`,
+  },
+  CACHE_TTL: { DAY: 86400 },
+}));
+
+// Phase 38: aiService now imports newsReadService for framing — mock it here
+// to prevent the prisma module-load chain from breaking pre-existing tests.
+vi.mock('./newsReadService', () => ({
+  getArticles: vi.fn().mockResolvedValue({ articles: [], total: 0 }),
+}));
+
+// Phase 38: aiService now imports factCheckReadService + translationService +
+// prisma for fact-check support — mock to prevent prisma init chain.
+vi.mock('./factCheckReadService', () => ({
+  searchClaimEvidence: vi.fn().mockResolvedValue([]),
+  mergeAndDedup: vi.fn().mockReturnValue([]),
+}));
+
+vi.mock('./translationService', () => ({
+  TranslationService: {
+    getInstance: () => ({
+      translate: vi.fn().mockImplementation(async (text: string) => ({
+        text,
+        provider: 'deepl',
+        cached: false,
+        quality: 0.9,
+      })),
+    }),
+  },
+}));
+
+vi.mock('../db/prisma', () => ({
+  prisma: {
+    newsArticle: { findMany: vi.fn().mockResolvedValue([]) },
+    factCheck: { create: vi.fn() },
   },
 }));
 

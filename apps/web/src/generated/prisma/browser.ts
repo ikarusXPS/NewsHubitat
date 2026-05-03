@@ -142,3 +142,8 @@ export type StudentVerification = Prisma.StudentVerificationModel
  * 
  */
 export type ApiKey = Prisma.ApiKeyModel
+/**
+ * Model FactCheck
+ * 
+ */
+export type FactCheck = Prisma.FactCheckModel
