@@ -114,6 +114,11 @@ const VALID_PERSPECTIVE_REGIONS: PerspectiveRegion[] = [
   'ozeanien',
   'kanada',
   'alternative',
+  // Phase 40 D-A2: 4 new sub-regions
+  'sudostasien',
+  'nordeuropa',
+  'sub-saharan-africa',
+  'indien',
 ];
 
 // ---- Phase 38 fact-check types (Task 7) ----
