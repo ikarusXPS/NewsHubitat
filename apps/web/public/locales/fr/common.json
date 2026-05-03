@@ -1,0 +1,114 @@
+{
+  "buttons": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "confirm": "Confirmer",
+    "close": "Fermer",
+    "apply": "Appliquer",
+    "load": "Charger",
+    "clearAll": "Tout effacer",
+    "signIn": "Se connecter",
+    "signOut": "Se déconnecter"
+  },
+  "errors": {
+    "generic": "Une erreur s'est produite",
+    "network": "Erreur réseau. Veuillez réessayer.",
+    "loadFailed": "Échec du chargement des données",
+    "saveFailed": "Échec de l'enregistrement"
+  },
+  "status": {
+    "connected": "Connecté",
+    "loading": "Chargement...",
+    "noData": "Aucune donnée disponible"
+  },
+  "time": {
+    "justNow": "À l'instant",
+    "minutesAgo": "{count, plural, one {il y a # minute} other {il y a # minutes}}",
+    "hoursAgo": "{count, plural, one {il y a # heure} other {il y a # heures}}",
+    "daysAgo": "{count, plural, one {il y a # jour} other {il y a # jours}}"
+  },
+  "articles": {
+    "count": "{count, plural, =0 {Aucun article} one {# article} other {# articles}}",
+    "available": "{count} sur {total} articles disponibles"
+  },
+  "navigation": {
+    "dashboard": "Tableau de bord",
+    "monitor": "Moniteur",
+    "analysis": "Analyse",
+    "timeline": "Chronologie",
+    "events": "Événements",
+    "globe": "Globe",
+    "map": "Carte",
+    "community": "Communauté",
+    "bookmarks": "Favoris",
+    "history": "Historique",
+    "settings": "Paramètres",
+    "profile": "Profil"
+  },
+  "search": {
+    "placeholder": "Rechercher des signaux...",
+    "clear": "Effacer la recherche"
+  },
+  "regions": {
+    "usa": "USA",
+    "europa": "Europe",
+    "deutschland": "Allemagne",
+    "nahost": "Moyen-Orient",
+    "tuerkei": "Turquie",
+    "russland": "Russie",
+    "china": "Chine",
+    "asien": "Asie",
+    "afrika": "Afrique",
+    "lateinamerika": "Amérique latine",
+    "ozeanien": "Océanie",
+    "kanada": "Canada",
+    "alternative": "Alternative",
+    "sudostasien": "Asie du Sud-Est",
+    "nordeuropa": "Pays nordiques",
+    "sub-saharan-africa": "Afrique subsaharienne",
+    "indien": "Inde"
+  },
+  "comments": {
+    "post": "Publier le commentaire",
+    "reply": "Répondre",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "flag": "Signaler",
+    "showReplies": "Afficher {{count}} réponses",
+    "hideReplies": "Masquer les réponses",
+    "typing": "Quelqu'un est en train d'écrire...",
+    "deleted": "[Commentaire supprimé]",
+    "edited": "(modifié)",
+    "flagged": "Signalé pour examen",
+    "characterCount": "{{current}} / {{max}}",
+    "characterLimitExceeded": "Commentaire trop long",
+    "authRequired": "Connectez-vous pour rejoindre la discussion",
+    "emptyState": {
+      "heading": "Aucun commentaire pour le moment",
+      "body": "Soyez le premier à partager vos réflexions sur cet article."
+    },
+    "errors": {
+      "postFailed": "Échec de la publication du commentaire. Veuillez réessayer.",
+      "rateLimit": "Trop de commentaires. Veuillez patienter un instant.",
+      "flagged": "Votre commentaire a été signalé pour examen.",
+      "editExpired": "Délai de modification expiré",
+      "deleteFailed": "Échec de la suppression du commentaire."
+    },
+    "deleteConfirm": {
+      "heading": "Supprimer le commentaire ?",
+      "body": "Cela retirera votre commentaire de la discussion. Les réponses resteront visibles.",
+      "confirm": "Supprimer"
+    }
+  },
+  "upgrade": {
+    "required": "Abonnement {{tier}} requis",
+    "clickToUnlock": "Cliquez pour mettre à niveau",
+    "unlockFeature": "Mettez à niveau pour débloquer {{feature}}"
+  },
+  "ai": {
+    "dailyQueries": "Requêtes IA quotidiennes",
+    "remaining": "restant",
+    "upgradeCta": "Mettez à niveau pour des requêtes illimitées"
+  }
+}
