@@ -62,6 +62,11 @@ export function getRegionColor(region: string): string {
     ozeanien: 'bg-teal-500',
     kanada: 'bg-red-500',
     alternative: 'bg-green-500',
+    // Phase 40 D-A2: 4 new sub-regions
+    sudostasien: 'bg-teal-400',
+    nordeuropa: 'bg-sky-400',
+    'sub-saharan-africa': 'bg-orange-400',
+    indien: 'bg-amber-600',
   };
   return colors[region] || 'bg-gray-500';
 }
@@ -81,6 +86,11 @@ export function getRegionLabel(region: string): string {
     ozeanien: 'Ozeanien',
     kanada: 'Kanada',
     alternative: 'Alternative',
+    // Phase 40 D-A2: 4 new sub-regions
+    sudostasien: 'Südostasien',
+    nordeuropa: 'Nordeuropa',
+    'sub-saharan-africa': 'Subsahara-Afrika',
+    indien: 'Indien',
   };
   return labels[region] || region;
 }

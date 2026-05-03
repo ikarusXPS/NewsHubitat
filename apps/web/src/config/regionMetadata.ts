@@ -84,6 +84,31 @@ export const REGION_GEO_METADATA: Record<PerspectiveRegion, RegionGeoMetadata> =
     bounds: { north: 85.0, south: -85.0, east: 180.0, west: -180.0 },
     countries: [],
   },
+
+  // Phase 40 D-A2: 4 new sub-regions
+  sudostasien: {
+    center: { lat: 5.0, lng: 110.0, zoom: 4 },
+    bounds: { north: 25.0, south: -10.0, east: 140.0, west: 92.0 },
+    countries: ['Indonesia', 'Thailand', 'Vietnam', 'Philippines', 'Malaysia', 'Singapore', 'Myanmar', 'Cambodia', 'Laos'],
+  },
+
+  nordeuropa: {
+    center: { lat: 62.0, lng: 18.0, zoom: 4 },
+    bounds: { north: 71.0, south: 54.0, east: 32.0, west: -25.0 },
+    countries: ['Sweden', 'Norway', 'Finland', 'Denmark', 'Iceland'],
+  },
+
+  'sub-saharan-africa': {
+    center: { lat: -5.0, lng: 22.0, zoom: 3 },
+    bounds: { north: 18.0, south: -35.0, east: 51.0, west: -18.0 },
+    countries: ['Nigeria', 'Kenya', 'Ethiopia', 'South Africa', 'Ghana', 'Uganda', 'Tanzania', 'Senegal'],
+  },
+
+  indien: {
+    center: { lat: 22.0, lng: 79.0, zoom: 4 },
+    bounds: { north: 36.0, south: 6.0, east: 97.0, west: 68.0 },
+    countries: ['India', 'Pakistan', 'Bangladesh', 'Sri Lanka', 'Nepal', 'Bhutan'],
+  },
 };
 
 /**
@@ -103,4 +128,9 @@ export const REGION_DISPLAY_NAMES: Record<PerspectiveRegion, string> = {
   lateinamerika: 'Lateinamerika',
   ozeanien: 'Ozeanien',
   alternative: 'Alternative Medien',
+  // Phase 40 D-A2: 4 new sub-regions
+  sudostasien: 'Südostasien',
+  nordeuropa: 'Nordeuropa',
+  'sub-saharan-africa': 'Subsahara-Afrika',
+  indien: 'Indien',
 };
