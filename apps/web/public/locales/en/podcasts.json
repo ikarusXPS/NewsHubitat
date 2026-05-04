@@ -32,5 +32,17 @@
     "publishedAt": "Published",
     "play": "Play episode",
     "pause": "Pause episode"
+  },
+  "transcript": {
+    "heading": "Transcript",
+    "show": "Show transcript",
+    "hide": "Hide transcript",
+    "searchPlaceholder": "Search transcript",
+    "unavailable": "Transcript not available for this content",
+    "transcribing": "Transcribing… (~30 seconds)",
+    "premium": {
+      "web": "Premium feature — upgrade to view transcripts",
+      "mobile": "This feature is not available on your current plan. Visit newshub.example from your browser to learn more."
+    }
   }
 }
