@@ -45,6 +45,11 @@ import { PodcastFeedPollJob } from './jobs/podcastFeedPollJob';
 // seams; VideoChannelPollJob.start() internally skips on RUN_JOBS=false).
 import { videosRoutes } from './routes/videos';
 import { VideoChannelPollJob } from './jobs/videoChannelPollJob';
+// Phase 40-06: Premium-gated transcript routes + worker job (mount + start at
+// the same placeholder seams; PodcastTranscribeJob.start() internally skips
+// on RUN_JOBS=false).
+import { transcriptRoutes } from './routes/transcripts';
+import { PodcastTranscribeJob } from './jobs/podcastTranscribeJob';
 // Phase 37 / WS-04: test-only fanout-trigger router. Module is imported
 // statically (no side effects at load time — only exports a Router instance);
 // the actual route is gated on NODE_ENV === 'test' below so production
@@ -211,7 +216,10 @@ app.use('/api/podcasts', newsLimiter, podcastRoutes);
 // newsLimiter (100 req/min/IP) absorbs cache-miss flooding (T-40-05-03);
 // the per-call YouTube Data API quota gate lives inside videoIndexService.
 app.use('/api/videos', newsLimiter, videosRoutes);
-// 40: transcripts route mount here (40-06 will replace this comment with the route mount + requireTier('PREMIUM') middleware)
+// Phase 40-06 / CC-02 / T-40-06-03: Premium-gated transcript routes.
+// authMiddleware runs first so requireTier inside the router sees req.user;
+// requireTier('PREMIUM') inside each handler enforces the actual tier gate.
+app.use('/api/transcripts', authMiddleware, transcriptRoutes);
 
 // =============================================================================
 // Public API v1 (Phase 35) - D-05: versioned at /api/v1/public/*
@@ -550,6 +558,7 @@ void runBootLifecycle({
 // 40: worker job starts here (40-03 starts podcastFeedPollJob, 40-05 starts videoChannelPollJob; both check RUN_JOBS internally inside the job module's start() method, so this seam just needs to import + invoke them)
 PodcastFeedPollJob.getInstance().start();
 VideoChannelPollJob.getInstance().start();
+PodcastTranscribeJob.getInstance().start();
 
 // Phase 37 Plan 05 (DEPLOY-04, DEPLOY-05): graceful shutdown via @godaddy/terminus.
 // Replaces the inline SIGTERM/SIGINT handler that previously lived here.
