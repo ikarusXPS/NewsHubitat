@@ -41,6 +41,10 @@ import { apiKeyRoutes } from './routes/apiKeys';
 // seams below; PodcastFeedPollJob.start() internally skips on RUN_JOBS=false).
 import { podcastRoutes } from './routes/podcasts';
 import { PodcastFeedPollJob } from './jobs/podcastFeedPollJob';
+// Phase 40-05: video routes + worker job (mount + start at the same placeholder
+// seams; VideoChannelPollJob.start() internally skips on RUN_JOBS=false).
+import { videosRoutes } from './routes/videos';
+import { VideoChannelPollJob } from './jobs/videoChannelPollJob';
 // Phase 37 / WS-04: test-only fanout-trigger router. Module is imported
 // statically (no side effects at load time — only exports a Router instance);
 // the actual route is gated on NODE_ENV === 'test' below so production
@@ -203,7 +207,10 @@ app.use('/api/keys', apiKeyRoutes);
 
 // 40: podcast routes mount here (40-03 will replace this comment with the route mount + middleware)
 app.use('/api/podcasts', newsLimiter, podcastRoutes);
-// 40: video routes mount here (40-05 will replace this comment with the route mount + middleware + youtubeQuota wiring)
+// Phase 40-05 / CONT-05: video discovery routes (related + channels + recent).
+// newsLimiter (100 req/min/IP) absorbs cache-miss flooding (T-40-05-03);
+// the per-call YouTube Data API quota gate lives inside videoIndexService.
+app.use('/api/videos', newsLimiter, videosRoutes);
 // 40: transcripts route mount here (40-06 will replace this comment with the route mount + requireTier('PREMIUM') middleware)
 
 // =============================================================================
@@ -542,6 +549,7 @@ void runBootLifecycle({
 
 // 40: worker job starts here (40-03 starts podcastFeedPollJob, 40-05 starts videoChannelPollJob; both check RUN_JOBS internally inside the job module's start() method, so this seam just needs to import + invoke them)
 PodcastFeedPollJob.getInstance().start();
+VideoChannelPollJob.getInstance().start();
 
 // Phase 37 Plan 05 (DEPLOY-04, DEPLOY-05): graceful shutdown via @godaddy/terminus.
 // Replaces the inline SIGTERM/SIGINT handler that previously lived here.

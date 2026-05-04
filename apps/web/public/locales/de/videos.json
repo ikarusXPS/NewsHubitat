@@ -1,1 +1,13 @@
-{}
+{
+  "relatedVideos": {
+    "heading": "Verwandte Videos",
+    "expand": "Verwandte Videos anzeigen",
+    "empty": "Keine verwandten Videos",
+    "loading": "Wird geladen…"
+  },
+  "embeddedVideo": {
+    "playButton": "Video abspielen",
+    "youtubeAttribution": "YouTube",
+    "vimeoAttribution": "Vimeo"
+  }
+}
