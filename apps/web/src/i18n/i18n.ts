@@ -13,7 +13,7 @@ i18n
   .init({
     fallbackLng: 'en',         // D-08: English fallback
     supportedLngs: ['de', 'en', 'fr'],
-    ns: ['common', 'share', 'teams', 'pricing', 'factcheck', 'credibility', 'videos'],   // + factcheck + credibility (Phase 38); + videos (Phase 40-05)
+    ns: ['common', 'share', 'teams', 'pricing', 'factcheck', 'credibility', 'videos', 'podcasts'],   // + factcheck + credibility (Phase 38); + videos (Phase 40-05); + podcasts (Phase 40-04)
     defaultNS: 'common',
 
     backend: {

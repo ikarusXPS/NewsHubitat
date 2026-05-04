@@ -39,6 +39,7 @@ import {
   DevelopersPage,
   Pricing,
   SubscriptionSuccess,
+  PodcastsPage,
 } from './routes';
 import './index.css';
 
@@ -125,6 +126,7 @@ function AppRoutes() {
               <Route path="/events" element={<EventMap />} />
               <Route path="/community" element={<Community />} />
               <Route path="/bookmarks" element={<Bookmarks />} />
+              <Route path="/podcasts" element={<PodcastsPage />} />
               <Route path="/history" element={<ReadingHistory />} />
               <Route path="/profile" element={<Profile />} />
               {/* Article detail page with comments */}
