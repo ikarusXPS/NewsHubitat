@@ -1,1 +1,36 @@
-{}
+{
+  "relatedPodcasts": {
+    "heading": "Verwandte Podcast-Folgen",
+    "expand": "Verwandte Podcasts anzeigen",
+    "collapse": "Verwandte Podcasts ausblenden",
+    "empty": "Keine verwandten Folgen",
+    "loadError": "Verwandte Podcasts konnten nicht geladen werden"
+  },
+  "podcastsPage": {
+    "title": "Podcasts",
+    "searchPlaceholder": "Podcasts und Folgen durchsuchen",
+    "transcriptSearchToggle": "Transkripte durchsuchen (Premium)",
+    "transcriptSearchFeature": "Transkriptsuche",
+    "transcriptSearchMobileNotAvailable": "Diese Funktion ist in Ihrem aktuellen Plan nicht verfügbar. Besuchen Sie",
+    "transcriptSearchUnavailable": "Transkriptsuche ist vorübergehend nicht verfügbar",
+    "selectPodcast": "Wählen Sie einen Podcast, um Folgen zu sehen",
+    "loadError": "Podcasts konnten nicht geladen werden",
+    "noResults": "Keine passenden Folgen"
+  },
+  "podcastPlayer": {
+    "play": "Abspielen",
+    "pause": "Pause",
+    "skip30": "30 Sekunden vorspulen",
+    "skipBack30": "30 Sekunden zurückspulen",
+    "speed": "Geschwindigkeit",
+    "mute": "Stummschalten",
+    "unmute": "Stummschaltung aufheben",
+    "invalidUrl": "Audioquelle ist nicht verfügbar"
+  },
+  "podcastEpisode": {
+    "duration": "Dauer",
+    "publishedAt": "Veröffentlicht",
+    "play": "Folge abspielen",
+    "pause": "Folge pausieren"
+  }
+}

@@ -1,1 +1,36 @@
-{}
+{
+  "relatedPodcasts": {
+    "heading": "Épisodes de podcast liés",
+    "expand": "Voir les podcasts liés",
+    "collapse": "Masquer les podcasts liés",
+    "empty": "Aucun épisode lié",
+    "loadError": "Impossible de charger les podcasts liés"
+  },
+  "podcastsPage": {
+    "title": "Podcasts",
+    "searchPlaceholder": "Rechercher podcasts et épisodes",
+    "transcriptSearchToggle": "Rechercher dans les transcriptions (Premium)",
+    "transcriptSearchFeature": "Recherche dans les transcriptions",
+    "transcriptSearchMobileNotAvailable": "Cette fonctionnalité n'est pas disponible avec votre forfait actuel. Visitez",
+    "transcriptSearchUnavailable": "La recherche de transcriptions est temporairement indisponible",
+    "selectPodcast": "Sélectionnez un podcast pour voir les épisodes",
+    "loadError": "Impossible de charger les podcasts",
+    "noResults": "Aucun épisode correspondant"
+  },
+  "podcastPlayer": {
+    "play": "Lecture",
+    "pause": "Pause",
+    "skip30": "Avancer de 30 secondes",
+    "skipBack30": "Reculer de 30 secondes",
+    "speed": "Vitesse",
+    "mute": "Couper le son",
+    "unmute": "Activer le son",
+    "invalidUrl": "La source audio est indisponible"
+  },
+  "podcastEpisode": {
+    "duration": "Durée",
+    "publishedAt": "Publié",
+    "play": "Lire l'épisode",
+    "pause": "Mettre en pause"
+  }
+}
