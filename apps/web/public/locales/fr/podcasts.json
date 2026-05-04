@@ -32,5 +32,17 @@
     "publishedAt": "Publié",
     "play": "Lire l'épisode",
     "pause": "Mettre en pause"
+  },
+  "transcript": {
+    "heading": "Transcription",
+    "show": "Afficher la transcription",
+    "hide": "Masquer la transcription",
+    "searchPlaceholder": "Rechercher dans la transcription",
+    "unavailable": "Aucune transcription disponible pour ce contenu",
+    "transcribing": "Transcription en cours… (~30 secondes)",
+    "premium": {
+      "web": "Fonctionnalité Premium — passez au niveau supérieur pour afficher les transcriptions",
+      "mobile": "Cette fonctionnalité n'est pas disponible avec votre forfait actuel. Visitez newshub.example depuis votre navigateur pour en savoir plus."
+    }
   }
 }

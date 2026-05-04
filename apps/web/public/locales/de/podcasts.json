@@ -32,5 +32,17 @@
     "publishedAt": "Veröffentlicht",
     "play": "Folge abspielen",
     "pause": "Folge pausieren"
+  },
+  "transcript": {
+    "heading": "Transkript",
+    "show": "Transkript anzeigen",
+    "hide": "Transkript ausblenden",
+    "searchPlaceholder": "Transkript durchsuchen",
+    "unavailable": "Für diesen Inhalt ist kein Transkript verfügbar",
+    "transcribing": "Transkribiere… (~30 Sekunden)",
+    "premium": {
+      "web": "Premium-Funktion — Upgrade erforderlich, um Transkripte anzuzeigen",
+      "mobile": "Diese Funktion ist in Ihrem aktuellen Plan nicht verfügbar. Besuchen Sie newshub.example von Ihrem Browser aus, um mehr zu erfahren."
+    }
   }
 }
