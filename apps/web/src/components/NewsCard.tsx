@@ -9,6 +9,7 @@ import { SwipeableCard } from './mobile/SwipeableCard';
 import { CredibilityPill } from './credibility/CredibilityPill';
 import { BiasBadge } from './credibility/BiasBadge';
 import { useCredibility } from '../hooks/useCredibility';
+import { RelatedVideos } from './videos/RelatedVideos';
 import { cn, getRegionColor, getSentimentColor, truncate } from '../lib/utils';
 import { formatDateTime } from '../lib/formatters';
 import { useAppStore } from '../store';
@@ -480,6 +481,10 @@ export function NewsCard({ article, priority = false, onTranslate }: NewsCardPro
           </div>
         </div>
       )}
+
+      {/* Phase 40 / CONT-05: lazy related-video discovery (collapsed-by-default; zero LCP cost) */}
+      {/* TODO 40-04: insert <RelatedPodcasts articleId={article.id} /> above this line */}
+      <RelatedVideos articleId={article.id} />
     </article>
   );
 
