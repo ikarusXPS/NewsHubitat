@@ -12,6 +12,7 @@ import {
   Globe2,
   History,
   MapPin,
+  Podcast,
   Radio,
   Settings,
   User,
@@ -86,6 +87,7 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
     { to: '/timeline', icon: Clock, label: t('navigation.timeline') },
     { to: '/history', icon: History, label: t('navigation.history') },
     { to: '/bookmarks', icon: Bookmark, label: t('navigation.bookmarks') },
+    { to: '/podcasts', icon: Podcast, label: t('navigation.podcasts') },
   ], [t]);
 
   const { data: eventStats, dataUpdatedAt } = useQuery({

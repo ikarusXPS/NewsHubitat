@@ -50,6 +50,11 @@ export const Settings = lazyWithRetry(() =>
   import('./pages/Settings').then(m => ({ default: m.Settings }))
 );
 
+// Phase 40-04 / CONT-03: dedicated /podcasts page (D-B3)
+export const PodcastsPage = lazyWithRetry(() =>
+  import('./pages/PodcastsPage').then(m => ({ default: m.PodcastsPage }))
+);
+
 export const Community = lazyWithRetry(() =>
   import('./pages/Community').then(m => ({ default: m.Community }))
 );
@@ -155,5 +160,8 @@ export const routePreloaders: Record<string, () => void> = {
   },
   '/pricing': () => {
     Pricing.preload();
+  },
+  '/podcasts': () => {
+    PodcastsPage.preload();
   },
 };
