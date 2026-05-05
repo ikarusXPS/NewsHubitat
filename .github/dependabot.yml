@@ -1,0 +1,95 @@
+# Dependabot version-update config.
+#
+# Security alerts are handled separately by enabling Dependabot security
+# updates in Settings → Code security. This file controls *version* update
+# PRs (non-security cadence) for the three ecosystems NewsHub uses.
+#
+# Pnpm monorepo note: `directory: /` lets Dependabot read pnpm-workspace.yaml
+# and traverse all workspace packages from a single config block.
+
+version: 2
+updates:
+  # npm — root + apps/web + apps/mobile + packages/types (pnpm workspace)
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Europe/Berlin
+    open-pull-requests-limit: 5
+    versioning-strategy: increase
+    labels:
+      - dependencies
+      - npm
+    commit-message:
+      prefix: chore
+      include: scope
+    groups:
+      # Bundle minor + patch into one PR per group to avoid PR storm
+      prod-minor-patch:
+        applies-to: version-updates
+        dependency-type: production
+        update-types:
+          - minor
+          - patch
+      dev-minor-patch:
+        applies-to: version-updates
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
+    ignore:
+      # Keep these pinned — major upgrades require manual planning per
+      # CLAUDE.md (Prisma 7 datasource quirks, Express 5 middleware,
+      # Tailwind v4 PostCSS, React 19 RSC, Stripe API version).
+      - dependency-name: prisma
+        update-types: [version-update:semver-major]
+      - dependency-name: "@prisma/*"
+        update-types: [version-update:semver-major]
+      - dependency-name: express
+        update-types: [version-update:semver-major]
+      - dependency-name: react
+        update-types: [version-update:semver-major]
+      - dependency-name: react-dom
+        update-types: [version-update:semver-major]
+      - dependency-name: tailwindcss
+        update-types: [version-update:semver-major]
+      - dependency-name: stripe
+        update-types: [version-update:semver-major]
+      - dependency-name: socket.io
+        update-types: [version-update:semver-major]
+      - dependency-name: "@socket.io/*"
+        update-types: [version-update:semver-major]
+
+  # GitHub Actions — pin and update workflow action versions
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Europe/Berlin
+    open-pull-requests-limit: 3
+    labels:
+      - dependencies
+      - github-actions
+    commit-message:
+      prefix: ci
+      include: scope
+
+  # Docker — base image updates for production Dockerfile
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Europe/Berlin
+    open-pull-requests-limit: 2
+    labels:
+      - dependencies
+      - docker
+    commit-message:
+      prefix: chore
+      include: scope
