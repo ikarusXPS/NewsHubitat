@@ -67,7 +67,7 @@ export function PodcastsPage() {
     user?.subscriptionTier === 'ENTERPRISE';
   const isMobile = isNativeApp();
 
-  const [selectedFeedId, setSelectedFeedId] = useState<string | null>(null);
+  const [explicitFeedId, setSelectedFeedId] = useState<string | null>(null);
   const [searchQ, setSearchQ] = useState('');
   const [transcriptSearchOn, setTranscriptSearchOn] = useState(false);
   const [transcriptHits, setTranscriptHits] = useState<TranscriptHit[]>([]);
@@ -80,26 +80,26 @@ export function PodcastsPage() {
     refetch: refetchFeeds,
   } = useCuratedPodcasts();
 
+  // Auto-select the first feed once loaded so the page isn't empty.
+  // Derived during render — avoids the react-hooks/set-state-in-effect
+  // pattern of setSelectedFeedId(feeds[0].id) inside a useEffect.
+  const selectedFeedId = explicitFeedId ?? feeds?.[0]?.id ?? null;
+
   const { data: episodes, isLoading: episodesLoading } = usePodcastEpisodes(
     selectedFeedId ?? '',
   );
 
-  // Auto-select the first feed once loaded so the page isn't empty
-  useEffect(() => {
-    if (!selectedFeedId && feeds && feeds.length > 0) {
-      setSelectedFeedId(feeds[0].id);
-    }
-  }, [feeds, selectedFeedId]);
+  // Gate for the transcript-search effect. When false, the displayed hits /
+  // error are read from the derived values below — we never call setState
+  // inside an early-return branch (react-hooks/set-state-in-effect).
+  const isTranscriptSearchActive =
+    isPremium && transcriptSearchOn && !!searchQ.trim();
 
-  // Server-side transcript search (PREMIUM only). Fires when toggle is ON
-  // AND the query is non-empty. Failures are non-blocking — the page still
-  // shows client-side filtered episodes.
+  // Server-side transcript search (PREMIUM only). Fires when the gate is
+  // true. State setters live in fetch callbacks (allowed); the effect body
+  // contains no direct setState calls.
   useEffect(() => {
-    if (!isPremium || !transcriptSearchOn || !searchQ.trim()) {
-      setTranscriptHits([]);
-      setTranscriptError(null);
-      return;
-    }
+    if (!isTranscriptSearchActive) return;
     let cancelled = false;
     fetchTranscriptSearch(searchQ.trim())
       .then((hits) => {
@@ -117,7 +117,12 @@ export function PodcastsPage() {
     return () => {
       cancelled = true;
     };
-  }, [isPremium, transcriptSearchOn, searchQ, t]);
+  }, [isTranscriptSearchActive, searchQ, t]);
+
+  // Display values: ignore stale hits/error when the gate is off so the
+  // closed-state UI matches the original setState(reset)-on-gate behavior.
+  const displayedTranscriptHits = isTranscriptSearchActive ? transcriptHits : [];
+  const displayedTranscriptError = isTranscriptSearchActive ? transcriptError : null;
 
   const podcastTitle = feedTitleFor(feeds, selectedFeedId);
 
@@ -184,12 +189,12 @@ export function PodcastsPage() {
         </div>
       </div>
 
-      {transcriptError && (
+      {displayedTranscriptError && (
         <div
           role="alert"
           className="mb-3 rounded-md border border-[#ff0044]/30 bg-[#ff0044]/10 p-2 text-xs text-[#ff0044]"
         >
-          {transcriptError}
+          {displayedTranscriptError}
         </div>
       )}
 
@@ -248,9 +253,9 @@ export function PodcastsPage() {
             <Loader2 className="h-4 w-4 animate-spin text-[#00f0ff]" />
           )}
 
-          {transcriptSearchOn && isPremium && transcriptHits.length > 0 && (
+          {transcriptSearchOn && isPremium && displayedTranscriptHits.length > 0 && (
             <ul className="space-y-2">
-              {transcriptHits.map((hit) => (
+              {displayedTranscriptHits.map((hit) => (
                 <li
                   key={`${hit.episodeId}-${hit.startSec ?? 0}`}
                   className="rounded-md border border-gray-700 bg-gray-800 p-3"
