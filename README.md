@@ -1,7 +1,7 @@
 <!-- generated-by: gsd-doc-writer -->
 # NewsHub
 
-> **Multi-perspective global news analysis.** Aggregates 130+ sources across 13 regions, translates and sentiment-tags every article, clusters topics, surfaces how different regions frame the same story, and lets developers consume it all through a versioned public API.
+> **Multi-perspective global news analysis.** Aggregates 130+ sources across 17 regions, translates and sentiment-tags every article, clusters topics, surfaces how different regions frame the same story, and lets developers consume it all through a versioned public API.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 ![React](https://img.shields.io/badge/React-19-61dafb)
@@ -14,7 +14,7 @@
 
 ![NewsHub Dashboard](docs/screenshots/dashboard.png)
 
-> **Screenshot freshness:** captures in `docs/screenshots/` were taken 2026-04-29. The UI has continued to evolve through milestone v1.6 (mobile bottom nav, FactCheck drawer, team UI wiring) — re-capture using the Playwright recipe in [`docs/screenshots/CAPTURE-GUIDE.md`](docs/screenshots/CAPTURE-GUIDE.md) if you want pixel-current shots.
+> **Screenshot freshness:** captures in `docs/screenshots/` were taken 2026-04-29. The UI has continued to evolve through milestone v1.6 (mobile bottom nav, FactCheck drawer, team UI wiring, transcripts drawer for podcasts/videos) — re-capture using the Playwright recipe in [`docs/screenshots/CAPTURE-GUIDE.md`](docs/screenshots/CAPTURE-GUIDE.md) if you want pixel-current shots.
 
 ---
 
@@ -49,13 +49,13 @@ Three problems newsrooms, analysts, and curious readers all hit:
 
 NewsHub is a single platform that:
 
-- **Crawls 130+ curated RSS sources** across 13 regions (USA, Europe, Germany, Middle East, Turkey, Russia, China, Asia, Africa, Latin America, Oceania, Canada, Alternative). Each source carries a `bias` profile (`political`, `reliability`, `ownership`).
+- **Crawls 130+ curated RSS sources** across 17 regions (USA, Europe, Germany, Middle East, Turkey, Russia, China, Asia, Africa, Latin America, Oceania, Canada, Alternative, plus the Phase 40 sub-regions Southeast Asia, Northern Europe, Sub-Saharan Africa, India). Each source carries a `bias` profile (`political`, `reliability`, `ownership`).
 - **Translates and sentiment-tags every article** through a multi-provider fallback chain (DeepL → Google → LibreTranslate → Claude).
 - **Clusters articles by topic** and visualizes regional framing differences in a single comparison view.
 - **Exposes everything via a public REST API** with versioned endpoints, OpenAPI spec, and tiered rate limits — `nh_{env}_{random}_{checksum}` API keys, IETF `RateLimit-*` headers.
 - **Runs as a PWA, mobile app, and desktop web** from the same `apps/web/dist` bundle (Capacitor 8 wraps web for iOS + Android — 95%+ code reuse).
 
-The codebase ships with subscription tiers (Stripe), team collaboration, threaded comments, gamification badges, real-time updates over Socket.IO with cross-replica fanout via Redis, and a complete observability stack (Prometheus + Grafana + Alertmanager + Sentry).
+The codebase ships with subscription tiers (Stripe), team collaboration, threaded comments, gamification badges, real-time updates over Socket.IO with cross-replica fanout via Redis, transcript drawers for embedded podcasts/videos, and a complete observability stack (Prometheus + Grafana + Alertmanager + Sentry).
 
 ---
 
@@ -75,7 +75,7 @@ The codebase ships with subscription tiers (Stripe), team collaboration, threade
 <tr>
 <td width="50%" align="center">
 <img src="docs/screenshots/monitor-events.png" alt="Geo events panel" />
-<br/><sub><b>Event List</b> — severity (critical / high / medium / low) and category (conflict / humanitarian / political / economic / military / protest)</sub>
+<br/><sub><b>Event List</b> — severity (critical / high / medium / low) and category (conflict / humanitarian / political / economic / military / protest / diplomacy / other)</sub>
 </td>
 <td width="50%" align="center">
 <img src="docs/screenshots/analysis.png" alt="Perspective analysis" />
@@ -141,7 +141,7 @@ pnpm seed:load-test          # OPTIONAL: 100 verified test users for k6
 pnpm dev
 ```
 
-Open http://localhost:5173. Backend OpenAPI docs at http://localhost:3001/api-docs.
+Open http://localhost:5173. OpenAPI spec at http://localhost:3001/api/openapi.json; interactive Scalar UI at http://localhost:5173/developers.
 
 > **First-run gotcha (Windows + WSL):** if `pnpm seed` errors on `bcrypt`, rebuild native modules: `pnpm rebuild`.
 
@@ -175,7 +175,7 @@ NewsHub ships as a true native app (not just a webview shortcut) using Capacitor
 ```bash
 # 1. Build the web bundle and sync into native projects
 pnpm --filter @newshub/mobile build
-# This runs: pnpm --filter @newshub/web build  →  npx cap sync
+# This runs: pnpm --filter @newshub/web build  →  pnpm cap:sync
 
 # 2a. iOS (requires macOS + Xcode)
 pnpm --filter @newshub/mobile cap:open:ios
@@ -249,7 +249,7 @@ Architecture deep-dive: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 | **Mobile** | Capacitor 8 (iOS + Android) | 95%+ code reuse — wraps the same `apps/web/dist` bundle |
 | **i18n** | `react-i18next` + `i18next-icu` (DE / EN / FR) | ICU plural rules + bidirectional Zustand sync |
 | **PWA** | `vite-plugin-pwa` | Offline shell + install banner |
-| **Testing** | Vitest 80% lines / 75% branches, Playwright | Unit + integration + E2E |
+| **Testing** | Vitest 80% lines / 74% branches, Playwright | Unit + integration + E2E |
 | **Observability** | Prometheus + Grafana + Alertmanager + Sentry | Metrics, dashboards, alerting, error tracking |
 | **Deployment** | Docker Swarm + Traefik (sticky `nh_sticky` cookie) | Horizontal scaling with sticky-session WebSockets |
 
@@ -261,10 +261,11 @@ Production scaling sizing: **4 web replicas × Prisma `max:20` → PgBouncer poo
 
 ### News Aggregation & Translation
 
-- 130+ curated RSS sources (`apps/web/server/config/sources.ts`) across 13 regions, each tagged with `political` lean (-1..1), `reliability` (1..10), and `ownership` (`private` / `state` / `public`)
+- 130+ curated RSS sources (`apps/web/server/config/sources.ts`) across 17 regions, each tagged with `political` lean (-1..1), `reliability` (1..10), and `ownership` (`private` / `state` / `public` / `mixed`)
 - Multi-provider translation with graceful fallback (DeepL primary, Claude as last resort)
 - Translations stored as JSONB on `NewsArticle.titleTranslated` / `contentTranslated` so the same article can serve any UI language without re-hitting the translation provider
 - Sentiment per article: `positive` / `negative` / `neutral`
+- Per-region bias-balance gate (`pnpm check:source-bias`) — flags state-dominated press regions as `biasDiversityNote: 'limited'` (e.g. `russland`, `china`); surfaced as a framing-analysis footnote
 
 ### Multi-Perspective Analysis
 
@@ -290,7 +291,7 @@ Production scaling sizing: **4 web replicas × Prisma `max:20` → PgBouncer poo
 - Rate limits keyed by API key ID (NAT/VPN-friendly, not by IP)
 - 5-minute Redis cache on validated keys; only first 15 chars stored as identifier
 - **Code-first OpenAPI spec** via `@asteasolutions/zod-to-openapi` — Zod schemas in `server/openapi/schemas.ts` are the single source of truth for runtime validation AND API docs
-- Live spec at `/openapi.json`, interactive Scalar UI at `/api-docs`
+- Live spec at `/api/openapi.json` (backend), interactive Scalar UI at `/developers` (frontend SPA route)
 
 ### Subscriptions & Tiering
 
@@ -305,12 +306,20 @@ Production scaling sizing: **4 web replicas × Prisma `max:20` → PgBouncer poo
 ### Teams & Comments
 
 - `Team` / `TeamMember` / `TeamBookmark` / `TeamInvite` — role-based access (owner / admin / member)
+- TeamSettingsModal + TeamDashboard wired up in Phase 40.1 (gear icon → rename / re-describe)
 - Threaded comments on articles via `Comment` model with parent/child relationships
 
 ### Gamification
 
 - `Badge` (bronze / silver / gold / platinum) with progress tracking via `UserBadge`
 - `LeaderboardSnapshot` for periodic XP rankings
+
+### Embedded Media & Transcripts (Phase 40)
+
+- **Podcasts and videos** are first-class — dedicated `/api/podcasts` and `/api/videos` route groups with embedded players
+- **Transcript drawer** opens per-episode on the dashboard (`RelatedPodcasts`) and on the standalone `EmbeddedVideo` component
+- Transcripts pulled via `youtube-caption-extractor` for YouTube; `ffmpeg-static` + Whisper-style providers for podcasts
+- i18n keys for transcript UI live in `apps/web/public/locales/{de,en,fr}/{podcasts,videos}.json`
 
 ### Mobile (Capacitor 8)
 
@@ -492,14 +501,14 @@ Open `apps/web/server/config/sources.ts`. Add an entry to the exported `NEWS_SOU
   bias: {
     political: 0.1,                      // -1 (left) to 1 (right); ~0 = center
     reliability: 8,                      // 1 (low) to 10 (high)
-    ownership: 'private',                // 'private' | 'state' | 'public'
+    ownership: 'private',                // 'private' | 'state' | 'public' | 'mixed'
   },
   apiEndpoint: 'https://www.politico.eu/feed/',
   rateLimit: 100,                        // requests per minute (informational)
 }
 ```
 
-Allowed `region` values are listed in `packages/types/index.ts` under `PerspectiveRegion`. As of v1.6: `usa | europa | deutschland | nahost | tuerkei | russland | china | asien | afrika | lateinamerika | ozeanien | kanada | alternative` (Phase 40 adds `sudostasien | nordeuropa | sub-saharan-africa | indien`).
+Allowed `region` values are listed in `packages/types/index.ts` under `PerspectiveRegion`. As of v1.6 (post Phase 40): `usa | europa | deutschland | nahost | tuerkei | russland | china | asien | afrika | lateinamerika | ozeanien | kanada | alternative | sudostasien | nordeuropa | sub-saharan-africa | indien` — 17 regions total.
 
 #### 3. (Optional) Verify it passes the bias-balance gate
 
@@ -603,17 +612,17 @@ These follow the IETF `RateLimit` standard and are keyed by **API key ID**, not 
 #### 4. Use the OpenAPI spec
 
 ```bash
-curl -s http://localhost:3001/openapi.json | jq '.paths | keys'
+curl -s http://localhost:3001/api/openapi.json | jq '.paths | keys'
 ```
 
-Or import into Postman / Insomnia / Bruno via the live spec URL. Interactive docs: http://localhost:3001/api-docs (Scalar UI).
+Or import into Postman / Insomnia / Bruno via the live spec URL. Interactive docs: http://localhost:5173/developers (Scalar UI).
 
 #### 5. (Optional) Generate a TypeScript client
 
 The spec is OpenAPI 3.1, so any codegen works. Example with `openapi-typescript`:
 
 ```bash
-npx openapi-typescript http://localhost:3001/openapi.json -o ./newshub-api.d.ts
+npx openapi-typescript http://localhost:3001/api/openapi.json -o ./newshub-api.d.ts
 ```
 
 </details>
@@ -646,7 +655,7 @@ Install the Stripe CLI: https://stripe.com/docs/stripe-cli. Then:
 
 ```bash
 stripe login                    # one-time browser auth
-stripe listen --forward-to localhost:3001/api/stripe/webhook
+stripe listen --forward-to localhost:3001/api/webhooks/stripe
 # Output:
 # > Ready! Your webhook signing secret is whsec_xxx (^C to quit)
 ```
@@ -706,7 +715,7 @@ pnpm --filter @newshub/mobile build
 
 This runs:
 1. `pnpm --filter @newshub/web build` — produces `apps/web/dist/`
-2. `npx cap sync` — copies `dist/` into `apps/mobile/ios/App/App/public/` and `apps/mobile/android/app/src/main/assets/public/`, syncs Capacitor plugin metadata
+2. `pnpm cap:sync` — copies `dist/` into `apps/mobile/ios/App/App/public/` and `apps/mobile/android/app/src/main/assets/public/`, syncs Capacitor plugin metadata
 
 If you only changed native config (e.g. plugin versions), use the faster:
 
@@ -728,7 +737,7 @@ Opens `apps/mobile/ios/App/App.xcworkspace` in Xcode. First time:
 4. Pick a simulator (e.g. "iPhone 15 Pro") or a connected device
 5. Press **Run** (⌘R)
 
-The app loads the bundled web assets and points API calls at the configured backend (default: production; see `apps/web/src/lib/api.ts` for the env detection).
+The app loads the bundled web assets and points API calls at the backend configured at build time via the `VITE_API_URL` env var (relative `/api/...` paths in dev are proxied by Vite per `apps/web/vite.config.ts`).
 
 #### 2b. Run on Android
 
@@ -905,7 +914,7 @@ pnpm dev:backend               # Backend only
 pnpm typecheck                 # TypeScript across all packages
 pnpm lint                      # ESLint
 pnpm test:run                  # Vitest unit tests (CI mode)
-pnpm test:coverage             # Coverage report (80% lines / 75% branches gate)
+pnpm test:coverage             # Coverage report (80% lines / 74% branches gate)
 pnpm build                     # Production build (frontend + backend)
 
 # E2E
@@ -930,6 +939,9 @@ pnpm load:full                 # Full scenario
 
 # OpenAPI spec regeneration (after Zod schema edits)
 cd apps/web && pnpm openapi:generate
+
+# Source bias balance gate (Phase 40)
+cd apps/web && pnpm check:source-bias
 
 # Cross-replica WebSocket verification (Phase 37 gate — production-shaped check)
 pnpm test:fanout               # Boots 2× app behind Traefik, asserts cross-replica fanout
@@ -958,21 +970,33 @@ REST endpoints summary and request/response shapes: [`docs/API.md`](docs/API.md)
 |---|---|---|---|
 | **Internal API** | `/api/*` | JWT (`Authorization: Bearer ...`) | App's own frontend |
 | **Public API** | `/api/v1/public/*` | `X-API-Key` header | External developers |
-| **Live OpenAPI spec** | `/openapi.json` | — | Code-first via `@asteasolutions/zod-to-openapi` |
-| **Interactive docs** | `/api-docs` | — | Scalar UI |
+| **Stripe webhook** | `/api/webhooks/stripe` | HMAC signature | Stripe → us (raw-body, before `express.json()`) |
+| **Live OpenAPI spec** | `/api/openapi.json` | — | Code-first via `@asteasolutions/zod-to-openapi` |
+| **Interactive docs** | `/developers` (frontend SPA) | — | Scalar UI |
 | **Health probe** | `/api/health` | — | App is up |
 | **Readiness probe** | `/api/ready` | — | App is accepting traffic (drains during shutdown) |
-| **Prometheus metrics** | `/api/metrics` | — | Route-normalized labels |
+| **Prometheus metrics** | `/metrics` | — | Route-normalized labels |
 
-Key public endpoints:
+Public API endpoints (verified against `apps/web/server/routes/publicApi.ts`):
 
 | Endpoint | Method | What it does |
 |---|---|---|
-| `/api/v1/public/news` | GET | List articles (regions, search, sentiment, pagination) |
+| `/api/v1/public/news` | GET | List articles (regions, topics, sentiment, search, pagination) |
 | `/api/v1/public/news/:id` | GET | Single article |
-| `/api/v1/public/sources` | GET | All 130+ sources with bias metadata |
-| `/api/v1/public/clusters` | GET | Topic clusters with optional AI summaries |
-| `/api/v1/public/events/geo` | GET | Geo-located events |
+| `/api/v1/public/events` | GET | Geo-located timeline events with confidence + perspective metadata |
+| `/api/v1/public/sentiment` | GET | Aggregated sentiment statistics |
+
+Selected internal endpoints (JWT-gated):
+
+| Endpoint | Method | What it does |
+|---|---|---|
+| `/api/news` | GET | Internal article list (richer filters than public) |
+| `/api/analysis/clusters` | GET | Topic clusters; `?summaries=true` adds AI summaries |
+| `/api/ai/ask` | POST | RAG Q&A `{question, context[]}` (`aiTierLimiter` gates FREE) |
+| `/api/podcasts` / `/api/videos` | GET | Embedded media listings (Phase 40) |
+| `/api/transcripts/...` | GET | Per-episode transcript (Phase 40) |
+| `/api/account/export` | GET | GDPR Art. 20 data export (`?format=json\|csv`) |
+| `/api/account/delete-request` | POST | GDPR Art. 17 deletion (7-day grace) |
 
 ---
 
@@ -1030,7 +1054,7 @@ Production: Docker Swarm via `stack.yml` — see [Tutorial 6](#tutorials).
 
 1. Fork the repository
 2. Create a feature branch (`feat/short-description` or `fix/short-description`)
-3. Write tests first — TDD is the project default; coverage gate is 80% lines / 75% branches
+3. Write tests first — TDD is the project default; coverage gate is 80% lines / 74% branches
 4. Run `pnpm typecheck && pnpm test:run && pnpm build` before pushing
 5. Use [conventional commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `chore:`, `docs:`, `refactor:`)
 6. Open a PR — CI runs lint, typecheck, unit tests (with coverage gate), Docker build, and E2E

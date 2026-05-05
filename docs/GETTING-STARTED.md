@@ -7,7 +7,7 @@ Get NewsHub running locally in under 10 minutes. Copy each block in order — ev
 
 Install these once on your machine:
 
-- **Node.js** >= 18 (LTS recommended)
+- **Node.js** 22 (pinned in [`.nvmrc`](../.nvmrc); use `nvm use` to match)
 - **pnpm** — install globally with the one allowed `npm` invocation:
   ```bash
   npm i -g pnpm
@@ -15,7 +15,7 @@ Install these once on your machine:
 - **Docker** + Docker Compose (Docker Desktop on Windows/macOS includes both)
 - **Git**
 
-NewsHub is a pnpm monorepo. Use `pnpm` for every command after the bootstrap above.
+NewsHub is a pnpm monorepo (`apps/web`, `apps/mobile`, `packages/types`). Use `pnpm` for every command after the bootstrap above.
 
 ## 1. Clone the repository
 
@@ -30,7 +30,7 @@ cd NewsHub
 pnpm install
 ```
 
-This installs all workspace packages (`apps/web`, `packages/types`).
+This installs all workspace packages.
 
 ## 3. Configure environment variables
 
@@ -63,7 +63,7 @@ openssl rand -base64 32
 OPENROUTER_API_KEY=your-openrouter-api-key   # https://openrouter.ai/keys
 ```
 
-The app degrades gracefully without an AI key — news, translation, and visualizations still work; AI Q&A and clustering summaries fall back to keyword analysis.
+The app degrades gracefully without an AI key — news, translation, and visualizations still work; AI Q&A and clustering summaries fall back to keyword analysis. See [docs/CONFIGURATION.md](CONFIGURATION.md) for the full list of environment variables (translation, OAuth, Stripe, Sentry, etc.).
 
 ## 4. Start PostgreSQL and Redis
 
@@ -71,7 +71,7 @@ The app degrades gracefully without an AI key — news, translation, and visuali
 docker compose up -d postgres redis
 ```
 
-This starts only the two services dev needs (Postgres on `localhost:5433`, Redis on `localhost:6379`). The full `docker compose up -d` starts the production stack — don't run that for local dev.
+This starts only the two services dev needs (Postgres on `localhost:5433`, Redis on `localhost:6379`). The full `docker compose up -d` starts the production stack (app, Prometheus, Alertmanager, Grafana) — don't run that for local dev.
 
 ## 5. Initialize the database
 
@@ -84,13 +84,15 @@ cd ../..
 
 `prisma generate` builds the typed client into `apps/web/src/generated/prisma/`. `prisma db push` syncs the schema to your Postgres instance.
 
+> **Anti-pattern reminder:** `prisma.config.ts` lives at `apps/web/prisma.config.ts`, never at the repo root. Prisma 7 resolves the schema path relative to the config file's directory — a root-level config silently loads a stale duplicate schema. Always run `prisma` commands from `apps/web/`.
+
 ## 6. Seed initial data
 
 ```bash
 pnpm seed
 ```
 
-This loads gamification badges and the 8 built-in AI personas.
+This runs `apps/web/prisma/seed.ts`, which loads gamification badges and the 8 built-in AI personas. Subsets are also available: `pnpm seed:badges` and `pnpm seed:personas`.
 
 ## 7. Start the development server
 
@@ -103,6 +105,8 @@ pnpm dev
 - **Frontend:** http://localhost:5173
 - **Backend API:** http://localhost:3001
 
+Run them individually with `pnpm dev:frontend` or `pnpm dev:backend` if you only need one half of the stack.
+
 ## 8. Open the app
 
 Browse to **http://localhost:5173**. The dashboard should load with the 3D globe and live news feed.
@@ -110,8 +114,10 @@ Browse to **http://localhost:5173**. The dashboard should load with the 3D globe
 Verify the backend is healthy:
 
 ```bash
-curl http://localhost:3001/api/health
+curl http://127.0.0.1:3001/api/health
 ```
+
+> Use `127.0.0.1` instead of `localhost` for backend calls — Node 18+ resolves `localhost` to IPv6 `::1` first, and Express on `0.0.0.0` doesn't always bind there.
 
 ## 9. (Optional) Pre-create test users for load testing
 
@@ -150,7 +156,7 @@ Another process is using the port. Find and stop it:
 lsof -i :3001
 lsof -i :5173
 
-# Windows
+# Windows (PowerShell)
 netstat -ano | findstr :3001
 netstat -ano | findstr :5173
 ```
@@ -169,7 +175,7 @@ Confirm `DATABASE_URL` in `.env` matches the docker-compose mapping (port `5433`
 
 ### Redis warnings in the backend log
 
-Redis is optional. The app falls back to in-memory caches and rate limits. To silence the warnings, ensure Redis is running:
+Redis is optional for development. The app falls back to in-memory caches and rate limits. To silence the warnings, ensure Redis is running:
 
 ```bash
 docker compose up -d redis
@@ -183,14 +189,22 @@ Regenerate the Prisma client:
 cd apps/web && npx prisma generate && cd ../..
 ```
 
+### Wrong Node version
+
+If `pnpm install` complains about engine compatibility, switch to the pinned version:
+
+```bash
+nvm use   # reads .nvmrc -> Node 22
+```
+
 ## What's next?
 
 You're set up. Next stops:
 
 - **[docs/DEVELOPMENT.md](DEVELOPMENT.md)** — daily commands, code style, build/test/lint
+- **[docs/TESTING.md](TESTING.md)** — Vitest + Playwright workflows and conventions
 - **[docs/ARCHITECTURE.md](ARCHITECTURE.md)** — system design, services, data flow
+- **[docs/CONFIGURATION.md](CONFIGURATION.md)** — full environment-variable reference
 - **[docs/API.md](API.md)** — internal HTTP API reference
 - **http://localhost:3001/api-docs** — Scalar UI for the public API (live, served by your dev backend)
-- **[.planning/PROJECT.md](../.planning/PROJECT.md)** — product vision and core value
-- **[.planning/ROADMAP.md](../.planning/ROADMAP.md)** — phase breakdown and the GSD planning workflow
 - **[CONTRIBUTING.md](../CONTRIBUTING.md)** — read this before opening a PR

@@ -238,7 +238,7 @@ Gemäß Art. 30 DSGVO / According to Art. 30 GDPR
 | Recht | Implementierung | Endpoint/Feature |
 |-------|-----------------|------------------|
 | Art. 15 Auskunft | Datenexport (JSON/CSV) | `GET /api/account/export` |
-| Art. 16 Berichtigung | Profil-Bearbeitung | `PUT /api/profile` |
+| Art. 16 Berichtigung | Profil-Bearbeitung (mehrere Endpunkte) | `PUT /api/profile/name`, `PUT /api/profile/avatar/preset`, `POST /api/profile/avatar/upload`, `PUT /api/profile/leaderboard-visibility` |
 | Art. 17 Löschung | Account-Löschung | `POST /api/account/delete-request` |
 | Art. 18 Einschränkung | Historie pausieren | `isHistoryPaused` Toggle |
 | Art. 20 Portabilität | Datenexport (JSON) | `GET /api/account/export?format=json` |

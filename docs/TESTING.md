@@ -1,7 +1,7 @@
 <!-- generated-by: gsd-doc-writer -->
 # Testing
 
-NewsHub uses a two-layer test pyramid: Vitest for unit/integration tests against the React frontend and Express backend, and Playwright for end-to-end tests across the full stack. All commands assume `pnpm` (this is a `pnpm` monorepo — `npm` is not used).
+NewsHub uses a layered test strategy: Vitest for unit/integration tests against the React frontend and Express backend, Playwright for end-to-end browser tests, and a separate Docker Compose harness (`pnpm test:fanout`) for cross-replica WebSocket verification. All commands assume `pnpm` (this is a `pnpm` monorepo — `npm` is not used).
 
 ## Test Pyramid
 
@@ -9,9 +9,10 @@ NewsHub uses a two-layer test pyramid: Vitest for unit/integration tests against
 |-------|-----------|----------|-------|
 | Unit / integration | Vitest 4 + jsdom | `apps/web/src/**/*.test.{ts,tsx}`, `apps/web/server/**/*.test.{ts,tsx}` | Pure functions, hooks, components, services |
 | End-to-end | Playwright 1.58 | `apps/web/e2e/*.spec.ts` | Full-stack browser flows against `http://localhost:5173` (frontend) + `http://127.0.0.1:3001` (backend) |
+| Cross-replica fanout | Vitest + Docker Compose | `e2e-stack/ws-fanout.test.ts` | Phase 37 INFRA-04 / WS-04 gate — boots 2× app behind Traefik and asserts Socket.IO events fan out via the Redis adapter |
 | Load | k6 | `apps/web/k6/load-test.js` | Performance benchmarks (manual) |
 
-NewsHub's test suite is large (1,300+ unit tests as of v1.6, 20 Playwright spec files across `chromium` and `chromium-auth` projects). Treat new features as a contract: a unit test for the logic, plus an E2E spec for the user-visible flow if it crosses HTTP/UI boundaries.
+NewsHub's test suite is large (1,400+ unit tests as of v1.6, 19 Playwright spec files across `chromium` and `chromium-auth` projects). Treat new features as a contract: a unit test for the logic, plus an E2E spec for the user-visible flow if it crosses HTTP/UI boundaries.
 
 ## Test Framework and Setup
 
@@ -22,7 +23,7 @@ NewsHub's test suite is large (1,300+ unit tests as of v1.6, 20 Playwright spec 
 - **Setup file:** `apps/web/src/test/setup.ts` — sets `JWT_SECRET`, registers `@testing-library/jest-dom` matchers, mocks `matchMedia` / `ResizeObserver` / `IntersectionObserver`, and runs cleanup after each test
 - **Pool:** `forks` (isolated process per test file)
 - **Per-test timeout:** 10 seconds
-- **Config:** `apps/web/vitest.config.ts` (single source of truth — the root `vitest.config.ts` re-exports it)
+- **Config:** `apps/web/vitest.config.ts` is the single source of truth for actually-running tests, because `pnpm test` proxies to that workspace. A second `vitest.config.ts` exists at the repo root as an independent duplicate (not a re-export) and the two have already diverged — the root file pins `branches: 80` while `apps/web/vitest.config.ts` pins `branches: 74`. Treat the root file as stale and edit `apps/web/vitest.config.ts` for any threshold change.
 
 ### E2E Testing: Playwright
 
@@ -35,6 +36,17 @@ NewsHub's test suite is large (1,300+ unit tests as of v1.6, 20 Playwright spec 
 - **Retries:** 1 in CI, 0 locally
 - **Timeouts:** 30 s per test, 10 s for `expect`, 10 s action, 20 s navigation, 120 s web-server startup
 - **Artifacts on failure:** Screenshot + trace (`trace: 'on-first-retry'`)
+
+### Cross-Replica Fanout: `pnpm test:fanout`
+
+Phase 37 added a horizontal-scaling topology where multiple web replicas fan Socket.IO events to each other through `@socket.io/redis-adapter`. Mocked-adapter unit tests don't satisfy the WS-04 gate — only a real two-replica boot does. The `e2e-stack/` directory provides that harness.
+
+- **Entry point:** `pnpm test:fanout` (calls `bash e2e-stack/run-fanout-test.sh`)
+- **Stack:** `e2e-stack/docker-compose.test.yml` boots `postgres:17` + `redis:7.4-alpine` + `traefik:v3.3` + 2× app (`app-1`, `app-2`) behind Traefik on host port 8000
+- **Schema:** A one-shot `db-init` container runs `prisma db push` against the empty Postgres before the app replicas start (gated via `service_completed_successfully`)
+- **Sticky sessions:** Traefik issues a `nh_sticky` cookie matching the production `stack.yml` configuration, so individual sessions pin to one replica while the test asserts cross-replica fanout
+- **Test logic:** `e2e-stack/ws-fanout.test.ts` (Vitest) emits a Socket.IO event on replica A and asserts a client on replica B receives it within budget
+- **Teardown:** The script runs `docker compose down -v` to drop volumes — never reuse Postgres state across runs
 
 ### Prerequisites Before Running E2E
 
@@ -85,6 +97,14 @@ Run a single E2E file (must `cd` into the workspace package — Playwright is no
 cd apps/web && npx playwright test e2e/auth.spec.ts
 ```
 
+### Cross-Replica Fanout
+
+```bash
+pnpm test:fanout        # Boots the 2-replica Docker stack and runs the WS-04 verification
+```
+
+Expect a 30-60 s warm-up while Postgres/Redis/Traefik come healthy and the app images build (cached after first run).
+
 ### Pre-Commit Verification
 
 The canonical green-light command before pushing:
@@ -93,7 +113,7 @@ The canonical green-light command before pushing:
 pnpm typecheck && pnpm test:run && pnpm build
 ```
 
-E2E is not part of the pre-commit chain — it runs in CI on top of build artifacts.
+E2E and the fanout harness are not part of the pre-commit chain — E2E runs in CI on top of build artifacts; fanout runs on demand for Phase 37 changes that touch WebSocket / Redis-adapter code paths.
 
 ## Playwright Project Structure
 
@@ -102,15 +122,16 @@ E2E is not part of the pre-commit chain — it runs in CI on top of build artifa
 | Project | Storage State | Test Match | Purpose |
 |---------|---------------|------------|---------|
 | `setup` | none (writes state) | `*.setup.ts` | Runs `auth.setup.ts`, registers + logs in test user, saves auth to `playwright/.auth/user.json` |
-| `chromium` | none | All `*.spec.ts` except profile/settings/history | Unauthenticated specs (auth flow, dashboard, navigation, search, bookmarks, etc.) |
+| `chromium` | none | All `*.spec.ts` except `profile.spec.ts`, `settings.spec.ts`, `history.spec.ts` (via `testIgnore`) | Unauthenticated specs (auth flow, dashboard, navigation, search, bookmarks, comments, teams, public API, etc.) |
 | `chromium-auth` | `playwright/.auth/user.json` | `profile.spec.ts`, `settings.spec.ts`, `history.spec.ts`, `comments.spec.ts`, `teams.spec.ts` | Authenticated specs; depends on `setup` |
 
-`bookmarks.spec.ts` deliberately runs in `chromium` (unauth) because the bookmarks page is backed by client-side localStorage, not server-side auth.
+`bookmarks.spec.ts` deliberately runs in `chromium` (unauth) because the bookmarks page is backed by client-side localStorage, not server-side auth. `comments.spec.ts` and `teams.spec.ts` are listed in the `chromium-auth` `testMatch` so the auth state is loaded for them, while still being included in `chromium`'s broader pattern — Playwright runs each spec under whichever project's filter matches.
 
 ### Auth Setup (`apps/web/e2e/auth.setup.ts`)
 
 - Polls `http://127.0.0.1:3001/api/health` for 30 s before doing anything (avoids ECONNREFUSED races where Playwright's `webServer` is up but the Express backend is still booting)
 - Registers the canonical E2E user `e2e-test@newshub.test` via `POST /api/auth/register` (idempotent — silent failure if user already exists)
+- Mocks `/api/focus/suggestions` to an empty list inside the setup itself (the bottom-right toast stack would otherwise overflow upward and intercept the Sign In button)
 - Pre-seeds `localStorage` via `addInitScript` to bypass two blocking modals:
   - `FocusOnboarding` (z-90) — gated by `hasCompletedOnboarding` in the `newshub-storage` Zustand persist key
   - `ConsentBanner` (z-100) — gated by the `newshub-consent` localStorage key
@@ -138,6 +159,7 @@ Import this fixture (`import { test, expect } from './fixtures'`) instead of the
 | Unit (backend) | `apps/web/server/**/*.test.ts` (or `apps/web/server/__tests__/`) | Yes |
 | E2E | `apps/web/e2e/*.spec.ts` | No — central directory |
 | E2E setup | `apps/web/e2e/*.setup.ts` | No |
+| Cross-replica | `e2e-stack/ws-fanout.test.ts` | No — single file in `e2e-stack/` |
 
 ### Conventions (CRITICAL — Discovered the Hard Way)
 
@@ -145,10 +167,10 @@ These rules look pedantic but each one corresponds to a real flake or cascading 
 
 - **Use `domcontentloaded`, not `networkidle`** — Socket.io polls the backend continuously, so the network never goes idle. `await page.waitForLoadState('networkidle')` will time out on every page that mounts a real-time component.
 - **Use `127.0.0.1`, not `localhost`, for backend calls** — Node 18+ resolves `localhost` to `::1` (IPv6) first, but the backend listens on IPv4. Hitting `http://localhost:3001` from `request.get(...)` in setup files yields ECONNREFUSED.
-- **Authenticated `page.request.*` calls don't auto-inject auth** — `storageState` only restores cookies and localStorage for the *page*. For raw API calls in a spec, manually pull the JWT and pass it:
+- **Authenticated `page.request.*` calls don't auto-inject auth** — `storageState` only restores cookies and localStorage for the *page*. For raw API calls in a spec, manually pull the JWT and pass it. The localStorage key is `newshub-auth-token`:
 
   ```typescript
-  const token = await page.evaluate(() => localStorage.getItem('newshub-token'));
+  const token = await page.evaluate(() => localStorage.getItem('newshub-auth-token'));
   const res = await page.request.get('http://127.0.0.1:3001/api/account/export', {
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -159,13 +181,23 @@ These rules look pedantic but each one corresponds to a real flake or cascading 
 
 ### Currently Skipped Tests (Tracked Debt)
 
-| File | Test(s) | Reason |
-|------|---------|--------|
-| `apps/web/e2e/settings.spec.ts` | 3 language-toggle tests | UI moved to the header; tests need rewrite to find the new control |
-| `apps/web/e2e/analysis.spec.ts` | 2 compare-modal tests (`should open compare mode modal`, `should close compare mode modal`) | Parallel-load race condition in the compare modal mount |
-| `apps/web/e2e/publicApi.spec.ts` | Cache Headers + Revocation tests | Self-skip via `test.skip(...)` when the 3-key-per-user API key cap is hit (so the suite degrades gracefully instead of failing) |
+Skips fall into three buckets: dead-UI debt (re-enable after rewriting selectors), CI-environment skips (browser/seed-data shape doesn't match local), and graceful self-skips (the test detects an upstream constraint and reports skipped instead of failing).
 
-These are explicit `test.skip(...)` calls — they show up as "skipped" in the report rather than failures. Re-enable when the underlying issue is fixed.
+| File | Test(s) | Bucket | Reason |
+|------|---------|--------|--------|
+| `settings.spec.ts` | 3 language-toggle tests | Dead UI | Language toggle moved to header `LanguageSwitcher` (D-04); tests target the old settings-page control |
+| `analysis.spec.ts` | 2 compare-modal tests (`should open compare mode modal`, `should close compare mode modal`) | Flake | Parallel-load race condition under 4-worker CI; modal misses 10 s visibility budget |
+| `dashboard.spec.ts` | `should have refresh/sync button` | Flake | Fallback assertion `expect(count).toBeGreaterThan(0)` fires before the lazy Dashboard tree mounts in CI. Re-enable once the assertion targets a hydration-anchored selector (e.g. `data-testid="refresh-button"`) |
+| `factcheck.spec.ts` | `user highlights a claim and sees a fact-check drawer with verdict + citations` (line 83) | Seed-data | Happy-path requires a seeded article whose content contains a fact-checkable claim; CI seed data is opaque. The other 4 factcheck tests exercise the security/limit surfaces directly via `request` and stay green. Re-enable once the seed pipeline guarantees a known fact-checkable article (or the test mocks the LLM verdict via Playwright route interception) |
+| `factcheck.spec.ts` | `test.skip(!articleId, ...)` (line 93), `test.skip(userTier !== 'FREE', ...)` (line 235) | Self-skip | Conditional skips when no seed article is available or when the auth user isn't FREE |
+| `comments.spec.ts` | `should be visible after navigating to article` (line 26) | Self-skip | Conditional skip when no internal `/article/` link is rendered in the seeded dataset |
+| `community.spec.ts` | Entire `Community Page` describe | Dead UI | Community page is unstable — whole-describe skip via `test.describe.skip` |
+| `timeline.spec.ts` | Entire `Timeline` describe | Dead UI | Timeline page is unstable — whole-describe skip via `test.describe.skip` |
+| `event-map.spec.ts` | 7 tests (map container, filter toggle, filter panel, severity/category filters, AI Extract, AI badge) | CI-only | All gated by `test.skip(isCI, ...)` — Leaflet/globe rendering is unreliable on CI's headless Chromium |
+| `monitor.spec.ts` | 4 tests (stats panel, severity filter, globe/map toggle, panel containers) | CI-only | Same as event-map — `test.skip(isCI, ...)` for visualization-heavy panels |
+| `publicApi.spec.ts` | Cache Headers + Revocation tests | Self-skip | Self-skip via `test.skip(...)` when the 3-key-per-user API key cap is hit (so the suite degrades gracefully instead of failing). Covered by upstream auth tests |
+
+These are explicit `test.skip(...)` or `test.describe.skip(...)` calls — they show up as "skipped" in the report rather than failures. Re-enable when the underlying issue is fixed.
 
 ## Coverage Requirements
 
@@ -176,7 +208,7 @@ Coverage thresholds are enforced by Vitest in `apps/web/vitest.config.ts`. Faili
 | Statements | 80% | Enforced |
 | Lines | 80% | Enforced |
 | Functions | 80% | Enforced |
-| **Branches** | **75%** | **Tracked debt** — temporarily lowered from 80%. Actual: 75.61% (CI run 25107573823). Backfill targets: `routes/ai.ts`, `routes/leaderboard.ts`, `services/webhookService.ts`, `jobs/workerEmitter.ts`, `hooks/useComments.ts`. Goal: raise back to 80%. |
+| **Branches** | **74%** | **Tracked debt** — temporarily lowered from 80% in three waiver steps (80 → 75 in CI run 25107573823 during the Phase 37/38 expansion; 75 → 74 in PR #4 covering Phase 38 + 39 scaffold + 40.1). Actual branch coverage: ~74.73%. Backfill targets: `routes/ai.ts`, `routes/leaderboard.ts`, `services/webhookService.ts`, `services/teamService.ts`, `services/metricsService.ts`, `jobs/workerEmitter.ts`, `hooks/useComments.ts`. Goal: raise back to 80%. |
 
 Coverage is provided by `@vitest/coverage-v8` with the following exclusions:
 
@@ -214,14 +246,21 @@ On failure, Playwright captures:
 
 If a spec fails only in CI, download the trace artifact rather than trying to reproduce locally — the trace contains the exact DOM state at each step.
 
+### Cross-Replica Fanout
+
+If `pnpm test:fanout` fails, `docker compose -f e2e-stack/docker-compose.test.yml logs` shows logs from both app replicas, Postgres, Redis, and Traefik. Common failure modes: stale build cache after Dockerfile changes (rebuild with `--no-cache`), Redis-adapter wiring drift, or sticky-cookie name mismatches between `docker-compose.test.yml` and the production `stack.yml`.
+
 ## CI Integration
 
 Tests run in `.github/workflows/ci.yml`:
 
-- **Lint + typecheck + unit tests + build** — Runs on every push and PR. The unit-test step is `pnpm test:coverage` and enforces the thresholds in `vitest.config.ts` (the 80%/80%/80%/75% gate). Failing coverage fails the build.
-- **E2E tests** — Run after build succeeds, with PostgreSQL 17 and Redis 7.4-alpine as service containers. Chromium-only browser install (`npx playwright install --with-deps chromium`). The HTML report is uploaded as an artifact.
+- **Lint + typecheck + unit tests + build** — Runs on every push and PR. The unit-test step is `pnpm test:coverage` and enforces the thresholds in `vitest.config.ts` (the 80% / 80% / 80% / 74% gate). Failing coverage fails the build.
+- **E2E tests** — Run after build succeeds, with PostgreSQL 17 and Redis 7.4-alpine as service containers. Chromium-only browser install (`pnpm --filter @newshub/web exec playwright install --with-deps chromium`). The job runs `pnpm --filter @newshub/web exec playwright test --reporter=html` with a 30-minute timeout. The HTML report (`apps/web/playwright-report/`) is uploaded as an artifact with 7-day retention.
 - **Lighthouse CI** — Runs *after* deploy-staging, **on master only**. Required scores: 90+ for performance, accessibility, best-practices, SEO. Core Web Vitals (LCP / CLS / INP / FCP) are tracked but warn-only.
+- **Branch protection on `master`:** the required check names are `Lint`, `Type Check`, `Unit Tests`, `Build Docker Image`, `E2E Tests` (display names, not job IDs); strict mode is on and admins are enforced.
 - **CI workflow validation:** `pnpm validate:ci` (uses `action-validator`) — run this locally before editing `.github/workflows/`.
+
+The cross-replica fanout harness (`pnpm test:fanout`) is not currently wired into CI; it is run on demand against changes that touch `apps/web/server/services/websocketService.ts`, the Redis adapter, or the production `stack.yml` topology.
 
 ## Load Testing
 

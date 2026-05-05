@@ -265,7 +265,7 @@ edge caching:
   of read traffic.
 - `GET /api/news/sources` — `Cache-Control: public, max-age=86400`. 24-hour
   cache; sources change rarely.
-- `GET /api/news/:id` — `Cache-Control: public, max-age=300`. Per-article;
+- `GET /api/news/:id` — `Cache-Control: public, max-age=600`. Per-article;
   edge cache works because article bodies are immutable post-write.
 - `GET /api/clusters` (or analogous topic-clustering endpoints) —
   `Cache-Control: public, max-age=600`. 10-minute cache.

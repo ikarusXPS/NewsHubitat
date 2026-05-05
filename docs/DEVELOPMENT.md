@@ -9,8 +9,8 @@ This guide covers local development setup, daily commands, debugging, and contri
 
 Before starting, ensure you have:
 
-- **Node.js 18+** (Node 22 recommended; the repo's `package.json` pins TypeScript and devDeps that target modern Node)
-- **pnpm** (install via `npm install -g pnpm` or `corepack enable && corepack prepare pnpm@latest --activate`)
+- **Node.js 22** (CI pins `node-version: 22` in `.github/workflows/ci.yml`; older 18+ may work locally but is not tested)
+- **pnpm 10** (CI pins `pnpm/action-setup@v4` with `version: 10`; install via `npm install -g pnpm@10` or `corepack enable && corepack prepare pnpm@10 --activate`)
 - **Docker** + **Docker Compose** (for PostgreSQL and Redis containers)
 - **Git**
 - **Stripe CLI** (optional — only needed for local Stripe webhook testing)
@@ -21,19 +21,35 @@ Before starting, ensure you have:
 ```
 NewsHub/
 ├── apps/
-│   └── web/                    # Frontend (Vite/React) + Backend (Express)
-│       ├── src/                # React app
-│       ├── server/             # Express API
-│       ├── prisma/             # Schema + seed scripts
-│       ├── e2e/                # Playwright tests
-│       └── src/generated/prisma/   # Auto-generated Prisma client (DO NOT EDIT)
+│   ├── web/                    # Frontend (Vite/React) + Backend (Express)
+│   │   ├── src/                # React app
+│   │   ├── server/             # Express API
+│   │   ├── prisma/             # Schema + seed scripts
+│   │   ├── prisma.config.ts    # Prisma 7 datasource — MUST live here, never root
+│   │   ├── e2e/                # Playwright tests
+│   │   └── src/generated/prisma/   # Auto-generated Prisma client (DO NOT EDIT)
+│   └── mobile/                 # @newshub/mobile — Capacitor 8 wrapper for iOS + Android
+│       ├── android/            # Native Android project
+│       ├── ios/                # Native iOS project
+│       └── capacitor.config.ts # Bundle ID com.newshub.app; webDir → ../web/dist
 ├── packages/
 │   └── types/                  # Shared types (@newshub/types)
-├── pnpm-workspace.yaml
+├── e2e-stack/                  # Cross-replica WebSocket fanout verification harness (Phase 37)
+├── pgbouncer/                  # PgBouncer config template for production scaling
+├── pnpm-workspace.yaml         # packages: apps/*, packages/*
 └── package.json                # Root scripts proxy to apps/web via pnpm --filter
 ```
 
 The root `package.json` exposes thin wrapper scripts that forward to the `@newshub/web` workspace via `pnpm --filter`. Run all dev commands from the repository root.
+
+### Critical Anti-Patterns (LOCKED — milestone-level)
+
+These rules cost the v1.6 milestone four full sub-phases (36.1, 36.2, 36.3, 36.4) of rework. Treat them as build-breakers.
+
+- **Never write to root `server/`, `prisma/`, or `src/`.** Those paths were physically deleted in commit `651ce93` (Phase 36.3-03). The only valid file roots are `apps/web/...`, `apps/<other>/...`, `packages/...`, `.github/...`, `.planning/...`, plus named top-level configs (`docker-compose.yml`, `Dockerfile`, etc.). A root-level write compiles fine but `pnpm dev:backend` runs `apps/web/server/index.ts` — orphan files become dead code.
+- **`prisma.config.ts` lives at `apps/web/prisma.config.ts`, never at the repository root.** Prisma 7's `schema:` field resolves relative to the config file's directory, not `cwd`. A root-level config silently loads a stale duplicate schema (this dropped the `ApiKey` table during Phase 36.2-03).
+
+If you find yourself about to create a file at the repo root, stop and ask: "does this belong inside `apps/web/`?" The answer is almost always yes.
 
 ### Initial Setup
 
@@ -142,8 +158,9 @@ pnpm typecheck && pnpm test:run && pnpm build
 | `pnpm test:e2e` | Playwright headless |
 | `pnpm test:e2e:headed` | Playwright with browser visible |
 | `pnpm test:e2e:ui` | Playwright interactive UI |
+| `pnpm test:fanout` | Cross-replica WebSocket fanout test (boots `e2e-stack/docker-compose.test.yml`) |
 
-**Coverage thresholds** (`apps/web/vitest.config.ts`): statements 80%, functions 80%, lines 80%, **branches 75%** (temporarily lowered from 80% — backfill TODO is tracked in the config file).
+**Coverage thresholds** (`apps/web/vitest.config.ts`): statements 80%, functions 80%, lines 80%, **branches 74%** (temporarily lowered from 80% — TODO waiver list in the config file: `routes/ai.ts`, `routes/leaderboard.ts`, `services/webhookService.ts`, `services/teamService.ts`, `services/metricsService.ts`, `jobs/workerEmitter.ts`, `hooks/useComments.ts`).
 
 **Run a single test file:**
 
@@ -152,6 +169,14 @@ pnpm test -- apps/web/src/lib/utils.test.ts        # Unit test by path
 pnpm test -- -t "mapCentering"                     # Tests matching a pattern
 cd apps/web && npx playwright test e2e/auth.spec.ts   # Single E2E spec
 ```
+
+**Cross-replica WebSocket verification:**
+
+```bash
+pnpm test:fanout
+```
+
+This boots `postgres + redis + traefik + 2× app` via `e2e-stack/docker-compose.test.yml`, emits a Socket.IO event on replica A, and asserts a client on replica B receives it. Required to satisfy the Phase 37 INFRA-04 / WS-04 gate. Mocked-adapter unit tests do not satisfy this gate — only the full stack does.
 
 ### Database
 
@@ -166,7 +191,7 @@ npx prisma studio       # Database GUI on localhost:5555
 
 ### OpenAPI Spec
 
-The OpenAPI document is code-first — Zod schemas in `apps/web/server/openapi/schemas.ts` are the single source of truth.
+The OpenAPI document is code-first — Zod schemas in `apps/web/server/openapi/schemas.ts` are the single source of truth for both runtime validation and API docs.
 
 ```bash
 cd apps/web && pnpm openapi:generate
@@ -192,6 +217,17 @@ pnpm load:full         # k6 full load scenario
 
 For staging runs, use the manual `workflow_dispatch` on `.github/workflows/load-test.yml` (requires `STAGING_URL`; never runs against production).
 
+### Mobile (Capacitor 8)
+
+```bash
+pnpm --filter @newshub/mobile build           # Builds web (apps/web/dist) + cap sync
+pnpm --filter @newshub/mobile cap:sync        # Sync only (assumes apps/web/dist is current)
+pnpm --filter @newshub/mobile cap:open:ios    # Open Xcode (macOS only)
+pnpm --filter @newshub/mobile cap:open:android # Open Android Studio
+```
+
+The mobile workspace consumes `apps/web/dist` directly — there is no separate UI codebase. `cap sync` copies `dist/` into `ios/App/App/public/` and `android/app/src/main/assets/public/`.
+
 ### CI Validation
 
 ```bash
@@ -205,9 +241,13 @@ pnpm validate:ci       # Validate .github/workflows/ci.yml syntax via action-val
 | `apps/web/src/` | React frontend (pages, components, hooks, store) |
 | `apps/web/server/` | Express backend (routes, services, middleware) |
 | `apps/web/prisma/` | Prisma schema and seed scripts |
+| `apps/web/prisma.config.ts` | **Prisma 7 datasource — MUST live here (never at root)** |
 | `apps/web/e2e/` | Playwright E2E tests |
 | `apps/web/src/generated/prisma/` | **Auto-generated Prisma client — do not edit** |
+| `apps/mobile/` | Capacitor 8 wrapper for iOS + Android |
 | `packages/types/` | Shared TypeScript types published as `@newshub/types` |
+| `e2e-stack/` | Cross-replica WebSocket fanout test harness |
+| `pgbouncer/` | PgBouncer config template for production |
 
 Import shared types from the workspace package:
 
@@ -223,15 +263,15 @@ import type { PerspectiveRegion, NewsArticle, ApiResponse } from '@newshub/types
   - `setup` — runs `*.setup.ts`, creates the auth state file
   - `chromium` — unauthenticated tests
   - `chromium-auth` — authenticated tests using `playwright/.auth/user.json` as `storageState`; depends on `setup`
-- **Vitest coverage:** 80% statements/functions/lines, 75% branches (see `apps/web/vitest.config.ts`).
-- **Bundle budget:** 250KB warning threshold (CI annotation, non-blocking).
+- **Vitest coverage:** 80% statements/functions/lines, **74% branches** (see `apps/web/vitest.config.ts`).
+- **Bundle budget:** 250KB warning threshold (CI annotation, non-blocking — the PR-vs-base size compare uses `continue-on-error: true` because the action fails on stale-lockfile master).
 - **Sentry source maps:** uploaded during CI builds via `@sentry/vite-plugin`; release tag is `newshub@${{ github.sha }}`.
 
 ## Code Style
 
 ### ESLint
 
-**Configuration:** `apps/web/eslint.config.js` (flat config).
+**Configurations:** `eslint.config.js` (root) and `apps/web/eslint.config.js` (workspace) — both use the flat-config format with the same rule set.
 
 **Plugins in use:**
 - `@eslint/js` — JavaScript recommended rules
@@ -240,8 +280,9 @@ import type { PerspectiveRegion, NewsArticle, ApiResponse } from '@newshub/types
 - `eslint-plugin-react-refresh`
 
 **Conventions:**
-- Unused identifiers prefixed with `_` are allowed
-- Test files (`*.test.ts`, `*.spec.ts`) may use `any` for mocks
+- Unused identifiers prefixed with `_` are allowed (`argsIgnorePattern: '^_'`)
+- Test files (`*.test.ts`, `*.spec.ts`, `**/test/**`) may use `any` for mocks (`@typescript-eslint/no-explicit-any: 'off'`)
+- `dist/` is globally ignored
 
 **Run:**
 
@@ -249,7 +290,7 @@ import type { PerspectiveRegion, NewsArticle, ApiResponse } from '@newshub/types
 pnpm lint
 ```
 
-ESLint is enforced in CI via the `lint` job in `.github/workflows/ci.yml`.
+ESLint is enforced in CI via the `Lint` job in `.github/workflows/ci.yml`.
 
 ### TypeScript
 
@@ -259,11 +300,11 @@ ESLint is enforced in CI via the `lint` job in `.github/workflows/ci.yml`.
 pnpm typecheck
 ```
 
-Type checking is enforced in CI via the `typecheck` job.
+Type checking is enforced in CI via the `Type Check` job.
 
 ### Formatter
 
-There is no Prettier or `.editorconfig` configuration. Style is enforced through ESLint rules only.
+There is no Prettier, Biome, or `.editorconfig` configuration in this repository. Style is enforced through ESLint rules only. Use your editor's TypeScript/ESLint integration for on-save formatting.
 
 ## Code Conventions
 
@@ -312,6 +353,17 @@ className={cn('base-class', isActive && 'active-class', variant)}
 
 Backend services use the `getInstance()` singleton pattern. Do not instantiate them directly — call `MyService.getInstance()`.
 
+### Native Mobile Detection
+
+When code needs to behave differently on iOS / Android, use `isNativeApp()` from `apps/web/src/lib/platform.ts`:
+
+```typescript
+import { isNativeApp } from '../lib/platform';
+if (isNativeApp()) { /* hide pricing surfaces, biometric login, etc. */ }
+```
+
+Never check `Capacitor` directly in components. The reader-app exemption (Apple Rule 3.1.3) requires hiding every pricing surface when `isNativeApp()` is true.
+
 ### Generated Code
 
 Files under `apps/web/src/generated/prisma/` are produced by `npx prisma generate`. Treat them as build artifacts: never edit them by hand and never commit edits.
@@ -320,6 +372,8 @@ Files under `apps/web/src/generated/prisma/` are produced by `npx prisma generat
 
 - **Default branch:** `master` (deployment target for staging and production)
 - **Branch naming:** No formal convention is documented. Use descriptive prefixes such as `feat/...`, `fix/...`, `refactor/...`, `docs/...`.
+- **Branch protection on `master`** requires the following CI checks (display names, not job IDs): `Lint`, `Type Check`, `Unit Tests`, `Build Docker Image`, `E2E Tests`. `strict: true`, admin-enforced.
+- **Production environment** requires reviewer approval (`ikarusXPS`) and restricts deploys to protected branches.
 
 ## PR Process
 
@@ -337,7 +391,7 @@ pnpm typecheck && pnpm test:run && pnpm build
 pnpm test:coverage
 ```
 
-3. Add or update tests for new features and bug fixes (TDD is a project principle — see the global `golden-principles.md`).
+3. Add or update tests for new features and bug fixes (TDD is a project principle).
 
 ### Submitting
 
@@ -349,14 +403,16 @@ pnpm test:coverage
 
 1. **Lint** — ESLint
 2. **Type Check** — `tsc --noEmit`
-3. **Unit Tests** — Vitest with the configured coverage thresholds (Postgres + Redis services)
-4. **Build** — Docker image (pushed to `ghcr.io` on `master` only)
-5. **E2E Tests** — Playwright (depends on build)
-6. **Deploy Staging** — `master` only
-7. **Lighthouse CI** — runs after deploy-staging on `master` only; 90+ required for Performance / Accessibility / Best Practices / SEO; Core Web Vitals tracked warn-only
-8. **Deploy Production** — after staging succeeds
+3. **Source Bias Coverage** — `pnpm --filter @newshub/web check:source-bias` (D-A3 gate)
+4. **Unit Tests** — Vitest with the configured coverage thresholds (Postgres 17 + Redis 7.4 services)
+5. **Bundle Analysis** — main-chunk size report; non-blocking 250KB warning
+6. **Build Docker Image** — pushed to `ghcr.io` on `master` only; uploads Sentry source maps
+7. **E2E Tests** — Playwright (depends on build); 30-minute timeout
+8. **Deploy Staging** — `master` only; SSH-driven `docker compose pull && up -d --wait`
+9. **Lighthouse CI** — runs after deploy-staging on `master` only; 90+ required for Performance / Accessibility / Best Practices / SEO; Core Web Vitals tracked warn-only
+10. **Deploy Production** — after staging succeeds; requires `production` environment approval
 
-All required jobs must pass before merge.
+All five branch-protection checks (`Lint`, `Type Check`, `Unit Tests`, `Build Docker Image`, `E2E Tests`) must pass before merge.
 
 ### PR Review Checklist
 
@@ -367,6 +423,8 @@ All required jobs must pass before merge.
 - [ ] No hardcoded secrets — all configuration through environment variables
 - [ ] Build succeeds (`pnpm build`)
 - [ ] Generated Prisma client is **not** edited by hand
+- [ ] No files written to root `server/`, `prisma/`, or `src/` (anti-pattern)
+- [ ] `prisma.config.ts` is at `apps/web/`, not root (anti-pattern)
 
 ## Database Development
 
@@ -414,6 +472,10 @@ docker compose logs -f app
 docker compose ps          # Health status
 ```
 
+### Production Topology Note
+
+Local `docker-compose.yml` is single-replica. Production uses a separate `stack.yml` for Docker Swarm with Traefik (sticky `nh_sticky` cookie), PgBouncer (transaction-mode pooling), an Emitter-only `app-worker` service (`replicas=1`, `RUN_JOBS=true`), and `@socket.io/redis-adapter` for cross-replica fanout. Verify cross-replica behavior locally with `pnpm test:fanout`.
+
 ## Common Development Tasks
 
 ### Add a New API Endpoint
@@ -425,6 +487,8 @@ docker compose ps          # Health status
 5. Regenerate the OpenAPI spec: `cd apps/web && pnpm openapi:generate`
 6. Update the API table in `CLAUDE.md`
 7. `pnpm typecheck && pnpm test:run`
+
+If the endpoint exposes article data via the public API, hand-map the top-level `sourceId` from `source.id` in the route handler — see `apps/web/server/routes/publicApi.ts`. The read service returns only the nested `source` object, but the OpenAPI contract requires both.
 
 ### Add a React Component
 
@@ -450,7 +514,7 @@ Edit `apps/web/server/config/sources.ts`:
 }
 ```
 
-Restart the backend to load the new source.
+Restart the backend to load the new source. The `Source Bias Coverage` CI job (`check:source-bias`) gates merges on every source having complete bias metadata.
 
 ### Update the Database Schema
 
@@ -494,6 +558,13 @@ npx playwright test e2e/auth.spec.ts     # Single spec
 
 The `setup` project creates `playwright/.auth/user.json`, which `chromium-auth` consumes via `storageState`. If authenticated tests fail unexpectedly, delete that file and let the setup project recreate it.
 
+**E2E gotchas (learned the hard way):**
+
+- Use `page.waitForLoadState('domcontentloaded')`, NOT `networkidle` — Socket.io polling never lets the network idle.
+- Use `127.0.0.1`, NOT `localhost`, for backend API calls — Node 18+ resolves `localhost` to IPv6 `::1` first.
+- `page.request.*` does NOT auto-attach the JWT from localStorage. For authenticated API tests, read the token via `page.evaluate(() => localStorage.getItem('newshub-auth-token'))` and pass `Authorization: Bearer ${token}` manually.
+- Files sharing module-scope state need `test.describe.configure({ mode: 'serial' })` at the top — `fullyParallel: true` otherwise splits describes across workers.
+
 ### Stripe Webhooks (optional)
 
 The Stripe webhook route must be registered **before** `express.json()` to preserve the raw body for HMAC verification. To test webhooks locally:
@@ -511,7 +582,7 @@ pnpm load:smoke    # Smoke scenario
 pnpm load:full     # Full load scenario
 ```
 
-Requires k6 (https://k6.io/docs/getting-started/installation/). For staging runs use the `load-test.yml` GitHub Actions workflow.
+Requires k6 (https://k6.io/docs/getting-started/installation/). For staging runs use the `load-test.yml` GitHub Actions workflow (`workflow_dispatch` only).
 
 ## Security Best Practices
 
