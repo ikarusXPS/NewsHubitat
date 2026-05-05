@@ -1,0 +1,85 @@
+name: Feature Request
+description: Suggest a new feature or enhancement
+title: "[Feature]: "
+labels: ["enhancement", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for proposing an idea! A few notes before submitting:
+
+        - This is a solo-developer pre-launch project; not all proposals will be accepted.
+        - Concrete user problems > technical solutions. Lead with the *why*.
+        - Search [existing issues](https://github.com/ikarusXPS/NewsHubitat/issues?q=is%3Aissue) first.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem are you trying to solve?
+      description: Describe the user-visible problem, not the proposed implementation.
+      placeholder: As a [user type], I cannot [do thing] because [obstacle], which causes [pain].
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: How would you like to see this solved? Be specific about the user experience.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What other approaches did you think about? Why are they worse?
+    validations:
+      required: false
+
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Which surface does this affect?
+      options:
+        - Web frontend
+        - Mobile (iOS / Android)
+        - Backend / Server
+        - Public API
+        - Database schema
+        - CI / DevOps
+        - Documentation
+        - Cross-cutting / Multiple
+    validations:
+      required: true
+
+  - type: dropdown
+    id: tier
+    attributes:
+      label: Should this be free, paid, or both?
+      options:
+        - FREE (everyone)
+        - PREMIUM only
+        - ENTERPRISE only
+        - Not sure / Up to maintainers
+      default: 3
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Mockups, links, references — anything else that helps explain the request.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Pre-flight checks
+      options:
+        - label: I searched existing issues and didn't find a duplicate
+          required: true
+        - label: This is a feature request, not a bug or security issue
+          required: true
