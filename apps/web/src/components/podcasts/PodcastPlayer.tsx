@@ -35,6 +35,13 @@ export interface PodcastPlayerProps {
   title?: string;
   onTimeUpdate?: (currentSec: number) => void;
   className?: string;
+  /**
+   * When true, attempt to start playback once metadata loads. Use this when
+   * mounting the player synchronously inside a user-gesture handler (the
+   * gesture is preserved across the loadedmetadata callback so Chrome's
+   * autoplay policy treats it as user-initiated). Defaults to false.
+   */
+  autoPlayOnMount?: boolean;
 }
 
 export interface PodcastPlayerHandle {
@@ -57,11 +64,12 @@ function formatSec(s: number): string {
 
 export const PodcastPlayer = forwardRef<PodcastPlayerHandle, PodcastPlayerProps>(
   function PodcastPlayer(
-    { audioUrl, title, onTimeUpdate, className },
+    { audioUrl, title, onTimeUpdate, className, autoPlayOnMount },
     ref,
   ) {
     const { t } = useTranslation('podcasts');
     const audioRef = useRef<HTMLAudioElement | null>(null);
+    const hasAttemptedAutoPlay = useRef(false);
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
@@ -90,7 +98,16 @@ export const PodcastPlayer = forwardRef<PodcastPlayerHandle, PodcastPlayerProps>
         setCurrentTime(audio.currentTime);
         onTimeUpdate?.(audio.currentTime);
       };
-      const onLoaded = () => setDuration(audio.duration);
+      const onLoaded = () => {
+        setDuration(audio.duration);
+        if (autoPlayOnMount && !hasAttemptedAutoPlay.current && audio.paused) {
+          hasAttemptedAutoPlay.current = true;
+          void audio.play().catch(() => {
+            /* Autoplay policy may still reject if user-gesture window expired.
+               No-op fallback: user can click the inner Play button. */
+          });
+        }
+      };
       const onEnded = () => setIsPlaying(false);
       const onPlay = () => setIsPlaying(true);
       const onPause = () => setIsPlaying(false);
@@ -101,6 +118,12 @@ export const PodcastPlayer = forwardRef<PodcastPlayerHandle, PodcastPlayerProps>
       audio.addEventListener('play', onPlay);
       audio.addEventListener('pause', onPause);
 
+      // Defensive: if metadata is already cached (readyState >= HAVE_METADATA)
+      // the loadedmetadata event won't fire — call onLoaded synchronously.
+      if (audio.readyState >= 1) {
+        onLoaded();
+      }
+
       return () => {
         audio.removeEventListener('timeupdate', onTime);
         audio.removeEventListener('loadedmetadata', onLoaded);
@@ -109,9 +132,9 @@ export const PodcastPlayer = forwardRef<PodcastPlayerHandle, PodcastPlayerProps>
         audio.removeEventListener('pause', onPause);
         audio.pause();
       };
-      // onTimeUpdate is the only re-runnable dep; ref-based audio lookup is
-      // stable across renders so the effect can be re-entrant safely.
-    }, [onTimeUpdate]);
+      // onTimeUpdate and autoPlayOnMount are the re-runnable deps; ref-based
+      // audio lookup is stable across renders so the effect can re-run safely.
+    }, [onTimeUpdate, autoPlayOnMount]);
 
     const togglePlay = useCallback(() => {
       const audio = audioRef.current;
