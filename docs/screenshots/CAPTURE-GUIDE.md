@@ -7,13 +7,12 @@ Capture README screenshots at **1920x1080** with real seeded news data.
 | Filename | Page | What to capture |
 |----------|------|-----------------|
 | `dashboard.png` | `/` | Signal feed with article cards, region distribution bar |
-| `monitor-globe.png` | `/monitor` | 3D globe / 2D map with severity panel |
-| `monitor-events.png` | `/monitor` | Map view with event categories |
+| `monitor-globe.png` | `/monitor` (3D Globe view) | Click "3D Globe" toggle, then capture — dark Earth from space with city lights |
 | `analysis.png` | `/analysis` | Perspektiven-Analyse: clusters + framing + sentiment chart |
-| `timeline.png` | `/timeline` | Event timeline grouped by date |
-| `community.png` | `/community` | XP/contribution UI |
-| `feed-manager.png` | Any | Feed manager dropdown / region filter open |
-| `shortcuts.png` | Any | Keyboard shortcuts modal (`?`) |
+| `timeline.png` | `/timeline` | Event timeline grouped by date (acts as the canonical event-list shot) |
+| `community.png` | `/community` | XP / contribution UI |
+| `podcasts.png` | `/podcasts` | Curated feed list (left) + selected feed's episodes (right) |
+| `shortcuts.png` | Any | Keyboard shortcuts modal — opened via Shift+? (synthesized via `dispatchEvent`) |
 
 ## One-shot capture (recommended)
 

@@ -66,17 +66,12 @@ test.describe('README Screenshots', () => {
   test('capture monitor globe', async ({ page }) => {
     await page.goto('/monitor');
     await page.waitForLoadState('domcontentloaded');
-    // Globe canvas takes time to initialize WebGL
-    await page.waitForTimeout(8000);
+    // Default view is 2D Map — click the "3D Globe" button before capturing
+    const globeBtn = page.locator('button', { hasText: /^\s*3D\s*Globe\s*$/i }).first();
+    await globeBtn.click({ timeout: 15000 });
+    // WebGL canvas needs time to initialize + globe markers to drop in
+    await page.waitForTimeout(10000);
     await page.screenshot({ path: `${SCREENSHOT_DIR}/monitor-globe.png`, fullPage: false });
-  });
-
-  test('capture monitor events', async ({ page }) => {
-    await page.goto('/monitor');
-    await page.waitForLoadState('domcontentloaded');
-    // Try to switch to 2D map view if a button exists, then wait for events list
-    await page.waitForTimeout(6000);
-    await page.screenshot({ path: `${SCREENSHOT_DIR}/monitor-events.png`, fullPage: false });
   });
 
   test('capture analysis', async ({ page }) => {
@@ -101,18 +96,12 @@ test.describe('README Screenshots', () => {
     await page.screenshot({ path: `${SCREENSHOT_DIR}/community.png`, fullPage: false });
   });
 
-  test('capture feed manager', async ({ page }) => {
-    await page.goto('/');
+  test('capture podcasts', async ({ page }) => {
+    // /podcasts shows the curated podcast feed list (from config) + selected feed's episodes
+    await page.goto('/podcasts');
     await page.waitForLoadState('domcontentloaded');
-    await expect(page.locator('article, [class*="ArticleCard"]').first()).toBeVisible({ timeout: 30000 });
-    await page.waitForTimeout(1500);
-    // Open feed manager modal (gear icon)
-    const feedManagerButton = page.locator('button[aria-label*="Feed"], button:has-text("Feed"), button:has([class*="Settings"]), button:has([class*="Sliders"])').first();
-    if (await feedManagerButton.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await feedManagerButton.click();
-      await page.waitForTimeout(1000);
-    }
-    await page.screenshot({ path: `${SCREENSHOT_DIR}/feed-manager.png`, fullPage: false });
+    await page.waitForTimeout(6000);
+    await page.screenshot({ path: `${SCREENSHOT_DIR}/podcasts.png`, fullPage: false });
   });
 
   test('capture keyboard shortcuts', async ({ page }) => {
@@ -120,8 +109,14 @@ test.describe('README Screenshots', () => {
     await page.waitForLoadState('domcontentloaded');
     await expect(page.locator('article, [class*="ArticleCard"]').first()).toBeVisible({ timeout: 30000 });
     await page.waitForTimeout(1500);
-    await page.keyboard.press('?');
-    await page.waitForTimeout(800);
+    // Click body to ensure focus, then dispatch a synthetic Shift+? keydown.
+    // Playwright's keyboard.press('Shift+/') doesn't always set event.key='?', which the
+    // app's handler requires (case '?' && event.shiftKey).
+    await page.locator('body').click({ position: { x: 10, y: 10 } });
+    await page.evaluate(() => {
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: '?', shiftKey: true, bubbles: true }));
+    });
+    await page.waitForTimeout(1000);
     await page.screenshot({ path: `${SCREENSHOT_DIR}/shortcuts.png`, fullPage: false });
   });
 });

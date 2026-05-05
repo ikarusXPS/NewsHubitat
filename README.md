@@ -74,32 +74,28 @@ The codebase ships with subscription tiers (Stripe), team collaboration, threade
 </tr>
 <tr>
 <td width="50%" align="center">
-<img src="docs/screenshots/monitor-events.png" alt="Geo events panel" />
-<br/><sub><b>Event List</b> — severity (critical / high / medium / low) and category (conflict / humanitarian / political / economic / military / protest / diplomacy / other)</sub>
-</td>
-<td width="50%" align="center">
 <img src="docs/screenshots/analysis.png" alt="Perspective analysis" />
 <br/><sub><b>Analysis</b> — topic clusters with regional perspective distribution; AI-summarized when <code>?summaries=true</code></sub>
 </td>
-</tr>
-<tr>
 <td width="50%" align="center">
 <img src="docs/screenshots/timeline.png" alt="Historical timeline" />
-<br/><sub><b>Timeline</b> — historical event timeline filterable by category and severity</sub>
+<br/><sub><b>Timeline</b> — chronological event list, severity (critical / high / medium / low) and category (conflict / humanitarian / political / economic / military / protest / diplomacy / other)</sub>
 </td>
+</tr>
+<tr>
 <td width="50%" align="center">
 <img src="docs/screenshots/community.png" alt="Community / Teams" />
 <br/><sub><b>Community</b> — gamification (badges bronze → platinum), leaderboard snapshots, team workspaces</sub>
 </td>
+<td width="50%" align="center">
+<img src="docs/screenshots/podcasts.png" alt="Podcasts directory" />
+<br/><sub><b>Podcasts</b> — curated feed list + episode browser with transcript drawer (Phase 40); two-tier search (titles for FREE, transcript-excerpts for PREMIUM)</sub>
+</td>
 </tr>
 <tr>
-<td width="50%" align="center">
-<img src="docs/screenshots/feed-manager.png" alt="Feed manager" />
-<br/><sub><b>Feed Manager</b> — toggle regions, sources, and topic filters; persisted in Zustand <code>newshub-storage</code></sub>
-</td>
-<td width="50%" align="center">
-<img src="docs/screenshots/shortcuts.png" alt="Keyboard shortcuts" />
-<br/><sub><b>Keyboard Shortcuts</b> — press <kbd>?</kbd> anywhere to bring up the cheat sheet</sub>
+<td colspan="2" align="center">
+<img src="docs/screenshots/shortcuts.png" alt="Keyboard shortcuts" width="50%" />
+<br/><sub><b>Keyboard Shortcuts</b> — press <kbd>Shift</kbd>+<kbd>?</kbd> anywhere to bring up the cheat sheet</sub>
 </td>
 </tr>
 </table>
