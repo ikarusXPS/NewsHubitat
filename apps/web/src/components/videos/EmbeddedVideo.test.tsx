@@ -24,7 +24,8 @@ vi.mock('./LiteVimeoEmbed', () => ({
   ),
 }));
 
-import { EmbeddedVideo, parseVideoUrl } from './EmbeddedVideo';
+import { EmbeddedVideo } from './EmbeddedVideo';
+import { parseVideoUrl } from './parseVideoUrl';
 
 describe('parseVideoUrl', () => {
   it('parses youtube.com/watch?v=ID', () => {
