@@ -127,10 +127,8 @@ export function VirtualizedGrid({
           return (
             <div
               key={virtualRow.key}
-              data-row-index={virtualRow.index}
-              ref={(el) => {
-                if (el) virtualizer.measureElement(el);
-              }}
+              data-index={virtualRow.index}
+              ref={virtualizer.measureElement}
               style={{
                 position: 'absolute',
                 top: 0,
