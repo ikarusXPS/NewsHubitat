@@ -170,7 +170,7 @@ export class VideoIndexService {
     }
 
     // 3. Local FTS query (parameterized).
-    let rows: VideoIndexRow[] = [];
+    let rows: VideoIndexRow[];
     try {
       rows = await prisma.$queryRaw<VideoIndexRow[]>`
         SELECT id,
