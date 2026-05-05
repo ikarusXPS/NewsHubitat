@@ -119,6 +119,7 @@ function AppRoutes() {
             <Routes location={routeLocation}>
               <Route path="/" element={<Dashboard />} />
               <Route path="/monitor" element={<Monitor />} />
+              {/* TODO(40-07): gate /analysis with auth guard once a RequireAuth/ProtectedRoute wrapper exists; backend rejects unauthenticated requests with 401 since c5553f9 */}
               <Route path="/analysis" element={<Analysis />} />
               <Route path="/timeline" element={<Timeline />} />
               <Route path="/map" element={<MapView />} />
