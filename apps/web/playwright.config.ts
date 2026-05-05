@@ -25,7 +25,15 @@ export default defineConfig({
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
-      testIgnore: ['**/profile.spec.ts', '**/settings.spec.ts', '**/history.spec.ts'],
+      testIgnore: [
+        '**/profile.spec.ts',
+        '**/settings.spec.ts',
+        '**/history.spec.ts',
+        // screenshots.spec.ts deliberately bypasses fixtures.ts to hit the real backend
+        // for README documentation captures — it requires `pnpm seed:news` data and is
+        // not a CI gate. Run via `pnpm --filter @newshub/web screenshots` when refreshing docs.
+        '**/screenshots.spec.ts',
+      ],
     },
 
     // Authenticated tests (depend on setup)
