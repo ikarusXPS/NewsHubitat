@@ -1,8 +1,8 @@
 ---
-status: diagnosed
+status: resolved
 trigger: "Header LanguageSwitcher dropdown shows only DE + EN as selectable options. FR is missing from the UI despite (a) CLAUDE.md i18n & PWA section explicitly stating languages DE/EN/FR, (b) every Phase-40 SUMMARY documenting i18n triple-write across DE/EN/FR, (c) FR locale JSON files existing under apps/web/public/locales/fr/."
 created: 2026-05-05T07:48:44Z
-updated: 2026-05-05T07:48:44Z
+updated: 2026-05-05T08:00:00Z
 ---
 
 ## Current Focus
@@ -69,5 +69,8 @@ root_cause: |
 fix: |
   Add `{ code: 'fr', label: 'Français', flag: 'FR' }` to the `languages` array in apps/web/src/components/LanguageSwitcher.tsx (line 9, between English and the closing `]`). Optionally (lower priority): backfill missing FR namespaces — share.json, teams.json — to eliminate 404s on i18next-http-backend lazy load. Without those backfills the FR experience still works (English fallback per `fallbackLng: 'en'`), but with two harmless 404 errors in network panel.
 
-verification: (not applied — diagnose-only mode per goal flag)
-files_changed: []
+verification: typecheck passes (npx tsc --noEmit exits 0); component renders 3 options in dropdown
+files_changed:
+  - apps/web/src/components/LanguageSwitcher.tsx
+fix_commit: 3dc11da
+plan: 40-10
