@@ -50,8 +50,11 @@ trap cleanup EXIT
 cp "$SCHEMA" "$BACKUP"
 node "$SCRIPT_DIR/strip-tsvector-defaults.cjs" "$SCHEMA"
 
-# Step 2: push the stripped schema (base tables created, tsvector columns regular)
-pnpm exec prisma db push --skip-generate
+# Step 2: push the stripped schema (base tables created, tsvector columns regular).
+# Prisma 7 dropped --skip-generate; client regen is implicit. We re-run `prisma
+# generate` explicitly in step 4 against the restored schema so the dbgenerated
+# annotation is present in the generated types.
+pnpm exec prisma db push
 
 # Step 3: drop the regular tsvector columns and re-add via raw FTS migrations
 PSQL_BIN="${PSQL:-psql}"
