@@ -24,6 +24,7 @@
     "seed": "pnpm --filter @newshub/web seed",
     "seed:badges": "pnpm --filter @newshub/web seed:badges",
     "seed:personas": "pnpm --filter @newshub/web seed:personas",
+    "seed:news": "pnpm --filter @newshub/web seed:news",
     "seed:load-test": "pnpm --filter @newshub/web seed:load-test",
     "load:smoke": "pnpm --filter @newshub/web load:smoke",
     "load:full": "pnpm --filter @newshub/web load:full",
