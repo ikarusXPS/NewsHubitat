@@ -151,7 +151,7 @@ export function PodcastEpisodeCard({
 
         {!onPlay && isPlaying && (
           <div className="mt-3">
-            <PodcastPlayer audioUrl={episode.audioUrl} title={title} />
+            <PodcastPlayer audioUrl={episode.audioUrl} title={title} autoPlayOnMount />
           </div>
         )}
       </div>
