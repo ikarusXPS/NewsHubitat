@@ -1,4 +1,4 @@
-# Roadmap: NewsHub
+﻿# Roadmap: NewsHub
 
 ## Milestones
 
@@ -92,7 +92,7 @@
 - [x] **Phase 37.1 (INSERTED): Fix root Dockerfile for pnpm monorepo + close WS-04** — Rewrite Dockerfile that predates the phase-35 monorepo migration; re-run e2e-stack/run-fanout-test.sh to close WS-04 cross-replica fanout gate (completed 2026-04-29; Dockerfile rewrite `67ec0a7` + 6 follow-up fixes; WS-04 verified PASS in 564ms; closure log + reconciliation `e5b8414`)
 - [x] **Phase 38: Advanced AI Features** - Credibility scoring, bias detection, fact-checking (completed 2026-04-29)
 - [ ] **Phase 39: Mobile Apps** - Capacitor wrapper and app store deployment
-- [ ] **Phase 40: Content Expansion** - Video, podcast, and source expansion
+- [x] **Phase 40: Content Expansion** - Video, podcast, and source expansion (completed 2026-05-04)
 
 ## Phase Details
 
@@ -358,16 +358,20 @@ Plans:
   5. Premium users see auto-generated video transcription with searchable text
   6. Media pipeline handles video/audio transcoding with Cloudinary integration
   7. Storage costs remain predictable through embed-first strategy and upload quotas
-**Plans**: 6 plans across 3 waves (planned 2026-05-03; verified PASS plan-checker iter 2)
+**Plans**: 10 plans across 4 waves (planned 2026-05-03; verified PASS plan-checker iter 2; gap-closure plans 07-10 added 2026-05-05 after /gsd-verify-work 40 found 4 issues)
 **UI hint**: yes
 
 Plans:
 - [x] 40-01-PLAN.md — Cross-cutting prep (schema + types + isNativeApp() stub + i18n + 4 server/index.ts placeholders) — Wave 1, BLOCKING for entire phase, autonomous=true; revised 9e3d56f after iter 1 schema fixes
-- [ ] 40-02-PLAN.md — Source curation (proposed-sources.md → human-verify → sources.ts merge + bias-balance script) — Wave 2, autonomous=false (D-A4 human-verify checkpoint)
-- [ ] 40-03-PLAN.md — Podcast backend (Podcast Index + iTunes + curated podcasts.ts + routes + feed-poll worker) — Wave 2, autonomous=true; revised abeefe8 with stripHtml() at persistence boundary
-- [ ] 40-04-PLAN.md — Podcast frontend (RelatedPodcasts inline + PodcastsPage + vanilla audio player + Sidebar entry + DE/EN/FR i18n) — Wave 3, depends_on [40-01, 40-03]
-- [ ] 40-05-PLAN.md — Video full slice (services + youtubeQuota middleware + curated video-channels.ts + lite-youtube + Vimeo lite + worker) — Wave 2, heaviest plan (~50% context)
-- [ ] 40-06-PLAN.md — Transcripts (Whisper + ffmpeg chunking + youtube-caption-extractor + TranscriptDrawer with 3 UI branches + nightly worker + Premium gate) — Wave 3, depends_on [40-03, 40-05]
+- [x] 40-02-PLAN.md — Source curation (proposed-sources.md → human-verify → sources.ts merge + bias-balance script) — Wave 2, autonomous=false (D-A4 human-verify checkpoint)
+- [x] 40-03-PLAN.md — Podcast backend (Podcast Index + iTunes + curated podcasts.ts + routes + feed-poll worker) — Wave 2, autonomous=true; revised abeefe8 with stripHtml() at persistence boundary
+- [x] 40-04-PLAN.md — Podcast frontend (RelatedPodcasts inline + PodcastsPage + vanilla audio player + Sidebar entry + DE/EN/FR i18n) — Wave 3, depends_on [40-01, 40-03]
+- [x] 40-05-PLAN.md — Video full slice (services + youtubeQuota middleware + curated video-channels.ts + lite-youtube + Vimeo lite + worker) — Wave 2, heaviest plan (~50% context)
+- [x] 40-06-PLAN.md — Transcripts (Whisper + ffmpeg chunking + youtube-caption-extractor + TranscriptDrawer with 3 UI branches + nightly worker + Premium gate) — Wave 3, depends_on [40-03, 40-05]
+- [ ] 40-07-PLAN.md - [GAP-CLOSURE] Analysis Bearer-JWT fetch fix + RequireAuth gate (UAT Test 3) - Wave 1, autonomous=true, depends_on []
+- [ ] 40-08-PLAN.md - [GAP-CLOSURE] PodcastPlayer.autoPlayOnMount + EpisodeCard wiring + test rewrite + new player tests (UAT Test 4) - Wave 1, autonomous=true, depends_on []
+- [ ] 40-09-PLAN.md - [GAP-CLOSURE] VirtualizedGrid data-index attribute fix + ref simplification + estimateSize tune (UAT Test 5; Phase 35-01 carry-over) - Wave 1, autonomous=true, depends_on []
+- [ ] 40-10-PLAN.md - [GAP-CLOSURE] LanguageSwitcher add FR entry (UAT Test 10) - Wave 1, autonomous=true, depends_on []
 
 ## Progress
 
@@ -412,19 +416,19 @@ Plans:
 | 37. Horizontal Scaling | v1.6 | 0/? | Not started | - |
 | 38. Advanced AI Features | v1.6 | 0/? | Not started | - |
 | 39. Mobile Apps | v1.6 | 0/? | Not started | - |
-| 40. Content Expansion | v1.6 | 1/6 | In Progress|  |
+| 40. Content Expansion | v1.6 | 6/10 | Gap closure (4 plans pending; UAT 4 issues) | 2026-05-04 |
 
 ---
 
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-04-30 — Phase 40.1 COMPLETE (5/5 plans; VERIFICATION 15/15 must-haves verified; UAT 3 PASS + 1 PARTIAL). Wired 4 team-UI debt sessions: (1) BookmarkButton/TeamBookmarkCard/PendingInviteList/DeleteTeamModal unit tests added (26 tests), (2) new TeamSettingsModal component + 8 tests, (3) Settings gear integrated into TeamDashboard gated on owner+admin, (4) 4 E2E tests appended to teams.spec.ts (Test 15 owner-delete live PASS; Tests 12/13/14 skip cleanly in dev due to Dashboard NewsFeed signals-vs-grid view-mode race — wiring fully proven by unit tests), (5) all 4 debug sessions archived to `.planning/debug/resolved/` with verification + files_changed populated. Two side-fixes shipped during verification: `fix(focus-suggestions): cap toast stack height to prevent header overlap` (339d66a) — was a latent UX bug overlapping the header Sign In; `test(e2e): mock focus-suggestions in auth.setup.ts` (fba1d73) — unblocks all 14+ authenticated E2E tests. Next: `/gsd-progress` to see updated roadmap; remaining v1.6 work: Phase 39 (mobile-apps) + Phase 40 (content-expansion); 36-05 human-verify still queued.*
+*Last updated: 2026-05-05 - Phase 40 gap-closure plans 07-10 created (4 plans, all Wave 1, all gap_closure=true, all autonomous=true, file-disjoint for parallel execution). Closes 4 UAT issues: Test 3 (Analysis 401), Test 4 (Podcast play single-click), Test 5 (Dashboard grid overlap; Phase 35-01 carry-over bug), Test 10 (LanguageSwitcher missing FR). 3 follow-up tech-debt todos filed. Original update: 2026-04-30 — Phase 40.1 COMPLETE (5/5 plans; VERIFICATION 15/15 must-haves verified; UAT 3 PASS + 1 PARTIAL). Wired 4 team-UI debt sessions: (1) BookmarkButton/TeamBookmarkCard/PendingInviteList/DeleteTeamModal unit tests added (26 tests), (2) new TeamSettingsModal component + 8 tests, (3) Settings gear integrated into TeamDashboard gated on owner+admin, (4) 4 E2E tests appended to teams.spec.ts (Test 15 owner-delete live PASS; Tests 12/13/14 skip cleanly in dev due to Dashboard NewsFeed signals-vs-grid view-mode race — wiring fully proven by unit tests), (5) all 4 debug sessions archived to `.planning/debug/resolved/` with verification + files_changed populated. Two side-fixes shipped during verification: `fix(focus-suggestions): cap toast stack height to prevent header overlap` (339d66a) — was a latent UX bug overlapping the header Sign In; `test(e2e): mock focus-suggestions in auth.setup.ts` (fba1d73) — unblocks all 14+ authenticated E2E tests. Next: `/gsd-progress` to see updated roadmap; remaining v1.6 work: Phase 39 (mobile-apps) + Phase 40 (content-expansion); 36-05 human-verify still queued.*
 
 ### Phase 40.1: team-ui-wiring (INSERTED)
 
 **Goal:** Pay back 4 diagnosed UI-wiring debt sessions from Phase 28 (Team Collaboration). Wire team-feature UI to existing backend, prove via tests, archive 4 debug sessions to .planning/debug/resolved/.
 **Requirements**: null (debt-payback phase — no new REQ-IDs to map; 40.1-CONTEXT.md is the contract)
 **Depends on:** Phase 40
-**Plans:** 1/6 plans executed
+**Plans:** 6/6 plans complete
 
 Plans:
 - [x] 40.1-01-PLAN.md — Vitest unit tests for the 4 already-wired team components (BookmarkButton, TeamBookmarkCard, PendingInviteList, DeleteTeamModal)
@@ -432,3 +436,9 @@ Plans:
 - [x] 40.1-03-PLAN.md — Integrate TeamSettingsModal into TeamDashboard (gear icon between Invite and Trash2, gated on owner+admin)
 - [x] 40.1-04-PLAN.md — Extend apps/web/e2e/teams.spec.ts with 4 new E2E tests (one per debug-session flow) in a serial describe block
 - [x] 40.1-05-PLAN.md — Archive 4 debug sessions from .planning/debug/ to .planning/debug/resolved/ with status=resolved + verification + files_changed populated
+
+
+
+
+
+

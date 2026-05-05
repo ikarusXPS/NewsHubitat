@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Infrastructure & Scale
-current_plan: 1
-status: executing
-last_updated: "2026-05-03T21:48:46.253Z"
-last_activity: 2026-05-03 -- Phase 40 execution started
+current_plan: 6
+status: awaiting-verification
+last_updated: "2026-05-04T00:00:00.000Z"
+last_activity: 2026-05-04
 progress:
   total_phases: 7
   completed_phases: 5
   total_plans: 40
-  completed_plans: 29
-  percent: 73
+  completed_plans: 37
+  percent: 93
 ---
 
 # State: NewsHub
@@ -25,11 +25,11 @@ See: .planning/PROJECT.md (updated 2026-04-26)
 
 ## Current Position
 
-Phase: 40 (content-expansion) — EXECUTING
-Plan: 1 of 6
-Current Plan: 1
-Status: Executing Phase 40
-Last activity: 2026-05-03 -- Phase 40 execution started
+Phase: 40 (content-expansion) — EXECUTED, awaiting verification
+Plan: 6 of 6
+Current Plan: 6 (complete)
+Status: All 6 plans have SUMMARY.md on disk; last commit `9a0a9d8` (2026-05-04) finalized 40-06 transcripts. Run `/gsd-verify-work 40` next.
+Last activity: 2026-05-04
 
 ## Maintenance Log
 
@@ -87,7 +87,7 @@ v1.6 Progress: [████████████████████] (9
 
 **Milestone:** v1.6 - Infrastructure & Scale
 **Goal:** Comprehensive expansion across infrastructure, AI, mobile, monetization, and content
-**Status:** Executing Phase 40
+**Status:** Ready to execute
 **Previous:** v1.5 complete 2026-04-26
 
 ### Phase Summary
@@ -105,7 +105,7 @@ v1.6 Progress: [████████████████████] (9
 | 37.1 | Fix root Dockerfile for pnpm monorepo + close WS-04 (INSERTED) | INFRA-04, DEPLOY-01 | No | **Verified** (Dockerfile rewritten for pnpm monorepo; WS-04 fanout test passes in 564ms on Docker Desktop + WSL2; closure log committed) |
 | 38 | Advanced AI Features | 7 reqs (AI-01 to AI-07) | Yes | **Complete** (6/6 plans; VERIFICATION.md status=passed 2026-04-29; 6/6 ROADMAP criteria + 7/7 AI-XX + 19/19 D-XX + 0 violations; 1412/1412 unit + 5/5 E2E green) |
 | 39 | Mobile Apps | 8 reqs (MOB-01 to MOB-08) | Yes | Not started |
-| 40 | Content Expansion | 7 reqs (CONT-01 to CONT-07) | Yes | Not started |
+| 40 | Content Expansion | 7 reqs (CONT-01 to CONT-07) | Yes | **Executed — awaiting verification** (6/6 plans complete 2026-05-04; last commit `9a0a9d8` finalized 40-06 transcripts. Pending follow-up todos: 40-02 branch-protection manual GitHub UI step, 40-04 vitest worker crash diagnostic — both non-blocking) |
 | 40.1 | Team UI Wiring (INSERTED) | Debt-payback Phase 28 v1.4 | Yes | **Complete** (5/5 plans; VERIFICATION 15/15 must-haves; UAT 3 PASS + 1 PARTIAL — Test 15 live E2E green, Tests 12/13/14 skip in dev due to homepage view-mode race; covered by 26 unit tests. Two side-fixes shipped during verification: cap FocusSuggestions toast stack height (339d66a), mock focus-suggestions in auth.setup.ts (fba1d73)) |
 
 **Coverage:** 37/37 requirements mapped (100%) — 40.1 is debt-payback, not new requirements
