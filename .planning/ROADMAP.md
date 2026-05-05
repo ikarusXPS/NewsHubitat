@@ -368,10 +368,10 @@ Plans:
 - [x] 40-04-PLAN.md — Podcast frontend (RelatedPodcasts inline + PodcastsPage + vanilla audio player + Sidebar entry + DE/EN/FR i18n) — Wave 3, depends_on [40-01, 40-03]
 - [x] 40-05-PLAN.md — Video full slice (services + youtubeQuota middleware + curated video-channels.ts + lite-youtube + Vimeo lite + worker) — Wave 2, heaviest plan (~50% context)
 - [x] 40-06-PLAN.md — Transcripts (Whisper + ffmpeg chunking + youtube-caption-extractor + TranscriptDrawer with 3 UI branches + nightly worker + Premium gate) — Wave 3, depends_on [40-03, 40-05]
-- [ ] 40-07-PLAN.md - [GAP-CLOSURE] Analysis Bearer-JWT fetch fix + RequireAuth gate (UAT Test 3) - Wave 1, autonomous=true, depends_on []
-- [ ] 40-08-PLAN.md - [GAP-CLOSURE] PodcastPlayer.autoPlayOnMount + EpisodeCard wiring + test rewrite + new player tests (UAT Test 4) - Wave 1, autonomous=true, depends_on []
-- [ ] 40-09-PLAN.md - [GAP-CLOSURE] VirtualizedGrid data-index attribute fix + ref simplification + estimateSize tune (UAT Test 5; Phase 35-01 carry-over) - Wave 1, autonomous=true, depends_on []
-- [ ] 40-10-PLAN.md - [GAP-CLOSURE] LanguageSwitcher add FR entry (UAT Test 10) - Wave 1, autonomous=true, depends_on []
+- [x] 40-07-PLAN.md - [GAP-CLOSURE] Analysis Bearer-JWT fetch fix + RequireAuth gate (UAT Test 3) - Wave 1, autonomous=true, depends_on []
+- [x] 40-08-PLAN.md - [GAP-CLOSURE] PodcastPlayer.autoPlayOnMount + EpisodeCard wiring + test rewrite + new player tests (UAT Test 4) - Wave 1, autonomous=true, depends_on []
+- [x] 40-09-PLAN.md - [GAP-CLOSURE] VirtualizedGrid data-index attribute fix + ref simplification + estimateSize tune (UAT Test 5; Phase 35-01 carry-over) - Wave 1, autonomous=true, depends_on []
+- [x] 40-10-PLAN.md - [GAP-CLOSURE] LanguageSwitcher add FR entry (UAT Test 10) - Wave 1, autonomous=true, depends_on []
 
 ## Progress
 
@@ -416,7 +416,7 @@ Plans:
 | 37. Horizontal Scaling | v1.6 | 0/? | Not started | - |
 | 38. Advanced AI Features | v1.6 | 0/? | Not started | - |
 | 39. Mobile Apps | v1.6 | 0/? | Not started | - |
-| 40. Content Expansion | v1.6 | 6/10 | Gap closure (4 plans pending; UAT 4 issues) | 2026-05-04 |
+| 40. Content Expansion | v1.6 | 10/10 | Complete   | 2026-05-05 |
 
 ---
 
@@ -428,7 +428,7 @@ Plans:
 **Goal:** Pay back 4 diagnosed UI-wiring debt sessions from Phase 28 (Team Collaboration). Wire team-feature UI to existing backend, prove via tests, archive 4 debug sessions to .planning/debug/resolved/.
 **Requirements**: null (debt-payback phase — no new REQ-IDs to map; 40.1-CONTEXT.md is the contract)
 **Depends on:** Phase 40
-**Plans:** 6/6 plans complete
+**Plans:** 10/10 plans complete
 
 Plans:
 - [x] 40.1-01-PLAN.md — Vitest unit tests for the 4 already-wired team components (BookmarkButton, TeamBookmarkCard, PendingInviteList, DeleteTeamModal)
