@@ -68,6 +68,12 @@ const REGION_LABELS: Record<PerspectiveRegion, string> = {
   alternative: 'Alternative',
 };
 
+// TODO(api-fetch-wrapper): see todos/pending/40-07-shared-api-fetch.md
+function getToken(): string {
+  if (typeof window === 'undefined') return '';
+  return localStorage.getItem('newshub-auth-token') ?? '';
+}
+
 export function FramingComparison() {
   const { t } = useTranslation('credibility');
   const language = useAppStore((s) => s.language);
@@ -83,7 +89,8 @@ export function FramingComparison() {
     queryKey: ['framing', topic, language],
     queryFn: async () => {
       const r = await fetch(
-        `/api/analysis/framing?topic=${encodeURIComponent(searchTopic ?? '')}&locale=${encodeURIComponent(language)}`
+        `/api/analysis/framing?topic=${encodeURIComponent(searchTopic ?? '')}&locale=${encodeURIComponent(language)}`,
+        { headers: { Authorization: `Bearer ${getToken()}` } }
       );
       if (!r.ok) throw new Error('Framing fetch failed');
       const body: ApiResponse = await r.json();
