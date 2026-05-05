@@ -31,7 +31,8 @@ if [ -z "${DATABASE_URL:-}" ]; then
   exit 1
 fi
 
-cd "$(dirname "$0")/.."
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+cd "$SCRIPT_DIR/.."
 SCHEMA="prisma/schema.prisma"
 BACKUP="${SCHEMA}.ci-bak"
 
@@ -47,7 +48,7 @@ trap cleanup EXIT
 # string with nested parens and escaped quotes — not safely matchable with a
 # simple regex.
 cp "$SCHEMA" "$BACKUP"
-node "$(dirname "$0")/strip-tsvector-defaults.cjs" "$SCHEMA"
+node "$SCRIPT_DIR/strip-tsvector-defaults.cjs" "$SCHEMA"
 
 # Step 2: push the stripped schema (base tables created, tsvector columns regular)
 pnpm exec prisma db push --skip-generate
