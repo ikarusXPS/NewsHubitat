@@ -1,9 +1,9 @@
 /**
- * Unit tests for PodcastEpisodeCard (Phase 40-04 / Task 3).
+ * Unit tests for PodcastEpisodeCard (Phase 40-04 / Task 3; updated 40-08).
  *
  * Covers PLAN behaviors:
  *   1. Renders episode title, podcast title, formatted duration + date
- *   2. Click play (no onPlay) mounts internal PodcastPlayer
+ *   2. Click play (no onPlay) mounts internal PodcastPlayer with autoPlayOnMount
  *   3. Click play (with onPlay) invokes handler, no PodcastPlayer mount
  *   4. HTML in description renders as plain text (no <script> in DOM)
  */
@@ -25,8 +25,12 @@ vi.mock('../../../lib/formatters', () => ({
 }));
 
 vi.mock('../PodcastPlayer', () => ({
-  PodcastPlayer: ({ audioUrl }: { audioUrl: string }) => (
-    <div data-testid="podcast-player-stub" data-url={audioUrl} />
+  PodcastPlayer: ({ audioUrl, autoPlayOnMount }: { audioUrl: string; autoPlayOnMount?: boolean }) => (
+    <div
+      data-testid="podcast-player-stub"
+      data-url={audioUrl}
+      data-auto-play={String(autoPlayOnMount ?? false)}
+    />
   ),
 }));
 
@@ -65,12 +69,13 @@ describe('PodcastEpisodeCard', () => {
     expect(screen.getByText('30:00')).toBeTruthy();
   });
 
-  it('Test 2: clicking play without onPlay mounts internal PodcastPlayer', () => {
+  it('Test 2: clicking play without onPlay mounts the internal player with autoPlayOnMount', () => {
     render(<PodcastEpisodeCard episode={fixture} />);
     expect(screen.queryByTestId('podcast-player-stub')).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: /podcastEpisode\.play/ }));
     const player = screen.getByTestId('podcast-player-stub');
     expect(player.getAttribute('data-url')).toBe(fixture.audioUrl);
+    expect(player.getAttribute('data-auto-play')).toBe('true');
   });
 
   it('Test 3: clicking play with onPlay invokes handler without mounting player', () => {
