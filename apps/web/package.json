@@ -49,7 +49,7 @@
     "@newshub/types": "workspace:*",
     "@prisma/adapter-pg": "^7.7.0",
     "@prisma/client": "^7.7.0",
-    "@scalar/api-reference-react": "^0.9.27",
+    "@scalar/api-reference-react": "^0.9.33",
     "@sendgrid/eventwebhook": "^8.0.0",
     "@sentry/node": "^10.49.0",
     "@sentry/react": "^10.49.0",
