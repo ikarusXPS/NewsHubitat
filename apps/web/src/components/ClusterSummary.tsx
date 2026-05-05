@@ -38,11 +38,19 @@ interface ApiResponse {
   };
 }
 
+// TODO(api-fetch-wrapper): see todos/pending/40-07-shared-api-fetch.md
+function getToken(): string {
+  if (typeof window === 'undefined') return '';
+  return localStorage.getItem('newshub-auth-token') ?? '';
+}
+
 async function fetchClusters(withSummaries: boolean): Promise<ApiResponse> {
   const url = withSummaries
     ? '/api/analysis/clusters?summaries=true'
     : '/api/analysis/clusters';
-  const response = await fetch(url);
+  const response = await fetch(url, {
+    headers: { Authorization: `Bearer ${getToken()}` },
+  });
   if (!response.ok) throw new Error('Failed to fetch clusters');
   return response.json();
 }

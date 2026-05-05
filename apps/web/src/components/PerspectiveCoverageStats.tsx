@@ -74,8 +74,16 @@ const PERSPECTIVE_LABELS: Record<string, string> = {
   usa: 'USA',
 };
 
+// TODO(api-fetch-wrapper): see todos/pending/40-07-shared-api-fetch.md
+function getToken(): string {
+  if (typeof window === 'undefined') return '';
+  return localStorage.getItem('newshub-auth-token') ?? '';
+}
+
 async function fetchCoverageGaps(): Promise<CoverageGapsResponse> {
-  const response = await fetch('/api/analysis/coverage-gaps');
+  const response = await fetch('/api/analysis/coverage-gaps', {
+    headers: { Authorization: `Bearer ${getToken()}` },
+  });
   if (!response.ok) throw new Error('Failed to fetch coverage gaps');
   return response.json();
 }
