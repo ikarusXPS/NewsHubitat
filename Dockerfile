@@ -2,7 +2,7 @@
 # =============================================================================
 # Stage 1: Dependencies (pnpm workspace install — production + dev for builder)
 # =============================================================================
-FROM node:22-alpine3.19 AS deps
+FROM node:23-alpine3.19 AS deps
 WORKDIR /app
 
 # Enable pnpm via corepack (matches CI: pnpm/action-setup@v4 version: 10)
@@ -28,7 +28,7 @@ RUN pnpm install --frozen-lockfile --filter @newshub/web...
 # =============================================================================
 # Stage 2: Builder (Prisma generate + Vite + tsup)
 # =============================================================================
-FROM node:22-alpine3.19 AS builder
+FROM node:23-alpine3.19 AS builder
 WORKDIR /app
 
 # Upgrade corepack first — Node 22's bundled corepack ships with outdated
@@ -62,7 +62,7 @@ RUN pnpm --filter @newshub/web build
 # =============================================================================
 # Stage 3: Production Runtime
 # =============================================================================
-FROM node:22-alpine3.19 AS runner
+FROM node:23-alpine3.19 AS runner
 WORKDIR /app
 
 # Upgrade corepack first — Node 22's bundled corepack ships with outdated
