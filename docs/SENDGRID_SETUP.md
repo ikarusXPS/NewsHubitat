@@ -168,7 +168,7 @@ Verify:
 ### 6.2 Test Password Reset Email
 
 ```bash
-curl -X POST https://newshub.app/api/auth/request-password-reset \
+curl -X POST https://newshub.app/api/auth/request-reset \
   -H "Content-Type: application/json" \
   -d '{"email":"your-test-email@example.com"}'
 ```
@@ -188,7 +188,7 @@ Complete a password reset, then verify:
 
 ### Prometheus Metrics
 
-Access at `/api/metrics`:
+Access at `/metrics`:
 
 | Metric | Description |
 |--------|-------------|
