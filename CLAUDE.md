@@ -70,7 +70,7 @@ pnpm typecheck && pnpm test:run && pnpm build
 pnpm typecheck            # TypeScript validation (all packages)
 pnpm lint                 # ESLint validation (all packages)
 
-# Unit Testing (Vitest) - 80% coverage (branches at 75% per waiver in vitest.config.ts)
+# Unit Testing (Vitest) - 80% coverage (branches at 71% per waiver in vitest.config.ts)
 pnpm test                 # Run unit tests (watch mode)
 pnpm test:run             # Run tests once (CI mode)
 pnpm test:coverage        # Coverage report (fails below threshold)
@@ -139,7 +139,7 @@ docker compose logs -f app
 - **Translation**: Multi-provider chain (DeepL → Google → LibreTranslate → Claude)
 - **Mobile**: Capacitor 8 (iOS + Android) wrapping the same `apps/web/dist` bundle (95% code reuse)
 - **Production scaling**: Docker Swarm + Traefik (sticky sessions via `nh_sticky` cookie); separate `app-worker` Swarm service (replicas=1) runs singleton jobs
-- **Testing**: Vitest (unit, 80% coverage; **branches at 75% — TODO waiver in `vitest.config.ts`**) + Playwright (E2E)
+- **Testing**: Vitest (unit, 80% coverage; **branches at 71% — TODO waiver in `vitest.config.ts`**) + Playwright (E2E)
 - **Monitoring**: Prometheus + Grafana + Alertmanager; Sentry for errors
 
 ## Architecture
