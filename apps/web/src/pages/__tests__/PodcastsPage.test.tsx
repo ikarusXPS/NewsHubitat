@@ -194,7 +194,7 @@ describe('PodcastsPage', () => {
     expect(checkbox.disabled).toBe(false);
 
     // Type a query first so the toggle has something to search
-    const search = screen.getByPlaceholderText('podcastsPage.searchPlaceholder');
+    const search = screen.getByPlaceholderText('podcasts:podcastsPage.searchPlaceholder');
     fireEvent.change(search, { target: { value: 'inflation' } });
 
     fireEvent.click(checkbox);
@@ -218,7 +218,7 @@ describe('PodcastsPage', () => {
       expect(screen.getAllByTestId('episode-card-stub')).toHaveLength(2);
     });
 
-    const search = screen.getByPlaceholderText('podcastsPage.searchPlaceholder');
+    const search = screen.getByPlaceholderText('podcasts:podcastsPage.searchPlaceholder');
     fireEvent.change(search, { target: { value: 'Inflation' } });
 
     await waitFor(() => {
