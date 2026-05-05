@@ -1,14 +1,14 @@
 ---
-status: diagnosed
+status: resolved
 phase: 40-content-expansion
-source: [40-01-SUMMARY.md, 40-02-SUMMARY.md, 40-03-SUMMARY.md, 40-04-SUMMARY.md, 40-05-SUMMARY.md, 40-06-SUMMARY.md]
+source: [40-01-SUMMARY.md, 40-02-SUMMARY.md, 40-03-SUMMARY.md, 40-04-SUMMARY.md, 40-05-SUMMARY.md, 40-06-SUMMARY.md, 40-07-SUMMARY.md, 40-08-SUMMARY.md, 40-09-SUMMARY.md, 40-10-SUMMARY.md]
 started: 2026-05-05T11:00:00Z
-updated: 2026-05-05T12:00:00Z
+updated: 2026-05-05T13:30:00Z
 ---
 
 ## Current Test
 
-[testing paused — 1 blocked, 2 skipped, 4 issues outstanding]
+[all 4 gaps resolved by gap-closure plans 40-07/08/09/10 — 1 blocked + 2 skipped remain (pre-existing, not phase-40 gaps)]
 
 ## Tests
 
@@ -149,7 +149,8 @@ blocked: 1
 ## Gaps
 
 - truth: "Framing analysis surface (/analysis page) renders cluster groupings — required to display the bias diversity note for state-dominated regions"
-  status: failed
+  status: resolved
+  resolved_by: "40-07 (commits 04d1811, 5df729b, 0b8ed04, 3be0d16)"
   reason: "User reported: Fehler beim Laden der Cluster"
   severity: major
   test: 3
@@ -170,7 +171,8 @@ blocked: 1
   specialist: react
 
 - truth: "Click on Play-Button in PodcastPlayer starts audio playback for selected episode"
-  status: failed
+  status: resolved
+  resolved_by: "40-08 (commits 49ae551, 88de4a7, 7f80e4f, ea8f3a2, 2cf8da2, 9ab4d3f)"
   reason: "User reported: Pass aber folge lässt sich mit play nicht abspielen"
   severity: major
   test: 4
@@ -191,7 +193,8 @@ blocked: 1
   specialist: react
 
 - truth: "Dashboard NewsCard grid renders cards without vertical overlap; bottom of each card (READ MORE) is fully visible above the next row"
-  status: failed
+  status: resolved
+  resolved_by: "40-09 (commit 0f04edd, shipped before this gap-closure run)"
   reason: "User reported: auf dashboard überlappen sich die karten gegenseitig"
   severity: major
   test: 5
@@ -208,7 +211,8 @@ blocked: 1
   specialist: react
 
 - truth: "Header LanguageSwitcher exposes DE, EN, AND FR — all three languages selectable per CLAUDE.md and Phase-40 i18n triple-write convention"
-  status: failed
+  status: resolved
+  resolved_by: "40-10 (commits 3dc11da, 20a0842, 7e7f7dd)"
   reason: "User reported: Pass aber nur deutsch und englisch zur auswahl im header"
   severity: major
   test: 10
