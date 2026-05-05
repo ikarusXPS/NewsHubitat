@@ -1,9 +1,9 @@
 ---
-status: partial
+status: diagnosed
 phase: 40-content-expansion
 source: [40-01-SUMMARY.md, 40-02-SUMMARY.md, 40-03-SUMMARY.md, 40-04-SUMMARY.md, 40-05-SUMMARY.md, 40-06-SUMMARY.md]
 started: 2026-05-05T11:00:00Z
-updated: 2026-05-05T11:30:00Z
+updated: 2026-05-05T12:00:00Z
 ---
 
 ## Current Test
@@ -153,37 +153,74 @@ blocked: 1
   reason: "User reported: Fehler beim Laden der Cluster"
   severity: major
   test: 3
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "Three Analysis-page components fetch /api/analysis/* without an Authorization: Bearer header. Backend mounts authMiddleware before aiTierLimiter on /api/analysis since commit c5553f9 (2026-04-28) — silent 401 → React Query error → German error string at ClusterSummary.tsx:275. NOT an AI-quota issue (CLAUDE.md note is stale)."
+  artifacts:
+    - path: "apps/web/src/components/ClusterSummary.tsx"
+      issue: "fetch('/api/analysis/clusters') at line 41-48 omits Authorization header; line 275 renders 'Fehler beim Laden der Cluster' on any non-2xx"
+    - path: "apps/web/src/components/FramingComparison.tsx"
+      issue: "fetch at line 84-91 omits Authorization header — blocks the bias-diversity-note display that Test 3 was supposed to verify"
+    - path: "apps/web/src/components/PerspectiveCoverageStats.tsx"
+      issue: "fetch at line 77-81 omits Authorization header — coverage-gap card silently 401ing"
+  missing:
+    - "Add headers: { Authorization: `Bearer ${localStorage.getItem('newshub-auth-token')}` } to all three component fetchers (mirror useFactCheck.ts:31-58 pattern)"
+    - "Add <RequireAuth> wrapper around /analysis route in App.tsx:122 so anonymous users redirect to login instead of seeing a 401-derived error"
+    - "(Follow-up tech-debt) introduce shared apps/web/src/lib/api.ts apiFetch() wrapper to auto-attach JWT — refactor 19+ DIY fetchers"
+  debug_session: ".planning/debug/analysis-cluster-load-error.md"
+  worktree_branch: "worktree-agent-a41ad2a7f281b4a7b"
+  specialist: react
 
 - truth: "Click on Play-Button in PodcastPlayer starts audio playback for selected episode"
   status: failed
   reason: "User reported: Pass aber folge lässt sich mit play nicht abspielen"
   severity: major
   test: 4
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "Card-level Play button on PodcastEpisodeCard only mounts the PodcastPlayer UI; user must click a SECOND Play button INSIDE the player to actually start audio. Backend data is fine (audioUrl populated correctly). Current behavior is documented as design intent in PodcastEpisodeCard.test.tsx:68-74 — but is a UX/spec gap, not a regression."
+  artifacts:
+    - path: "apps/web/src/components/podcasts/PodcastEpisodeCard.tsx"
+      issue: "handlePlay at lines 87-93 only calls setIsPlaying(toggle) when no onPlay prop passed; PodcastsPage.tsx:274-282 doesn't pass onPlay, so toggle-mount branch is active. Lines 152-156 render <PodcastPlayer> only when !onPlay && isPlaying — mount-only, no playback start."
+    - path: "apps/web/src/components/podcasts/PodcastPlayer.tsx"
+      issue: "<audio> at lines 178-184 has preload='metadata' (headers only), no autoPlay, no useEffect calling play() on mount. Only togglePlay (lines 116-124) ever invokes audio.play()."
+    - path: "apps/web/src/components/podcasts/__tests__/PodcastEpisodeCard.test.tsx"
+      issue: "Test 2 (lines 68-74) explicitly asserts the broken UX (clicking Play just mounts the player). Must be updated alongside the fix."
+  missing:
+    - "Add optional autoPlayOnMount?: boolean prop to PodcastPlayer; when true, attach a loadedmetadata listener (or in existing wiring useEffect) that calls void audio.play() once. Pass autoPlayOnMount from PodcastEpisodeCard whenever it mounts the player on user-gesture click — Chrome treats programmatic playback within ~5s of a user gesture as user-initiated."
+    - "Update PodcastEpisodeCard.test.tsx Test 2 to spy on HTMLMediaElement.prototype.play and assert it was invoked, not just that the player mounted."
+    - "(Optional) Add a Playwright E2E that clicks the card Play and waits for an <audio> element with non-zero currentTime to lock the fix."
+  debug_session: ".planning/debug/podcast-player-play-noop.md"
+  worktree_branch: "worktree-agent-a24566a02e168b8e4"
+  specialist: react
 
 - truth: "Dashboard NewsCard grid renders cards without vertical overlap; bottom of each card (READ MORE) is fully visible above the next row"
   status: failed
   reason: "User reported: auf dashboard überlappen sich die karten gegenseitig"
   severity: major
   test: 5
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "VirtualizedGrid.tsx:130 sets data-row-index instead of the literal data-index attribute that @tanstack/react-virtual v3 requires for measureElement() to map DOM nodes back to virtualizer rows. With wrong attr name, every measurement silently fails → falls back to constant estimateSize: 400. Real SignalCard rows often exceed 400px → row N+1's transform: translateY(start) is computed against under-counted estimate → row N+1 renders on top of the still-visible tail of row N. Bug predates Phase 40 (originated commit 4551cd45, Phase 35-01, 2026-04-26). Dashboard renders SignalCard, NOT NewsCard — Phase-40 RelatedPodcasts/RelatedVideos hypothesis disproven."
+  artifacts:
+    - path: "apps/web/src/components/virtualization/VirtualizedGrid.tsx"
+      issue: "Line 130: data-row-index={virtualRow.index} should be data-index={virtualRow.index}. Reference VirtualizedList.tsx:99 for the correct pattern (List view shows no overlap with same library — only Grid view does)."
+  missing:
+    - "Rename data-row-index → data-index on VirtualizedGrid.tsx:130 (one-character functional change)"
+    - "(Optional polish) Simplify the inline ref callback to ref={virtualizer.measureElement} — function is bound and stable in v3"
+    - "(Optional polish) Raise estimateSize from 400 to ~360 to reduce initial-paint scroll-jump"
+  debug_session: ".planning/debug/dashboard-newscard-grid-overlap.md"
+  worktree_branch: "worktree-agent-ae2561803af4ddf31"
+  specialist: react
 
 - truth: "Header LanguageSwitcher exposes DE, EN, AND FR — all three languages selectable per CLAUDE.md and Phase-40 i18n triple-write convention"
   status: failed
   reason: "User reported: Pass aber nur deutsch und englisch zur auswahl im header"
   severity: major
   test: 10
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "LanguageSwitcher.tsx hardcodes a `languages` array (lines 7-10) containing only de + en. Component renders the dropdown by mapping over this exact array — whatever isn't in the array can't be selected. Everything downstream of the switcher already supports FR (i18next supportedLngs: ['de','en','fr'], Zustand validators accept 'fr', FR locale files exist with real translations). Git history confirms 'fr'/'Français' have NEVER existed in this file — UI-list omission, not a regression."
+  artifacts:
+    - path: "apps/web/src/components/LanguageSwitcher.tsx"
+      issue: "Lines 7-10: const languages = [{code:'de',...}, {code:'en',...}] — FR entry missing. Line 73: dropdown render maps over this array."
+    - path: "apps/web/public/locales/fr/"
+      issue: "Bonus finding: 2 namespaces declared in i18n config are missing FR translations (share.json, teams.json). Graceful English fallback already wired via fallbackLng: 'en', so these yield harmless 404s + per-key fallback rather than broken UI."
+  missing:
+    - "Insert { code: 'fr', label: 'Français', flag: 'FR' } into the languages array at LanguageSwitcher.tsx:9 between English and the closing ]. This is the entire required fix."
+    - "(Optional follow-up, low priority) Copy share.json + teams.json from de/ or en/ to fr/ and translate, eliminating two 404s on first FR selection."
+  debug_session: ".planning/debug/language-switcher-missing-fr.md"
+  worktree_branch: "worktree-agent-a50037aeac585becf"
+  specialist: react
