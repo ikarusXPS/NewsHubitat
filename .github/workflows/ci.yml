@@ -137,8 +137,12 @@ jobs:
       - name: Generate Prisma client
         run: pnpm --filter @newshub/web exec prisma generate
 
-      - name: Push database schema
-        run: pnpm --filter @newshub/web exec prisma db push
+      - name: Push database schema (handles tsvector GENERATED columns)
+        # Wrapper script: see apps/web/scripts/ci-setup-db.sh — strips
+        # @default(dbgenerated(...)) from tsvector columns before db push
+        # (Postgres rejects column-referencing DEFAULT clauses), then re-adds
+        # the columns via the raw FTS migrations as GENERATED ALWAYS AS ... STORED.
+        run: bash apps/web/scripts/ci-setup-db.sh
 
       - name: Run unit tests with coverage
         run: pnpm test:coverage
@@ -353,8 +357,9 @@ jobs:
       - name: Generate Prisma client
         run: pnpm --filter @newshub/web exec prisma generate
 
-      - name: Push database schema
-        run: pnpm --filter @newshub/web exec prisma db push
+      - name: Push database schema (handles tsvector GENERATED columns)
+        # See apps/web/scripts/ci-setup-db.sh for the rationale.
+        run: bash apps/web/scripts/ci-setup-db.sh
 
       - name: Seed test data
         run: pnpm seed
