@@ -85,7 +85,12 @@ test.describe('README Screenshots', () => {
   test('capture timeline', async ({ page }) => {
     await page.goto('/timeline');
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForTimeout(8000);
+    // Timeline aggregates events from /api/news?limit=500 + extracts events server-side;
+    // the loader stays up until the first event card is rendered
+    await expect(page.locator('article, [class*="EventCard"], [class*="timeline-event"]').first())
+      .toBeVisible({ timeout: 30000 })
+      .catch(() => {});
+    await page.waitForTimeout(4000);
     await page.screenshot({ path: `${SCREENSHOT_DIR}/timeline.png`, fullPage: false });
   });
 
