@@ -227,7 +227,7 @@
 | ORG-01 | AVVs unterzeichnen (SendGrid, Sentry, OpenRouter, Google, Anthropic, DeepL, Cloudinary) | ⏳ Sprint 1 (extern) | — | — |
 | ORG-02 | Verantwortlicher-Daten ausfüllen (`PROCESSING-RECORDS.md` + `Privacy.tsx`) | ⏳ Sprint 1 | — | — |
 | ORG-03 | Transfer-Impact-Assessments pro US-Anbieter | ⏳ Sprint 2 | — | — |
-| DOC-01 | `PROCESSING-RECORDS.md` v1.1 (Phase 38/40-Verarbeitungstätigkeiten + 7 fehlende Drittanbieter ergänzen) | ⏳ Sprint 1 | — | — |
+| DOC-01 | `PROCESSING-RECORDS.md` v1.1 (Phase 14/26/28/35/36-36.4/38/40 + Phase-41+ Mobile-Push als Tätigkeiten 2.12-2.24; Drittanbieter um Stripe, OpenAI, YouTube/Vimeo, iTunes, Podcast Index, APNS, FCM, GitHub/Google-OAuth, Google Translate erweitert; TOM-11..13 + Retention-Schedule um Webhook-Idempotenz/Team-Invites/Studenten/Whisper-Tempfiles ergänzt) | ✅ Erledigt | (siehe folgender Commit) | 2026-05-05 |
 | DOC-02 | `Privacy.tsx` vollständig + DE/EN/FR-Übersetzungen | ⏳ Sprint 2 | — | — |
 | DOC-03 | Cookie-Policy-Seite | ⏳ Sprint 2 | — | — |
 
