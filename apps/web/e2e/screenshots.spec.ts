@@ -1,52 +1,96 @@
-import { test } from './fixtures';
+import { test, expect } from '@playwright/test';
 
 /**
  * Screenshot capture for README documentation.
- * Run: npx playwright test e2e/screenshots.spec.ts --project=chromium
  *
- * Screenshots are saved to docs/screenshots/
+ * Uses the bare `test` from @playwright/test (NOT fixtures.ts) because fixtures
+ * mocks /api/analysis/clusters, /api/events/geo, and /api/events/timeline to
+ * empty arrays — which is correct for deterministic E2E tests but produces
+ * empty UI for screenshots. This file deliberately hits the real backend so
+ * captured pages show real content from `pnpm seed:news` data.
+ *
+ * Run: pnpm --filter @newshub/web screenshots
+ * (or with custom port: PLAYWRIGHT_TEST_BASE_URL=http://localhost:5174 pnpm --filter @newshub/web screenshots)
+ *
+ * Output: docs/screenshots/ (relative to apps/web — copy to repo-level docs/screenshots/ when done)
  */
 
-const SCREENSHOT_DIR = 'docs/screenshots';
+// Path is relative to playwright's CWD (apps/web/), so go up two levels to repo root.
+const SCREENSHOT_DIR = '../../docs/screenshots';
+
+test.describe.configure({ mode: 'serial' }); // Avoid parallel hammering of the dev backend
+test.setTimeout(90 * 1000); // Each capture may need long waits for AI clustering, globe init, etc.
 
 test.describe('README Screenshots', () => {
   test.beforeEach(async ({ page }) => {
     await page.setViewportSize({ width: 1920, height: 1080 });
+
+    // Bypass FocusOnboarding (z-90) and ConsentBanner (z-100) — they cover real UI.
+    // Set German locale for the canonical screenshot language.
+    await page.addInitScript(() => {
+      const existing = localStorage.getItem('newshub-storage');
+      const parsed = existing ? JSON.parse(existing) : { state: {}, version: 0 };
+      parsed.state = {
+        ...parsed.state,
+        hasCompletedOnboarding: true,
+        theme: 'dark',
+        language: 'de',
+      };
+      localStorage.setItem('newshub-storage', JSON.stringify(parsed));
+      localStorage.setItem('newshub-consent', JSON.stringify({
+        essential: true,
+        preferences: true,
+        analytics: false,
+      }));
+    });
+
+    // Hide toast notifications and dev-only diagnostic banners that can clutter shots
+    await page.addStyleTag({
+      content: `
+        .fixed.bottom-4.right-4.z-50 { display: none !important; }
+        [data-sonner-toaster] { display: none !important; }
+      `,
+    });
   });
 
   test('capture dashboard', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForTimeout(5000); // Allow page and animations to settle
+    // Wait for at least one article/signal card to render — articles arrive via TanStack Query
+    await expect(page.locator('article, [class*="ArticleCard"], [class*="signal-card"]').first()).toBeVisible({ timeout: 30000 });
+    // Settle animations + region distribution bar
+    await page.waitForTimeout(2000);
     await page.screenshot({ path: `${SCREENSHOT_DIR}/dashboard.png`, fullPage: false });
   });
 
   test('capture monitor globe', async ({ page }) => {
     await page.goto('/monitor');
     await page.waitForLoadState('domcontentloaded');
-    // Wait for globe canvas to render
-    await page.waitForTimeout(5000); // Globe needs time to initialize
+    // Globe canvas takes time to initialize WebGL
+    await page.waitForTimeout(8000);
     await page.screenshot({ path: `${SCREENSHOT_DIR}/monitor-globe.png`, fullPage: false });
   });
 
   test('capture monitor events', async ({ page }) => {
     await page.goto('/monitor');
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForTimeout(3000);
+    // Try to switch to 2D map view if a button exists, then wait for events list
+    await page.waitForTimeout(6000);
     await page.screenshot({ path: `${SCREENSHOT_DIR}/monitor-events.png`, fullPage: false });
   });
 
   test('capture analysis', async ({ page }) => {
     await page.goto('/analysis');
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForTimeout(5000);
+    // Analysis page does AI clustering — give it generous time
+    await page.waitForTimeout(15000);
     await page.screenshot({ path: `${SCREENSHOT_DIR}/analysis.png`, fullPage: false });
   });
 
   test('capture timeline', async ({ page }) => {
     await page.goto('/timeline');
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForTimeout(5000);
+    await page.waitForTimeout(8000);
     await page.screenshot({ path: `${SCREENSHOT_DIR}/timeline.png`, fullPage: false });
   });
 
@@ -60,12 +104,13 @@ test.describe('README Screenshots', () => {
   test('capture feed manager', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForTimeout(2000);
-    // Open feed manager modal (gear icon button)
-    const feedManagerButton = page.locator('button[aria-label*="Feed"], button:has([class*="Settings"]), button:has([class*="Sliders"])').first();
+    await expect(page.locator('article, [class*="ArticleCard"]').first()).toBeVisible({ timeout: 30000 });
+    await page.waitForTimeout(1500);
+    // Open feed manager modal (gear icon)
+    const feedManagerButton = page.locator('button[aria-label*="Feed"], button:has-text("Feed"), button:has([class*="Settings"]), button:has([class*="Sliders"])').first();
     if (await feedManagerButton.isVisible({ timeout: 5000 }).catch(() => false)) {
       await feedManagerButton.click();
-      await page.waitForTimeout(500);
+      await page.waitForTimeout(1000);
     }
     await page.screenshot({ path: `${SCREENSHOT_DIR}/feed-manager.png`, fullPage: false });
   });
@@ -73,10 +118,10 @@ test.describe('README Screenshots', () => {
   test('capture keyboard shortcuts', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForTimeout(2000);
-    // Press ? to open shortcuts modal
+    await expect(page.locator('article, [class*="ArticleCard"]').first()).toBeVisible({ timeout: 30000 });
+    await page.waitForTimeout(1500);
     await page.keyboard.press('?');
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(800);
     await page.screenshot({ path: `${SCREENSHOT_DIR}/shortcuts.png`, fullPage: false });
   });
 });

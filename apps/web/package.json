@@ -26,6 +26,7 @@
     "seed": "npx tsx prisma/seed.ts",
     "seed:badges": "npx tsx prisma/seed-badges.ts",
     "seed:personas": "npx tsx prisma/seed-personas.ts",
+    "seed:news": "npx tsx prisma/seed-news.ts",
     "seed:load-test": "tsx scripts/seed-load-test-users.js",
     "load:smoke": "k6 run k6/load-test.js --env K6_SCENARIO=smoke",
     "load:full": "k6 run k6/load-test.js --env K6_SCENARIO=load",
