@@ -34,13 +34,13 @@ export class SubscriptionService {
 
   private constructor() {
     if (!process.env.STRIPE_SECRET_KEY) {
-      console.warn('[SubscriptionService] STRIPE_SECRET_KEY not set - service will be unavailable');
+      logger.warn('[SubscriptionService] STRIPE_SECRET_KEY not set - service will be unavailable');
       this.stripe = null;
     } else {
       this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
         apiVersion: STRIPE_CONFIG.apiVersion,
       });
-      console.log('[SubscriptionService] Initialized with Stripe API');
+      logger.info('[SubscriptionService] Initialized with Stripe API');
     }
     this.cacheService = CacheService.getInstance();
   }

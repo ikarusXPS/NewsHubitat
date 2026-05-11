@@ -5,6 +5,7 @@ import type { Browser, Page } from 'puppeteer';
 import * as cheerio from 'cheerio';
 import type { NewsArticle, NewsSource } from '../../src/types';
 import { hashString } from '../utils/hash';
+import logger from '../utils/logger';
 
 // Add stealth plugin to avoid detection
 puppeteer.use(StealthPlugin());
@@ -162,7 +163,7 @@ export class StealthScraper {
     this.isInitializing = true;
 
     try {
-      console.log('Launching stealth browser...');
+      logger.info('Launching stealth browser...');
       this.browser = await puppeteer.launch({
         headless: true,
         args: [
@@ -180,7 +181,7 @@ export class StealthScraper {
         this.browser = null;
       });
 
-      console.log('Stealth browser launched');
+      logger.info('Stealth browser launched');
       return this.browser;
     } finally {
       this.isInitializing = false;
@@ -222,14 +223,14 @@ export class StealthScraper {
     const cacheKey = config.source.id;
     const cached = this.cache.get(cacheKey);
     if (cached && Date.now() - cached.timestamp < this.CACHE_TTL) {
-      console.log(`Using cached articles for ${config.source.name}`);
+      logger.info(`Using cached articles for ${config.source.name}`);
       return cached.articles;
     }
 
     let page: Page | null = null;
 
     try {
-      console.log(`Stealth scraping ${config.source.name}: ${config.url}`);
+      logger.info(`Stealth scraping ${config.source.name}: ${config.url}`);
       page = await this.createPage();
 
       // Navigate with retry logic
@@ -244,7 +245,7 @@ export class StealthScraper {
         } catch (err) {
           retries--;
           if (retries === 0) throw err;
-          console.log(`Retry ${3 - retries} for ${config.source.name}`);
+          logger.info(`Retry ${3 - retries} for ${config.source.name}`);
           await new Promise((resolve) => setTimeout(resolve, 2000));
         }
       }
@@ -254,7 +255,7 @@ export class StealthScraper {
         try {
           await page.waitForSelector(config.waitFor, { timeout: 10000 });
         } catch {
-          console.log(`Selector ${config.waitFor} not found, continuing anyway`);
+          logger.info(`Selector ${config.waitFor} not found, continuing anyway`);
         }
       }
 
@@ -267,14 +268,14 @@ export class StealthScraper {
       const html = await page.content();
       const articles = this.parseArticles(html, config);
 
-      console.log(`Stealth scraped ${articles.length} articles from ${config.source.name}`);
+      logger.info(`Stealth scraped ${articles.length} articles from ${config.source.name}`);
 
       // Cache results
       this.cache.set(cacheKey, { articles, timestamp: Date.now() });
 
       return articles;
     } catch (err) {
-      console.error(`Stealth scrape failed for ${config.source.name}:`, err);
+      logger.error(`Stealth scrape failed for ${config.source.name}:`, err);
       return cached?.articles || [];
     } finally {
       if (page) {

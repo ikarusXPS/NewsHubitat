@@ -1,6 +1,7 @@
 import * as deepl from 'deepl-node';
 import Anthropic from '@anthropic-ai/sdk';
 import { hashString } from '../utils/hash';
+import logger from '../utils/logger';
 
 type TargetLang = 'de' | 'en';
 type Provider = 'deepl' | 'google' | 'libretranslate' | 'claude';
@@ -64,9 +65,9 @@ export class TranslationService {
       try {
         this.deeplClient = new deepl.Translator(this.DEEPL_API_KEY);
         this.providers.push('deepl');
-        console.log('DeepL client initialized');
+        logger.info('DeepL client initialized');
       } catch (err) {
-        console.warn('Failed to initialize DeepL client:', err);
+        logger.warn('Failed to initialize DeepL client:', err);
       }
     }
 
@@ -75,9 +76,9 @@ export class TranslationService {
       try {
         this.anthropicClient = new Anthropic({ apiKey: this.ANTHROPIC_API_KEY });
         this.providers.push('claude');
-        console.log('Anthropic client initialized');
+        logger.info('Anthropic client initialized');
       } catch (err) {
-        console.warn('Failed to initialize Anthropic client:', err);
+        logger.warn('Failed to initialize Anthropic client:', err);
       }
     }
 
@@ -89,7 +90,7 @@ export class TranslationService {
     // LibreTranslate always available as fallback
     this.providers.push('libretranslate');
 
-    console.log('Translation providers:', this.providers);
+    logger.info('Translation providers:', this.providers);
   }
 
   private getCacheKey(text: string, targetLang: TargetLang): string {
@@ -98,7 +99,7 @@ export class TranslationService {
   }
 
   private loadCacheFromStorage(): void {
-    console.log('Translation cache initialized (in-memory)');
+    logger.info('Translation cache initialized (in-memory)');
   }
 
   async translate(
@@ -132,7 +133,7 @@ export class TranslationService {
           return result;
         }
       } catch (err) {
-        console.warn(`Translation failed with ${provider}:`, err);
+        logger.warn(`Translation failed with ${provider}:`, err);
         continue;
       }
     }
@@ -175,7 +176,7 @@ export class TranslationService {
 
     // Check rate limit
     if (this.monthlyCharCount + text.length > this.MONTHLY_LIMIT) {
-      console.warn('DeepL monthly limit reached');
+      logger.warn('DeepL monthly limit reached');
       return null;
     }
 
@@ -199,7 +200,7 @@ export class TranslationService {
         quality: 0.95,
       };
     } catch (err) {
-      console.error('DeepL translation error:', err);
+      logger.error('DeepL translation error:', err);
       return null;
     }
   }
@@ -301,7 +302,7 @@ export class TranslationService {
         quality: 0.85,
       };
     } catch (err) {
-      console.error('Claude translation error:', err);
+      logger.error('Claude translation error:', err);
       return null;
     }
   }

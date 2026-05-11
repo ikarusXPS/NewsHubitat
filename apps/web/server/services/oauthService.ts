@@ -9,6 +9,7 @@ import { isDisposableEmail } from '../utils/disposableEmail';
 import { EmailService } from './emailService';
 import type { Profile as GoogleProfile } from 'passport-google-oauth20';
 import type { Profile as GitHubProfile } from 'passport-github2';
+import logger from '../utils/logger';
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 const JWT_EXPIRES_IN = '7d';
@@ -38,7 +39,7 @@ export class OAuthService {
   private static instance: OAuthService;
 
   private constructor() {
-    console.log('OAuth service initialized');
+    logger.info('OAuth service initialized');
   }
 
   static getInstance(): OAuthService {
@@ -297,7 +298,7 @@ export class OAuthService {
     const emailService = EmailService.getInstance();
     const html = this.generateSecurityNotificationHtml(name, subject, description);
     emailService.send(email, `NewsHub Security Alert: ${subject}`, html).catch((err) => {
-      console.error('Failed to send security notification:', err);
+      logger.error('Failed to send security notification:', err);
     });
   }
 

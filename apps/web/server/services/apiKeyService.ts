@@ -13,6 +13,7 @@ import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { prisma } from '../db/prisma';
 import { CacheService } from './cacheService';
+import logger from '../utils/logger';
 
 // Generate URL-safe random string (24 chars, alphanumeric)
 const nanoid = customAlphabet('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', 24);
@@ -43,7 +44,7 @@ export class ApiKeyService {
   private static instance: ApiKeyService;
 
   private constructor() {
-    console.log('API Key service initialized');
+    logger.info('API Key service initialized');
   }
 
   static getInstance(): ApiKeyService {

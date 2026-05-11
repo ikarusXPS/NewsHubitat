@@ -5,6 +5,7 @@ import { generateSecureToken, hashToken, getTokenExpiry, isTokenExpired } from '
 import { isDisposableEmail } from '../utils/disposableEmail';
 import { EmailService } from './emailService';
 import { CacheService, CACHE_TTL } from './cacheService';
+import logger from '../utils/logger';
 
 interface UserPreferences {
   language: 'de' | 'en';
@@ -33,8 +34,8 @@ interface SafeUser {
 // SECURITY: JWT_SECRET must be set in environment - no fallback allowed
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
-  console.error('FATAL: JWT_SECRET environment variable is not set');
-  console.error('Set JWT_SECRET in .env file or environment before starting the server');
+  logger.error('FATAL: JWT_SECRET environment variable is not set');
+  logger.error('Set JWT_SECRET in .env file or environment before starting the server');
   process.exit(1);
 }
 
@@ -48,7 +49,7 @@ export class AuthService {
   private static instance: AuthService;
 
   private constructor() {
-    console.log('Auth service initialized with Prisma');
+    logger.info('Auth service initialized with Prisma');
   }
 
   static getInstance(): AuthService {
@@ -112,9 +113,9 @@ export class AuthService {
     let emailSent = false;
     try {
       emailSent = await emailService.sendVerification(user.email, user.name, verificationToken);
-      console.log(`verification:${emailSent ? 'sent' : 'failed'} email=${user.email}`);
+      logger.info(`verification:${emailSent ? 'sent' : 'failed'} email=${user.email}`);
     } catch (err) {
-      console.error('verification:send_error', err);
+      logger.error('verification:send_error', err);
     }
 
     // Generate JWT token
@@ -194,7 +195,7 @@ export class AuthService {
       });
       return true;
     } catch (err) {
-      console.error('Failed to add bookmark:', err);
+      logger.error('Failed to add bookmark:', err);
       return false;
     }
   }
@@ -211,7 +212,7 @@ export class AuthService {
       });
       return true;
     } catch (err) {
-      console.error('Failed to remove bookmark:', err);
+      logger.error('Failed to remove bookmark:', err);
       return false;
     }
   }
@@ -283,19 +284,19 @@ export class AuthService {
 
     if (!user) {
       // Check if user exists with this email already verified (D-10)
-      console.log('verification:invalid_token');
+      logger.info('verification:invalid_token');
       return { success: false };
     }
 
     // Already verified (D-10)
     if (user.emailVerified) {
-      console.log(`verification:already_verified email=${user.email}`);
+      logger.info(`verification:already_verified email=${user.email}`);
       return { success: true, alreadyVerified: true };
     }
 
     // Token expired (D-02)
     if (isTokenExpired(user.verificationTokenExpiry)) {
-      console.log(`verification:expired email=${user.email}`);
+      logger.info(`verification:expired email=${user.email}`);
       return { success: false, expired: true };
     }
 
@@ -309,7 +310,7 @@ export class AuthService {
       },
     });
 
-    console.log(`verification:verified email=${user.email}`);
+    logger.info(`verification:verified email=${user.email}`);
     return { success: true };
   }
 
@@ -331,7 +332,7 @@ export class AuthService {
         const minutesRemaining = Math.ceil(
           (user.lastVerificationSentAt.getTime() + 60 * 60 * 1000 - Date.now()) / (60 * 1000)
         );
-        console.log(`verification:rate_limited email=${user.email} minutes=${minutesRemaining}`);
+        logger.info(`verification:rate_limited email=${user.email} minutes=${minutesRemaining}`);
         return { success: false, rateLimited: true, minutesRemaining };
       }
     }
@@ -357,7 +358,7 @@ export class AuthService {
     // Send email
     const emailService = EmailService.getInstance();
     const sent = await emailService.sendVerification(user.email, user.name, verificationToken);
-    console.log(`verification:resent email=${user.email} sent=${sent}`);
+    logger.info(`verification:resent email=${user.email} sent=${sent}`);
 
     return { success: sent };
   }
@@ -373,13 +374,13 @@ export class AuthService {
 
     // D-34, D-50: Generic response regardless of user existence
     if (!user) {
-      console.log(`reset:request_nonexistent email=${email}`);
+      logger.info(`reset:request_nonexistent email=${email}`);
       return { success: true }; // Same response as success
     }
 
     // D-50: Same response for disposable emails
     if (isDisposableEmail(email)) {
-      console.log(`reset:request_disposable email=${email}`);
+      logger.info(`reset:request_disposable email=${email}`);
       return { success: true };
     }
 
@@ -390,7 +391,7 @@ export class AuthService {
         const minutesRemaining = Math.ceil(
           (user.lastResetSentAt.getTime() + 60 * 60 * 1000 - Date.now()) / (60 * 1000)
         );
-        console.log(`reset:rate_limited email=${email} minutes=${minutesRemaining}`);
+        logger.info(`reset:rate_limited email=${email} minutes=${minutesRemaining}`);
         return { success: false, rateLimited: true, minutesRemaining };
       }
     }
@@ -431,12 +432,12 @@ export class AuthService {
     });
 
     if (!user) {
-      console.log('reset:invalid_token');
+      logger.info('reset:invalid_token');
       return { valid: false };
     }
 
     if (isTokenExpired(user.resetTokenExpiry)) {
-      console.log(`reset:expired email=${user.email}`);
+      logger.info(`reset:expired email=${user.email}`);
       return { valid: false };
     }
 
@@ -455,12 +456,12 @@ export class AuthService {
 
     // D-42, D-49: Generic error for invalid/used tokens
     if (!user) {
-      console.log('reset:invalid_token');
+      logger.info('reset:invalid_token');
       return { success: false, error: 'Invalid or expired link' };
     }
 
     if (isTokenExpired(user.resetTokenExpiry)) {
-      console.log(`reset:expired email=${user.email}`);
+      logger.info(`reset:expired email=${user.email}`);
       return { success: false, error: 'Invalid or expired link' };
     }
 
@@ -495,7 +496,7 @@ export class AuthService {
       },
     });
 
-    console.log(`reset:password_changed email=${user.email}`);
+    logger.info(`reset:password_changed email=${user.email}`);
 
     // D-32, D-33: Send confirmation with recovery link
     const emailService = EmailService.getInstance();

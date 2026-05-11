@@ -1,4 +1,5 @@
 import YahooFinance from 'yahoo-finance2';
+import logger from '../utils/logger';
 
 const yahooFinance = new YahooFinance();
 
@@ -77,9 +78,9 @@ export class MarketDataService {
             currency: config.currency,
           });
 
-          console.log(`[Markets] ${symbol}: $${price} (${changePercent.toFixed(2)}%)`);
+          logger.info(`[Markets] ${symbol}: $${price} (${changePercent.toFixed(2)}%)`);
         } catch {
-          console.warn(`[Markets] Failed to fetch ${symbol}, using fallback`);
+          logger.warn(`[Markets] Failed to fetch ${symbol}, using fallback`);
           // Use fallback for this symbol
           const fallback = this.getFallbackData().find(d => d.symbol === this.formatSymbol(symbol));
           if (fallback) {
@@ -93,16 +94,16 @@ export class MarketDataService {
 
       return marketData;
     } catch (err) {
-      console.error('[Markets] Yahoo Finance API error:', err);
+      logger.error('[Markets] Yahoo Finance API error:', err);
 
       // Return cached data if available, even if expired
       if (cached) {
-        console.log('[Markets] Using expired cache due to API error');
+        logger.info('[Markets] Using expired cache due to API error');
         return cached.data;
       }
 
       // Fallback to placeholder data if no cache
-      console.log('[Markets] Using fallback data');
+      logger.info('[Markets] Using fallback data');
       return this.getFallbackData();
     }
   }
