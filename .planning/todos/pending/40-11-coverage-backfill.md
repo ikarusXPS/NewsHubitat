@@ -1,7 +1,8 @@
 ---
-status: pending
+status: partially-resolved
 phase: 40-content-expansion
 created: 2026-05-05
+updated: 2026-05-11
 priority: medium
 labels: [testing, coverage, tech-debt]
 related_plans: [40-07, 40-08, 40-10]
@@ -9,6 +10,34 @@ related_ci: 25370135629
 ---
 
 # Backfill branch tests to raise coverage threshold from 71% → 80%
+
+## Progress 2026-05-11 (partial)
+
+**First ratchet step landed — commit `cb9c3a7`.**
+
+Branch coverage moved 71.11% → 72.02% (+0.91pp). Vitest gate bumped 71 → 72, locking in the gain (regression below 72% now fails CI).
+
+Three new test files, +46 tests:
+
+| File | Tests | Branch coverage of target file |
+|---|---|---|
+| `src/components/videos/parseVideoUrl.test.ts` | 14 | 81.25% → ~100% |
+| `src/lib/logger.test.ts` | 12 | 40% → ~100% |
+| `src/hooks/useFactCheck.test.tsx` | 10 | (all 6 error encodings + Bearer auto-attach covered) |
+
+Total suite: 1710 → 1758 tests across 94 → 97 files. Statements 81.27% → 81.38%; functions 81.31% → 81.46%; lines 82.5% → 82.61%.
+
+## Remaining work to reach 80%
+
+Highest-leverage uncovered surfaces (from coverage report — order by leverage):
+
+1. **`contexts/AuthContext.tsx`** — currently 0% branches. Test the `verifyToken` effect (404 → clearToken; OK → setUser), `login`/`register`/`logout`/`loginWithOAuth` flows. Largest single-file lever.
+2. **`hooks/useComments.ts`** — currently 15.38%. Already has a test file but doesn't exercise the 4 mutation paths (`postComment`, `useEditComment`, `useDeleteComment`, `useFlagComment`) which after the 40-07 apiFetch refactor are token-free.
+3. **`server/services/stripeWebhookService.ts`**, **`server/services/teamService.ts`**, **`server/services/metricsService.ts`**, **`server/jobs/workerEmitter.ts`** — server-side branches called out in the original todo body (still applies).
+4. **`pages/PodcastsPage.tsx`** — the `isTranscriptSearchActive` gate and `filteredEpisodes` `useMemo` branches (Phase 40 additions).
+5. **`components/videos/EmbeddedVideo.tsx`** — currently 50% branches; provider switching logic.
+
+Continue the ratchet in chunks: 72 → 74 → 78 → 80, bumping the threshold each PR as the actual reaches the next floor.
 
 ## Why
 
