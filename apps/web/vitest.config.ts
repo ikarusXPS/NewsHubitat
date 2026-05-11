@@ -22,15 +22,23 @@ export default defineConfig({
       ],
       thresholds: {
         statements: 80,
-        // Branch coverage temporarily at 71% — actual is 71.11% (Phase 40 gap closures
-        // 40-07 / 40-08 / 40-10 added branching code without backfill).
-        // History: 80 → 75 (CI 25107573823, Phase 37/38) → 74 (PR #4, Phase 38+39+40.1)
-        //         → 71 (Phase 40 gap closure, CI 25370135629 — see todos/pending/40-11-coverage-backfill.md).
-        // TODO(coverage): backfill branch tests for routes/ai.ts, routes/leaderboard.ts,
-        // services/stripeWebhookService.ts, services/teamService.ts, services/metricsService.ts,
-        // jobs/workerEmitter.ts, hooks/useComments.ts, pages/PodcastsPage.tsx (transcript gate),
-        // components/videos/parseVideoUrl.ts → raise back to 80.
-        branches: 71,
+        // Branch coverage at 72% — first ratchet step on the recovery path.
+        // Current actual: 72.02% (after 40-11 partial backfill 2026-05-11).
+        // History:
+        //   80 → 75 (CI 25107573823, Phase 37/38)
+        //   75 → 74 (PR #4, Phase 38+39+40.1)
+        //   74 → 71 (Phase 40 gap closure, CI 25370135629 — see 40-11)
+        //   71 → 72 (2026-05-11, +0.91pp from parseVideoUrl + logger.ts + useFactCheck tests)
+        // Next ratchet targets toward the 80% goal:
+        //   - hooks/useComments.ts (currently 15.38%)
+        //   - contexts/AuthContext.tsx (currently 0%)
+        //   - server services with low branch coverage (routes/ai.ts,
+        //     routes/leaderboard.ts, services/stripeWebhookService.ts,
+        //     services/teamService.ts, services/metricsService.ts,
+        //     jobs/workerEmitter.ts)
+        // See .planning/todos/pending/40-11-coverage-backfill.md for the
+        // remaining ratchet plan.
+        branches: 72,
         functions: 80,
         lines: 80,
       },
