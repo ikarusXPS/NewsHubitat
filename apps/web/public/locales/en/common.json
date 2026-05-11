@@ -111,5 +111,10 @@
     "dailyQueries": "Daily AI Queries",
     "remaining": "remaining",
     "upgradeCta": "Upgrade for unlimited queries"
+  },
+  "requireAuth": {
+    "title": "Sign in required",
+    "description": "You need to be signed in to view this page.",
+    "signInButton": "Sign in"
   }
 }

@@ -12,6 +12,7 @@ import { ConsentBanner } from './components/ConsentBanner';
 import { cacheService } from './services/cacheService';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ChunkErrorBoundary } from './components/ChunkErrorBoundary';
+import { RequireAuth } from './components/RequireAuth';
 import { FocusSuggestions } from './components/FocusSuggestions';
 import { FocusOnboarding } from './components/FocusOnboarding';
 import { SettingsModal } from './components/SettingsModal';
@@ -120,17 +121,16 @@ function AppRoutes() {
             <Routes location={routeLocation}>
               <Route path="/" element={<Dashboard />} />
               <Route path="/monitor" element={<Monitor />} />
-              {/* TODO(40-07): gate /analysis with auth guard once a RequireAuth/ProtectedRoute wrapper exists; backend rejects unauthenticated requests with 401 since c5553f9 */}
-              <Route path="/analysis" element={<Analysis />} />
+              <Route path="/analysis" element={<RequireAuth><Analysis /></RequireAuth>} />
               <Route path="/timeline" element={<Timeline />} />
               <Route path="/map" element={<MapView />} />
               <Route path="/globe" element={<Globe />} />
               <Route path="/events" element={<EventMap />} />
               <Route path="/community" element={<Community />} />
-              <Route path="/bookmarks" element={<Bookmarks />} />
+              <Route path="/bookmarks" element={<RequireAuth><Bookmarks /></RequireAuth>} />
               <Route path="/podcasts" element={<PodcastsPage />} />
-              <Route path="/history" element={<ReadingHistory />} />
-              <Route path="/profile" element={<Profile />} />
+              <Route path="/history" element={<RequireAuth><ReadingHistory /></RequireAuth>} />
+              <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
               {/* Article detail page with comments */}
               <Route path="/article/:id" element={<Article />} />
               {/* Auth pages (public - no auth required) */}
@@ -138,12 +138,12 @@ function AppRoutes() {
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               {/* Settings as full page when accessed directly */}
-              <Route path="/settings" element={<Settings />} />
+              <Route path="/settings" element={<RequireAuth><Settings /></RequireAuth>} />
               {/* Legal pages */}
               <Route path="/privacy" element={<Privacy />} />
               {/* Team pages - invite route must come before :teamId for specificity */}
               <Route path="/team/invite/:token" element={<TeamInviteAccept />} />
-              <Route path="/team/:teamId" element={<TeamDashboard />} />
+              <Route path="/team/:teamId" element={<RequireAuth><TeamDashboard /></RequireAuth>} />
               {/* Developer portal - D-09: dedicated /developers page */}
               <Route path="/developers" element={<DevelopersPage />} />
               {/* Subscription pages (public - Phase 36) */}

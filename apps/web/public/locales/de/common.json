@@ -111,5 +111,10 @@
     "dailyQueries": "Tägliche KI-Anfragen",
     "remaining": "verbleibend",
     "upgradeCta": "Upgrade für unbegrenzte Anfragen"
+  },
+  "requireAuth": {
+    "title": "Anmeldung erforderlich",
+    "description": "Sie müssen angemeldet sein, um diese Seite anzuzeigen.",
+    "signInButton": "Anmelden"
   }
 }
