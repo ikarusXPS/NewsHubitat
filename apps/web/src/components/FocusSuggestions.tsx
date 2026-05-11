@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { X, TrendingUp, AlertTriangle, Globe2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { FocusSuggestion } from '../types/focus';
+import { logger } from '../lib/logger';
 
 interface FocusSuggestionsResponse {
   success: boolean;
@@ -54,7 +55,7 @@ export function FocusSuggestions() {
   const handleApplySuggestion = (suggestion: FocusSuggestion) => {
     // TODO: Implement focus switching logic
     // This will be implemented in Phase 7 when we add the focus selector
-    console.log('Apply suggestion:', suggestion.preset.name);
+    logger.log('Apply suggestion:', suggestion.preset.name);
     handleDismiss(suggestion.id);
   };
 

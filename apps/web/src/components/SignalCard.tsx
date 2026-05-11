@@ -21,6 +21,7 @@ import { BookmarkButton } from './BookmarkButton';
 import { useCreateShare, type ShareUrls } from '../hooks/useShare';
 import { ResponsiveImage } from './ResponsiveImage';
 import type { NewsArticle } from '../types';
+import { logger } from '../lib/logger';
 
 interface SignalCardProps {
   article: NewsArticle;
@@ -83,7 +84,7 @@ export function SignalCard({ article, isBookmarked, onBookmark, index = 0, isRea
       setShareCode(urls.direct.split('/s/')[1]);
     } catch (err) {
       if (import.meta.env.DEV) {
-        console.error('Failed to create share:', err);
+        logger.error('Failed to create share:', err);
       }
     } finally {
       setIsCreatingShare(false);

@@ -28,6 +28,7 @@ import { LiteVimeoEmbed } from './LiteVimeoEmbed';
 import { TranscriptDrawer } from '../podcasts/TranscriptDrawer';
 import { cn } from '../../lib/utils';
 import { parseVideoUrl, type Provider } from './parseVideoUrl';
+import { logger } from '../../lib/logger';
 
 interface CommonProps {
   /** Optional Prisma Video.id; when present, enables the transcript toggle. */
@@ -79,7 +80,7 @@ export function EmbeddedVideo(props: Props) {
     const parsed = parseVideoUrl(props.url);
     if (!parsed) {
       // eslint-disable-next-line no-console
-      console.warn('EmbeddedVideo: unrecognized URL', props.url);
+      logger.warn('EmbeddedVideo: unrecognized URL', props.url);
       return null;
     }
     provider = parsed.provider;

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useUserShares } from '../../hooks/useShare';
 import { useAppStore } from '../../store';
 import { formatDateTime } from '../../lib/formatters';
+import { logger } from '../../lib/logger';
 
 // Platform colors for click breakdown badges
 const PLATFORM_COLORS: Record<string, string> = {
@@ -21,7 +22,7 @@ export function MyShares() {
 
   // Graceful degradation per D-10: don't break page on error
   if (error) {
-    console.error('Failed to load shares:', error);
+    logger.error('Failed to load shares:', error);
     return null;
   }
 

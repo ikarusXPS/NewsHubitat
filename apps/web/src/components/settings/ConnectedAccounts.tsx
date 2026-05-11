@@ -6,6 +6,7 @@ import { useOAuthPopup } from '../../hooks/useOAuthPopup';
 import { cn } from '../../lib/utils';
 import { Toast } from '../Toast';
 import { ConfirmDialog } from '../ConfirmDialog';
+import { logger } from '../../lib/logger';
 
 // Provider icons (same as OAuthButton)
 const GoogleIcon = () => (
@@ -85,7 +86,7 @@ export function ConnectedAccounts() {
           setProviders(data.data);
         }
       } catch (err) {
-        console.error('Failed to fetch providers:', err);
+        logger.error('Failed to fetch providers:', err);
       } finally {
         setIsLoading(false);
       }

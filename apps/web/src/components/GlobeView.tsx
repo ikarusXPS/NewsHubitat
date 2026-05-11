@@ -6,6 +6,7 @@ import { cn } from '../lib/utils';
 import * as THREE from 'three';
 import { useMapCenter } from '../hooks/useMapCenter';
 import type { GeoEvent } from '../types';
+import { logger } from '../lib/logger';
 
 interface GlobeViewProps {
   points?: GeoEvent[];                    // Optional: external data (keeps backward compat)
@@ -448,7 +449,7 @@ export function GlobeView({
 
         updateLoop();
       } catch (error) {
-        console.error('Failed to initialize globe:', error);
+        logger.error('Failed to initialize globe:', error);
         setIsInitializing(false);
       }
     };

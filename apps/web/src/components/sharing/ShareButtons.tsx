@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { cn } from '../../lib/utils';
 import { useIsMobile } from '../../hooks/useMediaQuery';
 import { useShareClick, type ShareUrls } from '../../hooks/useShare';
+import { logger } from '../../lib/logger';
 
 interface ShareButtonsProps {
   shareCode: string;
@@ -90,7 +91,7 @@ export function ShareButtons({ shareCode, title, urls, className }: ShareButtons
       trackClick.mutate({ shareCode, platform: 'copy' });
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error('Failed to copy:', err);
+      logger.error('Failed to copy:', err);
     }
   };
 

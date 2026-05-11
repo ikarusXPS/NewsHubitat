@@ -3,6 +3,7 @@ import { Download, FileJson, FileSpreadsheet, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppStore } from '../../store';
 import { cn } from '../../lib/utils';
+import { logger } from '../../lib/logger';
 
 interface DataExportModalProps {
   isOpen: boolean;
@@ -37,7 +38,7 @@ export function DataExportModal({ isOpen, onClose }: DataExportModalProps) {
 
       onClose();
     } catch (e) {
-      console.error('Export failed:', e);
+      logger.error('Export failed:', e);
     } finally {
       setIsExporting(false);
     }
