@@ -43,3 +43,16 @@ Use a translator agent or DeepL CLI for bulk translation, then human-review for 
 - Mobile-only namespaces.
 - Changing `fallbackLng` behavior.
 - Translation QA process documentation (separate concern).
+
+## Resolution
+
+**Closed 2026-05-11.**
+
+Created `apps/web/public/locales/fr/share.json` (19 keys) and `apps/web/public/locales/fr/teams.json` (80 keys). Translations follow the formal-vouvoiement tone of the existing FR namespaces ("Veuillez réessayer", "Vous perdrez l'accès", "Enregistrer" / "Annuler").
+
+**Parity verified programmatically:**
+- Key sets identical across en/de/fr for both namespaces (19/19/19 and 80/80/80).
+- All 9 named placeholders (`{{name}}`, `{{email}}`, `{{team}}`, `{{count}}`) preserved in `teams`.
+- Both ICU plural placeholders (`{count, plural, one {…} other {…}}`) preserved in `share`.
+
+Per i18n.ts ns array (`apps/web/src/i18n/i18n.ts:16`), share + teams are declared. With these two files present, first-load 404s on FR are eliminated.
