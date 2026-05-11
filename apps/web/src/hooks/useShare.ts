@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import type { NewsArticle } from '../types';
 import { logger } from '../lib/logger';
+import { apiFetch, getAuthToken } from '../lib/api';
 
 // Types matching backend
 export interface ShareUrls {
@@ -36,12 +37,9 @@ export interface SharedContent {
 export function useCreateShare() {
   return useMutation({
     mutationFn: async (article: NewsArticle): Promise<ShareUrls> => {
-      const response = await fetch('/api/share/article', {
+      const response = await apiFetch('/api/share/article', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('newshub-auth-token')}`,
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           article: {
             id: article.id,
@@ -92,14 +90,10 @@ export function useUserShares() {
   return useQuery({
     queryKey: ['user-shares'],
     queryFn: async (): Promise<SharedContent[]> => {
-      const token = localStorage.getItem('newshub-auth-token');
+      const token = getAuthToken();
       if (!token) return [];
 
-      const response = await fetch('/api/share/my', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await apiFetch('/api/share/my');
 
       if (!response.ok) {
         if (response.status === 401) return [];

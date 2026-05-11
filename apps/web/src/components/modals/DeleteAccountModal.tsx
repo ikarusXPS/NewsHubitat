@@ -3,6 +3,8 @@ import { Trash2, AlertTriangle, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppStore } from '../../store';
 import { cn } from '../../lib/utils';
+import { apiFetch } from '../../lib/api';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface DeleteAccountModalProps {
   isOpen: boolean;
@@ -12,6 +14,7 @@ interface DeleteAccountModalProps {
 
 export function DeleteAccountModal({ isOpen, onClose, userEmail }: DeleteAccountModalProps) {
   const { language } = useAppStore();
+  const { logout } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -27,12 +30,9 @@ export function DeleteAccountModal({ isOpen, onClose, userEmail }: DeleteAccount
     setError(null);
 
     try {
-      const response = await fetch('/api/account/delete-request', {
+      const response = await apiFetch('/api/account/delete-request', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('newshub-auth-token')}`,
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
 
@@ -42,7 +42,7 @@ export function DeleteAccountModal({ isOpen, onClose, userEmail }: DeleteAccount
       }
 
       // Redirect to logout
-      localStorage.removeItem('newshub-auth-token');
+      logout();
       window.location.href = '/';
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed');

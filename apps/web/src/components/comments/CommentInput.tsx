@@ -46,14 +46,8 @@ export function CommentInput({
   const handleSubmit = () => {
     if (!canSubmit) return;
 
-    const token = localStorage.getItem('newshub-auth-token');
-    if (!token) {
-      toast.error(t('comments.authRequired', 'Sign in to join the discussion'));
-      return;
-    }
-
     postComment(
-      { text: input, parentId, token },
+      { text: input, parentId },
       {
         onSuccess: () => {
           setInput('');

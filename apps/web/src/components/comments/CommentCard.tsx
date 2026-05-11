@@ -58,11 +58,9 @@ export function CommentCard({ comment, articleId, socket, isNew }: CommentCardPr
   const createdAt = new Date(comment.createdAt);
 
   const handleSaveEdit = () => {
-    const token = localStorage.getItem('newshub-auth-token');
-    if (!token) return;
-
+    if (!user) return;
     editComment(
-      { commentId: comment.id, text: editText, token },
+      { commentId: comment.id, text: editText },
       {
         onSuccess: () => {
           setIsEditing(false);
@@ -77,12 +75,9 @@ export function CommentCard({ comment, articleId, socket, isNew }: CommentCardPr
 
   const handleDelete = () => {
     if (!confirm(t('comments.deleteConfirm.body', 'This will remove your comment from the discussion. Replies will remain visible.'))) return;
-
-    const token = localStorage.getItem('newshub-auth-token');
-    if (!token) return;
-
+    if (!user) return;
     deleteComment(
-      { commentId: comment.id, token },
+      { commentId: comment.id },
       {
         onSuccess: () => toast.success(t('comments.deleted', '[Comment deleted]')),
         onError: () => toast.error(t('comments.errors.deleteFailed', 'Failed to delete comment.')),
@@ -91,14 +86,13 @@ export function CommentCard({ comment, articleId, socket, isNew }: CommentCardPr
   };
 
   const handleFlag = () => {
-    const token = localStorage.getItem('newshub-auth-token');
-    if (!token) {
+    if (!user) {
       toast.error(t('comments.authRequired', 'Sign in to join the discussion'));
       return;
     }
 
     flagComment(
-      { commentId: comment.id, reason: 'other', token },
+      { commentId: comment.id, reason: 'other' },
       {
         onSuccess: () => toast.success(t('comments.flagSuccess', 'Comment flagged for review')),
         onError: () => toast.error(t('comments.errors.flagFailed', 'Failed to flag comment')),

@@ -9,6 +9,7 @@ import { Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
 import { cn } from '../../lib/utils';
+import { apiFetch } from '../../lib/api';
 
 interface AIUsageCounterProps {
   className?: string;
@@ -28,11 +29,7 @@ export function AIUsageCounter({ className, compact = false }: AIUsageCounterPro
       if (!isAuthenticated || tier !== 'FREE') return;
 
       try {
-        const response = await fetch('/api/ai/usage', {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('newshub-auth-token')}`,
-          },
-        });
+        const response = await apiFetch('/api/ai/usage');
         const data = await response.json();
         if (data.success) {
           setUsage({ used: data.data.used, limit: data.data.limit });

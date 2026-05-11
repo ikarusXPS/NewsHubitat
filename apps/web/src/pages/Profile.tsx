@@ -24,6 +24,7 @@ import { Toast } from '../components/Toast';
 import { ReadingInsights } from '../components/profile/ReadingInsights';
 import { MyShares } from '../components/profile/MyShares';
 import type { NewsArticle } from '../types';
+import { apiFetch } from '../lib/api';
 
 export function Profile() {
   const navigate = useNavigate();
@@ -91,12 +92,9 @@ export function Profile() {
 
     setIsSubmitting(true);
     try {
-      const response = await fetch('/api/auth/password', {
+      const response = await apiFetch('/api/auth/password', {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('newshub-auth-token')}`,
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ currentPassword, newPassword }),
       });
 

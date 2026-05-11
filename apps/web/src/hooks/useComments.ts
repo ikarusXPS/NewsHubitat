@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useRef, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
 import type { ServerToClientEvents, ClientToServerEvents } from '../../server/services/websocketService';
+import { apiFetch } from '../lib/api';
 
 const SOCKET_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
@@ -42,14 +43,10 @@ async function postComment(data: {
   articleId: string;
   text: string;
   parentId?: string;
-  token: string;
 }): Promise<Comment> {
-  const response = await fetch('/api/comments', {
+  const response = await apiFetch('/api/comments', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${data.token}`,
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       articleId: data.articleId,
       text: data.text,
@@ -126,7 +123,7 @@ export function usePostComment(articleId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: { text: string; parentId?: string; token: string }) =>
+    mutationFn: (data: { text: string; parentId?: string }) =>
       postComment({ articleId, ...data }),
 
     onMutate: async ({ text, parentId }) => {
@@ -179,13 +176,10 @@ export function useEditComment(articleId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ commentId, text, token }: { commentId: string; text: string; token: string }) => {
-      const response = await fetch(`/api/comments/${commentId}/edit`, {
+    mutationFn: async ({ commentId, text }: { commentId: string; text: string }) => {
+      const response = await apiFetch(`/api/comments/${commentId}/edit`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text }),
       });
 
@@ -210,12 +204,9 @@ export function useDeleteComment(articleId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ commentId, token }: { commentId: string; token: string }) => {
-      const response = await fetch(`/api/comments/${commentId}`, {
+    mutationFn: async ({ commentId }: { commentId: string }) => {
+      const response = await apiFetch(`/api/comments/${commentId}`, {
         method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       });
 
       if (!response.ok) {
@@ -262,19 +253,14 @@ export function useFlagComment(articleId: string) {
       commentId,
       reason,
       details,
-      token,
     }: {
       commentId: string;
       reason: string;
       details?: string;
-      token: string;
     }) => {
-      const response = await fetch(`/api/comments/${commentId}/flag`, {
+      const response = await apiFetch(`/api/comments/${commentId}/flag`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ reason, details }),
       });
 

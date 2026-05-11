@@ -1,4 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
+import { apiFetch } from '../lib/api';
 
 export type Verdict = 'true' | 'mostly-true' | 'mixed' | 'unverified' | 'false';
 
@@ -28,11 +29,6 @@ export interface FactCheckResult {
   cached: boolean;
 }
 
-function getToken(): string {
-  if (typeof window === 'undefined') return '';
-  return localStorage.getItem('newshub-auth-token') ?? '';
-}
-
 /**
  * TanStack Mutation hook for `POST /api/ai/fact-check`.
  *
@@ -48,12 +44,9 @@ export function useFactCheck() {
       articleId?: string;
       language?: 'de' | 'en' | 'fr';
     }): Promise<FactCheckResult> => {
-      const r = await fetch('/api/ai/fact-check', {
+      const r = await apiFetch('/api/ai/fact-check', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${getToken()}`,
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(args),
       });
       if (r.status === 429) {

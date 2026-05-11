@@ -3,6 +3,7 @@ import { useAppStore } from '../store';
 import { useAuth } from '../contexts/AuthContext';
 import type { AchievementUnlock } from '../types/gamification';
 import { logger } from '../lib/logger';
+import { apiFetch } from '../lib/api';
 
 interface UseAchievementsResult {
   pendingUnlock: AchievementUnlock | null;
@@ -95,12 +96,9 @@ export function useAchievements(): UseAchievementsResult {
 
         // Persist to server
         try {
-          await fetch('/api/badges/award', {
+          await apiFetch('/api/badges/award', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${localStorage.getItem('newshub-auth-token')}`,
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               badgeId: `bookworm-${tier}`,
               progress: stats.totalArticles,

@@ -14,6 +14,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { Toast } from '../components/Toast';
 import { Loader2, Key, Copy, Trash2, Plus, Code, ExternalLink } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { apiFetch } from '../lib/api';
 
 interface ApiKey {
   id: string;
@@ -49,11 +50,7 @@ export function DevelopersPage() {
 
   const loadApiKeys = useCallback(async () => {
     try {
-      const response = await fetch('/api/keys', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('newshub-auth-token')}`,
-        },
-      });
+      const response = await apiFetch('/api/keys');
 
       if (response.ok) {
         const data = await response.json();
@@ -93,12 +90,9 @@ export function DevelopersPage() {
 
     setCreating(true);
     try {
-      const response = await fetch('/api/keys', {
+      const response = await apiFetch('/api/keys', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('newshub-auth-token')}`,
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: newKeyName,
           tier: 'free',
@@ -135,12 +129,9 @@ export function DevelopersPage() {
     }
 
     try {
-      const response = await fetch(`/api/keys/${keyId}`, {
+      const response = await apiFetch(`/api/keys/${keyId}`, {
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('newshub-auth-token')}`,
-        },
+        headers: { 'Content-Type': 'application/json' },
       });
 
       if (response.ok) {

@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAppStore } from '../../store';
 import { cn } from '../../lib/utils';
 import { logger } from '../../lib/logger';
+import { apiFetch } from '../../lib/api';
 
 interface DataExportModalProps {
   isOpen: boolean;
@@ -18,11 +19,7 @@ export function DataExportModal({ isOpen, onClose }: DataExportModalProps) {
   const handleExport = async () => {
     setIsExporting(true);
     try {
-      const response = await fetch(`/api/account/export?format=${format}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('newshub-auth-token')}`,
-        },
-      });
+      const response = await apiFetch(`/api/account/export?format=${format}`);
 
       if (!response.ok) throw new Error('Export failed');
 

@@ -12,20 +12,14 @@
 
 import { useQuery } from '@tanstack/react-query';
 import type { ContentType, TranscriptResponse } from '../types/transcripts';
-
-function getToken(): string {
-  if (typeof window === 'undefined') return '';
-  return localStorage.getItem('newshub-auth-token') ?? '';
-}
+import { apiFetch } from '../lib/api';
 
 async function fetchTranscript(
   contentType: ContentType,
   id: string,
 ): Promise<TranscriptResponse | null> {
   const url = `/api/transcripts/${encodeURIComponent(contentType)}/${encodeURIComponent(id)}`;
-  const r = await fetch(url, {
-    headers: { Authorization: `Bearer ${getToken()}` },
-  });
+  const r = await apiFetch(url);
   if (r.status === 404) return null;
   if (!r.ok) throw new Error(`Failed to fetch transcript: ${r.status}`);
   const body = (await r.json()) as { data: TranscriptResponse };
