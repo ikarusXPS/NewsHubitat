@@ -111,5 +111,10 @@
     "dailyQueries": "Requêtes IA quotidiennes",
     "remaining": "restant",
     "upgradeCta": "Mettez à niveau pour des requêtes illimitées"
+  },
+  "requireAuth": {
+    "title": "Connexion requise",
+    "description": "Vous devez être connecté pour voir cette page.",
+    "signInButton": "Se connecter"
   }
 }
