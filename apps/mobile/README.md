@@ -61,18 +61,18 @@ iOS builds and signing require macOS + Xcode. Android builds run anywhere Androi
 
 ## Native plugins
 
-Configured in `capacitor.config.ts` and pulled in via `package.json`:
+Configured in `capacitor.config.ts` and declared in `package.json`:
 
-| Plugin | Purpose |
-|--------|---------|
-| `@capacitor/app` | App lifecycle (resume/pause, deep links) |
-| `@capacitor/haptics` | Haptic feedback |
-| `@capacitor/keyboard` | Soft-keyboard events and resize behavior |
-| `@capacitor/push-notifications` | APNs / FCM push |
-| `@capacitor/splash-screen` | Launch screen (1s, `#0a0e1a` background) |
-| `@capacitor/status-bar` | Status bar style (`DARK`, `#0a0e1a`) |
-| `@capacitor/preferences` | Native key-value storage |
-| `@capgo/capacitor-native-biometric` | Face ID / Touch ID / Android biometrics |
+| Plugin | Version | Purpose |
+|--------|---------|---------|
+| `@capacitor/app` | ^8.1.0 | App lifecycle (resume/pause, deep links) |
+| `@capacitor/haptics` | ^8.0.2 | Haptic feedback |
+| `@capacitor/keyboard` | ^8.0.3 | Soft-keyboard events and resize behavior (`resize: 'native'`) |
+| `@capacitor/push-notifications` | ^8.0.3 | APNs / FCM push (badge, sound, alert) |
+| `@capacitor/splash-screen` | ^8.0.1 | Launch screen (`launchAutoHide: false` — splash stays visible until the app explicitly calls `SplashScreen.hide()`; `#0a0e1a` background) |
+| `@capacitor/status-bar` | ^8.0.2 | Status bar style (`DARK`, `#0a0e1a`, no overlay) |
+| `@capacitor/preferences` | ^8.0.1 | Native key-value storage |
+| `@capgo/capacitor-native-biometric` | ^8.4.2 | Face ID / Touch ID / Android biometrics |
 
 Plugin runtime config (splash duration, push presentation options, keyboard resize mode, etc.) lives in `capacitor.config.ts`.
 
@@ -90,6 +90,8 @@ if (isNativeApp()) {
 
 `isNativeApp()` lives in `apps/web/src/lib/platform.ts` and wraps `Capacitor.getPlatform() === 'ios' | 'android'`. Centralizing this check keeps the reader-app exemption (below) consistent across the app.
 
+> **Note:** `platform.ts` is currently a Phase 39 stub that returns `false`. The real `Capacitor.getPlatform()` detection ships with Phase 39. No consumers need to change when the stub is replaced.
+
 ## Reader-app exemption (CRITICAL)
 
 Per Apple Rule 3.1.3 (and Google Play's equivalent), the iOS and Android builds ship as **reader apps** — users sign in with an account whose subscription was purchased on the web. The native app must not advertise or link to external purchasing.
@@ -106,6 +108,20 @@ For FREE-tier feature gates, the native build shows a generic "feature not avail
 Subscriptions are managed entirely on the web. The app reads `user.subscriptionTier` from `GET /api/auth/me` and gates features accordingly.
 
 **No in-app purchases this milestone.** Apple In-App Purchase and Google Play Billing integration is deferred to v1.7+.
+
+## Testing
+
+There is no separate test suite for this package — the shell itself has no logic to test. The web bundle tests live in `apps/web/`:
+
+```bash
+# Unit tests (from repo root)
+pnpm test:run
+
+# E2E tests (from repo root)
+pnpm test:e2e
+```
+
+Native-specific behavior (biometrics, push, deep links) is validated manually on device or simulator after running `pnpm --filter @newshub/mobile build` and opening the native IDE.
 
 ## License
 

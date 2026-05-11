@@ -79,10 +79,10 @@ All scripts run from `apps/web/` (or via `pnpm --filter @newshub/web <script>` f
 | `test` | `vitest` (watch mode) |
 | `test:run` | `vitest run` (single CI pass) |
 | `test:watch` | `vitest --watch` |
-| `test:coverage` | `vitest run --coverage` — gate at **80% statements / functions / lines, 74% branches** (see `vitest.config.ts`) |
+| `test:coverage` | `vitest run --coverage` — gate at **80% statements / functions / lines, 71% branches** (see `vitest.config.ts`) |
 | `test:ui` | `vitest --ui` — interactive UI |
 
-The branches threshold is a tracked waiver — `vitest.config.ts` notes the actual is 74.73% with a TODO list of files that need backfill before raising it back to 80.
+The branches threshold is a tracked waiver — `vitest.config.ts` notes the actual is ~71.11% with a TODO list of files that need backfill before raising it back to 80. See `docs/TESTING.md` and the comment block in `vitest.config.ts` for the full history and backfill targets.
 
 ### Testing — Playwright (E2E)
 
@@ -113,6 +113,7 @@ npx prisma studio            # GUI on :5555
 | `seed` | Runs `prisma/seed.ts` (badges + AI personas) |
 | `seed:badges` | `prisma/seed-badges.ts` only |
 | `seed:personas` | `prisma/seed-personas.ts` only |
+| `seed:news` | `prisma/seed-news.ts` only |
 | `seed:load-test` | `scripts/seed-load-test-users.js` — pre-creates 100 verified test users (`loadtest1-100@example.com`) for k6 |
 
 ### Load testing — k6
@@ -128,6 +129,75 @@ npx prisma studio            # GUI on :5555
 |---|---|
 | `openapi:generate` | `tsx server/openapi/generator.ts public/openapi.json` — regenerates the OpenAPI spec from the Zod schemas in `server/openapi/schemas.ts`. Run after editing those schemas. |
 | `check:source-bias` | `tsx scripts/check-source-bias-coverage.ts` — verifies regional source bias diversity (Phase 40 gate) |
+
+---
+
+## OpenAPI spec (code-first)
+
+The public API spec at `public/openapi.json` is generated from Zod schemas — never hand-edited.
+
+**Source of truth:** `server/openapi/schemas.ts` (Zod schemas via `@asteasolutions/zod-to-openapi`).  
+**Generator:** `server/openapi/generator.ts`.  
+**Output:** `public/openapi.json` — served at `/openapi.json`; rendered by Scalar at `/api-docs`.
+
+After changing any public-facing request shape, response envelope, or security scheme in `schemas.ts`, regenerate with:
+
+```bash
+cd apps/web
+pnpm openapi:generate
+```
+
+Commit both `schemas.ts` and the updated `public/openapi.json` together so the live `/api-docs` UI stays in sync with the implementation.
+
+---
+
+## Public API vs internal `/api/*`
+
+The application exposes two distinct API surfaces:
+
+| | Internal API | Public API |
+|---|---|---|
+| Prefix | `/api/*` | `/api/v1/public/*` |
+| Auth | JWT `Authorization: Bearer <token>` | `X-API-Key: nh_<env>_<random>_<checksum>` |
+| Route file | `server/routes/` (per-feature) | `server/routes/publicApi.ts` |
+| Rate limit | Tiered per endpoint (auth 5/min, AI 10/min, news 100/min) | Key-tier sliding window: **free 10 req/min, pro 100 req/min** |
+| Rate-limit headers | `X-RateLimit-*` (legacy) | `RateLimit-Limit / RateLimit-Remaining / RateLimit-Reset` (IETF draft) |
+| Management | Session-scoped | `GET/POST/DELETE /api/keys` |
+
+### API key format
+
+Keys follow the pattern `nh_{env}_{random}_{checksum}`:
+
+```
+nh_live_1A2b3C4d5E6f7G8h9I0j1K2L_A3B4
+│   │    │                        │
+│   │    24-char alphanumeric      4-char SHA-256 prefix (uppercase hex)
+│   environment: live | test
+nh_ prefix
+```
+
+- **Checksum pre-validation** (`server/services/apiKeyService.ts`) rejects malformed keys before any DB lookup, preventing wasteful queries.
+- **Max 3 keys per user** (D-10) — enforced in the service layer; `POST /api/keys` returns 400 if the limit is reached.
+- **Redis cache** stores the first 15 characters as the cache identifier (never the full key); TTL is 5 minutes. A secondary `apikey:by-id:{keyId}` index enables O(1) cache invalidation on revoke.
+- **Usage tracking** is fire-and-forget (does not add latency to the request path).
+
+### Tier-gating middleware
+
+`server/middleware/requireTier.ts` exports three utilities used across internal routes:
+
+```typescript
+// Hard gate: returns 403 if user's tier is below minTier, or subscription is CANCELED/PAUSED
+requireTier('PREMIUM')
+
+// Soft attach: adds req.userTier / req.userSubscriptionStatus without blocking
+attachUserTier
+
+// Boolean helper for conditional logic
+hasTier(req.userTier, 'ENTERPRISE')
+```
+
+Tier resolution order: Redis cache (`user:tier:{userId}`, 5-min TTL) → Prisma `user.subscriptionTier`.  
+`PAST_DUE` status is treated as active (7-day grace period). `CANCELED` and `PAUSED` return `403` with `upgradeUrl: '/pricing'`.
 
 ---
 
@@ -160,8 +230,8 @@ apps/web/
 │   ├── index.ts                   # boot — applies middleware, mounts routes, starts Socket.IO
 │   ├── routes/                    # HTTP route modules (auth, news, publicApi, webhooks/stripe, ...)
 │   ├── services/                  # Singleton services (newsAggregator, aiService, translationService, ...)
-│   ├── middleware/                # requireTier, apiKeyAuth, rateLimiter, queryCounter, ...
-│   ├── openapi/                   # Zod schemas → OpenAPI generator
+│   ├── middleware/                # requireTier, apiKeyAuth, apiKeyRateLimiter, rateLimiter, ...
+│   ├── openapi/                   # Zod schemas (schemas.ts) → OpenAPI generator (generator.ts)
 │   ├── config/                    # sources.ts (130+ RSS feeds), aiProviders.ts, stripe.ts, ...
 │   ├── jobs/                      # workerEmitter.ts (singleton-job emission via Redis Emitter)
 │   ├── db/prisma.ts               # PrismaClient singleton with @prisma/adapter-pg
@@ -171,6 +241,7 @@ apps/web/
 │   ├── seed.ts                    # Aggregator that runs seed-badges + seed-personas
 │   ├── seed-badges.ts             # Gamification badges (bronze/silver/gold/platinum tiers)
 │   ├── seed-personas.ts           # 8 built-in AI personas
+│   ├── seed-news.ts               # News article seed data
 │   └── migrations/                # Raw SQL migrations (FTS, indexes)
 ├── prisma.config.ts               # Prisma 7 datasource (workspace-local — see anti-patterns)
 ├── e2e/                           # Playwright tests

@@ -54,6 +54,7 @@ These rules cost milestone v1.6 four full sub-phases (36.1, 36.2, 36.3, 36.4) of
 
 - **Never write to root `server/`, `prisma/`, or `src/`.** Those paths were physically deleted in commit `651ce93` (Phase 36.3-03). Valid file roots are `apps/web/...`, `apps/<other>/...`, `packages/...`, `.github/...`, `.planning/...`, plus named top-level configs (`docker-compose.yml`, `Dockerfile`, etc.). A root-level write compiles fine but `pnpm dev:backend` runs `apps/web/server/index.ts` — orphan files are dead code.
 - **`prisma.config.ts` lives at `apps/web/prisma.config.ts`, never root.** Prisma 7's `schema:` field resolves relative to the config file's directory, not cwd. A root-level config silently loads a stale duplicate schema (this dropped the ApiKey table in Phase 36.2-03).
+- **Single-environment deployment (decision 2026-05-05).** NewsHub is pre-launch; the `deploy-staging` CI job exists as scaffolding only (`if: false`). Production is provisioned directly when needed — do not re-enable `deploy-staging` without a real staging tier behind it (Lighthouse/load-test workflows assume `STAGING_URL` exists). See `.planning/todos/pending/40-12-production-deploy-setup.md` for the provisioning plan.
 
 ## Commands
 
@@ -139,7 +140,7 @@ docker compose logs -f app
 - **Translation**: Multi-provider chain (DeepL → Google → LibreTranslate → Claude)
 - **Mobile**: Capacitor 8 (iOS + Android) wrapping the same `apps/web/dist` bundle (95% code reuse)
 - **Production scaling**: Docker Swarm + Traefik (sticky sessions via `nh_sticky` cookie); separate `app-worker` Swarm service (replicas=1) runs singleton jobs
-- **Testing**: Vitest (unit, 80% coverage; **branches at 71% — TODO waiver in `vitest.config.ts`**) + Playwright (E2E)
+- **Testing**: Vitest (unit, 80% coverage; **branches at 71% — see waiver in `vitest.config.ts` and `.planning/todos/pending/40-11-coverage-backfill.md`**) + Playwright (E2E)
 - **Monitoring**: Prometheus + Grafana + Alertmanager; Sentry for errors
 
 ## Architecture
@@ -325,13 +326,19 @@ Tiered access enforced via middleware. Tiers: `FREE` / `PREMIUM` / `ENTERPRISE`.
 
 ## CI/CD
 
-- **`.github/workflows/ci.yml`** — Lint, typecheck, test (80% coverage gate), build; Lighthouse CI runs **after deploy-staging on master only** (90+ required for performance / accessibility / best-practices / SEO; Core Web Vitals tracked warn-only)
-- **`.github/workflows/load-test.yml`** — k6 load tests via `workflow_dispatch` against `STAGING_URL` (manual trigger; never runs on production)
+- **`.github/workflows/ci.yml`** — Lint, typecheck, test (80% coverage / 71% branches gate), build. **`deploy-staging` is currently gated `if: false`** (single-env decision 2026-05-05 — see `.planning/todos/pending/40-12-production-deploy-setup.md`). Lighthouse + `deploy-production` cascade-skip via `needs: deploy-staging` until provisioning happens. When live: 90+ Lighthouse required for performance / accessibility / best-practices / SEO; Core Web Vitals warn-only.
+- **`.github/workflows/load-test.yml`** — k6 load tests via `workflow_dispatch` against `STAGING_URL` (manual; dormant until production exists).
 - **Validate locally:** `pnpm validate:ci` (uses `action-validator`)
-- **Sentry:** `@sentry/vite-plugin` uploads source maps during CI build; release tag `newshub@${{ github.sha }}`; environment set per deploy job (staging vs production)
-- **Bundle budget:** 250KB warning threshold (CI annotation, non-blocking). The PR-vs-base size compare uses `continue-on-error: true` because the action fails on stale-lockfile master — TODO to tighten once stabilized.
-- **Artifacts:** Lighthouse reports retained 30 days; load-test JSON+HTML retained 30 days
-- **Branch protection on `master`:** requires checks `Lint`, `Type Check`, `Unit Tests`, `Build Docker Image`, `E2E Tests` (display names, not job IDs); `strict: true`, admin-enforced. The `production` environment requires reviewer approval (`ikarusXPS`) and restricts deploys to protected branches.
+- **Sentry:** `@sentry/vite-plugin` uploads source maps during CI build; release tag `newshub@${{ github.sha }}`; environment set per deploy job.
+- **Bundle budget:** 250KB warning threshold (CI annotation, non-blocking). PR-vs-base size compare uses `continue-on-error: true` (stale-lockfile master issue — TODO to tighten).
+- **Artifacts:** Lighthouse and load-test reports retained 30 days.
+- **Branch protection on `master`:** requires `Lint`, `Type Check`, `Unit Tests`, `Build Docker Image`, `E2E Tests` (display names, not job IDs); `strict: true`, admin-enforced. The `production` environment requires reviewer approval (`ikarusXPS`) and restricts deploys to protected branches.
+
+### Repo hygiene (`.github/`)
+- **`SECURITY.md`** — Disclosure SLAs (3d ack / 14d assessment / 90d disclosure); reports route to GitHub Security Advisories, not email.
+- **`dependabot.yml`** — Weekly Monday 06:00 Europe/Berlin; grouped prod/dev minor+patch; major bumps pinned for prisma, react, express, stripe, socket.io.
+- **`ISSUE_TEMPLATE/`** — YAML forms (bug + feature); blank issues disabled via `config.yml`.
+- **`PULL_REQUEST_TEMPLATE.md`** — Pre-merge checklist enforces typecheck/test/build, prisma-regen, i18n-3-locales, mobile-no-CTA (Apple Rule 3.1.1(a)).
 
 ## Performance Budgets
 

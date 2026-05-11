@@ -284,7 +284,7 @@ Enforced by Vitest (`apps/web/vitest.config.ts`):
 | Type | Threshold | Notes |
 |------|-----------|-------|
 | Statements | 80 % | |
-| Branches | **74 %** | Temporary waiver — actual is 74.73 % (CI run 25286923254 + PR #4). History: 80 → 75 (CI 25107573823, Phase 37/38 expansion) → 74 (PR #4, Phase 38+39+40.1 bundle). TODO: backfill `routes/ai.ts`, `routes/leaderboard.ts`, `services/stripeWebhookService.ts`, `services/teamService.ts`, `services/metricsService.ts`, `jobs/workerEmitter.ts`, `hooks/useComments.ts` and raise back to 80 %. |
+| Branches | **71 %** | Temporary waiver — actual is ~71.11 % (Phase 40 gap closures 40-07/40-08/40-10 added branching code without backfill). History: 80 → 75 (CI 25107573823, Phase 37/38) → 74 (PR #4, Phase 38+39+40.1) → 71 (Phase 40, CI 25370135629). TODO: backfill `routes/ai.ts`, `routes/leaderboard.ts`, `services/stripeWebhookService.ts`, `services/teamService.ts`, `services/metricsService.ts`, `jobs/workerEmitter.ts`, `hooks/useComments.ts`, `pages/PodcastsPage.tsx` and raise back to 80 %. |
 | Functions | 80 % | |
 | Lines | 80 % | |
 

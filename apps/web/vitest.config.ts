@@ -27,7 +27,7 @@ export default defineConfig({
         // History: 80 → 75 (CI 25107573823, Phase 37/38) → 74 (PR #4, Phase 38+39+40.1)
         //         → 71 (Phase 40 gap closure, CI 25370135629 — see todos/pending/40-11-coverage-backfill.md).
         // TODO(coverage): backfill branch tests for routes/ai.ts, routes/leaderboard.ts,
-        // services/webhookService.ts, services/teamService.ts, services/metricsService.ts,
+        // services/stripeWebhookService.ts, services/teamService.ts, services/metricsService.ts,
         // jobs/workerEmitter.ts, hooks/useComments.ts, pages/PodcastsPage.tsx (transcript gate),
         // components/videos/parseVideoUrl.ts → raise back to 80.
         branches: 71,

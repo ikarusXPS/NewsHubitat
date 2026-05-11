@@ -259,6 +259,7 @@ Stripe-backed tiers (`FREE` / `PREMIUM` / `ENTERPRISE`) are enforced through thr
 - **Build flow:** `pnpm --filter @newshub/web build` → `cap sync` copies `dist/` into `ios/App/App/public/` and `android/app/src/main/assets/public/`. Wrapped by `pnpm --filter @newshub/mobile build`.
 - **Plugins:** `@capacitor/{app,haptics,keyboard,push-notifications,splash-screen,status-bar,preferences}` + `@capgo/capacitor-native-biometric`
 - **Reader-app exemption (CRITICAL — Apple Rule 3.1.3 / Google Play equivalent):** when `isNativeApp()` returns true, every pricing surface is hidden — `TierCard`, `UpgradePrompt`, `AIUsageCounter` upgrade link, and any `/pricing` route reference. FREE-tier feature gates show a generic "feature not available" message + plain-text `newshub.example` URL (NOT clickable, per Apple Rule 3.1.1(a)). Subscription happens on web; the app reads `user.subscriptionTier` from `/api/auth/me`.
+- **No in-app purchases** this milestone — Apple IAP / Google Play Billing deferred to v1.7+.
 
 ## Production Scaling (Phase 37)
 
@@ -330,7 +331,7 @@ apps/mobile/
 
 ### Shared types (`packages/types/`)
 
-Single `index.ts` exporting domain types (`PerspectiveRegion`, `NewsArticle`, `Sentiment`, `EventSeverity`, `EventCategory`, `ApiResponse<T>`, `GeoEvent`, `TimelineEvent`, ...). `PerspectiveRegion` covers 17 regions including the 4 Phase 40 sub-regions (`sudostasien`, `nordeuropa`, `sub-saharan-africa`, `indien`). Imported as:
+Single `index.ts` exporting domain types (`PerspectiveRegion`, `NewsArticle`, `Sentiment`, `EventSeverity`, `EventCategory`, `ApiResponse<T>`, `GeoEvent`, `TimelineEvent`, ...). `PerspectiveRegion` covers 17 regions: 13 original (`usa`, `europa`, `deutschland`, `nahost`, `tuerkei`, `russland`, `china`, `asien`, `afrika`, `lateinamerika`, `ozeanien`, `kanada`, `alternative`) plus 4 Phase 40 sub-regions (`sudostasien`, `nordeuropa`, `sub-saharan-africa`, `indien`). Imported as:
 
 ```typescript
 import type { PerspectiveRegion, NewsArticle, ApiResponse } from '@newshub/types';
@@ -344,5 +345,5 @@ import type { PerspectiveRegion, NewsArticle, ApiResponse } from '@newshub/types
 - **`e2e-stack/`** — Cross-replica WebSocket fanout test harness (`docker-compose.test.yml` + `ws-fanout.test.ts` + `traefik-dynamic.yml`); driven by `pnpm test:fanout` / `bash e2e-stack/run-fanout-test.sh`.
 - **`prometheus/`** — Scrape config targeting `/metrics` on backend and `pgbouncer-exporter:9127`.
 - **`grafana/`** — Dashboards for request latency, DB performance, cache hit rate, queue depth, and PgBouncer pool saturation.
-- **`.github/workflows/`** — `ci.yml` (lint → typecheck → unit tests with 80% coverage gate → build → Lighthouse on master), `load-test.yml` (k6 via `workflow_dispatch` against `STAGING_URL`).
+- **`.github/workflows/`** — `ci.yml` (lint → typecheck → unit tests with 80% / 71%-branch coverage gate → build); `deploy-staging` is currently gated `if: false` (single-environment decision 2026-05-05 — Lighthouse CI and `deploy-production` are cascade-dormant until a production server is provisioned). `load-test.yml` runs k6 via `workflow_dispatch` against `STAGING_URL` (manual; dormant until production exists).
 - **`apps/web/e2e/`** — Playwright projects split into `setup`, unauthenticated `chromium`, and authenticated `chromium-auth` (uses persisted storage state).

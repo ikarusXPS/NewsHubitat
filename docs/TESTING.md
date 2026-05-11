@@ -23,7 +23,7 @@ NewsHub's test suite is large (1,400+ unit tests as of v1.6, 19 Playwright spec 
 - **Setup file:** `apps/web/src/test/setup.ts` — sets `JWT_SECRET`, registers `@testing-library/jest-dom` matchers, mocks `matchMedia` / `ResizeObserver` / `IntersectionObserver`, and runs cleanup after each test
 - **Pool:** `forks` (isolated process per test file)
 - **Per-test timeout:** 10 seconds
-- **Config:** `apps/web/vitest.config.ts` is the single source of truth for actually-running tests, because `pnpm test` proxies to that workspace. A second `vitest.config.ts` exists at the repo root as an independent duplicate (not a re-export) and the two have already diverged — the root file pins `branches: 80` while `apps/web/vitest.config.ts` pins `branches: 74`. Treat the root file as stale and edit `apps/web/vitest.config.ts` for any threshold change.
+- **Config:** `apps/web/vitest.config.ts` is the single source of truth for actually-running tests, because `pnpm test` proxies to that workspace. A second `vitest.config.ts` exists at the repo root as an independent duplicate (not a re-export) and the two have already diverged — the root file pins `branches: 80` while `apps/web/vitest.config.ts` pins `branches: 71`. Treat the root file as stale and edit `apps/web/vitest.config.ts` for any threshold change.
 
 ### E2E Testing: Playwright
 
@@ -39,7 +39,7 @@ NewsHub's test suite is large (1,400+ unit tests as of v1.6, 19 Playwright spec 
 
 ### Cross-Replica Fanout: `pnpm test:fanout`
 
-Phase 37 added a horizontal-scaling topology where multiple web replicas fan Socket.IO events to each other through `@socket.io/redis-adapter`. Mocked-adapter unit tests don't satisfy the WS-04 gate — only a real two-replica boot does. The `e2e-stack/` directory provides that harness.
+Phase 37 added a horizontal-scaling topology where multiple web replicas fan Socket.IO events to each other through `@socket.io/redis-adapter`. **Mocked-adapter unit tests do not satisfy the WS-04 gate** — only a real two-replica boot does. The `e2e-stack/` directory provides that harness.
 
 - **Entry point:** `pnpm test:fanout` (calls `bash e2e-stack/run-fanout-test.sh`)
 - **Stack:** `e2e-stack/docker-compose.test.yml` boots `postgres:17` + `redis:7.4-alpine` + `traefik:v3.3` + 2× app (`app-1`, `app-2`) behind Traefik on host port 8000
@@ -141,7 +141,7 @@ E2E and the fanout harness are not part of the pre-commit chain — E2E runs in 
 
 Custom `test` fixture exported from `fixtures.ts` extends `@playwright/test`'s base `test` and:
 
-- Mocks AI / analysis endpoints (`/api/ai/ask`, `/api/ai/propaganda`, `/api/analysis/clusters`, `/api/analysis/summarize`, `/api/analysis/framing`, `/api/analysis/coverage-gaps`) so specs don't burn the FREE-tier 10/day AI quota
+- Mocks AI / analysis endpoints (`/api/ai/ask`, `/api/ai/propaganda`, `/api/analysis/clusters`, `/api/analysis/summarize`, `/api/analysis/framing`, `/api/analysis/coverage-gaps`) so specs don't burn the FREE-tier ~10/day AI quota
 - Mocks `/api/events/geo` and `/api/events/timeline` to empty arrays (avoids the EventMap error fallback that strips the page `<h1>` and breaks navigation assertions)
 - Mocks `/api/focus/suggestions` to an empty array (prevents focus suggestion overlays from covering header buttons)
 - Bypasses `FocusOnboarding` and `ConsentBanner` via the same `addInitScript` strategy as `auth.setup.ts`
@@ -179,7 +179,21 @@ These rules look pedantic but each one corresponds to a real flake or cascading 
 - **Use `test.describe.configure({ mode: 'serial' })` for module-scoped state** — When a spec file shares state at module scope across `describe` blocks (e.g., `apps/web/e2e/publicApi.spec.ts` provisions an API key once and reuses it across tests), Playwright's default fully-parallel mode will split the file across workers and the state will be undefined in half of them. Force serial mode at the top of the file.
 - **Mock AI/analysis endpoints from `fixtures.ts`** — Don't hit the real AI provider. The FREE tier caps at ~10 requests/day, after which every spec touching the dashboard, bookmarks list, or analysis page begins failing because the page renders an error state.
 
-### Currently Skipped Tests (Tracked Debt)
+## Z-Index Ladder
+
+Stacking order within the UI is codified. Violations cause overlays to block interactive elements (the scan-line effect was previously `z-1000` and caused click-through failures in E2E tests).
+
+| Layer | z-index |
+|-------|---------|
+| scan-line CSS effect | `z-0` (was z-1000 — caused click-through bug) |
+| Header | `z-20` |
+| AuthModal / Compare modal | `z-50` |
+| FocusOnboarding | `z-[90]` |
+| ConsentBanner | `z-[100]` |
+
+The `auth.setup.ts` and `fixtures.ts` init scripts both pre-set `hasCompletedOnboarding` and `newshub-consent` in localStorage specifically to prevent `FocusOnboarding` (z-90) and `ConsentBanner` (z-100) from blocking test interactions.
+
+## Currently Skipped Tests (Tracked Debt)
 
 Skips fall into three buckets: dead-UI debt (re-enable after rewriting selectors), CI-environment skips (browser/seed-data shape doesn't match local), and graceful self-skips (the test detects an upstream constraint and reports skipped instead of failing).
 
@@ -208,7 +222,21 @@ Coverage thresholds are enforced by Vitest in `apps/web/vitest.config.ts`. Faili
 | Statements | 80% | Enforced |
 | Lines | 80% | Enforced |
 | Functions | 80% | Enforced |
-| **Branches** | **74%** | **Tracked debt** — temporarily lowered from 80% in three waiver steps (80 → 75 in CI run 25107573823 during the Phase 37/38 expansion; 75 → 74 in PR #4 covering Phase 38 + 39 scaffold + 40.1). Actual branch coverage: ~74.73%. Backfill targets: `routes/ai.ts`, `routes/leaderboard.ts`, `services/webhookService.ts`, `services/teamService.ts`, `services/metricsService.ts`, `jobs/workerEmitter.ts`, `hooks/useComments.ts`. Goal: raise back to 80%. |
+| **Branches** | **71%** | **Tracked debt** — temporarily lowered from 80% in three waiver steps: 80 → 75 (CI run 25107573823, Phase 37/38 expansion); 75 → 74 (PR #4, Phase 38+39+40.1 scaffold); 74 → 71 (Phase 40 gap closures 40-07/40-08/40-10, CI run 25370135629). Actual branch coverage: ~71.11%. See `.planning/todos/pending/40-11-coverage-backfill.md` for the full backfill plan. Goal: raise back to 80%. |
+
+Backfill targets (highest leverage, Phase 40 additions first):
+
+- `apps/web/src/pages/PodcastsPage.tsx` — `isTranscriptSearchActive` gate and `filteredEpisodes` memo branches
+- `apps/web/src/components/videos/parseVideoUrl.ts` — YouTube vs Vimeo vs unknown; with/without timestamp; malformed URL early-returns
+- `apps/web/server/services/videoIndexService.ts` — catch block at line 192
+- `apps/web/src/components/podcasts/PodcastEpisodeCard.tsx` — `autoPlayOnMount` + `hasAttemptedAutoPlay` gating
+- `apps/web/server/routes/ai.ts`
+- `apps/web/server/routes/leaderboard.ts`
+- `apps/web/server/services/webhookService.ts`
+- `apps/web/server/services/teamService.ts`
+- `apps/web/server/services/metricsService.ts`
+- `apps/web/server/jobs/workerEmitter.ts`
+- `apps/web/src/hooks/useComments.ts`
 
 Coverage is provided by `@vitest/coverage-v8` with the following exclusions:
 
@@ -254,9 +282,9 @@ If `pnpm test:fanout` fails, `docker compose -f e2e-stack/docker-compose.test.ym
 
 Tests run in `.github/workflows/ci.yml`:
 
-- **Lint + typecheck + unit tests + build** — Runs on every push and PR. The unit-test step is `pnpm test:coverage` and enforces the thresholds in `vitest.config.ts` (the 80% / 80% / 80% / 74% gate). Failing coverage fails the build.
+- **Lint + typecheck + unit tests + build** — Runs on every push and PR. The unit-test step is `pnpm test:coverage` and enforces the thresholds in `vitest.config.ts` (80% statements / lines / functions; **71% branches** — see waiver above). Failing coverage fails the build.
 - **E2E tests** — Run after build succeeds, with PostgreSQL 17 and Redis 7.4-alpine as service containers. Chromium-only browser install (`pnpm --filter @newshub/web exec playwright install --with-deps chromium`). The job runs `pnpm --filter @newshub/web exec playwright test --reporter=html` with a 30-minute timeout. The HTML report (`apps/web/playwright-report/`) is uploaded as an artifact with 7-day retention.
-- **Lighthouse CI** — Runs *after* deploy-staging, **on master only**. Required scores: 90+ for performance, accessibility, best-practices, SEO. Core Web Vitals (LCP / CLS / INP / FCP) are tracked but warn-only.
+- **Lighthouse CI** — Runs *after* `deploy-staging`, **on master only**. `deploy-staging` is currently gated `if: false` (single-env decision 2026-05-05 — see `.planning/todos/pending/40-12-production-deploy-setup.md`), so Lighthouse and `deploy-production` cascade-skip until provisioning happens. When live: 90+ required for performance, accessibility, best-practices, SEO; Core Web Vitals (LCP / CLS / INP / FCP) are tracked but warn-only.
 - **Branch protection on `master`:** the required check names are `Lint`, `Type Check`, `Unit Tests`, `Build Docker Image`, `E2E Tests` (display names, not job IDs); strict mode is on and admins are enforced.
 - **CI workflow validation:** `pnpm validate:ci` (uses `action-validator`) — run this locally before editing `.github/workflows/`.
 
@@ -271,7 +299,7 @@ pnpm load:smoke   # Quick smoke scenario
 pnpm load:full    # Full load scenario
 ```
 
-For staging-environment load tests, trigger the `load-test.yml` workflow manually via GitHub Actions `workflow_dispatch` against `STAGING_URL`. **It never runs against production** — the workflow is gated to staging only. Test users for load runs come from `pnpm seed:load-test` (creates `loadtest1@example.com` through `loadtest100@example.com` as pre-verified accounts).
+For staging-environment load tests, trigger the `load-test.yml` workflow manually via GitHub Actions `workflow_dispatch` against `STAGING_URL`. **It never runs against production** — the workflow is gated to staging only. The workflow is currently dormant until production infrastructure is provisioned. Test users for load runs come from `pnpm seed:load-test` (creates `loadtest1@example.com` through `loadtest100@example.com` as pre-verified accounts).
 
 Performance budgets validated by k6 + Lighthouse:
 
