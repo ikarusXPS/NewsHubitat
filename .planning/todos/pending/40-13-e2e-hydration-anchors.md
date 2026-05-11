@@ -1,13 +1,25 @@
 ---
-status: pending
+status: partially-resolved
 phase: 40-content-expansion
 created: 2026-05-11
+updated: 2026-05-11
 priority: medium
 labels: [test-infra, e2e, flake, ci]
-related_ci: [25680567876, 25681056228, 25681903432]
+related_ci: [25680567876, 25681056228, 25681903432, 25686123527, 25687269288]
 ---
 
 # Harden brittle E2E tests with hydration-anchored selectors
+
+## Status 2026-05-11 — partially resolved
+
+**Resolved** (this todo's action commit):
+- Fix 1 — `bookmarks.spec.ts:29` empty-state-or-grid → `data-testid="bookmarks-empty-state"` + `"bookmarks-articles-grid"` on `BookmarksPage`; beforeEach now `Promise.race`s on either anchor (15s).
+- Fix 2 — `analysis.spec.ts` × 3 skipped tests (compare modal open/close + cluster summaries) → `data-testid="analysis-ready"` on `AnalysisPage` root; beforeEach waits on the anchor (20s). All three tests un-skipped. CLAUDE.md skipped-tests table row removed.
+- Fix 4 — `navigation.spec.ts:32 should navigate to Analysis page` → swapped `expect(h1).toContainText(/PERSPEKTIVEN-ANALYSE/i)` for the anchor wait. h1 text content still verified by `analysis.spec.ts 'should load the Analysis page with header'`.
+
+**Outstanding:**
+- Fix 3 — `teams.spec.ts should mark to a team via dropdown` — needs `--repeat-each=20` diagnosis. Single flake on `02a32af`, hasn't recurred since. Watch for recurrence; if it returns, run the local repeat to localize.
+- Fix 5 — Repo-wide sweep for `waitForTimeout` + soft `isVisible()` pairs. Audit-only task; ~30 min. Leave for next session.
 
 ## Why
 

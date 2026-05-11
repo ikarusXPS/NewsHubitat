@@ -5,9 +5,12 @@ test.describe('Analysis Page', () => {
     await page.goto('/analysis');
     // Use domcontentloaded instead of networkidle to avoid timeout from WebSocket connections
     await page.waitForLoadState('domcontentloaded');
-    // Wait for the main heading to be visible as a proxy for page ready
-    // Increased timeout due to parallel test execution
-    await page.locator('h1:has-text("PERSPEKTIVEN-ANALYSE")').waitFor({ state: 'visible', timeout: 15000 });
+    // Wait for the hydration anchor on AnalysisPage's root container. This is
+    // a stable post-mount marker (not framer-motion-animated, not data-fetch-gated)
+    // that fires as soon as the lazy chunk loads — a faster, more reliable
+    // signal than the h1's text-content check under 4-worker parallel CI load.
+    // See todo 40-13 for the underlying anti-pattern audit.
+    await page.locator('[data-testid="analysis-ready"]').waitFor({ state: 'visible', timeout: 20000 });
   });
 
   test('should load the Analysis page with header', async ({ page }) => {
@@ -30,13 +33,10 @@ test.describe('Analysis Page', () => {
     await expect(compareBtn).toBeVisible();
   });
 
-  // Compare-modal interaction tests are consistently flaky in CI: the
-  // 'Artikel vergleichen' button often fails to appear within Playwright's
-  // 10s budget under parallel-worker load (Analysis page mounts framer-motion
-  // header + multiple data-driven sections concurrently). The button-presence
-  // check on line 27 already verifies the trigger exists; modal interaction
-  // is exercised manually + in unit tests for CompareMode.
-  test.skip('should open compare mode modal', async ({ page }) => {
+  // Re-enabled after todo 40-13 landed the [data-testid="analysis-ready"]
+  // hydration anchor — beforeEach now waits on a stable post-mount marker
+  // (20s budget) instead of the framer-motion-animated h1 text check.
+  test('should open compare mode modal', async ({ page }) => {
     const compareBtn = page.locator('button:has-text("Artikel vergleichen")');
     await expect(compareBtn).toBeVisible();
     await page.waitForTimeout(200);
@@ -44,7 +44,7 @@ test.describe('Analysis Page', () => {
     await expect(page.locator('[data-testid="compare-mode-close"]')).toBeVisible({ timeout: 5000 });
   });
 
-  test.skip('should close compare mode modal', async ({ page }) => {
+  test('should close compare mode modal', async ({ page }) => {
     // Open modal
     const compareBtn = page.locator('button:has-text("Artikel vergleichen")');
     await expect(compareBtn).toBeVisible();
@@ -65,13 +65,11 @@ test.describe('Analysis Page', () => {
     }
   });
 
-  // Skipped: under 4-worker parallel CI load this test slot consistently lands
-  // when /analysis is still resolving the RequireAuth gate + useClusters fetch,
-  // so the beforeEach 15s budget for `h1:has-text("PERSPEKTIVEN-ANALYSE")` blows.
-  // Same class of timing failure as the analysis compare-modal tests above.
-  // Test body is also a no-op when visible (soft `if (await ...isVisible())` check);
-  // the cluster-summary surface is exercised by ClusterSummary unit tests.
-  test.skip('should display cluster summaries section', async ({ page }) => {
+  // Re-enabled after todo 40-13 landed the [data-testid="analysis-ready"]
+  // hydration anchor (see beforeEach). The 15s-h1 wait that previously blew
+  // under parallel CI load is gone; the body is a soft `isVisible()` check so
+  // it stays robust either way.
+  test('should display cluster summaries section', async ({ page }) => {
     // Wait for content to load
     await page.waitForTimeout(1000);
 

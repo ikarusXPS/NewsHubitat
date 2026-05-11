@@ -32,7 +32,12 @@ test.describe('Navigation', () => {
   test('should navigate to Analysis page', async ({ page }) => {
     await page.click('a[href="/analysis"]');
     await expect(page).toHaveURL('/analysis');
-    await expect(page.locator('h1')).toContainText(/PERSPEKTIVEN-ANALYSE/i);
+    // Wait on the hydration anchor (lazy-chunk-mount marker) rather than the
+    // framer-motion-animated h1 — see todo 40-13. The h1's text content is
+    // still verified by analysis.spec.ts 'should load the Analysis page with header'.
+    await page
+      .locator('[data-testid="analysis-ready"]')
+      .waitFor({ state: 'visible', timeout: 20000 });
   });
 
   test('should navigate to Bookmarks page', async ({ page }) => {

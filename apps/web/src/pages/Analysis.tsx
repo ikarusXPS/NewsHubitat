@@ -63,7 +63,7 @@ export function Analysis() {
   const articles = data?.data || [];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="analysis-ready">
       {/* Header - Cyber styled */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
