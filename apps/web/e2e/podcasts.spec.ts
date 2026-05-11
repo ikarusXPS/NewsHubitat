@@ -96,14 +96,17 @@ test.describe('Podcasts — single-click playback', () => {
     // DE "Folge abspielen", EN "Play episode", FR "Lire l'épisode".
     await card.locator('button').first().click();
 
-    // The user-gesture-driven autoplay should kick the <audio> element into
-    // a non-zero currentTime within a few seconds. We don't care about an
-    // exact value — just that the wallclock advances at all, which means
-    // play() resolved and the media element is decoding.
+    // The user-gesture-driven autoplay should flip the <audio> element
+    // out of its paused state once play() resolves. We assert on .paused
+    // rather than .currentTime > 0 because the stub WAV is header-only
+    // (44 bytes, 0 audio frames) — a real browser will set paused=false
+    // when play() resolves, but currentTime can stay at 0 with no
+    // decoded frames. The contract under test is "single click flips the
+    // play state", not "audio frames advance".
     await page.waitForFunction(
       () => {
         const audio = document.querySelector('audio') as HTMLAudioElement | null;
-        return audio != null && audio.currentTime > 0;
+        return audio != null && audio.paused === false;
       },
       undefined,
       { timeout: 5_000 },
