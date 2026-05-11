@@ -2,6 +2,7 @@ import * as cheerio from 'cheerio';
 import axios from 'axios';
 import type { NewsArticle, NewsSource } from '../../src/types';
 import { hashString } from '../utils/hash';
+import logger from '../utils/logger';
 
 interface CrawlConfig {
   source: NewsSource;
@@ -246,7 +247,7 @@ export class NewsCrawler {
 
       return response.data;
     } catch (err) {
-      console.error(`Failed to fetch ${url}:`, err);
+      logger.error(`Failed to fetch ${url}:`, err);
       return null;
     }
   }
@@ -300,7 +301,7 @@ export class NewsCrawler {
           cached: false,
         });
       } catch (err) {
-        console.warn('Failed to parse article element:', err);
+        logger.warn('Failed to parse article element:', err);
       }
     });
 
@@ -312,12 +313,12 @@ export class NewsCrawler {
     const cached = this.cache.get(cacheKey);
 
     if (cached && Date.now() - cached.timestamp < this.CACHE_TTL) {
-      console.log(`Using cached articles for ${config.source.name}`);
+      logger.info(`Using cached articles for ${config.source.name}`);
       return cached.articles;
     }
 
     const url = config.searchPath ? `${config.baseUrl}${config.searchPath}` : config.baseUrl;
-    console.log(`Crawling ${config.source.name}: ${url}`);
+    logger.info(`Crawling ${config.source.name}: ${url}`);
 
     const html = await this.fetchPage(url);
     if (!html) {
@@ -325,7 +326,7 @@ export class NewsCrawler {
     }
 
     const articles = this.parseArticles(html, config);
-    console.log(`Crawled ${articles.length} articles from ${config.source.name}`);
+    logger.info(`Crawled ${articles.length} articles from ${config.source.name}`);
 
     this.cache.set(cacheKey, { articles, timestamp: Date.now() });
     return articles;
@@ -339,7 +340,7 @@ export class NewsCrawler {
         const articles = await this.crawlSource(config);
         results.push(...articles);
       } catch (err) {
-        console.error(`Failed to crawl ${config.source.name}:`, err);
+        logger.error(`Failed to crawl ${config.source.name}:`, err);
       }
     }
 

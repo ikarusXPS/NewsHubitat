@@ -1,5 +1,6 @@
 import type { NewsArticle, NewsSource, PerspectiveRegion } from '../../src/types';
 import { hashString } from '../utils/hash';
+import logger from '../utils/logger';
 
 interface GNewsArticle {
   title: string;
@@ -92,7 +93,7 @@ export class NewsApiService {
           const retryAfter = response.headers.get('Retry-After');
           const waitTime = retryAfter ? parseInt(retryAfter, 10) * 1000 : delay;
 
-          console.log(`Rate limited (429). Retrying in ${waitTime}ms (attempt ${attempt + 1}/${maxRetries})...`);
+          logger.info(`Rate limited (429). Retrying in ${waitTime}ms (attempt ${attempt + 1}/${maxRetries})...`);
           await this.sleep(waitTime);
           continue;
         }
@@ -104,7 +105,7 @@ export class NewsApiService {
         // Network errors: retry with backoff
         if (attempt < maxRetries) {
           const delay = baseDelay * Math.pow(2, attempt);
-          console.log(`Network error. Retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries})...`);
+          logger.info(`Network error. Retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries})...`);
           await this.sleep(delay);
           continue;
         }
@@ -127,7 +128,7 @@ export class NewsApiService {
 
   async fetchFromGNews(query: string = 'gaza israel conflict'): Promise<NewsArticle[]> {
     if (!this.GNEWS_API_KEY) {
-      console.log('GNews API key not configured');
+      logger.info('GNews API key not configured');
       return [];
     }
 
@@ -145,20 +146,20 @@ export class NewsApiService {
       }
 
       const data = await response.json();
-      console.log(`GNews: fetched ${data.articles?.length || 0} articles`);
+      logger.info(`GNews: fetched ${data.articles?.length || 0} articles`);
 
       return (data.articles || []).map((article: GNewsArticle) =>
         this.convertToNewsArticle(article, 'gnews')
       );
     } catch (err) {
-      console.error('GNews fetch error:', err);
+      logger.error('GNews fetch error:', err);
       return [];
     }
   }
 
   async fetchFromNewsApi(query: string = 'gaza OR israel OR middle east'): Promise<NewsArticle[]> {
     if (!this.NEWSAPI_KEY) {
-      console.log('NewsAPI key not configured');
+      logger.info('NewsAPI key not configured');
       return [];
     }
 
@@ -177,20 +178,20 @@ export class NewsApiService {
       }
 
       const data = await response.json();
-      console.log(`NewsAPI: fetched ${data.articles?.length || 0} articles`);
+      logger.info(`NewsAPI: fetched ${data.articles?.length || 0} articles`);
 
       return (data.articles || []).map((article: NewsApiArticle) =>
         this.convertNewsApiArticle(article)
       );
     } catch (err) {
-      console.error('NewsAPI fetch error:', err);
+      logger.error('NewsAPI fetch error:', err);
       return [];
     }
   }
 
   async fetchFromMediaStack(keywords: string = 'gaza,israel'): Promise<NewsArticle[]> {
     if (!this.MEDIASTACK_API_KEY) {
-      console.log('MediaStack API key not configured');
+      logger.info('MediaStack API key not configured');
       return [];
     }
 
@@ -212,13 +213,13 @@ export class NewsApiService {
       }
 
       const data = await response.json();
-      console.log(`MediaStack: fetched ${data.data?.length || 0} articles`);
+      logger.info(`MediaStack: fetched ${data.data?.length || 0} articles`);
 
       return (data.data || []).map((article: MediaStackArticle) =>
         this.convertMediaStackArticle(article)
       );
     } catch (err) {
-      console.error('MediaStack fetch error:', err);
+      logger.error('MediaStack fetch error:', err);
       return [];
     }
   }
