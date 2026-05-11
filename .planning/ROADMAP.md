@@ -93,6 +93,7 @@
 - [x] **Phase 38: Advanced AI Features** - Credibility scoring, bias detection, fact-checking (completed 2026-04-29)
 - [ ] **Phase 39: Mobile Apps** - Capacitor wrapper and app store deployment
 - [x] **Phase 40: Content Expansion** - Video, podcast, and source expansion (completed 2026-05-04)
+- [ ] **Phase 41 (INSERTED): GDPR Compliance Hardening** - Close P1/P2 items from `docs/legal/GDPR-AUDIT.md` (8 plans planned 2026-05-05; Wave 1 blocked on user-provided business data + external AVV procurement)
 
 ## Phase Details
 
@@ -373,6 +374,33 @@ Plans:
 - [x] 40-09-PLAN.md - [GAP-CLOSURE] VirtualizedGrid data-index attribute fix + ref simplification + estimateSize tune (UAT Test 5; Phase 35-01 carry-over) - Wave 1, autonomous=true, depends_on []
 - [x] 40-10-PLAN.md - [GAP-CLOSURE] LanguageSwitcher add FR entry (UAT Test 10) - Wave 1, autonomous=true, depends_on []
 
+### Phase 41 (INSERTED): GDPR Compliance Hardening
+**Goal**: Close all P1/P2 items from `docs/legal/GDPR-AUDIT.md` and stand up tracking infrastructure for externally-blocked items. NewsHub reaches a launch-ready GDPR posture for the EU market.
+**Depends on**: Phase 36 (privacy/account features), Sprint 1 P0 (already shipped in commits f990bce + 92b9342)
+**Requirements**: null (audit-driven phase — maps to ORG-01, ORG-02, ORG-03, DOC-02, DOC-03, TOM-FIX-03, TOM-FIX-04, TOM-FIX-05, TOM-FIX-06 in `docs/legal/GDPR-AUDIT.md`)
+**Audit source**: `docs/legal/GDPR-AUDIT.md` Status-Tracking (2026-05-05)
+**Success Criteria** (what must be TRUE):
+  1. `PROCESSING-RECORDS.md` and `Privacy.tsx` carry real company name + address + DSB contact (no `[PLACEHOLDER]` tokens)
+  2. Per-vendor AVV signature status tracked under `docs/legal/avv/`; `PROCESSING-RECORDS.md` section 4 reflects signed/pending state
+  3. `Privacy.tsx` covers all 24 processing activities, third-party table, retention, data-subject rights, and complaint right in DE/EN/FR
+  4. `/cookie-policy` page exists with banner + footer links; covers essential/preferences/embed cookies (YouTube/Vimeo click-to-load, Sentry session)
+  5. Server-side consent audit trail: `ConsentEvent` Prisma model + `POST /api/consent` + frontend `ConsentContext` calls endpoint on every confirmation; `CONSENT_BANNER_VERSION` constant + `docs/legal/CONSENT-VERSIONS.md`
+  6. Transfer Impact Assessment for each US vendor (17 markdown files under `docs/legal/tia/`) following template structure (transfer, legal basis, risk, safeguards, conclusion)
+  7. Sentry `beforeSend` redacts email/token/Stripe IDs in both frontend (`apps/web/src/main.tsx`) and backend (`apps/web/server/index.ts`); Pino logger + frontend console wrapper filter PII
+  8. Registration form collects `birthYear` + `tcAcceptedAt` + `tcAcceptedVersion`; minimum age 16 enforced via Zod (GDPR Art. 8)
+**Plans**: 8 plans across 3 waves (planned 2026-05-05; **execution blocked on user-provided business data + external AVV procurement**)
+**UI hint**: yes (DOC-02 Privacy.tsx + DOC-03 CookiePolicy page + TOM-FIX-06 register form + ConsentBanner verlinkung)
+
+Plans:
+- [ ] 41-01-PLAN.md — Verantwortlicher-Daten in `PROCESSING-RECORDS.md` + `Privacy.tsx` ausfüllen (ORG-02) — Wave 1, **BLOCKED on user input**
+- [ ] 41-02-PLAN.md — AVV-Tracking-Infra: `docs/legal/avv/` Status-Tracker per vendor (ORG-01) — Wave 1, **BLOCKED on external AVV procurement**
+- [ ] 41-03-PLAN.md — Privacy.tsx vollständig (24 activities + third-party table + rights + complaints) i18n DE/EN/FR (DOC-02) — Wave 2, depends_on [41-01]
+- [ ] 41-04-PLAN.md — Cookie-Policy-Seite `/cookie-policy` + Banner-Verlinkung + Footer-Link i18n DE/EN/FR (DOC-03) — Wave 2, depends_on [41-01]
+- [ ] 41-05-PLAN.md — Einwilligungsnachweis: `ConsentEvent` Prisma model + `POST /api/consent` + Banner-Version (TOM-FIX-03) — Wave 2, depends_on [41-04]
+- [ ] 41-06-PLAN.md — Transfer-Impact-Assessment pro US-Anbieter (17 `docs/legal/tia/*.md` files) (ORG-03) — Wave 3, depends_on [41-02]
+- [ ] 41-07-PLAN.md — PII-Scrubbing: Sentry `beforeSend` (frontend+backend) + Pino logger + frontend console wrapper (TOM-FIX-04 + TOM-FIX-05) — Wave 3, autonomous
+- [ ] 41-08-PLAN.md — Age-Gate + T&C-Acknowledgement: `birthYear` + `tcAcceptedAt` + `tcAcceptedVersion` + register-form fields + Zod min-age 16 (TOM-FIX-06) — Wave 3, depends_on [41-03]
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -417,11 +445,12 @@ Plans:
 | 38. Advanced AI Features | v1.6 | 0/? | Not started | - |
 | 39. Mobile Apps | v1.6 | 0/? | Not started | - |
 | 40. Content Expansion | v1.6 | 10/10 | Complete   | 2026-05-05 |
+| 41. GDPR Compliance Hardening | v1.6 | 0/8 | Planned (Wave 1 blocked) | - |
 
 ---
 
 *Roadmap created: 2026-04-18*
-*Last updated: 2026-05-05 - Phase 40 gap-closure plans 07-10 created (4 plans, all Wave 1, all gap_closure=true, all autonomous=true, file-disjoint for parallel execution). Closes 4 UAT issues: Test 3 (Analysis 401), Test 4 (Podcast play single-click), Test 5 (Dashboard grid overlap; Phase 35-01 carry-over bug), Test 10 (LanguageSwitcher missing FR). 3 follow-up tech-debt todos filed. Original update: 2026-04-30 — Phase 40.1 COMPLETE (5/5 plans; VERIFICATION 15/15 must-haves verified; UAT 3 PASS + 1 PARTIAL). Wired 4 team-UI debt sessions: (1) BookmarkButton/TeamBookmarkCard/PendingInviteList/DeleteTeamModal unit tests added (26 tests), (2) new TeamSettingsModal component + 8 tests, (3) Settings gear integrated into TeamDashboard gated on owner+admin, (4) 4 E2E tests appended to teams.spec.ts (Test 15 owner-delete live PASS; Tests 12/13/14 skip cleanly in dev due to Dashboard NewsFeed signals-vs-grid view-mode race — wiring fully proven by unit tests), (5) all 4 debug sessions archived to `.planning/debug/resolved/` with verification + files_changed populated. Two side-fixes shipped during verification: `fix(focus-suggestions): cap toast stack height to prevent header overlap` (339d66a) — was a latent UX bug overlapping the header Sign In; `test(e2e): mock focus-suggestions in auth.setup.ts` (fba1d73) — unblocks all 14+ authenticated E2E tests. Next: `/gsd-progress` to see updated roadmap; remaining v1.6 work: Phase 39 (mobile-apps) + Phase 40 (content-expansion); 36-05 human-verify still queued.*
+*Last updated: 2026-05-11 - Phase 41 (GDPR Compliance Hardening) inserted into v1.6 milestone (8 plans planned 2026-05-05; Wave 1 blocked on user-provided business data + external AVV procurement; Waves 2-3 unlock once Wave 1 lands). Previous update 2026-05-05: Phase 40 gap-closure plans 07-10 created (4 plans, all Wave 1, all gap_closure=true, all autonomous=true, file-disjoint for parallel execution). Closes 4 UAT issues: Test 3 (Analysis 401), Test 4 (Podcast play single-click), Test 5 (Dashboard grid overlap; Phase 35-01 carry-over bug), Test 10 (LanguageSwitcher missing FR). 3 follow-up tech-debt todos filed. Original update: 2026-04-30 — Phase 40.1 COMPLETE (5/5 plans; VERIFICATION 15/15 must-haves verified; UAT 3 PASS + 1 PARTIAL). Wired 4 team-UI debt sessions: (1) BookmarkButton/TeamBookmarkCard/PendingInviteList/DeleteTeamModal unit tests added (26 tests), (2) new TeamSettingsModal component + 8 tests, (3) Settings gear integrated into TeamDashboard gated on owner+admin, (4) 4 E2E tests appended to teams.spec.ts (Test 15 owner-delete live PASS; Tests 12/13/14 skip cleanly in dev due to Dashboard NewsFeed signals-vs-grid view-mode race — wiring fully proven by unit tests), (5) all 4 debug sessions archived to `.planning/debug/resolved/` with verification + files_changed populated. Two side-fixes shipped during verification: `fix(focus-suggestions): cap toast stack height to prevent header overlap` (339d66a) — was a latent UX bug overlapping the header Sign In; `test(e2e): mock focus-suggestions in auth.setup.ts` (fba1d73) — unblocks all 14+ authenticated E2E tests. Next: `/gsd-progress` to see updated roadmap; remaining v1.6 work: Phase 39 (mobile-apps) + Phase 40 (content-expansion); 36-05 human-verify still queued.*
 
 ### Phase 40.1: team-ui-wiring (INSERTED)
 

@@ -4,14 +4,14 @@ milestone: v1.6
 milestone_name: Infrastructure & Scale
 current_plan: 1
 status: executing
-last_updated: "2026-05-05T08:47:02.767Z"
-last_activity: 2026-05-05 -- Phase 40 execution started
+last_updated: "2026-05-11T15:30:23Z"
+last_activity: 2026-05-11 -- Phase 41 (GDPR Compliance Hardening) inserted into v1.6 milestone; ROADMAP + STATE reconciled
 progress:
-  total_phases: 7
+  total_phases: 8
   completed_phases: 5
-  total_plans: 44
+  total_plans: 52
   completed_plans: 36
-  percent: 82
+  percent: 69
 ---
 
 # State: NewsHub
@@ -21,19 +21,29 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-26)
 
 **Core value:** Users can see how the same story is covered by different regional perspectives
-**Current focus:** Phase 40 — content-expansion
+**Current focus:** Phase 41 — gdpr-compliance-hardening (planned, Wave 1 blocked on user-provided business data + external AVV procurement)
 
 ## Current Position
 
-Phase: 40 (content-expansion) — EXECUTING
-Plan: 1 of 10
-Current Plan: 1
-Status: Executing Phase 40
-Last activity: 2026-05-05 -- Phase 40 execution started
+Phase: 41 (gdpr-compliance-hardening) — PLANNED, BLOCKED
+Plan: 0 of 8
+Current Plan: —
+Status: Phase 41 plans drafted; Wave 1 (41-01, 41-02) blocked on user input + external AVVs. Waves 2-3 (41-03..41-08) unlock once Wave 1 lands. Phase 40 verification remains `human_needed` (SC-3 podcast seek + native reader exemption). Phase 39 plans 02-06 paused on Firebase + Apple/Google credentials.
+Last activity: 2026-05-11 -- Phase 41 (GDPR Compliance Hardening) inserted into v1.6 milestone; ROADMAP + STATE reconciled
 
 ## Maintenance Log
 
 Off-roadmap activity that landed on master between phase boundaries. These changes are not tracked in any phase summary but are visible in git history.
+
+### 2026-05-11 — Phase 41 reconciliation + working-tree cleanup
+
+Three commits on master (`3aa0fc3..65c52c6`) closed a planning drift between on-disk phase artifacts and ROADMAP/STATE indices, and committed the gsd-doc-writer regen output.
+
+- **`3aa0fc3` docs regen** — 15 files (+410/-237). CLAUDE.md, README.md, CONTRIBUTING.md, all `docs/*.md`, app/package READMEs refreshed via parallel `gsd-doc-writer` agents to reflect post-Phase-40 surface: pnpm-everywhere paths, AI fact-check + framing, Capacitor scaffold, podcasts + transcripts, public API + OpenAPI, GDPR endpoints, i18n DE/EN/FR. `vitest.config.ts` TODO comment typo fixed (`webhookService` → `stripeWebhookService`). 20 intermediate `.planning/tmp/verify-*.json` outputs from doc-verifier left uncommitted (per-doc claim-check results; treated as workflow scratch).
+- **`018a749` phase 41 scaffold** — 10 files (+920). New `.planning/phases/41-gdpr-compliance-hardening/` with CONTEXT, PLAN-OUTLINE, and 8 PLAN files. Closes P1/P2 items remaining in `docs/legal/GDPR-AUDIT.md` after Sprint 1 P0 closures `f990bce` + `92b9342`. Execution blocked on user-provided business data + external AVV procurement; 41-07 (Sentry + logger PII-scrubbing) is unblocked.
+- **`65c52c6` planning hygiene** — 6 files (+74/-358). Archived 4 resolved debug sessions consumed by Phase 40 gap-closure (analysis-cluster-load-error, dashboard-newscard-grid-overlap, language-switcher-missing-fr, podcast-player-play-noop). Filed two non-blocking follow-up todos: 40-02 branch-protection manual GitHub UI step, 40-04 vitest worker crash diagnostic.
+
+This entry + the matching ROADMAP edits (Phase 41 in v1.6 list, full details block after Phase 40, progress table row "0/8 Planned (Wave 1 blocked)", footer "Last updated" rewrite) close the drift detected by `/gsd-progress`.
 
 ### 2026-04-29 — CI/UI sidequest (between Phase 37 close and Phase 38 start)
 
@@ -107,12 +117,17 @@ v1.6 Progress: [████████████████████] (9
 | 39 | Mobile Apps | 8 reqs (MOB-01 to MOB-08) | Yes | Not started |
 | 40 | Content Expansion | 7 reqs (CONT-01 to CONT-07) | Yes | **Executed — awaiting verification** (6/6 plans complete 2026-05-04; last commit `9a0a9d8` finalized 40-06 transcripts. Pending follow-up todos: 40-02 branch-protection manual GitHub UI step, 40-04 vitest worker crash diagnostic — both non-blocking) |
 | 40.1 | Team UI Wiring (INSERTED) | Debt-payback Phase 28 v1.4 | Yes | **Complete** (5/5 plans; VERIFICATION 15/15 must-haves; UAT 3 PASS + 1 PARTIAL — Test 15 live E2E green, Tests 12/13/14 skip in dev due to homepage view-mode race; covered by 26 unit tests. Two side-fixes shipped during verification: cap FocusSuggestions toast stack height (339d66a), mock focus-suggestions in auth.setup.ts (fba1d73)) |
+| 41 | GDPR Compliance Hardening (INSERTED) | Audit-driven (ORG-01, ORG-02, ORG-03, DOC-02, DOC-03, TOM-FIX-03, TOM-FIX-04, TOM-FIX-05, TOM-FIX-06 from `docs/legal/GDPR-AUDIT.md`) | Yes | **Planned, Wave 1 blocked** (0/8 plans; CONTEXT + PLAN-OUTLINE + 8 PLAN files committed `018a749` on 2026-05-11. Source: `docs/legal/GDPR-AUDIT.md` P1/P2 items remaining after Sprint 1 P0 closures `f990bce` + `92b9342`. Wave 1: 41-01 BLOCKED on user input (Verantwortlicher-Daten: Firmenname/Adresse/DSB-Kontakt), 41-02 BLOCKED on external AVV procurement. Wave 2: 41-03 Privacy.tsx full + 41-04 /cookie-policy + 41-05 ConsentEvent server-audit. Wave 3: 41-06 TIA (17 vendor files) + 41-07 Sentry PII-scrubbing + Pino filter + 41-08 Age-gate + T&C versioning. 41-07 is unblocked and can execute independently.) |
 
-**Coverage:** 37/37 requirements mapped (100%) — 40.1 is debt-payback, not new requirements
+**Coverage:** 37/37 milestone v1.6 requirements mapped (100%); Phase 41 is audit-driven (maps to 9 GDPR-AUDIT.md items: ORG-01, ORG-02, ORG-03, DOC-02, DOC-03, TOM-FIX-03, TOM-FIX-04, TOM-FIX-05, TOM-FIX-06) — not new REQ-IDs. 40.1 is debt-payback, not new requirements.
 
-**Next step:** Milestone 36 verification debt CLOSED 2026-05-03 — `36-VERIFICATION.md` written via gsd-verifier agent (the `/gsd-verify-phase` command name in prior STATE notes does not exist as an installed skill; spawned the verifier directly). Verdict PASS_WITH_HUMAN_NEEDED, both human items already closed (live ad-free closed 2026-04-28 Plan 05 approval; `customer.subscription.resumed` live event carried as production-readiness deferred per 36.3-04). Remaining milestone v1.6 work: Phase 39 plans 02-06 (paused on Firebase + Apple/Google credentials), Phase 40 (Content Expansion — no plans drafted yet).
+**Next step:** Milestone v1.6 remaining work after Phase 41 reconciliation (2026-05-11):
+  1. **Phase 40 verification reconciliation** — `40-VERIFICATION.md` status is `human_needed` (SC-3 Premium podcast transcript timestamp seek requires PREMIUM account / test-mode tier-override; UAT Test 9 native reader-app exemption needs physical iOS/Android device). ROADMAP marks Phase 40 "completed 2026-05-04" but verifier disagrees — resolve before milestone close.
+  2. **Phase 39 (Mobile Apps) plans 02-06** — paused on Firebase + Apple Developer + Google Play credentials provisioning. Independent of Phase 41.
+  3. **Phase 41 (GDPR Compliance Hardening)** — Wave 1 BLOCKED on user-provided business data (41-01 Firmenname/Adresse/DSB) + external AVV procurement (41-02). Wave 2 (41-03/04/05) unlocks once 41-01 lands. Wave 3: 41-07 (Sentry + logger PII-scrubbing) is independent and can execute now; 41-06 depends on 41-02, 41-08 depends on 41-03.
+  4. **Milestone 36 verification debt CLOSED 2026-05-03** — `36-VERIFICATION.md` PASS_WITH_HUMAN_NEEDED; both human items already closed (live ad-free 2026-04-28 Plan 05; `customer.subscription.resumed` live event deferred to production-readiness per 36.3-04).
 
-**Phase 39 status unchanged:** Plan 02 still gated on Firebase + Apple/Google credentials provisioning. Independent of Phase 36 verification work.
+**Phase 39 status unchanged:** Plan 02 still gated on Firebase + Apple/Google credentials provisioning. Independent of Phase 36 verification work and Phase 41.
 
 ## Deferred Items
 
