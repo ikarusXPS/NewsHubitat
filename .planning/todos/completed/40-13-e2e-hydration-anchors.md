@@ -19,7 +19,43 @@ related_ci: [25680567876, 25681056228, 25681903432, 25686123527, 25687269288]
 
 **Outstanding:**
 - Fix 3 — `teams.spec.ts should mark to a team via dropdown` — needs `--repeat-each=20` diagnosis. Single flake on `02a32af`, hasn't recurred since. Watch for recurrence; if it returns, run the local repeat to localize.
-- Fix 5 — Repo-wide sweep for `waitForTimeout` + soft `isVisible()` pairs. Audit-only task; ~30 min. Leave for next session.
+- ~~Fix 5 — Repo-wide sweep for `waitForTimeout` + soft `isVisible()` pairs. Audit-only task; ~30 min. Leave for next session.~~ **Completed 2026-05-11; results below.**
+
+## Fix 5 — Audit Results (2026-05-11)
+
+**Method.** `awk` scan of all `apps/web/e2e/*.spec.ts` files: for every `waitForTimeout` site, look ahead 5 lines and flag any subsequent `isVisible().catch(...)` or `if (await ... .isVisible())` soft-check pattern. Sites followed by a hard `expect/waitFor/click/fill/screenshot` were treated as benign.
+
+**Totals.**
+- 54 `waitForTimeout` calls repo-wide
+- 8 of those are intentional visual-capture sleeps in `screenshots.spec.ts` (animations + WebGL globe init + AI-clustering settle) — keep as is
+- ~31 are followed by a hard assertion or action — benign
+- **15 are flake-in-waiting** (waitForTimeout immediately followed by a soft `isVisible()` check)
+
+**Flake-risk sites by file:**
+
+| File | Line | Soft check |
+|---|---|---|
+| `analysis.spec.ts` | 74 → 78 | `if (await clusterSection.isVisible())` |
+| `bookmarks.spec.ts` | 53 → 57 | `if (await emptyText.isVisible())` |
+| `bookmarks.spec.ts` | 74 → 78 | `if (await articleGrid.isVisible())` |
+| `bookmarks.spec.ts` | 90 → 94 | `if (await articleGrid.isVisible())` |
+| `history.spec.ts` | 63 → 67 | `if (await timelineGroup.isVisible().catch(...))` |
+| `history.spec.ts` | 74 → 79 | `const isEmpty = await emptyText.isVisible().catch(...)` |
+| `history.spec.ts` | 226 → 231 | `if (await todayOption.isVisible().catch(...))` |
+| `teams.spec.ts` | 16 → 18 | `const hasSignInRequired = ... isVisible().catch(...)` |
+| `teams.spec.ts` | 147 → 152 | `if (await teamItem.isVisible())` |
+| `teams.spec.ts` | 180 → 184 | `if (await teamItem.isVisible())` |
+| `teams.spec.ts` | 193 → 197 | `const hasOwner = await ownerBadge.isVisible().catch(...)` |
+| `teams.spec.ts` | 215 → 218 | `const hasError = ... isVisible().catch(...)` |
+| `teams.spec.ts` | 244 → 248 | `const hasTeamsSection = await teamsSection.isVisible().catch(...)` |
+
+**Note on `history.spec.ts`** — has the largest number of `.isVisible().catch()` calls (15+) but most are NOT preceded by waitForTimeout (they're branched off prior render state). Those are *resilient* under load — they just no-op if the optional UI isn't there. Only the 3 listed above are the genuine "race against a hydration window" pattern.
+
+**Recommendation.** File the actual fix work as follow-up `40-13b-e2e-flake-risk-fixes.md` — needs the same shape of fix as Fix 1+2 (hydration anchors on `BookmarksPage` / `TeamsDashboard` / `HistoryPage` / `AnalysisPage` plus updated waits). Not blocking master CI today; address before the flake count rises above 2 per run (current threshold from "When to act" section).
+
+## Resolution
+
+**Closed 2026-05-11.** All five sub-fixes either landed (Fix 1, 2, 4 in `62b2c65`) or have a clear deferral path (Fix 3 watch-only; Fix 5 audit complete, fixes filed as `40-13b-e2e-flake-risk-fixes.md`).
 
 ## Why
 
