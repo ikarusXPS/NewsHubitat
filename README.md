@@ -245,7 +245,7 @@ Architecture deep-dive: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 | **Mobile** | Capacitor 8 (iOS + Android) | 95%+ code reuse — wraps the same `apps/web/dist` bundle |
 | **i18n** | `react-i18next` + `i18next-icu` (DE / EN / FR) | ICU plural rules + bidirectional Zustand sync |
 | **PWA** | `vite-plugin-pwa` | Offline shell + install banner |
-| **Testing** | Vitest 80% lines / 74% branches, Playwright | Unit + integration + E2E |
+| **Testing** | Vitest 80% lines / 71% branches (waiver), Playwright | Unit + integration + E2E |
 | **Observability** | Prometheus + Grafana + Alertmanager + Sentry | Metrics, dashboards, alerting, error tracking |
 | **Deployment** | Docker Swarm + Traefik (sticky `nh_sticky` cookie) | Horizontal scaling with sticky-session WebSockets |
 
@@ -910,7 +910,7 @@ pnpm dev:backend               # Backend only
 pnpm typecheck                 # TypeScript across all packages
 pnpm lint                      # ESLint
 pnpm test:run                  # Vitest unit tests (CI mode)
-pnpm test:coverage             # Coverage report (80% lines / 74% branches gate)
+pnpm test:coverage             # Coverage report (80% lines / 71% branches gate)
 pnpm build                     # Production build (frontend + backend)
 
 # E2E
@@ -1002,6 +1002,8 @@ Local dev: [Path B above](#path-b--full-docker-compose-stack).
 
 Production: Docker Swarm via `stack.yml` — see [Tutorial 6](#tutorials).
 
+> **Single-environment policy (2026-05-05):** NewsHub is pre-launch. The `deploy-staging` CI job exists as scaffolding only (`if: false`) — production is provisioned directly when needed. See `.planning/todos/pending/40-12-production-deploy-setup.md` for the provisioning plan.
+
 | Topic | Doc |
 |---|---|
 | Full deploy + rollback runbook | [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) |
@@ -1050,10 +1052,16 @@ Production: Docker Swarm via `stack.yml` — see [Tutorial 6](#tutorials).
 
 1. Fork the repository
 2. Create a feature branch (`feat/short-description` or `fix/short-description`)
-3. Write tests first — TDD is the project default; coverage gate is 80% lines / 74% branches
+3. Write tests first — TDD is the project default; coverage gate is 80% lines / 71% branches
 4. Run `pnpm typecheck && pnpm test:run && pnpm build` before pushing
 5. Use [conventional commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `chore:`, `docs:`, `refactor:`)
-6. Open a PR — CI runs lint, typecheck, unit tests (with coverage gate), Docker build, and E2E
+6. Open a PR — CI runs lint, typecheck, source-bias check, unit tests (with coverage gate), Docker build, and E2E
+
+**Repo hygiene files (`.github/`):**
+- **`SECURITY.md`** — Security disclosure policy (3 business-day ack / 14-day assessment / 90-day coordinated disclosure). Report via GitHub Private Vulnerability Reporting, not issues.
+- **`dependabot.yml`** — Weekly Monday 06:00 Europe/Berlin; grouped prod/dev minor+patch PRs; major bumps pinned for prisma, react, express, stripe, socket.io.
+- **`ISSUE_TEMPLATE/`** — YAML forms for bug reports and feature requests; blank issues disabled.
+- **`PULL_REQUEST_TEMPLATE.md`** — Pre-merge checklist: typecheck/test/build, prisma-regen, i18n-3-locales, mobile-no-CTA (Apple Rule 3.1.1(a)).
 
 **E2E gotchas (learned the hard way — see `CLAUDE.md` for the full list):**
 

@@ -131,7 +131,7 @@ In addition to email/password login, two OAuth providers are supported via passp
 | `GET` | `/api/subscriptions/status` | Get current subscription status | Yes |
 | `POST` | `/api/webhooks/stripe` | Stripe webhook receiver (raw body) | Stripe signature |
 | **Account / GDPR** |||
-| `GET` | `/api/account/export` | Export user data (`?format=json\|csv`) | Yes (Premium+) |
+| `GET` | `/api/account/export` | Export user data (`?format=json\|csv`; pdf for Enterprise) | Yes |
 | `POST` | `/api/account/delete-request` | Request account deletion (7-day grace) | Yes |
 | `POST` | `/api/account/cancel-deletion` | Cancel pending deletion | Yes |
 | **User Features** |||
@@ -1085,16 +1085,16 @@ Stripe webhook receiver. **Critical implementation note**: this route is mounted
 
 ### GET /api/account/export
 
-Export the user's data per GDPR Article 20.
+Export the user's data per GDPR Articles 15 and 20. Available to all authenticated users.
 
 **Query parameters:**
 
-- `format` (string): `json` (default) or `csv`. PDF is reserved for `ENTERPRISE` tier.
+- `format` (string): `json` (default), `csv`, or `pdf`. PDF is reserved for `ENTERPRISE` tier only.
 
 **Tier gating:**
-- `FREE`: HTTP 403 with `{ upgradeUrl: "/pricing" }`
-- `PREMIUM`: `json`, `csv`
+- `FREE` / `PREMIUM`: `json`, `csv` — free per GDPR Art. 12(5) (right of access and portability must be provided at no cost)
 - `ENTERPRISE`: `json`, `csv`, `pdf`
+- Non-standard formats (e.g., `pdf` without Enterprise tier) return HTTP 400 with `{ allowedFormats, upgradeUrl: "/pricing" }`
 
 **Response:** Streamed file download with `Content-Disposition: attachment; filename=newshub-export.{json,csv}`. Includes profile, badges, and bookmarks.
 
@@ -1622,7 +1622,7 @@ For tier-gated 403 errors, an `upgradeUrl` is included:
 ```json
 {
   "success": false,
-  "error": "Data export requires Premium subscription",
+  "error": "PDF export requires Enterprise subscription",
   "upgradeUrl": "/pricing"
 }
 ```

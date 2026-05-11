@@ -63,15 +63,15 @@ const region: PerspectiveRegion = 'deutschland';
 
 | Type | Description |
 |------|-------------|
-| `ApiResponse<T>` | Standard API envelope: `success`, `data`, `error`, paginated `meta` |
+| `ApiResponse<T>` | Standard API envelope: `success`, `data?`, `error?`, and paginated `meta?` (`total`, `page`, `limit`, `hasMore?`) |
 | `NewsSource` | Source metadata: id, region, language, bias (political/reliability/ownership), optional `biasDiversityNote: 'limited'` for state-dominated press |
-| `NewsArticle` | Article shape with optional `titleTranslated`/`contentTranslated` (de/en), sentiment, perspective, entities, topics |
+| `NewsArticle` | Article shape with optional `titleTranslated`/`contentTranslated` (de/en), sentiment, perspective, entities, topics, and optional `confidence` score |
 | `GeoEvent` | AI-extracted geo-located event with lat/lng, category, severity, perspectives |
-| `TimelineEvent` | Historical timeline entry with date, severity (1-10), location, related articles |
-| `TimelineEventI18n` | Timeline event with `I18nText` title/description for localized rendering |
+| `TimelineEvent` | Historical timeline entry with date, severity (1-10), location, related articles; category is `military \| diplomacy \| humanitarian \| protest \| other` |
+| `TimelineEventI18n` | Timeline event with `I18nText` title/description for localized rendering; extends `TimelineEvent` category with `economic` |
 | `I18nText` | `{ de: string; en: string }` |
 | `SentimentData` | Per-region sentiment aggregate for charts |
-| `FilterState` | UI filter state: regions, topics, date range, search, sentiment, sort |
+| `FilterState` | UI filter state: regions, topics, date range, search query, sentiment, sort field and order |
 | `TranslationRequest` | `{ text, sourceLang?, targetLang: 'de' \| 'en' }` |
 
 ## Adding or changing types

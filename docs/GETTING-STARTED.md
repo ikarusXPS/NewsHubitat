@@ -38,14 +38,14 @@ This installs all workspace packages.
 cp .env.example .env
 ```
 
-Open `.env` and set the three required values:
+Open `.env` and set the required values:
 
 ```bash
+# Server
+PORT=3001
+
 # Database (matches the docker-compose Postgres mapping in step 4)
 DATABASE_URL="postgresql://newshub:newshub_dev@localhost:5433/newshub?schema=public"
-
-# Redis (matches the docker-compose Redis service in step 4)
-REDIS_URL=redis://localhost:6379
 
 # JWT secret — must be at least 32 characters
 JWT_SECRET=replace-me-with-a-32-plus-character-random-string
@@ -55,6 +55,12 @@ Generate a strong `JWT_SECRET` with:
 
 ```bash
 openssl rand -base64 32
+```
+
+**Redis (recommended):** add `REDIS_URL` to enable caching, real-time features, and rate limiting. The app falls back to in-memory caches if Redis is absent, but you will see warnings in the backend log:
+
+```bash
+REDIS_URL=redis://localhost:6379
 ```
 
 **AI provider (recommended):** add at least one key so AI features work. The free OpenRouter tier is recommended:
@@ -92,7 +98,7 @@ cd ../..
 pnpm seed
 ```
 
-This runs `apps/web/prisma/seed.ts`, which loads gamification badges and the 8 built-in AI personas. Subsets are also available: `pnpm seed:badges` and `pnpm seed:personas`.
+This runs the seed scripts for gamification badges and the 8 built-in AI personas. Subsets are also available: `pnpm seed:badges` and `pnpm seed:personas`.
 
 ## 7. Start the development server
 
@@ -119,7 +125,17 @@ curl http://127.0.0.1:3001/api/health
 
 > Use `127.0.0.1` instead of `localhost` for backend calls — Node 18+ resolves `localhost` to IPv6 `::1` first, and Express on `0.0.0.0` doesn't always bind there.
 
-## 9. (Optional) Pre-create test users for load testing
+## 9. (Optional) Run the verify gate before committing
+
+Before pushing any changes, run the full verification chain:
+
+```bash
+pnpm typecheck && pnpm test:run && pnpm build
+```
+
+This replicates the CI pipeline locally: TypeScript validation across all packages, Vitest unit tests (80% coverage / 71% branches gate), then a full build. All three must pass before a PR will merge.
+
+## 10. (Optional) Pre-create test users for load testing
 
 ```bash
 pnpm seed:load-test
@@ -127,7 +143,15 @@ pnpm seed:load-test
 
 Creates 100 verified test accounts (`loadtest1@example.com` through `loadtest100@example.com`) for k6 scenarios.
 
-## 10. (Optional) Inspect the database
+## 11. (Optional) Run the cross-replica WebSocket fanout gate
+
+```bash
+pnpm test:fanout
+```
+
+Boots Postgres + Redis + Traefik + two app replicas via `e2e-stack/docker-compose.test.yml`, emits a Socket.IO event on replica A, and asserts a client on replica B receives it. Required for Phase 37 INFRA-04 / WS-04 gate — mocked-adapter unit tests do not satisfy this gate.
+
+## 12. (Optional) Inspect the database
 
 ```bash
 cd apps/web && npx prisma studio
