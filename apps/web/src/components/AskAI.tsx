@@ -18,6 +18,7 @@ import { cn } from '../lib/utils';
 import { getTopRelevantArticles, estimateContextTokens } from '../lib/articleRelevance';
 import { prepareOptimizedHistory, estimateHistoryTokens } from '../lib/historySummarizer';
 import type { NewsArticle } from '../types';
+import { logger } from '../lib/logger';
 
 interface Message {
   id: string;
@@ -42,7 +43,7 @@ function loadMessages(): Message[] {
       }));
     }
   } catch (error) {
-    console.error('Failed to load chat history:', error);
+    logger.error('Failed to load chat history:', error);
   }
   return [];
 }
@@ -54,7 +55,7 @@ function saveMessages(messages: Message[]) {
     const toSave = messages.slice(-MAX_MESSAGES);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
   } catch (error) {
-    console.error('Failed to save chat history:', error);
+    logger.error('Failed to save chat history:', error);
   }
 }
 
@@ -188,7 +189,7 @@ export function AskAI({ articles }: AskAIProps) {
       // Log token estimates for monitoring
       const contextTokens = estimateContextTokens(relevantArticles);
       const historyTokens = estimateHistoryTokens(conversationHistory);
-      console.log(`[AI] Articles: ${context.length}, History: ${conversationHistory.length}, Tokens: ~${contextTokens + historyTokens + 400}`);
+      logger.log(`[AI] Articles: ${context.length}, History: ${conversationHistory.length}, Tokens: ~${contextTokens + historyTokens + 400}`);
 
       const response = await fetch('/api/ai/ask', {
         method: 'POST',

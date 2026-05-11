@@ -16,6 +16,7 @@ import { formatDateTime } from '../lib/formatters';
 import { useAppStore } from '../store';
 import { useIsMobile } from '../hooks/useMediaQuery';
 import type { NewsArticle } from '../types';
+import { logger } from '../lib/logger';
 
 interface PropagandaIndicator {
   type: string;
@@ -100,7 +101,7 @@ export function NewsCard({ article, priority = false, onTranslate }: NewsCardPro
       setShareUrls(urls);
       setShareCode(urls.direct.split('/s/')[1]);
     } catch (err) {
-      console.error('Failed to create share:', err);
+      logger.error('Failed to create share:', err);
     } finally {
       setIsCreatingShare(false);
     }
