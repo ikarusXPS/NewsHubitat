@@ -79,3 +79,18 @@ redirect back to the intended page.
 
 - Changing backend auth middleware.
 - Any changes to the existing auth flow (login, register, OAuth).
+
+## Resolution
+
+**Closed 2026-05-11 — commit `2808b5c`.**
+
+Created `apps/web/src/components/RequireAuth.tsx` with a slightly different UX than the todo's literal spec: instead of `<Navigate to="/login" />` (which would 404 — the app has no `/login` route, login is an AuthModal), the wrapper renders an inline "Sign in required" panel with a CTA that surfaces the existing AuthModal. After login, AuthContext.user flips truthy and the wrapped route re-renders automatically — no router-state plumbing or post-login redirect needed.
+
+6 routes wrapped: `/analysis`, `/bookmarks`, `/history`, `/profile`, `/settings`, `/team/:teamId` (the union of routes hitting authMiddleware-gated endpoints).
+
+i18n keys `requireAuth.{title,description,signInButton}` added to all 3 locale common.json files (EN/DE/FR).
+
+Verification:
+- `npx tsc --noEmit` exit 0
+- `npx vitest run src/` → 517/517 tests pass across 38 files (no regression)
+- TODO(40-07) comment in App.tsx removed (it named this todo)
