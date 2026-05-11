@@ -109,6 +109,7 @@ export const PodcastEpisodeCard = forwardRef<PodcastPlayerHandle, PodcastEpisode
 
   return (
     <div
+      data-testid={`podcast-episode-${episode.id}`}
       className={cn(
         'flex gap-3 rounded-lg border border-gray-700 bg-gray-800 p-3',
         className,
