@@ -13,6 +13,7 @@ import * as newsReadService from '../services/newsReadService';
 import { EventsService } from '../services/eventsService';
 import { NEWS_SOURCES } from '../config/sources';
 import type { PerspectiveRegion, Sentiment, EventCategory, EventSeverity, TimelineEvent } from '../../src/types';
+import logger from '../utils/logger';
 
 export const publicApiRoutes = Router();
 
@@ -100,7 +101,7 @@ publicApiRoutes.get('/news', async (req: ApiKeyRequest, res: Response) => {
       },
     });
   } catch (error) {
-    console.error('Public API /news error:', error);
+    logger.error('Public API /news error:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch articles',
@@ -132,7 +133,7 @@ publicApiRoutes.get('/news/:id', async (req: ApiKeyRequest, res: Response) => {
       data: article,
     });
   } catch (error) {
-    console.error('Public API /news/:id error:', error);
+    logger.error('Public API /news/:id error:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch article',
@@ -184,7 +185,7 @@ publicApiRoutes.get('/events', async (req: ApiKeyRequest, res: Response) => {
       },
     });
   } catch (error) {
-    console.error('Public API /events error:', error);
+    logger.error('Public API /events error:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch events',
@@ -223,7 +224,7 @@ publicApiRoutes.get('/sentiment', async (req: ApiKeyRequest, res: Response) => {
       data: stats,
     });
   } catch (error) {
-    console.error('Public API /sentiment error:', error);
+    logger.error('Public API /sentiment error:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch sentiment statistics',

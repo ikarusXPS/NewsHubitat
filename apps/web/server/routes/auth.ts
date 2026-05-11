@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { z } from 'zod';
 import { AuthService, authMiddleware } from '../services/authService';
+import logger from '../utils/logger';
 
 export const authRoutes = Router();
 
@@ -229,9 +230,9 @@ authRoutes.post('/logout', authMiddleware, async (req: AuthRequest, res: Respons
     const blacklisted = await authService.blacklistToken(token);
 
     if (blacklisted) {
-      console.log(`logout:blacklisted userId=${req.user!.userId}`);
+      logger.info(`logout:blacklisted userId=${req.user!.userId}`);
     } else {
-      console.log(`logout:redis_unavailable userId=${req.user!.userId}`);
+      logger.info(`logout:redis_unavailable userId=${req.user!.userId}`);
     }
 
     res.json({
@@ -239,7 +240,7 @@ authRoutes.post('/logout', authMiddleware, async (req: AuthRequest, res: Respons
       data: { message: 'Logged out successfully' },
     });
   } catch (err) {
-    console.error('logout:error', err);
+    logger.error('logout:error', err);
     // Still return success - user intended to log out
     res.json({
       success: true,
@@ -283,7 +284,7 @@ authRoutes.put('/password', authMiddleware, async (req: AuthRequest, res: Respon
       const token = authHeader.slice(7);
       const blacklisted = await authService.blacklistToken(token);
       if (blacklisted) {
-        console.log(`password_change:blacklisted userId=${req.user!.userId}`);
+        logger.info(`password_change:blacklisted userId=${req.user!.userId}`);
       }
     }
 
@@ -350,7 +351,7 @@ authRoutes.get('/verify-email', async (req: Request, res: Response) => {
       data: { message: 'Email verified successfully' },
     });
   } catch (err) {
-    console.error('verify-email:error', err);
+    logger.error('verify-email:error', err);
     res.status(500).json({
       success: false,
       error: 'Verification failed',
@@ -379,7 +380,7 @@ authRoutes.post('/resend-verification', authMiddleware, async (req: AuthRequest,
       data: { message: 'Verification email sent' },
     });
   } catch (err) {
-    console.error('resend-verification:error', err);
+    logger.error('resend-verification:error', err);
     res.status(500).json({
       success: false,
       error: 'Failed to send verification email',
@@ -421,7 +422,7 @@ authRoutes.post('/request-reset', async (req: Request, res: Response) => {
       data: { message: 'If an account exists, a reset email has been sent.' },
     });
   } catch (err) {
-    console.error('request-reset:error', err);
+    logger.error('request-reset:error', err);
     // D-34: Same response even on error
     res.json({
       success: true,
@@ -460,7 +461,7 @@ authRoutes.get('/validate-reset-token', async (req: Request, res: Response) => {
       data: { valid: true, email: validateResult.email },
     });
   } catch (err) {
-    console.error('validate-reset-token:error', err);
+    logger.error('validate-reset-token:error', err);
     res.status(400).json({
       success: false,
       error: 'Invalid link',
@@ -499,7 +500,7 @@ authRoutes.post('/reset-password', async (req: Request, res: Response) => {
       data: { message: 'Password reset successfully' },
     });
   } catch (err) {
-    console.error('reset-password:error', err);
+    logger.error('reset-password:error', err);
     res.status(500).json({
       success: false,
       error: 'Password reset failed',
@@ -516,7 +517,7 @@ authRoutes.get('/verification-status', authMiddleware, async (req: AuthRequest, 
       data: { emailVerified: isVerified },
     });
   } catch (err) {
-    console.error('verification-status:error', err);
+    logger.error('verification-status:error', err);
     res.status(500).json({
       success: false,
       error: 'Failed to check verification status',

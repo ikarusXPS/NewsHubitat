@@ -1,6 +1,8 @@
 import { Router, Request, Response } from 'express';
 import { prisma } from '../db/prisma';
 import { authMiddleware } from '../services/authService';
+import logger from '../utils/logger';
+
 export const badgeRoutes = Router();
 
 interface AuthRequest extends Request {
@@ -16,7 +18,7 @@ badgeRoutes.get('/definitions', async (_req: Request, res: Response) => {
 
     res.json({ success: true, data: badges });
   } catch (error) {
-    console.error('Failed to fetch badge definitions:', error);
+    logger.error('Failed to fetch badge definitions:', error);
     res.status(500).json({ success: false, error: 'Failed to fetch badges' });
   }
 });
@@ -32,7 +34,7 @@ badgeRoutes.get('/user', authMiddleware, async (req: AuthRequest, res: Response)
 
     res.json({ success: true, data: userBadges });
   } catch (error) {
-    console.error('Failed to fetch user badges:', error);
+    logger.error('Failed to fetch user badges:', error);
     res.status(500).json({ success: false, error: 'Failed to fetch user badges' });
   }
 });
@@ -60,7 +62,7 @@ badgeRoutes.get('/progress', authMiddleware, async (req: AuthRequest, res: Respo
       data: Object.fromEntries(progressMap),
     });
   } catch (error) {
-    console.error('Failed to fetch badge progress:', error);
+    logger.error('Failed to fetch badge progress:', error);
     res.status(500).json({ success: false, error: 'Failed to fetch progress' });
   }
 });
@@ -99,7 +101,7 @@ badgeRoutes.post('/award', authMiddleware, async (req: AuthRequest, res: Respons
 
     res.json({ success: true, data: userBadge });
   } catch (error) {
-    console.error('Failed to award badge:', error);
+    logger.error('Failed to award badge:', error);
     res.status(500).json({ success: false, error: 'Failed to award badge' });
   }
 });
@@ -127,7 +129,7 @@ badgeRoutes.put('/featured', authMiddleware, async (req: AuthRequest, res: Respo
 
     res.json({ success: true, message: 'Featured badge updated' });
   } catch (error) {
-    console.error('Failed to set featured badge:', error);
+    logger.error('Failed to set featured badge:', error);
     res.status(500).json({ success: false, error: 'Failed to update featured badge' });
   }
 });

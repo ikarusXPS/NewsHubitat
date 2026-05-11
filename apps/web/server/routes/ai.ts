@@ -232,7 +232,7 @@ Antworte basierend auf den Artikeln. Zitiere mit [1], [2] etc.`;
       model: 'claude-3-haiku',
     });
   } catch (error) {
-    console.error('AI Ask error:', error);
+    logger.error('AI Ask error:', error);
     res.status(500).json({ error: 'Failed to process question' });
   }
 });
@@ -324,7 +324,7 @@ Analysiere diesen Artikel auf Propaganda-Indikatoren.`;
       });
     }
   } catch (error) {
-    console.error('Propaganda detection error:', error);
+    logger.error('Propaganda detection error:', error);
     res.status(500).json({ error: 'Failed to analyze article' });
   }
 });

@@ -7,6 +7,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import { AsyncLocalStorage } from 'async_hooks';
 import { prisma } from '../db/prisma';
+import logger from '../utils/logger';
 
 // D-08: Only enable in development
 const isDev = process.env.NODE_ENV !== 'production';
@@ -61,11 +62,11 @@ export function queryCounterMiddleware(
     res.on('finish', () => {
       // D-08: Warn on >5 queries per request
       if (store.count > 5) {
-        console.warn(
+        logger.warn(
           `[N+1 WARNING] ${req.method} ${req.path}: ${store.count} queries`
         );
         if (store.queries.length > 0) {
-          console.warn(`  First queries: ${store.queries.slice(0, 3).join(' | ')}`);
+          logger.warn(`  First queries: ${store.queries.slice(0, 3).join(' | ')}`);
         }
       }
     });

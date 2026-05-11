@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { TranslationService } from '../services/translationService';
+import logger from '../utils/logger';
 
 export const translationRoutes = Router();
 
@@ -31,7 +32,7 @@ translationRoutes.post('/', async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err) {
-    console.error('Translation error:', err);
+    logger.error('Translation error:', err);
     res.status(500).json({
       success: false,
       error: 'Translation failed',
@@ -57,7 +58,7 @@ translationRoutes.post('/batch', async (req: Request, res: Response) => {
       data: results,
     });
   } catch (err) {
-    console.error('Batch translation error:', err);
+    logger.error('Batch translation error:', err);
     res.status(500).json({
       success: false,
       error: 'Batch translation failed',

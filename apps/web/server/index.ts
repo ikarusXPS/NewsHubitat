@@ -73,6 +73,7 @@ import { runBootLifecycle } from './bootLifecycle';
 import { registerShutdown } from './middleware/shutdown';
 import { prisma, getPoolStats } from './db/prisma';
 import { logDbHealthCheck } from './utils/dbLogger';
+import logger from './utils/logger';
 
 const app = express();
 const httpServer = createServer(app);
@@ -150,7 +151,7 @@ app.use(express.json({
 
 // Debug middleware to log all requests
 app.use((req, _res, next) => {
-  console.log(`[REQUEST] ${req.method} ${req.path}`);
+  logger.info(`[REQUEST] ${req.method} ${req.path}`);
   next();
 });
 
@@ -234,7 +235,7 @@ app.use('/api/v1/public', apiKeyAuth, apiKeyLimiter, publicApiRoutes);
 // Threat-model T-37-20: gate is the sole mitigation for the test endpoint.
 if (process.env.NODE_ENV === 'test') {
   app.use('/api/_test', testEmitRoutes);
-  console.log('⚠ WS-04 test routes mounted at /api/_test (NODE_ENV=test only)');
+  logger.info('⚠ WS-04 test routes mounted at /api/_test (NODE_ENV=test only)');
 }
 
 // Serve OpenAPI spec (no auth required - public documentation)
@@ -249,7 +250,7 @@ app.locals.aiService = aiService;
 
 // Test endpoint (no dependencies)
 app.get('/api/ping', (_req, res) => {
-  console.log('[PING] Received ping request');
+  logger.info('[PING] Received ping request');
   res.json({ status: 'pong' });
 });
 
@@ -317,7 +318,7 @@ app.get('/metrics', async (_req, res) => {
 
 // Database health check - dedicated endpoint for container orchestration (D-05)
 app.get('/api/health/db', async (_req, res) => {
-  console.log('[HEALTH/DB] Received database health request');
+  logger.info('[HEALTH/DB] Received database health request');
   res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
 
   const start = Date.now();
@@ -350,7 +351,7 @@ app.get('/api/health/db', async (_req, res) => {
 
 // Redis health check - dedicated endpoint for container orchestration (D-09)
 app.get('/api/health/redis', async (_req, res) => {
-  console.log('[HEALTH/REDIS] Received Redis health request');
+  logger.info('[HEALTH/REDIS] Received Redis health request');
   res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
 
   const start = Date.now();
@@ -392,7 +393,7 @@ app.get('/api/health/redis', async (_req, res) => {
 
 // Health check - no caching for real-time status
 app.get('/api/health', async (_req, res) => {
-  console.log('[HEALTH] Received health request');
+  logger.info('[HEALTH] Received health request');
   res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
 
   const cacheStats = await cacheService.getStats();
@@ -502,7 +503,7 @@ if (process.env.NODE_ENV === 'production') {
     }
   });
 
-  console.log('[STATIC] Production mode: serving frontend from dist/');
+  logger.info('[STATIC] Production mode: serving frontend from dist/');
 }
 
 // Sentry error handler - captures errors and forwards to next handler (per D-02)
@@ -510,7 +511,7 @@ Sentry.setupExpressErrorHandler(app);
 
 // Error handler (existing - formats response)
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-  console.error('Server error:', err);
+  logger.error('Server error:', err);
   res.status(500).json({
     success: false,
     error: 'Internal server error',
@@ -519,9 +520,9 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
 
 httpServer.on('error', (error: NodeJS.ErrnoException) => {
   if (error.code === 'EADDRINUSE') {
-    console.error(`Port ${PORT} is already in use`);
+    logger.error(`Port ${PORT} is already in use`);
   } else {
-    console.error('Server error:', error);
+    logger.error('Server error:', error);
   }
   process.exit(1);
 });
@@ -541,8 +542,8 @@ void runBootLifecycle({
   httpServer,
   port: PORT,
   onListening: () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-    console.log('WebSocket server ready');
+    logger.info(`Server running on http://localhost:${PORT}`);
+    logger.info('WebSocket server ready');
 
     // Update metrics periodically (D-14 - Phase 34: add pool metrics)
     setInterval(() => {

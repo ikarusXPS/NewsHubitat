@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { FocusSuggestionEngine } from '../services/focusSuggestionEngine';
+import logger from '../utils/logger';
 
 export const focusRoutes = Router();
 
@@ -35,7 +36,7 @@ focusRoutes.get('/suggestions', async (req: Request, res: Response) => {
       },
     });
   } catch (err) {
-    console.error('Focus suggestions error:', err);
+    logger.error('Focus suggestions error:', err);
     res.status(500).json({
       success: false,
       error: 'Failed to generate focus suggestions',

@@ -25,6 +25,7 @@ import type { Server as HttpServer } from 'http';
 import { NewsAggregator } from './services/newsAggregator';
 import { CleanupService } from './services/cleanupService';
 import { initWorkerEmitter } from './jobs/workerEmitter';
+import logger from './utils/logger';
 
 export interface BootLifecycleOptions {
   runHttp: boolean;
@@ -54,7 +55,7 @@ export async function runBootLifecycle(opts: BootLifecycleOptions): Promise<void
     const newsAggregator = NewsAggregator.getInstance();
     newsAggregator.startAggregation().catch((err) => {
       // eslint-disable-next-line no-console
-      console.error('Aggregation error:', err);
+      logger.error('Aggregation error:', err);
     });
 
     const cleanupService = CleanupService.getInstance();
