@@ -57,7 +57,12 @@ test.describe('Analysis Page', () => {
     const isVisible = await closeBtn.waitFor({ state: 'visible', timeout: 5000 }).then(() => true).catch(() => false);
 
     if (isVisible) {
-      await closeBtn.click();
+      // Let framer-motion's enter animation finish before clicking — the
+      // close button mounts inside an animated subtree and is briefly
+      // "unstable" while motion is applying transforms. CI run 25696186802
+      // hit "element was detached from the DOM" without this settle.
+      await page.waitForTimeout(400);
+      await closeBtn.click({ force: true });
       await expect(closeBtn).not.toBeVisible({ timeout: 5000 });
     } else {
       // Modal didn't open — passes gracefully (covered by 'open' test)

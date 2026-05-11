@@ -90,7 +90,11 @@ test.describe('Podcasts — single-click playback', () => {
     await card.waitFor({ state: 'visible', timeout: 15_000 });
 
     // Click the inner Play button — this is the single-click contract.
-    await card.locator('button[aria-label*="Play" i], button[aria-label*="Wiedergabe" i]').first().click();
+    // The card contains exactly one button before play starts (the play
+    // toggle); inner PodcastPlayer controls only mount after the click.
+    // Selecting `card.locator('button')` is language-agnostic — works for
+    // DE "Folge abspielen", EN "Play episode", FR "Lire l'épisode".
+    await card.locator('button').first().click();
 
     // The user-gesture-driven autoplay should kick the <audio> element into
     // a non-zero currentTime within a few seconds. We don't care about an
