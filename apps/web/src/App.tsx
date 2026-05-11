@@ -42,6 +42,7 @@ import {
   PodcastsPage,
 } from './routes';
 import './index.css';
+import { logger } from './lib/logger';
 
 // Report Core Web Vitals - only in development or with analytics endpoint
 function reportWebVitals() {
@@ -49,7 +50,7 @@ function reportWebVitals() {
     // Log to console in development
     if (import.meta.env.DEV) {
       const color = metric.rating === 'good' ? '#00ff88' : metric.rating === 'needs-improvement' ? '#ffee00' : '#ff0044';
-      console.log(
+      logger.log(
         `%c[Web Vitals] ${metric.name}: ${Math.round(metric.value)}ms (${metric.rating})`,
         `color: ${color}; font-weight: bold;`
       );
@@ -168,7 +169,7 @@ export default function App() {
 
   // Clear expired cache on app start and initialize performance monitoring
   useEffect(() => {
-    cacheService.clearExpired().catch(console.error);
+    cacheService.clearExpired().catch(logger.error);
 
     // Report Core Web Vitals
     reportWebVitals();

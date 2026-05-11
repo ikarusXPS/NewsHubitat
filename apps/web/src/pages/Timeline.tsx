@@ -22,6 +22,7 @@ import {
 import { cn } from '../lib/utils';
 import { useAppStore } from '../store';
 import type { TimelineEvent, NewsArticle } from '../types';
+import { logger } from '../lib/logger';
 
 type SeverityLevel = 'critical' | 'high' | 'medium' | 'low';
 
@@ -310,7 +311,7 @@ function EventDetailPanel({
         }
       })
       .catch(err => {
-        console.error('Failed to fetch articles:', err);
+        logger.error('Failed to fetch articles:', err);
       })
       .finally(() => {
         setIsLoadingArticles(false);

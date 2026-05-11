@@ -24,6 +24,7 @@ import { FactCheckForm, type FactCheckSubmission } from '../components/community
 import { TranslateForm, type TranslationSubmission } from '../components/community/TranslateForm';
 import { VerifyQueue } from '../components/community/VerifyQueue';
 import { StreakCalendar } from '../components/community/StreakCalendar';
+import { logger } from '../lib/logger';
 
 // Types
 interface ContributionType {
@@ -230,7 +231,7 @@ export function Community() {
 
   // Form submission handlers
   const handleNewsSubmit = (data: NewsSubmission) => {
-    console.log('News submission:', data);
+    logger.log('News submission:', data);
     toast.success('News article submitted! +50 XP', {
       description: 'Your submission will be reviewed by the community.',
     });
@@ -238,7 +239,7 @@ export function Community() {
   };
 
   const handleFactCheckSubmit = (data: FactCheckSubmission) => {
-    console.log('Fact check submission:', data);
+    logger.log('Fact check submission:', data);
     toast.success('Fact check submitted! +30 XP', {
       description: 'Thank you for helping verify information.',
     });
@@ -246,7 +247,7 @@ export function Community() {
   };
 
   const handleTranslationSubmit = (data: TranslationSubmission) => {
-    console.log('Translation submission:', data);
+    logger.log('Translation submission:', data);
     toast.success('Translation submitted! +40 XP', {
       description: 'Your translation will be reviewed shortly.',
     });
@@ -254,7 +255,7 @@ export function Community() {
   };
 
   const handleVerify = (itemId: string, verdict: 'approve' | 'reject' | 'flag') => {
-    console.log('Verification:', itemId, verdict);
+    logger.log('Verification:', itemId, verdict);
     const messages = {
       approve: 'Contribution approved! +20 XP',
       reject: 'Contribution rejected.',

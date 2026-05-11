@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import type { GeoEvent } from '../types';
+import { logger } from '../lib/logger';
 
 // Server event types (mirror websocketService.ts)
 interface ServerToClientEvents {
@@ -83,18 +84,18 @@ export function useEventSocket(options: UseEventSocketOptions = {}): EventSocket
       setIsConnected(true);
       setIsConnecting(false);
       setError(null);
-      console.log('[EventSocket] Connected');
+      logger.log('[EventSocket] Connected');
     });
 
     socket.on('disconnect', (reason) => {
       setIsConnected(false);
-      console.log('[EventSocket] Disconnected:', reason);
+      logger.log('[EventSocket] Disconnected:', reason);
     });
 
     socket.on('connect_error', (err) => {
       setIsConnecting(false);
       setError(err.message);
-      console.error('[EventSocket] Connection error:', err.message);
+      logger.error('[EventSocket] Connection error:', err.message);
     });
 
     // Business events
@@ -109,7 +110,7 @@ export function useEventSocket(options: UseEventSocketOptions = {}): EventSocket
     });
 
     socket.on('connected', (data) => {
-      console.log('[EventSocket] Server confirmed connection:', data.clientId);
+      logger.log('[EventSocket] Server confirmed connection:', data.clientId);
     });
 
     // Cleanup on unmount
