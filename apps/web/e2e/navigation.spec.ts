@@ -32,12 +32,15 @@ test.describe('Navigation', () => {
   test('should navigate to Analysis page', async ({ page }) => {
     await page.click('a[href="/analysis"]');
     await expect(page).toHaveURL('/analysis');
-    // Wait on the hydration anchor (lazy-chunk-mount marker) rather than the
-    // framer-motion-animated h1 — see todo 40-13. The h1's text content is
-    // still verified by analysis.spec.ts 'should load the Analysis page with header'.
-    await page
-      .locator('[data-testid="analysis-ready"]')
-      .waitFor({ state: 'visible', timeout: 20000 });
+    // Anonymous visitors hit the RequireAuth gate (40-07); authenticated
+    // analysis content is verified by analysis.spec.ts in chromium-auth.
+    // Here we just prove the navigation event resolved — assert URL +
+    // either the analysis tree (when authed) OR the RequireAuth panel
+    // (when not).
+    await Promise.race([
+      page.locator('[data-testid="analysis-ready"]').waitFor({ state: 'visible', timeout: 20000 }),
+      page.getByRole('heading', { name: /sign in required|anmeldung erforderlich|connexion requise/i }).waitFor({ state: 'visible', timeout: 20000 }),
+    ]);
   });
 
   test('should navigate to Bookmarks page', async ({ page }) => {
