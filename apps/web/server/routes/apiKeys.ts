@@ -11,6 +11,7 @@ import { Router, Request, Response } from 'express';
 import { z } from 'zod';
 import { authMiddleware } from '../services/authService';
 import { ApiKeyService } from '../services/apiKeyService';
+import logger from '../utils/logger';
 
 interface AuthRequest extends Request {
   user?: { userId: string; email: string };
@@ -52,7 +53,7 @@ apiKeyRoutes.get('/', authMiddleware, async (req: AuthRequest, res: Response) =>
       data: keys,
     });
   } catch (error) {
-    console.error('GET /api/keys error:', error);
+    logger.error('GET /api/keys error:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch API keys',

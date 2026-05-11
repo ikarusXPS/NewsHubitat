@@ -1,5 +1,6 @@
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient, Prisma } from '../../src/generated/prisma/client';
+import logger from '../utils/logger';
 
 const connectionString = process.env.DATABASE_URL;
 
@@ -39,9 +40,9 @@ if (isDev) {
 
     // Color-code slow queries (>100ms) for visibility
     if (duration > 100) {
-      console.warn(`[Prisma SLOW ${duration}ms] ${query}`);
+      logger.warn(`[Prisma SLOW ${duration}ms] ${query}`);
     } else {
-      console.log(`[Prisma ${duration}ms] ${query}`);
+      logger.info(`[Prisma ${duration}ms] ${query}`);
     }
 
     // Log params for debugging (truncate long values)
@@ -49,7 +50,7 @@ if (isDev) {
       const params = e.params.length > 200
         ? e.params.slice(0, 200) + '...'
         : e.params;
-      console.log(`  Params: ${params}`);
+      logger.info(`  Params: ${params}`);
     }
   });
 }

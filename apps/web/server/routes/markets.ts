@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { MarketDataService } from '../services/marketDataService.js';
+import logger from '../utils/logger';
 
 const router = Router();
 const marketService = MarketDataService.getInstance();
@@ -15,7 +16,7 @@ router.get('/', async (req, res) => {
       timestamp: new Date().toISOString(),
     });
   } catch (err) {
-    console.error('Markets API error:', err);
+    logger.error('Markets API error:', err);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch market data',

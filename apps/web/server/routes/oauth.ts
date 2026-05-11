@@ -9,6 +9,7 @@ import { OAuthService } from '../services/oauthService';
 import { authMiddleware } from '../services/authService';
 import { generateCallbackHtml } from '../utils/oauthCallbackHtml';
 import { GOOGLE_SCOPES, GITHUB_SCOPES } from '../config/passport';
+import logger from '../utils/logger';
 
 export const oauthRoutes = Router();
 
@@ -62,7 +63,7 @@ oauthRoutes.get(
   (req: Request, res: Response, next: NextFunction) => {
     passport.authenticate('google', { session: false }, (err: Error | null, result: unknown) => {
       if (err) {
-        console.error('google:callback:error', err);
+        logger.error('google:callback:error', err);
         res.send(generateCallbackHtml(null, false, err.message));
         return;
       }
@@ -119,7 +120,7 @@ oauthRoutes.get(
   (req: Request, res: Response, next: NextFunction) => {
     passport.authenticate('github', { session: false }, (err: Error | null, result: unknown) => {
       if (err) {
-        console.error('github:callback:error', err);
+        logger.error('github:callback:error', err);
         res.send(generateCallbackHtml(null, false, err.message));
         return;
       }
@@ -193,7 +194,7 @@ oauthRoutes.post('/oauth/link', async (req: Request, res: Response) => {
       },
     });
   } catch (err) {
-    console.error('oauth:link:error', err);
+    logger.error('oauth:link:error', err);
     res.status(500).json({
       success: false,
       error: 'Failed to link account',
@@ -241,7 +242,7 @@ oauthRoutes.post('/oauth/unlink', authMiddleware, async (req: AuthRequest, res: 
       },
     });
   } catch (err) {
-    console.error('oauth:unlink:error', err);
+    logger.error('oauth:unlink:error', err);
     res.status(500).json({
       success: false,
       error: 'Failed to unlink account',
@@ -262,7 +263,7 @@ oauthRoutes.get('/oauth/providers', authMiddleware, async (req: AuthRequest, res
       data: providers,
     });
   } catch (err) {
-    console.error('oauth:providers:error', err);
+    logger.error('oauth:providers:error', err);
     res.status(500).json({
       success: false,
       error: 'Failed to get connected providers',

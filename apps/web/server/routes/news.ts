@@ -4,6 +4,7 @@ import * as newsReadService from '../services/newsReadService';
 import { TranslationService } from '../services/translationService';
 import { CacheService, CacheKeys } from '../services/cacheService';
 import { prisma } from '../db/prisma';
+import logger from '../utils/logger';
 
 export const newsRoutes = Router();
 
@@ -175,7 +176,7 @@ newsRoutes.post('/:id/translate', async (req: Request, res: Response) => {
       data: updated,
     });
   } catch (err) {
-    console.error('Translation error:', err);
+    logger.error('Translation error:', err);
     res.status(500).json({
       success: false,
       error: 'Translation failed',
