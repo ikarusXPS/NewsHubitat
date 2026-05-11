@@ -1,0 +1,106 @@
+{
+  "title": "Équipes",
+  "myTeams": "Mes équipes",
+  "createTeam": "Créer une équipe",
+  "teamSettings": "Paramètres de l'équipe",
+  "teamMembers": "Membres de l'équipe",
+  "teamBookmarks": "Favoris de l'équipe",
+  "inviteMember": "Inviter un membre",
+  "sendInvite": "Envoyer l'invitation",
+  "saveToTeam": "Enregistrer dans l'équipe",
+  "personal": "Personnel",
+
+  "empty": {
+    "noTeams": {
+      "title": "Aucune équipe pour le moment",
+      "description": "Créez une équipe pour partager des favoris et collaborer avec d'autres."
+    },
+    "noBookmarks": {
+      "title": "Aucun favori partagé",
+      "description": "Enregistrez des articles dans cette équipe pour les partager avec tous les membres."
+    },
+    "noMembers": {
+      "title": "Invitez votre équipe",
+      "description": "Envoyez des invitations par e-mail pour ajouter des membres à cette équipe."
+    }
+  },
+
+  "roles": {
+    "owner": "Propriétaire",
+    "admin": "Administrateur",
+    "member": "Membre"
+  },
+
+  "form": {
+    "teamName": "Nom de l'équipe",
+    "teamNamePlaceholder": "Saisissez le nom de l'équipe",
+    "description": "Description",
+    "descriptionPlaceholder": "Description facultative de l'équipe",
+    "email": "E-mail",
+    "emailPlaceholder": "membre@exemple.com",
+    "role": "Rôle"
+  },
+
+  "validation": {
+    "nameRequired": "Le nom de l'équipe est requis",
+    "nameTooShort": "Le nom de l'équipe doit comporter au moins 3 caractères",
+    "nameTooLong": "Le nom de l'équipe ne peut pas dépasser 50 caractères",
+    "emailInvalid": "Veuillez saisir une adresse e-mail valide",
+    "descriptionTooLong": "La description ne peut pas dépasser 500 caractères"
+  },
+
+  "actions": {
+    "leaveTeam": "Quitter l'équipe",
+    "removeMember": "Retirer le membre",
+    "deleteTeam": "Supprimer l'équipe",
+    "removeBookmark": "Retirer le favori",
+    "transferOwnership": "Transférer la propriété",
+    "changeRole": "Modifier le rôle"
+  },
+
+  "confirm": {
+    "leaveTeam": {
+      "title": "Quitter l'équipe",
+      "message": "Vous perdrez l'accès aux favoris partagés. Cette action est irréversible."
+    },
+    "removeMember": {
+      "title": "Retirer le membre",
+      "message": "Cela retirera {{name}} de l'équipe. Cette personne perdra l'accès aux favoris partagés."
+    },
+    "deleteTeam": {
+      "title": "Supprimer l'équipe",
+      "message": "Toutes les données de l'équipe, y compris les favoris, seront supprimées après 7 jours. Cette action est irréversible."
+    },
+    "removeBookmark": {
+      "title": "Retirer le favori",
+      "message": "Retirer cet article des favoris de l'équipe ?"
+    }
+  },
+
+  "success": {
+    "teamCreated": "Équipe créée avec succès",
+    "inviteSent": "Invitation envoyée à {{email}}",
+    "inviteAccepted": "Vous avez rejoint {{team}}",
+    "memberRemoved": "Membre retiré de l'équipe",
+    "bookmarkAdded": "Enregistré dans {{team}}",
+    "bookmarkRemoved": "Retiré des favoris de l'équipe",
+    "teamDeleted": "Équipe supprimée"
+  },
+
+  "errors": {
+    "inviteFailed": "Impossible d'envoyer l'invitation. Veuillez réessayer.",
+    "teamLimit": "Vous avez atteint la limite de 10 équipes.",
+    "permissionDenied": "Vous n'avez pas l'autorisation d'effectuer cette action.",
+    "alreadyMember": "Cet utilisateur est déjà membre de l'équipe.",
+    "invitePending": "Une invitation a déjà été envoyée à cette adresse e-mail.",
+    "invalidInvite": "Cette invitation est invalide ou a expiré.",
+    "cannotRemoveOwner": "Impossible de retirer le propriétaire de l'équipe.",
+    "ownerCannotLeave": "Le propriétaire ne peut pas quitter l'équipe. Veuillez d'abord transférer la propriété."
+  },
+
+  "addedBy": "Ajouté par {{name}}",
+  "members_one": "{{count}} membre",
+  "members_other": "{{count}} membres",
+  "bookmarks_one": "{{count}} favori",
+  "bookmarks_other": "{{count}} favoris"
+}

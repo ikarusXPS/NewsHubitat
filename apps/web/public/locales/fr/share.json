@@ -1,0 +1,25 @@
+{
+  "buttons": {
+    "share": "Partager",
+    "copyLink": "Copier le lien",
+    "copied": "Lien copié !"
+  },
+  "platforms": {
+    "twitter": "Partager sur Twitter",
+    "linkedin": "Partager sur LinkedIn",
+    "facebook": "Partager sur Facebook",
+    "whatsapp": "Partager sur WhatsApp"
+  },
+  "myShares": {
+    "title": "Mes partages",
+    "noShares": "Aucun partage pour le moment",
+    "noSharesBody": "Partagez un article pour voir vos statistiques ici.",
+    "views": "{count, plural, one {# vue} other {# vues}}",
+    "clicks": "{count, plural, one {# clic} other {# clics}}",
+    "sharedOn": "Partagé le {date}"
+  },
+  "errors": {
+    "shareFailed": "Échec du partage. Veuillez réessayer.",
+    "copyFailed": "Impossible de copier le lien"
+  }
+}
