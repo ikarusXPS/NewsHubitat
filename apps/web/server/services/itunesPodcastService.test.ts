@@ -120,8 +120,13 @@ describe('ItunesPodcastService', () => {
       await svc.searchPodcasts('alpha', 'US');
       await svc.searchPodcasts('bravo', 'US');
       const elapsed = Date.now() - start;
-      // Two distinct cache-miss fetches with min 100ms gap => >= 100ms total
-      expect(elapsed).toBeGreaterThanOrEqual(100);
+      // Two distinct cache-miss fetches with min 100ms gap => ~100ms total.
+      // CI runners (GitHub Actions Linux) occasionally clock the elapsed
+      // time as 99ms — Node's setTimeout(100) can resolve 1ms early under
+      // load, and Date.now() granularity isn't sub-ms-precise. Tolerance
+      // of 95ms keeps the test honest about the throttle existing while
+      // surviving real-clock jitter (CI run 25697077674 caught the floor).
+      expect(elapsed).toBeGreaterThanOrEqual(95);
       expect(fetchMock).toHaveBeenCalledTimes(2);
     });
   });
