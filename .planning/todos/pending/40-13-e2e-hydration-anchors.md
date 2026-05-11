@@ -22,6 +22,7 @@ The flake-roulette manifest so far:
 - `be2ebf0` → `analysis.spec.ts:68 should display cluster summaries section` hard-failed
 - `02dbc72` → `bookmarks.spec.ts:29 should show empty state or articles grid` hard-failed
 - `02a32af` → bookmarks + `teams.spec.ts should mark to a team via dropdown` both flaked (passed on retry)
+- `468c145` → `navigation.spec.ts:32 should navigate to Analysis page` flaked (passed on retry)
 
 Pattern is identical: the test "succeeds" only when the worker happens to land
 in a low-CI-load slot. Currently masked by Playwright retries; `02a32af` was
@@ -86,7 +87,32 @@ Flaked in `02a32af` for the first time. Same anti-pattern likely. Diagnose by
 running the test under `--repeat-each=20` locally and watching the failure
 timeline.
 
-### 4. Sweep for the anti-pattern repo-wide
+### 4. `apps/web/e2e/navigation.spec.ts:32` — "should navigate to Analysis page"
+
+Flaked in `468c145` (the SC-3 closure run — third consecutive green only via
+retry). Current:
+
+```ts
+test('should navigate to Analysis page', async ({ page }) => {
+  await page.click('a[href="/analysis"]');
+  await expect(page).toHaveURL('/analysis');
+  await expect(page.locator('h1')).toContainText(/PERSPEKTIVEN-ANALYSE/i);  // ← flaky
+});
+```
+
+Same root cause as `analysis.spec.ts:10` beforeEach — the AnalysisPage h1 is
+framer-motion-animated and renders after RequireAuth + useClusters resolve.
+`toContainText` waits 5s by default; under CI parallel load that races the
+mount.
+
+Fix is shared with section 2: once `data-testid="analysis-ready"` lands on
+AnalysisPage, replace the h1 assertion with a wait on that anchor:
+
+```ts
+await page.locator('[data-testid="analysis-ready"]').waitFor({ state: 'visible', timeout: 20000 });
+```
+
+### 5. Sweep for the anti-pattern repo-wide
 
 ```bash
 grep -rn "waitForTimeout" apps/web/e2e/ | wc -l
@@ -109,20 +135,27 @@ or an `if (await ... .isVisible())` soft check, it's a flake-in-waiting.
 - Before Phase 41 execution begins (Phase 41 lands consent banner + cookie
   policy UI surfaces; those will need E2E coverage that won't survive the same
   anti-pattern).
-- OR if the flake count rises above 2 per run (currently 2/run on `02a32af`).
+- OR if the flake count rises above 2 per run (currently 1/run on `468c145`,
+  but the call-site count is climbing — 4 distinct tests across 4 files have
+  flaked in 4 runs).
 
 ## Estimated effort
 
 ~2 hours: add 6-8 `data-testid` attributes across 3-4 page components, refactor
-4-5 E2E tests to wait on them, run `--repeat-each=10` locally to verify
+5 E2E tests to wait on them, run `--repeat-each=10` locally to verify
 stability, un-skip the 3 analysis tests + the cluster-summaries skip filed in
 commit `02a32af`.
+
+Note: the `data-testid="analysis-ready"` anchor on `AnalysisPage.tsx` alone
+closes both sections 2 and 4 (analysis.spec.ts × 3 skipped + navigation.spec.ts
+flake) — one component change, four tests fixed.
 
 ## Reference
 
 - Existing pattern done right: `e2e/auth.setup.ts` polls `/api/health` (IPv4)
   for backend readiness — a real signal, not a fixed sleep.
 - Anti-pattern call sites:
-  - `e2e/analysis.spec.ts:10` (15s h1 wait)
+  - `e2e/analysis.spec.ts:10` (15s h1 wait in beforeEach)
   - `e2e/bookmarks.spec.ts:12` (500ms hydration) + `:31` (1000ms before soft check)
   - `e2e/teams.spec.ts` — TBD which line, diagnose with --repeat-each
+  - `e2e/navigation.spec.ts:35` (toContainText h1 race after click navigation)
