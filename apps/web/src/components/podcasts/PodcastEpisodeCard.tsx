@@ -13,13 +13,13 @@
  * tags, the DOM never gets them (T-40-04-02).
  */
 
-import { useState } from 'react';
+import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { Pause, Play, Headphones } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ResponsiveImage } from '../ResponsiveImage';
 import { formatDateTime } from '../../lib/formatters';
 import { cn } from '../../lib/utils';
-import { PodcastPlayer } from './PodcastPlayer';
+import { PodcastPlayer, type PodcastPlayerHandle } from './PodcastPlayer';
 import type { MatchedEpisode, PodcastEpisode } from '../../types/podcasts';
 
 /** Either flat (matched) or row (per-feed) — both have audioUrl + publishedAt. */
@@ -69,15 +69,28 @@ function pickPodcastTitle(ep: EpisodeLike, override?: string): string | undefine
   return (ep as MatchedEpisode).podcastTitle;
 }
 
-export function PodcastEpisodeCard({
-  episode,
-  episodeTitle,
-  podcastTitle,
-  onPlay,
-  className,
-}: PodcastEpisodeCardProps) {
+export const PodcastEpisodeCard = forwardRef<PodcastPlayerHandle, PodcastEpisodeCardProps>(
+  function PodcastEpisodeCard(
+    { episode, episodeTitle, podcastTitle, onPlay, className },
+    ref,
+  ) {
   const { t } = useTranslation('podcasts');
   const [isPlaying, setIsPlaying] = useState(false);
+  const playerRef = useRef<PodcastPlayerHandle | null>(null);
+
+  // Forward seek() to the internal PodcastPlayer when mounted. When the user
+  // hasn't pressed Play yet the player isn't rendered and seek is a no-op —
+  // expected behavior for the discovery surface where the card owns playback
+  // (RelatedPodcasts caller relies on this for transcript-segment clicks).
+  useImperativeHandle(
+    ref,
+    () => ({
+      seek(seconds: number) {
+        playerRef.current?.seek(seconds);
+      },
+    }),
+    [],
+  );
 
   const title = pickEpisodeTitle(episode, episodeTitle);
   const podcast = pickPodcastTitle(episode, podcastTitle);
@@ -151,10 +164,16 @@ export function PodcastEpisodeCard({
 
         {!onPlay && isPlaying && (
           <div className="mt-3">
-            <PodcastPlayer audioUrl={episode.audioUrl} title={title} autoPlayOnMount />
+            <PodcastPlayer
+              ref={playerRef}
+              audioUrl={episode.audioUrl}
+              title={title}
+              autoPlayOnMount
+            />
           </div>
         )}
       </div>
     </div>
   );
-}
+  },
+);

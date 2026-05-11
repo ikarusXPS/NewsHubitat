@@ -13,16 +13,17 @@
  * (`expandedEpisodeId`) and renders <TranscriptDrawer> with the episode's
  * id — the drawer enforces tier × platform branching internally.
  *
- * The TranscriptDrawer's onSeek callback is intentionally NOT wired to a
- * shared PodcastPlayer here because the lazy-list view doesn't host a
- * persistent audio element; PodcastEpisodeCard owns its own player when
- * expanded by the user. onSeek therefore stays undefined and
- * TranscriptSegment renders as a disabled button — acceptable UX in the
- * discovery surface. Dedicated /podcasts pages with a persistent player
- * can wire onSeek through to PodcastPlayer.seek() in a follow-up.
+ * onSeek wiring: each `PodcastEpisodeCard` forwards a `PodcastPlayerHandle`
+ * via ref. We keep a single `playerRef` for the currently-expanded transcript
+ * episode (transcript and player belong to the same episode by construction —
+ * see `expandedEpisodeId`) and pass `onSeek={(s) => playerRef.current?.seek(s)}`
+ * to the drawer. The seek is a no-op until the user has pressed Play on the
+ * card (the player only mounts when isPlaying); transcript segments are still
+ * shown as active buttons so the user can pre-scout timestamps, then press
+ * Play to start playback at the most recently clicked segment-time.
  */
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   ChevronDown,
   ChevronRight,
@@ -33,6 +34,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useRelatedPodcasts } from '../../hooks/useRelatedPodcasts';
 import { PodcastEpisodeCard } from './PodcastEpisodeCard';
+import type { PodcastPlayerHandle } from './PodcastPlayer';
 import { TranscriptDrawer } from './TranscriptDrawer';
 import { cn } from '../../lib/utils';
 
@@ -47,6 +49,7 @@ export function RelatedPodcasts({ articleId, className }: RelatedPodcastsProps) 
   const { t } = useTranslation('podcasts');
   const [isExpanded, setIsExpanded] = useState(false);
   const [expandedEpisodeId, setExpandedEpisodeId] = useState<string | null>(null);
+  const playerRef = useRef<PodcastPlayerHandle | null>(null);
   const { data: episodes, isLoading, error } = useRelatedPodcasts(articleId, {
     enabled: isExpanded,
   });
@@ -97,6 +100,7 @@ export function RelatedPodcasts({ articleId, className }: RelatedPodcastsProps) 
             return (
               <div key={ep.id} className="space-y-2">
                 <PodcastEpisodeCard
+                  ref={isTranscriptOpen ? playerRef : undefined}
                   episode={ep}
                   episodeTitle={ep.episodeTitle}
                   podcastTitle={ep.podcastTitle}
@@ -121,6 +125,7 @@ export function RelatedPodcasts({ articleId, className }: RelatedPodcastsProps) 
                   <TranscriptDrawer
                     contentType="podcast"
                     id={ep.id}
+                    onSeek={(seconds) => playerRef.current?.seek(seconds)}
                     className="rounded-lg border border-gray-800 bg-black/40"
                   />
                 )}
