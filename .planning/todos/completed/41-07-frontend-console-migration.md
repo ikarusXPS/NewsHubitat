@@ -51,3 +51,29 @@ Break into bisectable chunks (one PR per chunk):
 
 - Pino migration (Plan deviation §1 — Winston is the chosen logger)
 - New scrubbing fields (additions go directly into `apps/web/server/utils/scrub.ts` — single source of truth)
+
+## Resolution
+
+**Closed 2026-05-11.**
+
+All 45 candidate files migrated across 4 atomic commits:
+
+| Commit | Scope | Files | Verification |
+|---|---|---|---|
+| `1eb71ce` | Chunk 1 — server services | 9 | typecheck OK; 995 service tests pass |
+| `8c11dfb` | Chunk 2 — server routes / middleware / db / config / boot / index | 15 | typecheck OK; 1193 server tests pass |
+| `378522c` | Chunk 3 — frontend components (10 files; error boundaries kept raw) | 10 | typecheck OK; 114 component tests pass |
+| `3ae10a8` | Chunk 4 — frontend pages / hooks / contexts / services | 10 | typecheck OK; **full 1710/1710 suite green** |
+
+Mapping convention:
+- **Server** (Winston): `console.log → logger.info`, `console.warn → logger.warn`, `console.error → logger.error`. Winston has no `.log(...)` method — `console.log` always maps to `.info`.
+- **Frontend** (`apps/web/src/lib/logger.ts`): drop-in (identity) — `console.log → logger.log`, `console.warn → logger.warn`, `console.error → logger.error`.
+
+**Final `grep -rn "console\." apps/web/src/ apps/web/server/`** returns only the 5 intentional sites flagged in "Done when":
+- `apps/web/src/lib/logger.ts` — the wrapper itself (delegates to native console after scrubbing)
+- `apps/web/src/components/ErrorBoundary.tsx` — last-resort safety
+- `apps/web/src/components/ChunkErrorBoundary.tsx` — last-resort safety
+- `apps/web/server/utils/dbLogger.ts` — structured JSON event logger uses raw `console.log(JSON.stringify(...))` intentionally for log aggregation in production
+- `apps/web/server/openapi/generator.ts` — standalone tsx CLI tool with no Winston transport initialised
+
+**ESLint `no-console` enforcement** noted as a follow-up in the original todo but deferred — would require ESLint config edits + overrides for the 5 allowed sites. Not blocking 41-07 verification; closes the defense-in-depth gap regardless.
