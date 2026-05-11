@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { AlertTriangle, TrendingUp, Loader2, BarChart3, Info } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { apiFetch } from '../lib/api';
 
 interface CoverageGapDetail {
   perspective: string;
@@ -74,16 +75,8 @@ const PERSPECTIVE_LABELS: Record<string, string> = {
   usa: 'USA',
 };
 
-// TODO(api-fetch-wrapper): see todos/pending/40-07-shared-api-fetch.md
-function getToken(): string {
-  if (typeof window === 'undefined') return '';
-  return localStorage.getItem('newshub-auth-token') ?? '';
-}
-
 async function fetchCoverageGaps(): Promise<CoverageGapsResponse> {
-  const response = await fetch('/api/analysis/coverage-gaps', {
-    headers: { Authorization: `Bearer ${getToken()}` },
-  });
+  const response = await apiFetch('/api/analysis/coverage-gaps');
   if (!response.ok) throw new Error('Failed to fetch coverage gaps');
   return response.json();
 }

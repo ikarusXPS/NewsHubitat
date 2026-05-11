@@ -15,6 +15,7 @@ import { AvatarPicker } from '../components/profile/AvatarPicker';
 import { DataExportModal } from '../components/modals/DataExportModal';
 import { DeleteAccountModal } from '../components/modals/DeleteAccountModal';
 import { ConnectedAccounts } from '../components/settings/ConnectedAccounts';
+import { apiFetch } from '../lib/api';
 
 const ALL_REGIONS: PerspectiveRegion[] = [
   'afrika', 'alternative', 'asien', 'china', 'deutschland',
@@ -371,12 +372,9 @@ export function Settings() {
                   onClick={async () => {
                     setIsUpdatingName(true);
                     try {
-                      const response = await fetch('/api/profile/name', {
+                      const response = await apiFetch('/api/profile/name', {
                         method: 'PUT',
-                        headers: {
-                          'Content-Type': 'application/json',
-                          Authorization: `Bearer ${localStorage.getItem('newshub-auth-token')}`,
-                        },
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ name: newName, currentPassword: namePassword }),
                       });
                       if (!response.ok) throw new Error('Failed to update');
@@ -863,23 +861,18 @@ export function Settings() {
         isOpen={showAvatarPicker}
         onClose={() => setShowAvatarPicker(false)}
         onSave={async (presetId, file) => {
-          const token = localStorage.getItem('newshub-auth-token');
           if (file) {
             const formData = new FormData();
             formData.append('avatar', file);
-            const response = await fetch('/api/profile/avatar/upload', {
+            const response = await apiFetch('/api/profile/avatar/upload', {
               method: 'POST',
-              headers: { Authorization: `Bearer ${token}` },
               body: formData,
             });
             if (!response.ok) throw new Error('Upload failed');
           } else if (presetId) {
-            const response = await fetch('/api/profile/avatar/preset', {
+            const response = await apiFetch('/api/profile/avatar/preset', {
               method: 'PUT',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-              },
+              headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ presetId }),
             });
             if (!response.ok) throw new Error('Update failed');

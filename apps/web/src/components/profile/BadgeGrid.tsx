@@ -6,6 +6,7 @@ import { FeaturedBadge } from './FeaturedBadge';
 import { useAuth } from '../../contexts/AuthContext';
 import { useAppStore } from '../../store';
 import { cn } from '../../lib/utils';
+import { apiFetch } from '../../lib/api';
 import type { BadgeTier, BadgeCategory } from '../../types/gamification';
 
 interface Badge {
@@ -33,22 +34,17 @@ async function fetchBadges(): Promise<Badge[]> {
   return data.data;
 }
 
-async function fetchUserBadges(token: string): Promise<UserBadge[]> {
-  const response = await fetch('/api/badges/user', {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+async function fetchUserBadges(): Promise<UserBadge[]> {
+  const response = await apiFetch('/api/badges/user');
   if (!response.ok) throw new Error('Failed to fetch user badges');
   const data = await response.json();
   return data.data;
 }
 
-async function setFeaturedBadge(badgeId: string | null, token: string): Promise<void> {
-  const response = await fetch('/api/badges/featured', {
+async function setFeaturedBadge(badgeId: string | null): Promise<void> {
+  const response = await apiFetch('/api/badges/featured', {
     method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ badgeId }),
   });
   if (!response.ok) throw new Error('Failed to set featured badge');
@@ -73,13 +69,12 @@ export function BadgeGrid({ showFeatured = true, selectable = false, onSelect }:
 
   const { data: userBadges, isLoading: loadingUserBadges } = useQuery({
     queryKey: ['user-badges'],
-    queryFn: () => fetchUserBadges(localStorage.getItem('newshub-auth-token') || ''),
+    queryFn: () => fetchUserBadges(),
     enabled: isAuthenticated,
   });
 
   const featuredMutation = useMutation({
-    mutationFn: (badgeId: string | null) =>
-      setFeaturedBadge(badgeId, localStorage.getItem('newshub-auth-token') || ''),
+    mutationFn: (badgeId: string | null) => setFeaturedBadge(badgeId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-badges'] });
     },

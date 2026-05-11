@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Loader2, AlertCircle, Sparkles, ChevronDown, ChevronUp, Layers } from 'lucide-react';
 import { useState } from 'react';
 import { cn, getRegionColor } from '../lib/utils';
+import { apiFetch } from '../lib/api';
 import type { PerspectiveRegion } from '../types';
 
 interface ClusterData {
@@ -38,19 +39,11 @@ interface ApiResponse {
   };
 }
 
-// TODO(api-fetch-wrapper): see todos/pending/40-07-shared-api-fetch.md
-function getToken(): string {
-  if (typeof window === 'undefined') return '';
-  return localStorage.getItem('newshub-auth-token') ?? '';
-}
-
 async function fetchClusters(withSummaries: boolean): Promise<ApiResponse> {
   const url = withSummaries
     ? '/api/analysis/clusters?summaries=true'
     : '/api/analysis/clusters';
-  const response = await fetch(url, {
-    headers: { Authorization: `Bearer ${getToken()}` },
-  });
+  const response = await apiFetch(url);
   if (!response.ok) throw new Error('Failed to fetch clusters');
   return response.json();
 }

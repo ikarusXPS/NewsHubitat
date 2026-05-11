@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { CreditCard, Shield, Zap } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { cn } from '../lib/utils';
+import { apiFetch } from '../lib/api';
 import { TierCard } from '../components/subscription/TierCard';
 import { Toast } from '../components/Toast';
 
@@ -65,12 +66,9 @@ export function Pricing() {
         ? STRIPE_PRICE_ID_ANNUAL
         : STRIPE_PRICE_ID_MONTHLY;
 
-      const response = await fetch('/api/subscriptions/checkout', {
+      const response = await apiFetch('/api/subscriptions/checkout', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('newshub-auth-token')}`,
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ priceId, billingCycle }),
       });
 

@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useAppStore } from '../store';
+import { apiFetch } from '../lib/api';
 
 /**
  * Server-side credibility result shape (matches CredibilityResponseSchema in
@@ -26,16 +27,6 @@ export interface CredibilityResult {
   locale: 'de' | 'en' | 'fr';
 }
 
-/**
- * Read the JWT from localStorage. The repo-wide convention (see AuthContext.tsx)
- * is the key `'newshub-auth-token'`. Returning `''` falls through to an
- * unauthenticated request — the route layer rejects with 401 if needed.
- */
-function getToken(): string {
-  if (typeof window === 'undefined') return '';
-  return localStorage.getItem('newshub-auth-token') ?? '';
-}
-
 async function fetchCredibility(
   sourceId: string,
   locale: string
@@ -43,9 +34,7 @@ async function fetchCredibility(
   const url = `/api/ai/source-credibility/${encodeURIComponent(
     sourceId
   )}?locale=${encodeURIComponent(locale)}`;
-  const r = await fetch(url, {
-    headers: { Authorization: `Bearer ${getToken()}` },
-  });
+  const r = await apiFetch(url);
   if (!r.ok) throw new Error(`Failed to fetch credibility: ${r.status}`);
   const body = await r.json();
   return body.data as CredibilityResult;

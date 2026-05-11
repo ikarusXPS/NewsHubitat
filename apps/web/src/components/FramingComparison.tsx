@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, Search, Frame, TrendingUp, Clock, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { cn, getRegionColor } from '../lib/utils';
+import { apiFetch } from '../lib/api';
 import { useAppStore } from '../store';
 import type { PerspectiveRegion } from '../types';
 
@@ -68,12 +69,6 @@ const REGION_LABELS: Record<PerspectiveRegion, string> = {
   alternative: 'Alternative',
 };
 
-// TODO(api-fetch-wrapper): see todos/pending/40-07-shared-api-fetch.md
-function getToken(): string {
-  if (typeof window === 'undefined') return '';
-  return localStorage.getItem('newshub-auth-token') ?? '';
-}
-
 export function FramingComparison() {
   const { t } = useTranslation('credibility');
   const language = useAppStore((s) => s.language);
@@ -88,9 +83,8 @@ export function FramingComparison() {
   const { data, isLoading, error } = useQuery<FramingData>({
     queryKey: ['framing', topic, language],
     queryFn: async () => {
-      const r = await fetch(
+      const r = await apiFetch(
         `/api/analysis/framing?topic=${encodeURIComponent(searchTopic ?? '')}&locale=${encodeURIComponent(language)}`,
-        { headers: { Authorization: `Bearer ${getToken()}` } }
       );
       if (!r.ok) throw new Error('Framing fetch failed');
       const body: ApiResponse = await r.json();

@@ -7,6 +7,7 @@ import { WeeklyWinnerBanner } from './WeeklyWinnerBanner';
 import { useAuth } from '../../contexts/AuthContext';
 import { useAppStore } from '../../store';
 import { cn } from '../../lib/utils';
+import { apiFetch } from '../../lib/api';
 import type { LeaderboardEntry, LeaderboardTimeFilter } from '../../types/gamification';
 
 interface LeaderboardResponse {
@@ -32,10 +33,8 @@ async function fetchLeaderboard(timeframe: LeaderboardTimeFilter): Promise<Leade
   return data.data;
 }
 
-async function fetchUserPosition(token: string, timeframe: LeaderboardTimeFilter): Promise<LeaderboardEntry | null> {
-  const response = await fetch(`/api/leaderboard/me?timeframe=${timeframe}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+async function fetchUserPosition(timeframe: LeaderboardTimeFilter): Promise<LeaderboardEntry | null> {
+  const response = await apiFetch(`/api/leaderboard/me?timeframe=${timeframe}`);
   if (!response.ok) return null;
   const data: UserPositionResponse = await response.json();
   return data.data;
@@ -61,7 +60,7 @@ export function Leaderboard() {
 
   const { data: userPosition } = useQuery({
     queryKey: ['leaderboard-me', timeframe],
-    queryFn: () => fetchUserPosition(localStorage.getItem('newshub-auth-token') || '', timeframe),
+    queryFn: () => fetchUserPosition(timeframe),
     enabled: isAuthenticated,
     staleTime: 60_000,
   });
