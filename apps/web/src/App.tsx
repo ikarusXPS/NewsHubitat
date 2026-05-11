@@ -127,7 +127,10 @@ function AppRoutes() {
               <Route path="/globe" element={<Globe />} />
               <Route path="/events" element={<EventMap />} />
               <Route path="/community" element={<Community />} />
-              <Route path="/bookmarks" element={<RequireAuth><Bookmarks /></RequireAuth>} />
+              {/* Bookmarks page is purely client-side (Zustand store with
+                  localStorage persistence) — anonymous visitors get the
+                  empty-state UI, not an auth gate. */}
+              <Route path="/bookmarks" element={<Bookmarks />} />
               <Route path="/podcasts" element={<PodcastsPage />} />
               <Route path="/history" element={<RequireAuth><ReadingHistory /></RequireAuth>} />
               <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />

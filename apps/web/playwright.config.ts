@@ -21,7 +21,8 @@ export default defineConfig({
     { name: 'setup', testMatch: /.*\.setup\.ts/ },
 
     // Unauthenticated tests (no dependencies)
-    // Note: bookmarks.spec.ts moved here - page uses client-side localStorage, not server auth
+    // Note: bookmarks.spec.ts stays here — Bookmarks page is purely
+    // client-side (Zustand + localStorage), not gated by RequireAuth.
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
@@ -29,6 +30,10 @@ export default defineConfig({
         '**/profile.spec.ts',
         '**/settings.spec.ts',
         '**/history.spec.ts',
+        // analysis.spec.ts moved to chromium-auth as of 40-07 RequireAuth
+        // wiring — /analysis now requires auth (cluster + framing + coverage
+        // backend endpoints are authMiddleware-gated).
+        '**/analysis.spec.ts',
         // screenshots.spec.ts deliberately bypasses fixtures.ts to hit the real backend
         // for README documentation captures — it requires `pnpm seed:news` data and is
         // not a CI gate. Run via `pnpm --filter @newshub/web screenshots` when refreshing docs.
@@ -43,7 +48,14 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         storageState: 'playwright/.auth/user.json',
       },
-      testMatch: ['**/profile.spec.ts', '**/settings.spec.ts', '**/history.spec.ts', '**/comments.spec.ts', '**/teams.spec.ts'],
+      testMatch: [
+        '**/profile.spec.ts',
+        '**/settings.spec.ts',
+        '**/history.spec.ts',
+        '**/comments.spec.ts',
+        '**/teams.spec.ts',
+        '**/analysis.spec.ts',
+      ],
       dependencies: ['setup'],
     },
   ],
