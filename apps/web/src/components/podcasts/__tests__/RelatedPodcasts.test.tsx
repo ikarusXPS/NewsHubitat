@@ -14,7 +14,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
-import { createElement } from 'react';
+import { createElement, forwardRef, useImperativeHandle } from 'react';
+import type { PodcastPlayerHandle } from '../PodcastPlayer';
 
 vi.mock('react-i18next', async (importOriginal) => {
   const actual = await importOriginal<typeof import('react-i18next')>();
@@ -24,14 +25,45 @@ vi.mock('react-i18next', async (importOriginal) => {
   };
 });
 
+// Captured seek calls per episode-id — exposed for assertions in the seek-wiring test.
+const seekCalls: Array<{ id: string; seconds: number }> = [];
+
 vi.mock('../PodcastEpisodeCard', () => ({
-  PodcastEpisodeCard: (props: { episode: { id: string; episodeTitle: string } }) => (
-    <div
-      data-testid="episode-card-stub"
-      data-id={props.episode.id}
-      data-title={props.episode.episodeTitle}
-    />
-  ),
+  PodcastEpisodeCard: forwardRef<
+    PodcastPlayerHandle,
+    { episode: { id: string; episodeTitle: string } }
+  >(function PodcastEpisodeCardMock(props, ref) {
+    useImperativeHandle(
+      ref,
+      () => ({
+        seek(seconds: number) {
+          seekCalls.push({ id: props.episode.id, seconds });
+        },
+      }),
+      [props.episode.id],
+    );
+    return (
+      <div
+        data-testid="episode-card-stub"
+        data-id={props.episode.id}
+        data-title={props.episode.episodeTitle}
+      />
+    );
+  }),
+}));
+
+// Capture the onSeek prop given to TranscriptDrawer so the seek-wiring test
+// can invoke it directly and verify ref propagation.
+let lastDrawerOnSeek: ((seconds: number) => void) | undefined;
+
+vi.mock('../TranscriptDrawer', () => ({
+  TranscriptDrawer: (props: {
+    id: string;
+    onSeek?: (seconds: number) => void;
+  }) => {
+    lastDrawerOnSeek = props.onSeek;
+    return <div data-testid="transcript-drawer-stub" data-id={props.id} />;
+  },
 }));
 
 import { RelatedPodcasts } from '../RelatedPodcasts';
@@ -49,6 +81,8 @@ describe('RelatedPodcasts', () => {
 
   beforeEach(() => {
     fetchMock.mockReset();
+    seekCalls.length = 0;
+    lastDrawerOnSeek = undefined;
     (globalThis as unknown as { fetch: typeof fetchMock }).fetch = fetchMock;
   });
 
@@ -139,6 +173,72 @@ describe('RelatedPodcasts', () => {
       },
       { timeout: 5000 },
     );
+  });
+
+  it('Test 5 (SC-3): transcript drawer onSeek forwards to the open episode\'s player ref', async () => {
+    // Closes Phase 40 SC-3 verification gap (40-VERIFICATION.md human_needed item):
+    // proves the TranscriptDrawer onSeek -> playerRef.current?.seek(...) chain
+    // works in the lazy-list view that used to leave onSeek undefined.
+    const fixture = [
+      {
+        id: 'ep-A',
+        podcastGuid: 'gA',
+        podcastTitle: 'Pod A',
+        episodeTitle: 'A',
+        description: '',
+        audioUrl: 'https://example.com/A.mp3',
+        publishedAt: '2026-05-01T00:00:00Z',
+        score: 10,
+      },
+      {
+        id: 'ep-B',
+        podcastGuid: 'gB',
+        podcastTitle: 'Pod B',
+        episodeTitle: 'B',
+        description: '',
+        audioUrl: 'https://example.com/B.mp3',
+        publishedAt: '2026-04-30T00:00:00Z',
+        score: 9,
+      },
+    ];
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ success: true, data: fixture }),
+    });
+
+    render(<RelatedPodcasts articleId="article-1" />, { wrapper: createWrapper() });
+    fireEvent.click(screen.getByRole('button', { name: /relatedPodcasts/i }));
+
+    // Wait for both episode cards to render
+    await waitFor(() =>
+      expect(screen.getAllByTestId('episode-card-stub')).toHaveLength(2),
+    );
+
+    // No transcript open yet → drawer not mounted, onSeek capture is undefined
+    expect(lastDrawerOnSeek).toBeUndefined();
+
+    // Open transcript for the FIRST episode (ep-A). The ref is wired only to
+    // the card whose transcript is open — that's the contract we're testing.
+    const toggles = screen.getAllByTestId('transcript-toggle');
+    fireEvent.click(toggles[0]);
+
+    await waitFor(() =>
+      expect(screen.getByTestId('transcript-drawer-stub')).toBeTruthy(),
+    );
+
+    // Drawer should have received an onSeek callback.
+    expect(typeof lastDrawerOnSeek).toBe('function');
+
+    // Invoke it the same way TranscriptSegment would on segment-click.
+    lastDrawerOnSeek!(42);
+    lastDrawerOnSeek!(120.5);
+
+    // Only the ref-wired card (ep-A) should have received seek calls — ep-B's
+    // ref is undefined (transcript not open there).
+    expect(seekCalls).toEqual([
+      { id: 'ep-A', seconds: 42 },
+      { id: 'ep-A', seconds: 120.5 },
+    ]);
   });
 
   it('caps rendered episodes at 3 even if API returns more', async () => {
