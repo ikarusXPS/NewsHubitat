@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import type { NewsArticle } from '../types';
+import { logger } from '../lib/logger';
 
 // Types matching backend
 export interface ShareUrls {
@@ -80,7 +81,7 @@ export function useShareClick() {
       });
     },
     // Fire and forget - don't block navigation
-    onError: (err) => console.error('Share tracking failed:', err),
+    onError: (err) => logger.error('Share tracking failed:', err),
   });
 }
 

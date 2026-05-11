@@ -22,6 +22,7 @@ import { cn, getRegionColor, getSentimentColor } from '../lib/utils';
 import { formatDateTime } from '../lib/formatters';
 import type { NewsArticle } from '../types';
 import { useState } from 'react';
+import { logger } from '../lib/logger';
 
 interface ArticleResponse {
   success: boolean;
@@ -79,7 +80,7 @@ export function Article() {
       setShareUrls(urls);
       setShareCode(urls.direct.split('/s/')[1]);
     } catch (err) {
-      console.error('Failed to create share:', err);
+      logger.error('Failed to create share:', err);
     } finally {
       setIsCreatingShare(false);
     }

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAppStore } from '../store';
 import { useAuth } from '../contexts/AuthContext';
 import type { AchievementUnlock } from '../types/gamification';
+import { logger } from '../lib/logger';
 
 interface UseAchievementsResult {
   pendingUnlock: AchievementUnlock | null;
@@ -106,7 +107,7 @@ export function useAchievements(): UseAchievementsResult {
             }),
           });
         } catch (e) {
-          console.error('Failed to award badge:', e);
+          logger.error('Failed to award badge:', e);
         }
         break; // Only show one unlock at a time
       }

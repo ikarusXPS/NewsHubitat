@@ -20,6 +20,7 @@ import type { GeoEvent, ApiResponse, EventSeverity } from '../types';
 
 // Lazy load heavy components
 import { lazy, Suspense } from 'react';
+import { logger } from '../lib/logger';
 const GlobeView = lazy(() => import('../components/GlobeView').then(m => ({ default: m.GlobeView })));
 const EventsMapEmbed = lazy(() => import('../components/EventsMapEmbed').then(m => ({ default: m.EventsMapEmbed })));
 
@@ -40,7 +41,7 @@ class ViewErrorBoundary extends Component<{ children: ReactNode; fallbackToMap: 
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('Monitor view error:', error, errorInfo);
+    logger.error('Monitor view error:', error, errorInfo);
   }
 
   render() {

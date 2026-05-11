@@ -2,6 +2,7 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import * as Sentry from '@sentry/react';
 import type { ReactNode } from 'react';
+import { logger } from '../lib/logger';
 
 interface User {
   id: string;
@@ -81,7 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setToken(null);
         }
       } catch {
-        console.error('Failed to verify token');
+        logger.error('Failed to verify token');
       } finally {
         setIsLoading(false);
       }

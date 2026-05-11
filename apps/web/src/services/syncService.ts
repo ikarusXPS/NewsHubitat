@@ -1,3 +1,5 @@
+import { logger } from '../lib/logger';
+
 const DB_NAME = 'newshub-sync';
 const DB_VERSION = 1;
 const QUEUE_STORE = 'sync-queue';
@@ -72,7 +74,7 @@ class SyncService {
       await (registration as ServiceWorkerRegistration & { sync: { register: (tag: string) => Promise<void> } }).sync.register('sync-queue');
       return true;
     } catch (error) {
-      console.warn('Background Sync registration failed:', error);
+      logger.warn('Background Sync registration failed:', error);
       return false;
     }
   }
@@ -94,7 +96,7 @@ class SyncService {
         await this.sendToServer(action);
         await this.removeAction(action.id);
       } catch (error) {
-        console.error('Sync failed for action:', action, error);
+        logger.error('Sync failed for action:', action, error);
         // Leave in queue for next retry
       }
     }
