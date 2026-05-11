@@ -51,3 +51,20 @@ Notes:
 
 - E2E coverage of the inner Play/Pause/Skip buttons (those have unit-test coverage and shouldn't regress in isolation).
 - Cross-browser matrix beyond Playwright's default chromium.
+
+## Resolution
+
+**Closed 2026-05-11 — commit `33663b4`.**
+
+Created `apps/web/e2e/podcasts.spec.ts` with a single test that asserts `<audio>.currentTime > 0` within 5 seconds of a single Play-button click. Network is fully stubbed via Playwright route handlers:
+
+- `GET /api/podcasts` → single curated stub feed
+- `GET /api/podcasts/:feedId/episodes` → single stub episode
+- The audio URL itself → 44-byte silent WAV inline (base64, no fixture-file dependency) so the audio CDN is never hit
+
+Also added `data-testid="podcast-episode-{id}"` to `PodcastEpisodeCard`'s outer container (the DX improvement flagged in the original todo body).
+
+Verification:
+- `npx tsc --noEmit` exit 0
+- Existing podcast unit tests (26 across 4 files) still green
+- **Not run in this commit:** Playwright suite requires a live dev server (`pnpm dev`) which wasn't available in the session environment. Spec is wired into the existing `test:e2e` script and will run on the next CI invocation.
