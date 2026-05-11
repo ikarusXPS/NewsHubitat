@@ -46,3 +46,19 @@ Implementation passes typecheck. 1627/1631 passing is 99.75% — well above the 
 ## When to act
 
 Before merging the milestone v1.6 PR, OR if 40-06 (transcripts) tests start hitting the same crash (which would indicate the issue is in shared test setup, not a single file).
+
+## Resolution
+
+**Resolved 2026-05-11 — no longer reproduces on master.**
+
+`pnpm test:run` baseline from repo root after commit `e2fa10d`:
+
+```
+Test Files  93 passed (93)
+Tests       1710 passed (1710)
+Duration    32.93s
+```
+
+Zero worker crashes, zero failed/skipped tests in the suite count. The original baseline was 1627/1631 with 1 worker fork crash on 2026-05-04; current master has gained ~80 tests across intervening 40-x merges, Phase 41 scaffold, and the 41-07 PII-scrubbing landing — all green.
+
+No fix commit needed. The crash was likely a transient memory pressure event on a heavy mock-setup test that has since been refactored or run on a different worker pool config. Closing.

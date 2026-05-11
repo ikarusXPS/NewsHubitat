@@ -64,3 +64,17 @@ cd apps/web && pnpm vitest run --reporter=verbose 2>&1 | grep -E "FAIL " | head 
 ## When to act
 
 Before milestone v1.6 PR creation, OR if `/gsd-verify-work 40` finds runtime issues that map to these failing tests. If verification passes despite the failures, address as a 40.x follow-up plan during the milestone-completion sweep.
+
+## Resolution
+
+**Resolved 2026-05-11 — no longer reproduces on master.**
+
+`pnpm test:run` baseline from repo root after commit `e2fa10d`:
+
+```
+Test Files  93 passed (93)
+Tests       1710 passed (1710)
+Duration    32.93s
+```
+
+The original baseline was 89/92 test files + 1655/1668 tests with 9 failures + 1 worker crash on 2026-05-04. Today's master shows 93/93 files + 1710/1710 tests, no failures, no crash. The 9 failures (likely fixture/mock-shape drift between plan execution waves) have been resolved by intervening commits across the 40-x phase tail, the 40.1 team-UI debt-payback, and the Phase 41 scaffold. No targeted fix commit needed for this todo. Closing.
