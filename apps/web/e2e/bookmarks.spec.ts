@@ -8,8 +8,18 @@ test.describe('Bookmarks Page', () => {
     await page.goto('/bookmarks');
     // Use domcontentloaded instead of networkidle to avoid WebSocket timeouts
     await page.waitForLoadState('domcontentloaded');
-    // Wait for React to hydrate
-    await page.waitForTimeout(500);
+    // Wait for either the empty-state or the articles grid (whichever the
+    // current localStorage state produces) — hydration-anchored, not a fixed
+    // sleep. See todo 40-13 for the anti-pattern audit; both anchors landed
+    // on Bookmarks.tsx in the same change.
+    await Promise.race([
+      page
+        .locator('[data-testid="bookmarks-empty-state"]')
+        .waitFor({ state: 'visible', timeout: 15000 }),
+      page
+        .locator('[data-testid="bookmarks-articles-grid"]')
+        .waitFor({ state: 'visible', timeout: 15000 }),
+    ]);
   });
 
   test('should load the Bookmarks page', async ({ page }) => {
@@ -27,18 +37,15 @@ test.describe('Bookmarks Page', () => {
   });
 
   test('should show empty state or articles grid', async ({ page }) => {
-    // Wait for content to load
-    await page.waitForTimeout(1000);
+    // beforeEach already waited on whichever anchor renders for the current
+    // bookmark state; just read both and assert exactly one is visible.
+    const hasEmpty = await page
+      .locator('[data-testid="bookmarks-empty-state"]')
+      .isVisible();
+    const hasArticles = await page
+      .locator('[data-testid="bookmarks-articles-grid"]')
+      .isVisible();
 
-    // Either empty state OR articles grid should be visible
-    // Use getByText for more reliable text matching
-    const emptyText = page.getByText('Keine gespeicherten Artikel');
-    const articleGrid = page.locator('.grid.gap-4');
-
-    const hasEmpty = await emptyText.isVisible().catch(() => false);
-    const hasArticles = await articleGrid.isVisible().catch(() => false);
-
-    // One of these must be true
     expect(hasEmpty || hasArticles).toBeTruthy();
   });
 

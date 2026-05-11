@@ -71,7 +71,10 @@ export function Bookmarks() {
         <p className="text-gray-400">
           {t('bookmarks:description')}
         </p>
-        <div className="flex flex-col items-center justify-center py-12 text-center">
+        <div
+          className="flex flex-col items-center justify-center py-12 text-center"
+          data-testid="bookmarks-empty-state"
+        >
           <Bookmark className="mb-4 h-16 w-16 text-gray-500" />
           <p className="text-gray-400">{t('bookmarks:empty.title')}</p>
           <p className="mt-2 text-sm text-gray-500">
@@ -127,7 +130,10 @@ export function Bookmarks() {
             })}
           </p>
 
-          <div className="grid gap-4 md:grid-cols-2 md:grid-cols-3">
+          <div
+            className="grid gap-4 md:grid-cols-2 md:grid-cols-3"
+            data-testid="bookmarks-articles-grid"
+          >
             {articles?.map((article, index) => (
               <NewsCard
                 key={article.id}
