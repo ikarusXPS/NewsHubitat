@@ -1,19 +1,28 @@
 /**
  * WhisperService (Phase 40-06 / D-C1 / T-40-06-01 / T-40-06-02).
  *
- * Wraps OpenAI Whisper API for podcast/video transcription. Returns
- * timestamped segments (CC-05) via `verbose_json` + `timestamp_granularities:
- * ['segment']`.
+ * Wraps an OpenAI-SDK-compatible Whisper API for podcast/video transcription.
+ * Returns timestamped segments (CC-05) via `verbose_json` +
+ * `timestamp_granularities: ['segment']`.
+ *
+ * Provider selection (2026-05-12 update):
+ *  - If `GROQ_API_KEY` is set → Groq Whisper (free dev tier, drop-in
+ *    OpenAI-API-compatible). Uses `whisper-large-v3-turbo` model.
+ *  - Else if `OPENAI_API_KEY` is set → OpenAI Whisper (paid, ~$0.006/min).
+ *    Uses `whisper-1` model.
+ *  - Else `getClient()` throws.
+ * Groq is preferred when both are set so dev/test stays free.
  *
  * Hard requirements (40-RESEARCH "Anti-Patterns to Avoid"):
- *  - Whisper API caps single uploads at 25 MB. Larger files are chunked with
- *    `ffmpeg-static` (10-min segments, `-c copy` so no re-encode is needed).
- *    Per-chunk timestamps are shifted by the chunk's offset so the merged
- *    `segments[].startSec/endSec` are continuous across chunks (CC-05).
+ *  - Whisper API caps single uploads at 25 MB (Groq + OpenAI both). Larger
+ *    files are chunked with `ffmpeg-static` (10-min segments, `-c copy` so
+ *    no re-encode is needed). Per-chunk timestamps are shifted by the
+ *    chunk's offset so the merged `segments[].startSec/endSec` are
+ *    continuous across chunks (CC-05).
  *  - HEAD pre-fetch rejects audio > 200 MB (T-40-06-02 cost guard) BEFORE the
  *    download happens.
- *  - The OpenAI client is constructed lazily; missing OPENAI_API_KEY only
- *    throws at first `transcribe()` call so dev boot stays non-fatal.
+ *  - The OpenAI-shaped client is constructed lazily; missing API keys only
+ *    throw at first `transcribe()` call so dev boot stays non-fatal.
  *  - `WHISPER_DISABLED=true` short-circuits to an empty result so E2E and
  *    integration tests don't burn API credits.
  *
@@ -50,9 +59,14 @@ const WHISPER_HARD_LIMIT_BYTES = 25 * 1024 * 1024; // 25 MB — Whisper API cap
 const HEAD_REJECT_BYTES = 200 * 1024 * 1024;        // 200 MB — T-40-06-02 cost guard
 const CHUNK_DURATION_SEC = 600;                     // 10-minute segments
 
+const GROQ_BASE_URL = 'https://api.groq.com/openai/v1';
+const GROQ_MODEL = 'whisper-large-v3-turbo';
+const OPENAI_MODEL = 'whisper-1';
+
 export class WhisperService {
   private static instance: WhisperService;
   private client: OpenAI | null = null;
+  private model: string = OPENAI_MODEL;
 
   private constructor() {
     logger.info('WhisperService initialized');
@@ -75,12 +89,25 @@ export class WhisperService {
 
   private getClient(): OpenAI {
     if (this.client) return this.client;
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) {
-      throw new Error('OPENAI_API_KEY is not set; WhisperService cannot transcribe.');
+
+    const groqKey = process.env.GROQ_API_KEY;
+    const openaiKey = process.env.OPENAI_API_KEY;
+
+    if (groqKey) {
+      this.client = new OpenAI({ apiKey: groqKey, baseURL: GROQ_BASE_URL });
+      this.model = GROQ_MODEL;
+      logger.info('whisperService:provider', { provider: 'groq', model: this.model });
+      return this.client;
     }
-    this.client = new OpenAI({ apiKey });
-    return this.client;
+    if (openaiKey) {
+      this.client = new OpenAI({ apiKey: openaiKey });
+      this.model = OPENAI_MODEL;
+      logger.info('whisperService:provider', { provider: 'openai', model: this.model });
+      return this.client;
+    }
+    throw new Error(
+      'Neither GROQ_API_KEY nor OPENAI_API_KEY is set; WhisperService cannot transcribe.',
+    );
   }
 
   /**
@@ -235,7 +262,7 @@ export class WhisperService {
     const client = this.getClient();
     const res = (await client.audio.transcriptions.create({
       file: createReadStream(filePath) as unknown as File,
-      model: 'whisper-1',
+      model: this.model,
       response_format: 'verbose_json',
       timestamp_granularities: ['segment'],
       language,
