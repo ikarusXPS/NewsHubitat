@@ -40,6 +40,25 @@ vi.mock('../utils/logger', () => ({
   default: { info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() },
 }));
 
+// Imports added to podcasts.ts for the PREMIUM-gated /transcripts/search route
+// must be mocked here too — without these, the route module's top-level imports
+// load real prisma + auth, which need DATABASE_URL + JWT setup at test boot.
+vi.mock('../db/prisma', () => ({
+  prisma: {
+    $queryRaw: vi.fn(),
+    podcastEpisode: { findMany: vi.fn(), findUnique: vi.fn() },
+  },
+}));
+
+vi.mock('../services/authService', () => ({
+  authMiddleware: (_req: unknown, _res: unknown, next: () => void) => next(),
+}));
+
+vi.mock('../middleware/requireTier', () => ({
+  requireTier:
+    () => (_req: unknown, _res: unknown, next: () => void) => next(),
+}));
+
 function makeRes(): Response {
   const res: Partial<Response> = {};
   res.status = vi.fn().mockReturnValue(res as Response);
