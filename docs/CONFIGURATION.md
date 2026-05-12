@@ -56,8 +56,9 @@ These power podcast search, YouTube ingestion, and on-demand audio transcription
 | `PODCAST_INDEX_API_KEY` | Optional | None | Podcast Index API key (Phase 40-03 / CONT-03). Both this and `PODCAST_INDEX_API_SECRET` are required to enable podcast search. When unset, `PodcastIndexService` returns empty results and warns (never throws). HMAC SHA-1 auth: `sha1(KEY + SECRET + unixTimeSeconds)`, lowercase hex. Sign up at <https://api.podcastindex.org/>. |
 | `PODCAST_INDEX_API_SECRET` | Optional | None | Companion secret for the HMAC signature. |
 | `YOUTUBE_DATA_API_KEY` | Optional | None | YouTube Data API v3 key. Required for video channel polling (`videoChannelPollJob.ts`). `YouTubeService.requireApiKey()` throws when unset. |
-| `OPENAI_API_KEY` | Optional | None | OpenAI API key — used **only** by `WhisperService` (`apps/web/server/services/whisperService.ts`) for podcast/video audio transcription. Throws `'OPENAI_API_KEY is not set; WhisperService cannot transcribe.'` when transcription is requested without it. |
-| `WHISPER_DISABLED` | Optional | (unset) | Set to `true` to short-circuit `WhisperService.transcribe()` and return an empty transcript without calling OpenAI. Useful for staging/CI where you want podcast/video flows to run without burning Whisper quota. |
+| `GROQ_API_KEY` | Optional (preferred) | None | Groq API key — preferred provider for `WhisperService` (`apps/web/server/services/whisperService.ts`). Uses `whisper-large-v3-turbo` via `https://api.groq.com/openai/v1`. Free dev tier, drop-in OpenAI-API-compatible, ~10× faster than OpenAI Whisper. When both `GROQ_API_KEY` and `OPENAI_API_KEY` are set, Groq wins. Sign up at <https://console.groq.com>. |
+| `OPENAI_API_KEY` | Optional (fallback) | None | OpenAI API key — fallback provider for `WhisperService` when `GROQ_API_KEY` is unset. Uses `whisper-1` model (paid, ~$0.006/min). When BOTH keys are unset, `WhisperService.getClient()` throws and `TranscriptService.transcribePodcastEpisode()` writes `provider='unavailable'` sentinel rows. |
+| `WHISPER_DISABLED` | Optional | (unset) | Set to `true` to short-circuit `WhisperService.transcribe()` and return an empty transcript without calling any provider. Useful for CI/E2E where you want podcast/video flows to run without burning API quota. |
 
 ### Email / SMTP
 

@@ -133,7 +133,7 @@ Before pushing any changes, run the full verification chain:
 pnpm typecheck && pnpm test:run && pnpm build
 ```
 
-This replicates the CI pipeline locally: TypeScript validation across all packages, Vitest unit tests (80% coverage / 71% branches gate), then a full build. All three must pass before a PR will merge.
+This replicates the CI pipeline locally: TypeScript validation across all packages, Vitest unit tests (80% coverage / 73% branches gate), then a full build. All three must pass before a PR will merge.
 
 ## 10. (Optional) Pre-create test users for load testing
 

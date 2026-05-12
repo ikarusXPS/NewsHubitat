@@ -264,7 +264,7 @@ import type { PerspectiveRegion, NewsArticle, ApiResponse } from '@newshub/types
   - `setup` — runs `*.setup.ts`, creates the auth state file
   - `chromium` — unauthenticated tests
   - `chromium-auth` — authenticated tests using `playwright/.auth/user.json` as `storageState`; depends on `setup`
-- **Vitest coverage:** 80% statements/functions/lines, **71% branches** (see `apps/web/vitest.config.ts` and `.planning/todos/pending/40-11-coverage-backfill.md`).
+- **Vitest coverage:** 80% statements/functions/lines, **73% branches** (see `apps/web/vitest.config.ts` and `.planning/todos/pending/40-11-coverage-backfill.md`).
 - **Bundle budget:** 250KB warning threshold (CI annotation, non-blocking — the PR-vs-base size compare uses `continue-on-error: true` because the action fails on stale-lockfile master).
 - **Sentry source maps:** uploaded during CI builds via `@sentry/vite-plugin`; release tag is `newshub@${{ github.sha }}`.
 

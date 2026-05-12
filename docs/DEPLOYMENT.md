@@ -83,7 +83,7 @@ push / PR ──────┼─ typecheck ───────┼──┬�
 4. **`test`** — Unit tests with PostgreSQL 17 and Redis 7.4 service containers. Steps:
    - `pnpm --filter @newshub/web exec prisma generate`
    - `bash apps/web/scripts/ci-setup-db.sh` — strips `@default(dbgenerated(...))` from tsvector columns before `db push`, then re-adds them via raw FTS migrations as `GENERATED ALWAYS AS ... STORED`
-   - `pnpm test:coverage` — Vitest with coverage gate: **80% lines/functions/statements; branches at 71%** per the TODO waiver in `vitest.config.ts`
+   - `pnpm test:coverage` — Vitest with coverage gate: **80% lines/functions/statements; branches at 73%** per the TODO waiver in `vitest.config.ts`
    - Env: `DATABASE_URL=postgresql://newshub:test@localhost:5432/newshub`, `REDIS_URL=redis://localhost:6379`, `JWT_SECRET=test-jwt-secret-for-ci`
 5. **`bundle-analysis`** — Runs after `lint`/`typecheck`/`test`. Builds with the Vite visualizer, reports the main chunk size to `$GITHUB_STEP_SUMMARY`, and emits a `::warning::` if it exceeds the **250 KB** target. Uses `preactjs/compressed-size-action@v2` for the PR-vs-base comparison (`continue-on-error: true` — bundle budget is a warning, not a gate).
    - Uses a placeholder `DATABASE_URL` solely to satisfy the fail-fast guard in `prisma.config.ts` during `prisma generate`. No real DB is reached.
@@ -486,7 +486,7 @@ Defined in `prometheus/alert.rules.yml`:
 Before promoting a release to production:
 
 - [ ] `pnpm typecheck && pnpm test:run && pnpm build` clean locally
-- [ ] Coverage gate at 80 % (branches at 71 % per the TODO waiver in `vitest.config.ts` — make sure new code raises, not lowers, the bar)
+- [ ] Coverage gate at 80 % (branches at 73 % per the TODO waiver in `vitest.config.ts` — make sure new code raises, not lowers, the bar)
 - [ ] `pnpm validate:ci` passes after any workflow edits
 - [ ] `pnpm test:fanout` passes (Phase 37 cross-replica WebSocket gate) if the production stack is Swarm
 - [ ] All required GitHub Secrets set (see "Required GitHub Secrets" table above)

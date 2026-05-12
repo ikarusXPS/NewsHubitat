@@ -282,7 +282,7 @@ If `pnpm test:fanout` fails, `docker compose -f e2e-stack/docker-compose.test.ym
 
 Tests run in `.github/workflows/ci.yml`:
 
-- **Lint + typecheck + unit tests + build** — Runs on every push and PR. The unit-test step is `pnpm test:coverage` and enforces the thresholds in `vitest.config.ts` (80% statements / lines / functions; **71% branches** — see waiver above). Failing coverage fails the build.
+- **Lint + typecheck + unit tests + build** — Runs on every push and PR. The unit-test step is `pnpm test:coverage` and enforces the thresholds in `vitest.config.ts` (80% statements / lines / functions; **73% branches** — see waiver above). Failing coverage fails the build.
 - **E2E tests** — Run after build succeeds, with PostgreSQL 17 and Redis 7.4-alpine as service containers. Chromium-only browser install (`pnpm --filter @newshub/web exec playwright install --with-deps chromium`). The job runs `pnpm --filter @newshub/web exec playwright test --reporter=html` with a 30-minute timeout. The HTML report (`apps/web/playwright-report/`) is uploaded as an artifact with 7-day retention.
 - **Lighthouse CI** — Runs *after* `deploy-staging`, **on master only**. `deploy-staging` is currently gated `if: false` (single-env decision 2026-05-05 — see `.planning/todos/pending/40-12-production-deploy-setup.md`), so Lighthouse and `deploy-production` cascade-skip until provisioning happens. When live: 90+ required for performance, accessibility, best-practices, SEO; Core Web Vitals (LCP / CLS / INP / FCP) are tracked but warn-only.
 - **Branch protection on `master`:** the required check names are `Lint`, `Type Check`, `Unit Tests`, `Build Docker Image`, `E2E Tests` (display names, not job IDs); strict mode is on and admins are enforced.

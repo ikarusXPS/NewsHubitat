@@ -245,7 +245,7 @@ Architecture deep-dive: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 | **Mobile** | Capacitor 8 (iOS + Android) | 95%+ code reuse — wraps the same `apps/web/dist` bundle |
 | **i18n** | `react-i18next` + `i18next-icu` (DE / EN / FR) | ICU plural rules + bidirectional Zustand sync |
 | **PWA** | `vite-plugin-pwa` | Offline shell + install banner |
-| **Testing** | Vitest 80% lines / 71% branches (waiver), Playwright | Unit + integration + E2E |
+| **Testing** | Vitest 80% lines / 73% branches (waiver), Playwright | Unit + integration + E2E |
 | **Observability** | Prometheus + Grafana + Alertmanager + Sentry | Metrics, dashboards, alerting, error tracking |
 | **Deployment** | Docker Swarm + Traefik (sticky `nh_sticky` cookie) | Horizontal scaling with sticky-session WebSockets |
 
@@ -910,7 +910,7 @@ pnpm dev:backend               # Backend only
 pnpm typecheck                 # TypeScript across all packages
 pnpm lint                      # ESLint
 pnpm test:run                  # Vitest unit tests (CI mode)
-pnpm test:coverage             # Coverage report (80% lines / 71% branches gate)
+pnpm test:coverage             # Coverage report (80% lines / 73% branches gate)
 pnpm build                     # Production build (frontend + backend)
 
 # E2E
@@ -1052,7 +1052,7 @@ Production: Docker Swarm via `stack.yml` — see [Tutorial 6](#tutorials).
 
 1. Fork the repository
 2. Create a feature branch (`feat/short-description` or `fix/short-description`)
-3. Write tests first — TDD is the project default; coverage gate is 80% lines / 71% branches
+3. Write tests first — TDD is the project default; coverage gate is 80% lines / 73% branches
 4. Run `pnpm typecheck && pnpm test:run && pnpm build` before pushing
 5. Use [conventional commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `chore:`, `docs:`, `refactor:`)
 6. Open a PR — CI runs lint, typecheck, source-bias check, unit tests (with coverage gate), Docker build, and E2E

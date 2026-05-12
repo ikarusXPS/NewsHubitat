@@ -8,7 +8,7 @@ NewsHub is a multi-perspective global news analysis platform. It aggregates news
 
 ## Planning Workflow (.planning/)
 
-This repo is driven by the GSD planning system. Read these before resuming work:
+This repo is driven by the GSD planning system. **`.planning/` is gitignored as of 2026-05-12** — kept locally on disk for the workflow but never published. The directory was purged from public git history when the repo was still public (commit `bee6423` + `git filter-repo`), and the repo is now private. Don't re-add `.planning/` to git. Read these before resuming work:
 
 - `.planning/STATE.md` — Current milestone, phase, in-flight plan, and decisions log (read first)
 - `.planning/ROADMAP.md` — Phase breakdown, dependencies, and goals
@@ -55,6 +55,7 @@ These rules cost milestone v1.6 four full sub-phases (36.1, 36.2, 36.3, 36.4) of
 - **Never write to root `server/`, `prisma/`, or `src/`.** Those paths were physically deleted in commit `651ce93` (Phase 36.3-03). Valid file roots are `apps/web/...`, `apps/<other>/...`, `packages/...`, `.github/...`, `.planning/...`, plus named top-level configs (`docker-compose.yml`, `Dockerfile`, etc.). A root-level write compiles fine but `pnpm dev:backend` runs `apps/web/server/index.ts` — orphan files are dead code.
 - **`prisma.config.ts` lives at `apps/web/prisma.config.ts`, never root.** Prisma 7's `schema:` field resolves relative to the config file's directory, not cwd. A root-level config silently loads a stale duplicate schema (this dropped the ApiKey table in Phase 36.2-03).
 - **Single-environment deployment (decision 2026-05-05).** NewsHub is pre-launch; the `deploy-staging` CI job exists as scaffolding only (`if: false`). Production is provisioned directly when needed — do not re-enable `deploy-staging` without a real staging tier behind it (Lighthouse/load-test workflows assume `STAGING_URL` exists). See `.planning/todos/pending/40-12-production-deploy-setup.md` for the provisioning plan.
+- **Never set `crossOrigin="anonymous"` on the podcast `<audio>` element** (commit `ee03680`, 2026-05-12). The podcast CDN redirect chain (`dts.podtrac.com → pdst.fm → pfx.vpixl.com → pscrb.fm → simplecastaudio.com`) drops `Access-Control-Allow-Origin` across hops; the final 200 audio/mpeg response lacks the header entirely. With `crossOrigin` set, the browser rejects the source with `NotSupportedError: The element has no supported sources` and audio never plays. CORS is only required for Web Audio API analysis or canvas frame capture — neither is in scope for `PodcastPlayer.tsx`.
 
 ## Commands
 
@@ -71,7 +72,7 @@ pnpm typecheck && pnpm test:run && pnpm build
 pnpm typecheck            # TypeScript validation (all packages)
 pnpm lint                 # ESLint validation (all packages)
 
-# Unit Testing (Vitest) - 80% coverage (branches at 71% per waiver in vitest.config.ts)
+# Unit Testing (Vitest) - 80% coverage (branches at 73% per waiver in vitest.config.ts)
 pnpm test                 # Run unit tests (watch mode)
 pnpm test:run             # Run tests once (CI mode)
 pnpm test:coverage        # Coverage report (fails below threshold)
@@ -140,7 +141,7 @@ docker compose logs -f app
 - **Translation**: Multi-provider chain (DeepL → Google → LibreTranslate → Claude)
 - **Mobile**: Capacitor 8 (iOS + Android) wrapping the same `apps/web/dist` bundle (95% code reuse)
 - **Production scaling**: Docker Swarm + Traefik (sticky sessions via `nh_sticky` cookie); separate `app-worker` Swarm service (replicas=1) runs singleton jobs
-- **Testing**: Vitest (unit, 80% coverage; **branches at 71% — see waiver in `vitest.config.ts` and `.planning/todos/pending/40-11-coverage-backfill.md`**) + Playwright (E2E)
+- **Testing**: Vitest (unit, 80% coverage; **branches at 73% — see waiver in `vitest.config.ts` and `.planning/todos/pending/40-11-coverage-backfill.md`**) + Playwright (E2E)
 - **Monitoring**: Prometheus + Grafana + Alertmanager; Sentry for errors
 
 ## Architecture
@@ -171,6 +172,8 @@ docker compose logs -f app
 | `teamService.ts` | Team collaboration features |
 | `commentService.ts` | Article comments with threading |
 | `subscriptionService.ts` | Stripe subscription management |
+| `whisperService.ts` | Audio transcription — **Groq-first** (`whisper-large-v3-turbo`, free dev tier); OpenAI (`whisper-1`) fallback when only `OPENAI_API_KEY` is set |
+| `transcriptService.ts` | Pitfall-4 publisher-RSS short-circuit → Whisper fallback → `provider='unavailable'` sentinel. PREMIUM-gated routes consume this. |
 
 ### Shared Types (`packages/types/`)
 Import shared types from `@newshub/types`:
@@ -284,6 +287,8 @@ interface ApiResponse<T> {
 | `/api/events/timeline` | GET | Historical event timeline |
 | `/api/comments/:articleId` | GET/POST | Article comments |
 | `/api/teams` | GET/POST | Team management |
+| `/api/podcasts/transcripts/search` | GET | **PREMIUM-gated** cross-episode transcript FTS search; returns `TranscriptHit[]` with episode title, podcast title, excerpt, startSec. Frontend consumer: `PodcastsPage.tsx` `fetchTranscriptSearch()` |
+| `/api/transcripts/:contentType/:id` | GET | **PREMIUM-gated** single transcript with segments |
 | `/api/health` | GET | Server status |
 | `/api/metrics` | GET | Prometheus metrics |
 
@@ -326,7 +331,7 @@ Tiered access enforced via middleware. Tiers: `FREE` / `PREMIUM` / `ENTERPRISE`.
 
 ## CI/CD
 
-- **`.github/workflows/ci.yml`** — Lint, typecheck, test (80% coverage / 71% branches gate), build. **`deploy-staging` is currently gated `if: false`** (single-env decision 2026-05-05 — see `.planning/todos/pending/40-12-production-deploy-setup.md`). Lighthouse + `deploy-production` cascade-skip via `needs: deploy-staging` until provisioning happens. When live: 90+ Lighthouse required for performance / accessibility / best-practices / SEO; Core Web Vitals warn-only.
+- **`.github/workflows/ci.yml`** — Lint, typecheck, test (80% coverage / 73% branches gate), build. **`deploy-staging` is currently gated `if: false`** (single-env decision 2026-05-05 — see `.planning/todos/pending/40-12-production-deploy-setup.md`). Lighthouse + `deploy-production` cascade-skip via `needs: deploy-staging` until provisioning happens. When live: 90+ Lighthouse required for performance / accessibility / best-practices / SEO; Core Web Vitals warn-only.
 - **`.github/workflows/load-test.yml`** — k6 load tests via `workflow_dispatch` against `STAGING_URL` (manual; dormant until production exists).
 - **Validate locally:** `pnpm validate:ci` (uses `action-validator`)
 - **Sentry:** `@sentry/vite-plugin` uploads source maps during CI build; release tag `newshub@${{ github.sha }}`; environment set per deploy job.
@@ -426,6 +431,12 @@ JWT_SECRET=               # Required, minimum 32 characters
 OPENROUTER_API_KEY=       # FREE tier - multiple free models (recommended)
 GEMINI_API_KEY=           # FREE tier - 1500 req/day
 ANTHROPIC_API_KEY=        # Premium fallback
+
+# Whisper transcription (ONE required for PREMIUM transcript-search feature, priority: Groq → OpenAI)
+# When both set, Groq wins. Without either, TranscriptService writes provider='unavailable' sentinels.
+GROQ_API_KEY=             # FREE dev tier - drop-in OpenAI-API-compat, ~10x faster (recommended)
+OPENAI_API_KEY=           # Paid fallback (~$0.006/min) — only used by WhisperService
+WHISPER_DISABLED=         # Set to 'true' in CI/E2E to short-circuit transcription (no API call)
 
 # Translation (at least one recommended)
 DEEPL_API_KEY=
