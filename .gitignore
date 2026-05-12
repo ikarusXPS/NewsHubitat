@@ -19,30 +19,48 @@ yarn.lock
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
+.idea/
 .idea
+.vs/
+.history/
 .DS_Store
+Thumbs.db
+desktop.ini
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
 
+# TypeScript / build incremental
+*.tsbuildinfo
+.tsbuildinfo
+
 # Claude Code (v6 Post-Dev Workflow)
 .claude/handoff.md
 .claude/checkpoints/
 .claude/web-checklist-state.json
+.claude/worktrees/
+.claude/settings.local.json
 
+# Prisma generated client (regenerated via `prisma generate` — never edit, never commit)
 /src/generated/prisma
+**/generated/prisma/
+**/src/generated/prisma/
 
 # Database
 dev.db
 *.db
 
-# Playwright auth state (security: contains session tokens)
+# Playwright auth state (CRITICAL: contains JWT session tokens)
+# Old root-relative path kept for compatibility; the apps/web monorepo path is the one that actually matters.
 playwright/.auth/user.json
+**/playwright/.auth/*
+!**/playwright/.auth/.gitkeep
 
 # Load test data with plain passwords
 k6/data/users.json
+**/k6/data/users.json
 
 # Secrets — never commit
 .env
@@ -63,6 +81,12 @@ apps/web/test-results/
 # k6 load-test reports
 summary.html
 summary.json
+
+# GSD planning workflow scratch (intermediate doc-verifier outputs, manifests, dependabot dumps, etc.)
+.planning/tmp/
+
+# Diagnostic dumps at repo root (claude-code-diagnose.md and similar)
+/claude-code-diagnose.md
 
 # Windows / shell-quoting accidents
 nul
