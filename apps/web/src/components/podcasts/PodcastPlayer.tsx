@@ -42,6 +42,13 @@ export interface PodcastPlayerProps {
    * autoplay policy treats it as user-initiated). Defaults to false.
    */
   autoPlayOnMount?: boolean;
+  /**
+   * When set (> 0), seek to this position once metadata loads. Combines
+   * with `autoPlayOnMount` to deep-link into a transcript timestamp:
+   * the seek happens before the autoplay attempt so playback starts at
+   * the requested position. Defaults to undefined (no seek).
+   */
+  initialSeekSec?: number;
 }
 
 export interface PodcastPlayerHandle {
@@ -64,7 +71,7 @@ function formatSec(s: number): string {
 
 export const PodcastPlayer = forwardRef<PodcastPlayerHandle, PodcastPlayerProps>(
   function PodcastPlayer(
-    { audioUrl, title, onTimeUpdate, className, autoPlayOnMount },
+    { audioUrl, title, onTimeUpdate, className, autoPlayOnMount, initialSeekSec },
     ref,
   ) {
     const { t } = useTranslation('podcasts');
@@ -100,6 +107,16 @@ export const PodcastPlayer = forwardRef<PodcastPlayerHandle, PodcastPlayerProps>
       };
       const onLoaded = () => {
         setDuration(audio.duration);
+        if (
+          initialSeekSec !== undefined &&
+          initialSeekSec > 0 &&
+          !hasAttemptedAutoPlay.current
+        ) {
+          // Seek BEFORE the autoplay attempt so playback begins at the
+          // requested timestamp (deep-link from transcript search hit).
+          audio.currentTime = initialSeekSec;
+          setCurrentTime(initialSeekSec);
+        }
         if (autoPlayOnMount && !hasAttemptedAutoPlay.current && audio.paused) {
           hasAttemptedAutoPlay.current = true;
           void audio.play().catch(() => {
@@ -134,7 +151,7 @@ export const PodcastPlayer = forwardRef<PodcastPlayerHandle, PodcastPlayerProps>
       };
       // onTimeUpdate and autoPlayOnMount are the re-runnable deps; ref-based
       // audio lookup is stable across renders so the effect can re-run safely.
-    }, [onTimeUpdate, autoPlayOnMount]);
+    }, [onTimeUpdate, autoPlayOnMount, initialSeekSec]);
 
     const togglePlay = useCallback(() => {
       const audio = audioRef.current;
@@ -196,13 +213,17 @@ export const PodcastPlayer = forwardRef<PodcastPlayerHandle, PodcastPlayerProps>
           className,
         )}
       >
-        {/* No `controls` attribute — custom UI. crossOrigin avoids credentialed
-            requests to third-party CDNs. */}
+        {/* No `controls` attribute — custom UI. No `crossOrigin` attribute:
+            podcast CDN chains (podtrac → pdst.fm → simplecastaudio.com etc.)
+            do NOT preserve `Access-Control-Allow-Origin` across every redirect
+            hop. With `crossOrigin="anonymous"` the browser rejects the source
+            as "no supported sources". `<audio>` playback does not require CORS
+            unless we read the buffer via Web Audio API or render to canvas —
+            neither is in scope. Removed 2026-05-12 per UAT 8 diagnose. */}
         <audio
           ref={audioRef}
           src={audioUrl}
           preload="metadata"
-          crossOrigin="anonymous"
           aria-label={title}
         />
 
