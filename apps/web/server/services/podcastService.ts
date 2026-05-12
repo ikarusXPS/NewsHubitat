@@ -287,7 +287,17 @@ export class PodcastService {
             transcriptUrl: transcript?.url ?? null,
             transcriptType: transcript?.type ?? null,
           },
-          update: {},
+          // Backfill `transcriptUrl` + `transcriptType` on existing rows.
+          // Phase 40-03 originally shipped with `update: {}` so episodes
+          // imported before a publisher added `<podcast:transcript>` to
+          // their feed would never get the field. Pitfall 4's cost guard
+          // (publisher transcript wins over Whisper) only fires when the
+          // field is set, so re-poll backfill is required to actually
+          // honor it. See .planning/todos/pending/40-14-publisher-transcripts.md.
+          update: {
+            transcriptUrl: transcript?.url ?? null,
+            transcriptType: transcript?.type ?? null,
+          },
         });
         inserted++;
       } catch (err) {

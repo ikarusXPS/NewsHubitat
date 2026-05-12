@@ -321,6 +321,59 @@ describe('PodcastService', () => {
       expect(payload.create.podcastGuid).toBe('guid-1');
     });
 
+    it('backfills transcriptUrl + transcriptType on existing rows (40-14)', async () => {
+      // Regression: original Phase 40-03 shipped upsert.update: {} which meant
+      // episodes inserted before a publisher started exposing <podcast:transcript>
+      // would never get the field, even on subsequent polls. Pitfall 4's cost
+      // guard depends on the field being set, so the backfill matters.
+      mockParseURL.mockResolvedValueOnce({
+        description: 'Channel',
+        items: [
+          {
+            title: 'Episode 1',
+            content: 'plain',
+            enclosure: { url: 'https://x/audio.mp3' },
+            pubDate: '2026-05-01T00:00:00Z',
+            podcastGuid: 'guid-backfill',
+            transcripts: [
+              { $: { url: 'https://x/late-transcript.srt', type: 'application/srt' } },
+            ],
+          },
+        ],
+      });
+      const mod = await loadFreshService();
+      const svc = mod.PodcastService.getInstance();
+      await svc.pollFeed(feed);
+      const payload = prismaMock.podcastEpisode.upsert.mock.calls[0][0];
+      expect(payload.update.transcriptUrl).toBe('https://x/late-transcript.srt');
+      expect(payload.update.transcriptType).toBe('application/srt');
+    });
+
+    it('update.transcriptUrl is explicitly null when the feed drops the tag', async () => {
+      // Symmetric case: if a publisher REMOVES the <podcast:transcript> tag
+      // after first publishing it, the row should reflect that — null beats
+      // a stale URL that 404s on Pitfall 4 fetch.
+      mockParseURL.mockResolvedValueOnce({
+        description: 'Channel',
+        items: [
+          {
+            title: 'Episode 1',
+            content: 'plain',
+            enclosure: { url: 'https://x/audio.mp3' },
+            pubDate: '2026-05-01T00:00:00Z',
+            podcastGuid: 'guid-dropped',
+            // no `transcripts` field at all
+          },
+        ],
+      });
+      const mod = await loadFreshService();
+      const svc = mod.PodcastService.getInstance();
+      await svc.pollFeed(feed);
+      const payload = prismaMock.podcastEpisode.upsert.mock.calls[0][0];
+      expect(payload.update.transcriptUrl).toBeNull();
+      expect(payload.update.transcriptType).toBeNull();
+    });
+
     it('strips HTML from description (Test 11 — H8/M2)', async () => {
       mockParseURL.mockResolvedValueOnce({
         description: 'Channel',
