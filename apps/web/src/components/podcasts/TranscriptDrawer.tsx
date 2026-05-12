@@ -21,7 +21,7 @@
  * conditionally renders the gate and never tries to bypass server checks.
  */
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
@@ -37,6 +37,14 @@ export interface TranscriptDrawerProps {
   id: string;
   onSeek?: (seconds: number) => void;
   className?: string;
+  /**
+   * Current audio playback position in seconds. When provided, the
+   * segment containing this position is highlighted and auto-scrolled
+   * into view. Used to make Whisper timestamp inaccuracy navigable —
+   * users can see where the audio is and click adjacent segments to
+   * correct any drift.
+   */
+  currentSec?: number;
 }
 
 export function TranscriptDrawer({
@@ -44,6 +52,7 @@ export function TranscriptDrawer({
   id,
   onSeek,
   className,
+  currentSec,
 }: TranscriptDrawerProps) {
   const namespace = contentType === 'podcast' ? 'podcasts' : 'videos';
   const { t } = useTranslation(namespace);
@@ -117,6 +126,13 @@ export function TranscriptDrawer({
       )
     : segments;
 
+  const activeIndex =
+    currentSec !== undefined
+      ? filtered.findIndex(
+          (seg) => currentSec >= seg.startSec && currentSec < seg.endSec,
+        )
+      : -1;
+
   return (
     <div
       data-testid="transcript-drawer-premium"
@@ -135,13 +151,49 @@ export function TranscriptDrawer({
       />
       <div className="max-h-96 overflow-y-auto divide-y divide-gray-800">
         {filtered.map((seg, i) => (
-          <TranscriptSegment
+          <ActiveAwareSegment
             key={`${seg.startSec}-${i}`}
             segment={seg}
             onSeek={onSeek}
+            isActive={i === activeIndex}
           />
         ))}
       </div>
+    </div>
+  );
+}
+
+/**
+ * Wrapper around TranscriptSegment that auto-scrolls into view when this
+ * segment becomes active (audio playback reached its time range) and
+ * draws a cyber-accent border so the user can SEE where the audio is.
+ * Bridges Whisper's ±2-5s timestamp drift — user clicks an adjacent
+ * segment to correct if the highlighted line doesn't match what's heard.
+ */
+function ActiveAwareSegment({
+  segment,
+  onSeek,
+  isActive,
+}: {
+  segment: { startSec: number; endSec: number; text: string };
+  onSeek?: (s: number) => void;
+  isActive: boolean;
+}) {
+  const ref = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (isActive && ref.current) {
+      ref.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, [isActive]);
+  return (
+    <div
+      ref={ref}
+      className={cn(
+        'transition-colors',
+        isActive && 'bg-[#00f0ff]/10 border-l-2 border-[#00f0ff]',
+      )}
+    >
+      <TranscriptSegment segment={segment} onSeek={onSeek} />
     </div>
   );
 }

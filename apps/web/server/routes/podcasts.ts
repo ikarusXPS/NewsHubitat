@@ -20,7 +20,24 @@ import { Router, Request, Response } from 'express';
 import { z } from 'zod';
 import { PodcastService } from '../services/podcastService';
 import { PODCAST_FEEDS } from '../config/podcasts';
+import { prisma } from '../db/prisma';
+import { authMiddleware } from '../services/authService';
+import { requireTier, type TierRequest } from '../middleware/requireTier';
 import logger from '../utils/logger';
+
+interface TranscriptSegment {
+  startSec: number;
+  endSec: number;
+  text: string;
+}
+
+interface TranscriptHit {
+  episodeId: string;
+  episodeTitle: string;
+  podcastTitle: string;
+  excerpt: string;
+  startSec?: number;
+}
 
 export const podcastRoutes = Router();
 const podcastService = PodcastService.getInstance();
@@ -30,6 +47,11 @@ const feedIdSchema = z.string().min(1).max(64).regex(/^[a-z0-9-]+$/i);
 const episodeIdSchema = z.string().min(1).max(128);
 const articleIdSchema = z.string().min(1).max(128);
 const limitSchema = z.coerce.number().int().min(1).max(100).default(50);
+const transcriptSearchSchema = z.object({ q: z.string().min(1).max(200) });
+
+const TRANSCRIPT_SEARCH_EPISODE_LIMIT = 20;
+const TRANSCRIPT_SEARCH_SEGMENTS_PER_EPISODE = 3;
+const TRANSCRIPT_SEARCH_EXCERPT_CHARS = 220;
 
 // 1. Browse curated podcasts (FREE)
 podcastRoutes.get('/', async (_req: Request, res: Response) => {
@@ -38,6 +60,77 @@ podcastRoutes.get('/', async (_req: Request, res: Response) => {
   res.set('Vary', 'Accept-Encoding');
   res.json({ success: true, data, meta: { total: data.length } });
 });
+
+// 1b. Cross-episode transcript search (PREMIUM-gated).
+// MUST precede the /:feedId/episodes dynamic route so Express does not treat
+// "transcripts" as a feedId. Uses the FTS GIN index on Transcript.search_tsv
+// (Phase 40-01) to narrow rows, then filters segments in JS for excerpt picks.
+// Frontend consumer: apps/web/src/pages/PodcastsPage.tsx fetchTranscriptSearch().
+podcastRoutes.get(
+  '/transcripts/search',
+  authMiddleware,
+  requireTier('PREMIUM'),
+  async (req: TierRequest, res: Response) => {
+    const parsed = transcriptSearchSchema.safeParse(req.query);
+    if (!parsed.success) {
+      res.status(400).json({ success: false, error: 'invalid_query' });
+      return;
+    }
+    const query = parsed.data.q;
+    try {
+      const matches = (await prisma.$queryRaw`
+        SELECT t."contentId", t.segments, e.title AS "episodeTitle", e."podcastId"
+        FROM "Transcript" t
+        INNER JOIN "PodcastEpisode" e ON e.id = t."contentId"
+        WHERE t."contentType" = 'podcast'
+          AND t.provider <> 'unavailable'
+          AND t.search_tsv @@ websearch_to_tsquery('simple', ${query})
+        LIMIT ${TRANSCRIPT_SEARCH_EPISODE_LIMIT}
+      `) as Array<{
+        contentId: string;
+        segments: unknown;
+        episodeTitle: string;
+        podcastId: string;
+      }>;
+
+      const tokens = query
+        .toLowerCase()
+        .split(/\s+/)
+        .filter((t) => t.length >= 2);
+      const hits: TranscriptHit[] = [];
+
+      for (const m of matches) {
+        const feed = PODCAST_FEEDS.find((f) => f.id === m.podcastId);
+        const podcastTitle = feed?.title ?? m.podcastId;
+        const segs = Array.isArray(m.segments) ? (m.segments as TranscriptSegment[]) : [];
+        const matching =
+          tokens.length === 0
+            ? segs
+            : segs.filter((s) =>
+                tokens.every((tok) => s.text.toLowerCase().includes(tok)),
+              );
+        for (const seg of matching.slice(0, TRANSCRIPT_SEARCH_SEGMENTS_PER_EPISODE)) {
+          const text = String(seg.text ?? '').trim();
+          hits.push({
+            episodeId: m.contentId,
+            episodeTitle: m.episodeTitle,
+            podcastTitle,
+            excerpt:
+              text.length > TRANSCRIPT_SEARCH_EXCERPT_CHARS
+                ? text.slice(0, TRANSCRIPT_SEARCH_EXCERPT_CHARS) + '…'
+                : text,
+            startSec: typeof seg.startSec === 'number' ? seg.startSec : undefined,
+          });
+        }
+      }
+      res.set('Cache-Control', 'private, max-age=300');
+      res.json({ success: true, data: hits, meta: { total: hits.length } });
+    } catch (err) {
+      logger.error('podcastsTranscriptsSearch:failed', { err: String(err) });
+      res.status(500).json({ success: false, error: 'internal_error' });
+    }
+  },
+);
 
 // 2. Single episode by id — MUST precede the /:feedId/episodes dynamic route
 podcastRoutes.get('/episodes/:episodeId', async (req: Request, res: Response) => {

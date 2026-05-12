@@ -23,17 +23,35 @@
  * inline below the search bar.
  */
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AlertCircle, Loader2, Search } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { useCuratedPodcasts } from '../hooks/useCuratedPodcasts';
 import { usePodcastEpisodes } from '../hooks/usePodcastEpisodes';
 import { useAuth } from '../contexts/AuthContext';
 import { UpgradePrompt } from '../components/subscription/UpgradePrompt';
 import { isNativeApp } from '../lib/platform';
 import { PodcastEpisodeCard } from '../components/podcasts/PodcastEpisodeCard';
+import {
+  PodcastPlayer,
+  type PodcastPlayerHandle,
+} from '../components/podcasts/PodcastPlayer';
+import { TranscriptDrawer } from '../components/podcasts/TranscriptDrawer';
 import { cn } from '../lib/utils';
+import { apiFetch } from '../lib/api';
 import type { PodcastEpisode, PodcastFeed } from '../types/podcasts';
+
+function transcriptHitKey(hit: TranscriptHit): string {
+  return `${hit.episodeId}-${hit.startSec ?? 0}`;
+}
+
+async function fetchEpisode(episodeId: string): Promise<PodcastEpisode | null> {
+  const r = await apiFetch(`/api/podcasts/episodes/${encodeURIComponent(episodeId)}`);
+  if (!r.ok) throw new Error(`episode-fetch ${r.status}`);
+  const body = await r.json();
+  return (body.data ?? null) as PodcastEpisode | null;
+}
 
 interface TranscriptHit {
   episodeId: string;
@@ -43,9 +61,65 @@ interface TranscriptHit {
   startSec?: number;
 }
 
+interface TranscriptHitExpansionProps {
+  hit: TranscriptHit;
+  playerRef: React.MutableRefObject<PodcastPlayerHandle | null>;
+}
+
+/**
+ * Inline expansion shown under a clicked transcript hit. Fetches the
+ * underlying episode, mounts a PodcastPlayer that auto-seeks to the hit's
+ * timestamp + autoplays, and renders a TranscriptDrawer wired through the
+ * player ref so segment clicks seek the audio.
+ */
+function TranscriptHitExpansion({ hit, playerRef }: TranscriptHitExpansionProps) {
+  const { t } = useTranslation(['podcasts', 'common']);
+  const [currentSec, setCurrentSec] = useState(hit.startSec ?? 0);
+  const { data: episode, isLoading, error } = useQuery({
+    queryKey: ['podcast-episode', hit.episodeId],
+    queryFn: () => fetchEpisode(hit.episodeId),
+    staleTime: 5 * 60_000,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="border-t border-gray-700 p-3 flex items-center gap-2 text-xs text-gray-400">
+        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+        <span>{t('common:loading')}</span>
+      </div>
+    );
+  }
+  if (error || !episode || !episode.audioUrl) {
+    return (
+      <div className="border-t border-gray-700 p-3 text-xs text-[#ff0044]">
+        {t('podcasts:transcript.unavailable')}
+      </div>
+    );
+  }
+
+  return (
+    <div className="border-t border-gray-700 p-3 space-y-3">
+      <PodcastPlayer
+        ref={playerRef}
+        audioUrl={episode.audioUrl}
+        title={episode.title}
+        autoPlayOnMount
+        initialSeekSec={hit.startSec}
+        onTimeUpdate={setCurrentSec}
+      />
+      <TranscriptDrawer
+        contentType="podcast"
+        id={hit.episodeId}
+        onSeek={(sec) => playerRef.current?.seek(sec)}
+        currentSec={currentSec}
+      />
+    </div>
+  );
+}
+
 async function fetchTranscriptSearch(query: string): Promise<TranscriptHit[]> {
   const url = `/api/podcasts/transcripts/search?q=${encodeURIComponent(query)}`;
-  const r = await fetch(url);
+  const r = await apiFetch(url);
   if (!r.ok) throw new Error(`transcript-search ${r.status}`);
   const body = await r.json();
   return (body.data ?? []) as TranscriptHit[];
@@ -72,6 +146,8 @@ export function PodcastsPage() {
   const [transcriptSearchOn, setTranscriptSearchOn] = useState(false);
   const [transcriptHits, setTranscriptHits] = useState<TranscriptHit[]>([]);
   const [transcriptError, setTranscriptError] = useState<string | null>(null);
+  const [expandedHitKey, setExpandedHitKey] = useState<string | null>(null);
+  const playerRef = useRef<PodcastPlayerHandle | null>(null);
 
   const {
     data: feeds,
@@ -255,18 +331,38 @@ export function PodcastsPage() {
 
           {transcriptSearchOn && isPremium && displayedTranscriptHits.length > 0 && (
             <ul className="space-y-2">
-              {displayedTranscriptHits.map((hit) => (
-                <li
-                  key={`${hit.episodeId}-${hit.startSec ?? 0}`}
-                  className="rounded-md border border-gray-700 bg-gray-800 p-3"
-                >
-                  <p className="text-sm font-semibold text-white">
-                    {hit.episodeTitle}
-                  </p>
-                  <p className="text-xs text-gray-400">{hit.podcastTitle}</p>
-                  <p className="mt-1 text-xs text-gray-300">{hit.excerpt}</p>
-                </li>
-              ))}
+              {displayedTranscriptHits.map((hit) => {
+                const key = transcriptHitKey(hit);
+                const isExpanded = expandedHitKey === key;
+                return (
+                  <li
+                    key={key}
+                    className="rounded-md border border-gray-700 bg-gray-800"
+                  >
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setExpandedHitKey(isExpanded ? null : key)
+                      }
+                      aria-expanded={isExpanded}
+                      aria-label={`${hit.episodeTitle} — ${hit.podcastTitle}`}
+                      className="block w-full p-3 text-left hover:bg-gray-700/40 focus:outline-none focus:ring-1 focus:ring-[#00f0ff]/50 rounded-md cursor-pointer transition-colors"
+                    >
+                      <p className="text-sm font-semibold text-white">
+                        {hit.episodeTitle}
+                      </p>
+                      <p className="text-xs text-gray-400">{hit.podcastTitle}</p>
+                      <p className="mt-1 text-xs text-gray-300">{hit.excerpt}</p>
+                    </button>
+                    {isExpanded && (
+                      <TranscriptHitExpansion
+                        hit={hit}
+                        playerRef={playerRef}
+                      />
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           )}
 
