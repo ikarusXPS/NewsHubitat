@@ -82,8 +82,10 @@ apps/web/test-results/
 summary.html
 summary.json
 
-# GSD planning workflow scratch (intermediate doc-verifier outputs, manifests, dependabot dumps, etc.)
-.planning/tmp/
+# GSD planning workspace — kept locally for the GSD workflow, never published to a public repo.
+# Purged from public history 2026-05-12 (contained Stripe CLI test-mode webhook secrets,
+# bug investigations, and internal architecture decisions). Stays on disk; never re-add.
+.planning/
 
 # Diagnostic dumps at repo root (claude-code-diagnose.md and similar)
 /claude-code-diagnose.md
